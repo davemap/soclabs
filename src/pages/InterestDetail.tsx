@@ -126,32 +126,34 @@ const InterestDetail = () => {
                   >
                     <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
                       <CardContent className="p-5">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                            <span className="text-primary font-display font-bold text-sm">
-                              {member.name.split(" ").map((n) => n[0]).join("")}
-                            </span>
+                        <Link to={`/community/${member.id}`} className="group">
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                              <span className="text-primary font-display font-bold text-sm">
+                                {member.name.split(" ").map((n) => n[0]).join("")}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-display font-bold text-sm truncate group-hover:text-primary transition-colors">{member.name}</h3>
+                              <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <h3 className="font-display font-bold text-sm truncate">{member.name}</h3>
-                            <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
+                          <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {member.expertise.map((e) => (
+                              <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
+                                {e}
+                              </span>
+                            ))}
                           </div>
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {member.expertise.map((e) => (
-                            <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
-                              {e}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {member.projects.map((p) => (
-                            <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                              {p}
-                            </span>
-                          ))}
-                        </div>
+                          <div className="flex flex-wrap gap-1">
+                            {member.projects.map((p) => (
+                              <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                                {p}
+                              </span>
+                            ))}
+                          </div>
+                        </Link>
                       </CardContent>
                     </Card>
                   </motion.div>

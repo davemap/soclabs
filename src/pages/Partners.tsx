@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, X, ArrowRight } from "lucide-react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -160,12 +161,12 @@ const Partners = () => {
                     </div>
                   </div>
 
-                  <a
-                    href={selected.url}
+                  <Link
+                    to={`/community/${selected.id}`}
                     className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
                   >
-                    View Profile <ExternalLink className="h-3 w-3" />
-                  </a>
+                    View Profile <ArrowRight className="h-3 w-3" />
+                  </Link>
                 </motion.div>
               )}
             </AnimatePresence>

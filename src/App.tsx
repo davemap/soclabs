@@ -10,6 +10,7 @@ import LearningHub from "./pages/LearningHub";
 import ProjectDetail from "./pages/ProjectDetail";
 import Technologies from "./pages/Technologies";
 import Partners from "./pages/Partners";
+import MemberDetail from "./pages/MemberDetail";
 
 import About from "./pages/About";
 import Interests from "./pages/Interests";
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/learn" element={<LearningHub />} />
           <Route path="/technologies" element={<Technologies />} />
           <Route path="/partners" element={<Partners />} />
+          <Route path="/community/:id" element={<MemberDetail />} />
           
           <Route path="/interests" element={<Interests />} />
           <Route path="/interests/:slug" element={<InterestDetail />} />
