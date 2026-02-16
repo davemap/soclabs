@@ -20,31 +20,25 @@ const RegisterInterestBox = ({ interestName }: { interestName: string }) => {
   return (
     <button
       onClick={() => setRegistered(!registered)}
-      className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 text-left ${
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-300 shrink-0 ${
         registered
           ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
           : "border-border/60 bg-card hover:border-primary/40"
       }`}
+      title={registered ? "Interest registered" : `Register interest in ${interestName}`}
     >
       <div
-        className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
+        className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
           registered
             ? "border-primary bg-primary text-primary-foreground"
             : "border-border"
         }`}
       >
-        {registered && <Check className="h-5 w-5" />}
+        {registered && <Check className="h-4 w-4" />}
       </div>
-      <div>
-        <p className="font-display font-bold text-base">
-          {registered ? "Interest registered!" : `Register interest in ${interestName}`}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {registered
-            ? "You'll be connected with people and projects in this area."
-            : "Click to show your interest and connect with the community."}
-        </p>
-      </div>
+      <span className="text-sm font-display font-semibold whitespace-nowrap">
+        {registered ? "Interested" : "Register Interest"}
+      </span>
     </button>
   );
 };
@@ -101,10 +95,11 @@ const InterestDetail = () => {
               </span>
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{interest.name}</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">{interest.description}</p>
-
-            <RegisterInterestBox interestName={interest.name} />
+            <div className="flex items-start justify-between gap-6 mb-4">
+              <h1 className="text-4xl md:text-5xl font-display font-bold">{interest.name}</h1>
+              <RegisterInterestBox interestName={interest.name} />
+            </div>
+            <p className="text-lg text-muted-foreground leading-relaxed">{interest.description}</p>
           </motion.div>
 
           {/* Linked Technology */}
