@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -40,12 +41,14 @@ const Technologies = () => {
                   .filter((t) => t.category === cat)
                   .map((tech, i) => (
                     <ScrollReveal key={tech.name} delay={i * 0.06}>
-                      <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
-                        <CardContent className="p-5">
-                          <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{tech.description}</p>
-                        </CardContent>
-                      </Card>
+                      <Link to={`/technologies/${tech.id}`}>
+                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
+                          <CardContent className="p-5">
+                            <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{tech.description}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
                     </ScrollReveal>
                   ))}
               </div>
