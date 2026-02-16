@@ -61,7 +61,7 @@ const DesignDetail = () => {
             </Link>
           </motion.div>
 
-          <div className="flex gap-8 items-start">
+          <div className="flex gap-6 items-start max-w-5xl">
             {/* Main column */}
             <div className="flex-1 min-w-0">
               {/* Header */}
