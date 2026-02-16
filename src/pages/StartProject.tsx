@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, X, Search, Rocket, ExternalLink,
@@ -58,6 +59,7 @@ const slideVariants = {
 
 const StartProject = () => {
   const { toast } = useToast();
+  const [joinOpen, setJoinOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -212,10 +214,8 @@ const StartProject = () => {
                   Sign up to save your project, collaborate with the community, and track progress.
                 </p>
               </div>
-              <Button asChild size="sm" className="rounded-full">
-                <Link to="/about#join">
-                  Sign Up <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                </Link>
+              <Button size="sm" className="rounded-full" onClick={() => setJoinOpen(true)}>
+                Sign Up <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
               </Button>
             </CardContent>
           </Card>
@@ -517,6 +517,7 @@ const StartProject = () => {
           </div>
         </div>
       </section>
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </Layout>
   );
 };
