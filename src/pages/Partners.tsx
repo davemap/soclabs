@@ -133,9 +133,9 @@ const Partners = () => {
           <ScrollReveal className="max-w-5xl mx-auto mb-6">
             <div className="relative rounded-2xl border border-border/60 bg-card overflow-hidden shadow-sm">
               <ComposableMap
-                projectionConfig={{ scale: 170, center: [10, 10] }}
+                projectionConfig={{ scale: 147 }}
                 width={800}
-                height={380}
+                height={450}
                 style={{ background: "transparent", width: "100%", height: "auto" }}
               >
                 <ZoomableGroup
@@ -144,6 +144,7 @@ const Partners = () => {
                   onMoveEnd={handleMoveEnd}
                   minZoom={1}
                   maxZoom={12}
+                  translateExtent={[[-100, -50], [900, 500]]}
                 >
                   <Geographies geography={geoUrl}>
                     {({ geographies }) =>
