@@ -542,34 +542,70 @@ export const learningPhases: LearningPhase[] = [
 
 export const technologies = [
   {
+    id: "arm-cortex-m0",
     name: "ARM Cortex-M0",
     category: "Processor IP",
     description: "Ultra-low-power 32-bit processor ideal for education and small designs. Available through the ARM DesignStart programme.",
+    longDescription: "The ARM Cortex-M0 is the smallest and most energy-efficient ARM processor, featuring a 3-stage pipeline and Thumb instruction set. Its minimal gate count makes it ideal for FPGA prototyping and educational SoC designs. Available royalty-free through the ARM DesignStart programme.",
+    features: ["32-bit ARMv6-M architecture", "3-stage pipeline", "Thumb instruction set", "Minimal gate count (~12K gates)", "AMBA AHB-Lite interface", "Available via DesignStart"],
+    links: [{ label: "ARM DesignStart", url: "https://www.arm.com/resources/designstart" }],
   },
   {
+    id: "arm-cortex-m3",
     name: "ARM Cortex-M3",
     category: "Processor IP",
     description: "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production designs.",
+    longDescription: "The ARM Cortex-M3 brings a richer feature set including hardware multiply/divide, bit-banding, and a Nested Vectored Interrupt Controller (NVIC). Its 3-stage pipeline and Thumb-2 instruction set deliver high code density and performance suitable for production ASIC tapeouts.",
+    features: ["32-bit ARMv7-M architecture", "3-stage pipeline with branch speculation", "Thumb-2 instruction set", "Hardware multiply and divide", "NVIC with up to 240 interrupts", "Memory Protection Unit (MPU)"],
+    links: [{ label: "ARM Cortex-M3 Documentation", url: "https://developer.arm.com/Processors/Cortex-M3" }],
   },
   {
+    id: "vivado-quartus",
     name: "Vivado / Quartus",
     category: "FPGA Tools",
     description: "Industry-standard FPGA development suites from AMD/Xilinx and Intel/Altera for synthesis, simulation, and programming.",
+    longDescription: "Vivado (AMD/Xilinx) and Quartus Prime (Intel/Altera) are the primary FPGA development environments. They provide integrated synthesis, place & route, timing analysis, and on-chip debugging. Both offer free editions suitable for academic use with most common FPGA families.",
+    features: ["RTL synthesis and optimisation", "Place and route", "Static timing analysis", "Integrated logic analyser (ILA/SignalTap)", "IP integrator and block design", "Free academic licences available"],
+    links: [
+      { label: "AMD Vivado", url: "https://www.xilinx.com/products/design-tools/vivado.html" },
+      { label: "Intel Quartus", url: "https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html" },
+    ],
   },
   {
+    id: "yosys-openroad",
     name: "Yosys + OpenROAD",
     category: "Open Source EDA",
     description: "Open-source synthesis and place & route toolchain. Enables fully open ASIC and FPGA flows.",
+    longDescription: "Yosys is an open-source synthesis framework supporting Verilog and SystemVerilog. Combined with OpenROAD for place & route, it enables a fully open-source ASIC flow from RTL to GDSII. Also supports open FPGA flows targeting Lattice iCE40 and ECP5 devices via nextpnr.",
+    features: ["Open-source Verilog synthesis", "ASIC flow via OpenROAD", "FPGA flow via nextpnr", "Technology mapping", "Formal verification via sby", "Active community and development"],
+    links: [
+      { label: "Yosys GitHub", url: "https://github.com/YosysHQ/yosys" },
+      { label: "OpenROAD", url: "https://openroad.readthedocs.io/" },
+    ],
   },
   {
+    id: "cadence-synopsys",
     name: "Cadence / Synopsys",
     category: "ASIC Tools",
     description: "Commercial EDA tools for synthesis, physical design, and sign-off. Available through academic licensing programmes.",
+    longDescription: "Cadence and Synopsys provide the industry-standard toolchains for ASIC design. From logic synthesis (Genus/Design Compiler) through physical design (Innovus/ICC2) to sign-off (Tempus/PrimeTime), these tools enable production-quality tapeouts. Academic licences are available through university programmes.",
+    features: ["Logic synthesis (Genus / Design Compiler)", "Physical design (Innovus / ICC2)", "Timing sign-off (Tempus / PrimeTime)", "DRC/LVS (Calibre / IC Validator)", "Power analysis (Voltus / PrimePower)", "Academic licensing available"],
+    links: [
+      { label: "Cadence Academic", url: "https://www.cadence.com/en_US/home/company/cadence-academic-network.html" },
+      { label: "Synopsys University", url: "https://www.synopsys.com/university.html" },
+    ],
   },
   {
+    id: "uvm-cocotb",
     name: "UVM / cocotb",
     category: "Verification",
     description: "Universal Verification Methodology (SystemVerilog) and cocotb (Python) for comprehensive design verification.",
+    longDescription: "UVM is the industry-standard verification methodology built on SystemVerilog, providing a structured framework for creating reusable testbenches. cocotb offers a Python-based alternative that lowers the barrier to entry while still supporting complex verification scenarios with coroutine-driven test flows.",
+    features: ["UVM: structured verification methodology", "Constrained-random stimulus generation", "Functional coverage collection", "cocotb: Python-based testbenches", "Coroutine-driven test flows", "Works with major simulators"],
+    links: [
+      { label: "UVM Reference", url: "https://www.accellera.org/activities/working-groups/uvm" },
+      { label: "cocotb GitHub", url: "https://github.com/cocotb/cocotb" },
+    ],
   },
 ];
 

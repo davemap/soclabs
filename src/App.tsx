@@ -11,6 +11,7 @@ import Projects from "./pages/Projects";
 import LearningHub from "./pages/LearningHub";
 import ProjectDetail from "./pages/ProjectDetail";
 import Technologies from "./pages/Technologies";
+import TechnologyDetail from "./pages/TechnologyDetail";
 import Partners from "./pages/Partners";
 import MemberDetail from "./pages/MemberDetail";
 
@@ -37,7 +38,8 @@ const App = () => (
           <Route path="/projects/start" element={<StartProject />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/learn" element={<LearningHub />} />
-          <Route path="/technologies" element={<Technologies />} />
+           <Route path="/technologies" element={<Technologies />} />
+           <Route path="/technologies/:id" element={<TechnologyDetail />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/community/:id" element={<MemberDetail />} />
           
