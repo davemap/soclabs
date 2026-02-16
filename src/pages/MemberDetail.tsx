@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
-import { communityMembers, communityProjects } from "@/data/mockData";
+import { communityMembers, communityProjects, partners } from "@/data/mockData";
 import { interests } from "@/data/interests";
 
 const MemberDetail = () => {
@@ -33,6 +33,10 @@ const MemberDetail = () => {
 
   const memberInterests = interests.filter((i) =>
     member.interests.includes(i.slug)
+  );
+
+  const memberOrgs = partners.filter((p) =>
+    member.organisations?.includes(p.id)
   );
 
   const statusColor = (status: string) => {
@@ -96,7 +100,22 @@ const MemberDetail = () => {
               ))}
             </div>
 
-            <p className="text-muted-foreground leading-relaxed">{member.bio}</p>
+            <p className="text-muted-foreground leading-relaxed mb-4">{member.bio}</p>
+
+            {memberOrgs.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {memberOrgs.map((org) => (
+                  <Link
+                    key={org.id}
+                    to={`/partners/${org.id}`}
+                    className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
+                  >
+                    <Building2 className="h-3 w-3" />
+                    {org.name}
+                  </Link>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Interests */}

@@ -13,6 +13,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import Technologies from "./pages/Technologies";
 import TechnologyDetail from "./pages/TechnologyDetail";
 import Partners from "./pages/Partners";
+import OrganisationDetail from "./pages/OrganisationDetail";
 import MemberDetail from "./pages/MemberDetail";
 
 import StartProject from "./pages/StartProject";
@@ -41,6 +42,7 @@ const App = () => (
            <Route path="/technologies" element={<Technologies />} />
            <Route path="/technologies/:id" element={<TechnologyDetail />} />
           <Route path="/partners" element={<Partners />} />
+           <Route path="/partners/:id" element={<OrganisationDetail />} />
           <Route path="/community/:id" element={<MemberDetail />} />
           
           <Route path="/interests" element={<Interests />} />
