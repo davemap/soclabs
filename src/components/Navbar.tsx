@@ -11,7 +11,7 @@ const navLinks = [
   { to: "/learn", label: "Learning Hub" },
   { to: "/technologies", label: "Technologies" },
   { to: "/interests", label: "Interests" },
-  { to: "/partners", label: "Partners" },
+  { to: "/partners", label: "Community" },
   { to: "/map", label: "Community Map" },
   { to: "/about", label: "About" },
 ];
@@ -23,7 +23,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight">
+        <Link to="/" className="flex items-center gap-2.5 font-nav font-bold text-lg tracking-tight">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Cpu className="h-4 w-4 text-primary-foreground" />
           </div>
@@ -36,7 +36,7 @@ const Navbar = () => {
               key={link.to}
               to={link.to}
               className={cn(
-                "px-3 py-2 text-sm rounded-lg transition-all",
+                "px-3 py-2 text-sm rounded-lg transition-all font-nav",
                 location.pathname === link.to
                   ? "text-primary bg-primary/10 font-semibold"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -67,7 +67,7 @@ const Navbar = () => {
                 to={link.to}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "px-3 py-2.5 text-sm rounded-lg transition-all",
+                  "px-3 py-2.5 text-sm rounded-lg transition-all font-nav",
                   location.pathname === link.to
                     ? "text-primary bg-primary/10 font-semibold"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
