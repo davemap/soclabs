@@ -102,7 +102,7 @@ const Index = () => {
       </section>
 
       {/* Why Join */}
-      <section className="py-24 bg-muted/40 accent-stripe border-y border-border">
+      <section className="relative py-24 bg-muted/40 accent-stripe border-y border-border">
         <div className="container mx-auto px-4">
           <ScrollReveal>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
@@ -139,25 +139,26 @@ const Index = () => {
               </ScrollReveal>
             ))}
           </div>
+
+          {/* Floating Stats Bar */}
+          <ScrollReveal className="mt-16">
+            <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-background/80 backdrop-blur-sm shadow-lg p-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {stats.map((stat, i) => (
+                  <div key={stat.label} className="text-center">
+                    <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
+                    <div className="text-xs text-muted-foreground mt-1 font-medium">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+
           <ScrollReveal className="text-center mt-12">
             <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
               <Link to="/about#join">Join the Community</Link>
             </Button>
           </ScrollReveal>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="border-y border-border">
-        <div className="container mx-auto px-4 py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <ScrollReveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="text-4xl md:text-5xl font-display font-bold text-gradient">{stat.value}</div>
-                <div className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</div>
-              </ScrollReveal>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -168,11 +169,11 @@ const Index = () => {
             <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
               <h2 className="text-3xl font-display font-bold mb-4">Ready to Build Your SoC?</h2>
               <p className="text-muted-foreground mb-8 leading-relaxed">
-                Join our community, fork a reference design, and start building custom silicon today.
+                Define your project, pick a reference design, and start building custom silicon today.
               </p>
               <Button asChild size="lg" className="rounded-full px-8">
-                <Link to="/about#join">
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/projects/start">
+                  Start a Project <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
