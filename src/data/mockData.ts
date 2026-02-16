@@ -34,6 +34,10 @@ export const referenceDesigns = [
     ],
     relatedTechnologies: ["ARM Cortex-M0", "Vivado / Quartus", "Yosys + OpenROAD", "UVM / cocotb"],
     developmentProjectId: "nanosoc-dev",
+    provenIn: [
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)" },
+      { type: "FPGA", details: "Intel Cyclone V" },
+    ],
   },
   {
     id: "ecosoc",
@@ -79,6 +83,10 @@ export const referenceDesigns = [
     ],
     relatedTechnologies: ["ARM Cortex-M3", "Cadence / Synopsys", "Vivado / Quartus", "UVM / cocotb"],
     developmentProjectId: "ecosoc-dev",
+    provenIn: [
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
+      { type: "ASIC", details: "TSMC 65nm (via Europractice)" },
+    ],
   },
 ];
 

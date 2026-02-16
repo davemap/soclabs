@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Github, ExternalLink, Cpu, ArrowRight } from "lucide-react";
+import { Github, ExternalLink, Cpu, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -43,6 +44,17 @@ const Designs = () => {
                         <p className="text-primary font-medium text-sm">{design.tagline}</p>
                       </div>
                     </div>
+
+                    {design.provenIn && design.provenIn.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-5">
+                        {design.provenIn.map((p) => (
+                          <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-amber-500/50 text-amber-400" : "border-emerald-500/50 text-emerald-400"}`}>
+                            <CheckCircle2 className="h-3 w-3" />
+                            {p.type}: {p.details}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
 
                     <p className="text-muted-foreground mb-6 leading-relaxed">{design.description}</p>
 
