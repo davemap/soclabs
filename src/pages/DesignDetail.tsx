@@ -79,6 +79,20 @@ const DesignDetail = () => {
                 <Badge key={t} variant="outline">{t}</Badge>
               ))}
             </div>
+            {/* Get Started */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild className="rounded-full">
+                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" /> Getting Started Guide
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4 mr-2" /> View on GitHub
+                </a>
+              </Button>
+            </div>
+
             {design.provenIn && design.provenIn.length > 0 && (
               <div className="mt-4 p-4 rounded-lg border border-border bg-muted/30">
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
@@ -93,20 +107,6 @@ const DesignDetail = () => {
                 </div>
               </div>
             )}
-
-            {/* Get Started */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="rounded-full">
-                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" /> Getting Started Guide
-                </a>
-              </Button>
-              <Button asChild variant="outline" className="rounded-full">
-                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4 mr-2" /> View on GitHub
-                </a>
-              </Button>
-            </div>
           </motion.div>
 
           <div className="max-w-4xl space-y-12">
