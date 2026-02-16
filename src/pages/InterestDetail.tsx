@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink, Wrench } from "lucide-react";
+import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink, Wrench, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -11,6 +12,41 @@ const categoryColor: Record<string, string> = {
   Technologies: "bg-primary/10 text-primary",
   "Research Fields": "bg-coral/10 text-coral",
   Activities: "bg-violet/10 text-violet",
+};
+
+const RegisterInterestBox = ({ interestName }: { interestName: string }) => {
+  const [registered, setRegistered] = useState(false);
+
+  return (
+    <button
+      onClick={() => setRegistered(!registered)}
+      className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-300 text-left ${
+        registered
+          ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+          : "border-border/60 bg-card hover:border-primary/40"
+      }`}
+    >
+      <div
+        className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center shrink-0 transition-all duration-200 ${
+          registered
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-border"
+        }`}
+      >
+        {registered && <Check className="h-5 w-5" />}
+      </div>
+      <div>
+        <p className="font-display font-bold text-base">
+          {registered ? "Interest registered!" : `Register interest in ${interestName}`}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {registered
+            ? "You'll be connected with people and projects in this area."
+            : "Click to show your interest and connect with the community."}
+        </p>
+      </div>
+    </button>
+  );
 };
 
 const InterestDetail = () => {
@@ -66,7 +102,9 @@ const InterestDetail = () => {
             </div>
 
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{interest.name}</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">{interest.description}</p>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">{interest.description}</p>
+
+            <RegisterInterestBox interestName={interest.name} />
           </motion.div>
 
           {/* Linked Technology */}

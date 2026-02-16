@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ArrowRight, Sparkles, Search, Cpu, FlaskConical, Users, ExternalLink } from "lucide-react";
+import { Check, ArrowRight, Sparkles, Search, Cpu, FlaskConical, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
@@ -56,50 +56,43 @@ const InterestCard = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={cn(
-        "group relative rounded-xl border bg-card transition-all duration-300",
-        isSelected ? `${colors.border} shadow-md ${colors.glow}` : `border-border/50 ${colors.card}`
-      )}
     >
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex-1 min-w-0">
-            <span className={cn("text-[10px] font-semibold uppercase tracking-wider", colors.icon)}>
-              {interest.category}
-            </span>
-            <h3 className="font-display font-bold text-base mt-1">{interest.name}</h3>
+      <Link
+        to={`/interests/${interest.slug}`}
+        className={cn(
+          "group relative block rounded-xl border bg-card transition-all duration-300",
+          isSelected ? `${colors.border} shadow-md ${colors.glow}` : `border-border/50 ${colors.card}`
+        )}
+      >
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1 min-w-0">
+              <span className={cn("text-[10px] font-semibold uppercase tracking-wider", colors.icon)}>
+                {interest.category}
+              </span>
+              <h3 className="font-display font-bold text-base mt-1 group-hover:text-primary transition-colors">{interest.name}</h3>
+            </div>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onToggle();
+              }}
+              className={cn(
+                "w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
+                isSelected
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border/60 hover:border-primary/50"
+              )}
+            >
+              {isSelected && <Check className="h-3.5 w-3.5" />}
+            </button>
           </div>
-          <button
-            onClick={onToggle}
-            className={cn(
-              "w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
-              isSelected
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border/60 hover:border-primary/50"
-            )}
-          >
-            {isSelected && <Check className="h-3.5 w-3.5" />}
-          </button>
+          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+            {interest.description}
+          </p>
         </div>
-        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4">
-          {interest.description}
-        </p>
-        <div className="flex items-center justify-between">
-          <Link
-            to={`/interests/${interest.slug}`}
-            className={cn(
-              "inline-flex items-center gap-1.5 text-xs font-medium transition-colors",
-              colors.icon,
-              "opacity-70 group-hover:opacity-100"
-            )}
-          >
-            Explore <ExternalLink className="h-3 w-3" />
-          </Link>
-          {interest.technologyName && (
-            <span className="text-[10px] text-muted-foreground/60">Links to tech page</span>
-          )}
-        </div>
-      </div>
+      </Link>
     </motion.div>
   );
 };
