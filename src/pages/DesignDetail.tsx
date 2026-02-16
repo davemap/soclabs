@@ -79,20 +79,6 @@ const DesignDetail = () => {
                 <Badge key={t} variant="outline">{t}</Badge>
               ))}
             </div>
-            {/* Get Started */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild className="rounded-full">
-                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" /> Getting Started Guide
-                </a>
-              </Button>
-              <Button asChild variant="outline" className="rounded-full">
-                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4 mr-2" /> View on GitHub
-                </a>
-              </Button>
-            </div>
-
             {design.provenIn && design.provenIn.length > 0 && (
               <div className="mt-4 p-4 rounded-lg border border-border bg-muted/30">
                 <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
@@ -109,103 +95,128 @@ const DesignDetail = () => {
             )}
           </motion.div>
 
-          <div className="max-w-4xl space-y-12">
-            {/* Architecture Overview */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-display font-bold mb-4">Architecture Overview</h2>
-              <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                {design.architectureOverview}
-              </div>
-            </motion.div>
+          <div className="flex gap-8 items-start">
+            {/* Main content */}
+            <div className="flex-1 min-w-0 max-w-4xl space-y-12">
+              {/* Architecture Overview */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <h2 className="text-2xl font-display font-bold mb-4">Architecture Overview</h2>
+                <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                  {design.architectureOverview}
+                </div>
+              </motion.div>
 
-            {/* Block Diagram */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-display font-bold mb-4">System Blocks</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {design.blockDiagram.map((block) => (
-                  <div
-                    key={block.name}
-                    className={`flex items-center gap-2.5 p-3 rounded-lg border ${blockTypeColor[block.type] || "bg-muted text-foreground border-border"}`}
-                  >
-                    {blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}
-                    <span className="text-sm font-medium">{block.name}</span>
+              {/* Block Diagram */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <h2 className="text-2xl font-display font-bold mb-4">System Blocks</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {design.blockDiagram.map((block) => (
+                    <div
+                      key={block.name}
+                      className={`flex items-center gap-2.5 p-3 rounded-lg border ${blockTypeColor[block.type] || "bg-muted text-foreground border-border"}`}
+                    >
+                      {blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}
+                      <span className="text-sm font-medium">{block.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Features & Use Cases */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h2 className="text-2xl font-display font-bold mb-4">Key Features</h2>
+                  <ul className="space-y-2">
+                    {design.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-muted-foreground">
+                        <ArrowRight className="h-3.5 w-3.5 mt-1 text-primary shrink-0" />
+                        <span className="text-sm">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-display font-bold mb-4">Use Cases</h2>
+                  <ul className="space-y-2">
+                    {design.useCases.map((u) => (
+                      <li key={u} className="flex items-start gap-2 text-muted-foreground">
+                        <ArrowRight className="h-3.5 w-3.5 mt-1 text-coral shrink-0" />
+                        <span className="text-sm">{u}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </motion.div>
+
+              {/* Related Technologies */}
+              {relatedTechs.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                  <h2 className="text-2xl font-display font-bold mb-4">Technologies & Tools</h2>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {relatedTechs.map((tech) => (
+                      <Link to="/technologies" key={tech.name}>
+                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40">
+                          <CardContent className="p-5">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-display font-semibold">{tech.name}</h3>
+                              <Badge variant="outline" className="text-xs">{tech.category}</Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{tech.description}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </motion.div>
+                </motion.div>
+              )}
 
-            {/* Features & Use Cases */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-2xl font-display font-bold mb-4">Key Features</h2>
-                <ul className="space-y-2">
-                  {design.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-muted-foreground">
-                      <ArrowRight className="h-3.5 w-3.5 mt-1 text-primary shrink-0" />
-                      <span className="text-sm">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h2 className="text-2xl font-display font-bold mb-4">Use Cases</h2>
-                <ul className="space-y-2">
-                  {design.useCases.map((u) => (
-                    <li key={u} className="flex items-start gap-2 text-muted-foreground">
-                      <ArrowRight className="h-3.5 w-3.5 mt-1 text-coral shrink-0" />
-                      <span className="text-sm">{u}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
+              {/* Community Projects */}
+              {relatedProjects.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                  <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
+                  <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {relatedProjects.map((project) => (
+                      <Link to={`/projects/${project.id}`} key={project.id}>
+                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
+                          <CardContent className="p-5">
+                            <h3 className="font-display font-semibold mb-1">{project.title}</h3>
+                            <p className="text-xs text-primary mb-2">{project.author} — {project.institution}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                            <div className="flex gap-2 mt-3">
+                              <Badge variant="outline" className="text-xs">{project.technology}</Badge>
+                              <Badge variant="secondary" className="text-xs">{project.status}</Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
 
-            {/* Related Technologies */}
-            {relatedTechs.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">Technologies & Tools</h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {relatedTechs.map((tech) => (
-                    <Link to="/technologies" key={tech.name}>
-                      <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40">
-                        <CardContent className="p-5">
-                          <div className="flex items-center justify-between mb-1">
-                            <h3 className="font-display font-semibold">{tech.name}</h3>
-                            <Badge variant="outline" className="text-xs">{tech.category}</Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">{tech.description}</p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Community Projects */}
-            {relatedProjects.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
-                <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {relatedProjects.map((project) => (
-                    <Link to={`/projects/${project.id}`} key={project.id}>
-                      <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
-                        <CardContent className="p-5">
-                          <h3 className="font-display font-semibold mb-1">{project.title}</h3>
-                          <p className="text-xs text-primary mb-2">{project.author} — {project.institution}</p>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                          <div className="flex gap-2 mt-3">
-                            <Badge variant="outline" className="text-xs">{project.technology}</Badge>
-                            <Badge variant="secondary" className="text-xs">{project.status}</Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+            {/* Sticky sidebar */}
+            <aside className="hidden lg:block w-56 shrink-0 sticky top-24">
+              <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
+                <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
+                <Button asChild className="w-full rounded-lg justify-start" size="sm">
+                  <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" /> Docs & Guide
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
+                  <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4 mr-2" /> GitHub
+                  </a>
+                </Button>
+                <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+                  <Link to="/projects/start">
+                    <ArrowRight className="h-4 w-4 mr-2" /> Start a Project
+                  </Link>
+                </Button>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
