@@ -53,7 +53,6 @@ const TopicCard = ({ topic, isActive, onClick }: { topic: LearningTopic; isActiv
 );
 
 const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [activeTopic, setActiveTopic] = useState<string | null>(null);
   const Icon = iconMap[phase.icon] || Cpu;
 
@@ -62,21 +61,17 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
   }, []);
 
   return (
-    <ScrollReveal delay={index * 0.06}>
-      <div className={cn(
-        "rounded-2xl border transition-all duration-300",
-        isOpen ? "border-primary/30 bg-card shadow-md" : "border-border/60 bg-card/80 hover:border-border"
-      )}>
+    <motion.div
+      key={phase.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="rounded-2xl border border-primary/30 bg-card shadow-md">
         {/* Phase header */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full text-left p-6 md:p-7 flex items-center gap-4"
-        >
-          <div className={cn(
-            "p-3 rounded-xl transition-colors",
-            isOpen ? "bg-primary/15" : "bg-muted"
-          )}>
-            <Icon className={cn("h-5 w-5", isOpen ? "text-primary" : "text-muted-foreground")} />
+        <div className="p-6 md:p-7 flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-primary/15">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -84,69 +79,48 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
               <span className="text-xs text-muted-foreground">· {phase.topics.length} topics</span>
             </div>
             <h2 className="text-xl font-display font-bold">{phase.title}</h2>
-            {!isOpen && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{phase.description}</p>
-            )}
           </div>
-          <ChevronDown className={cn(
-            "h-5 w-5 text-muted-foreground transition-transform duration-300 shrink-0",
-            isOpen && "rotate-180"
-          )} />
-        </button>
+        </div>
 
         {/* Phase content */}
-        <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <div className="px-6 md:px-7 pb-6 md:pb-7">
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">{phase.description}</p>
+        <div className="px-6 md:px-7 pb-6 md:pb-7">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-6">{phase.description}</p>
 
-                {/* Quick nav */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {phase.topics.map((topic) => (
-                    <a
-                      key={topic.id}
-                      href={`#${topic.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveTopic(topic.id);
-                        document.getElementById(topic.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                      }}
-                      className={cn(
-                        "text-xs px-3 py-1.5 rounded-full border transition-all",
-                        activeTopic === topic.id
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
-                      )}
-                    >
-                      {topic.title}
-                    </a>
-                  ))}
-                </div>
+          {/* Quick nav */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {phase.topics.map((topic) => (
+              <button
+                key={topic.id}
+                onClick={() => {
+                  setActiveTopic(topic.id);
+                  document.getElementById(topic.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                }}
+                className={cn(
+                  "text-xs px-3 py-1.5 rounded-full border transition-all",
+                  activeTopic === topic.id
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
+                )}
+              >
+                {topic.title}
+              </button>
+            ))}
+          </div>
 
-                {/* Topic cards */}
-                <div className="space-y-3">
-                  {phase.topics.map((topic) => (
-                    <TopicCard
-                      key={topic.id}
-                      topic={topic}
-                      isActive={activeTopic === topic.id}
-                      onClick={() => toggleTopic(topic.id)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Topic cards */}
+          <div className="space-y-3">
+            {phase.topics.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                topic={topic}
+                isActive={activeTopic === topic.id}
+                onClick={() => toggleTopic(topic.id)}
+              />
+            ))}
+          </div>
+        </div>
       </div>
-    </ScrollReveal>
+    </motion.div>
   );
 };
 
@@ -155,7 +129,6 @@ const LearningHub = () => {
 
   const goTo = (index: number) => {
     setActivePhase(index);
-    document.getElementById(`phase-${learningPhases[index].id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -245,13 +218,9 @@ const LearningHub = () => {
             </div>
           </ScrollReveal>
 
-          {/* Phase sections */}
-          <div className="max-w-3xl mx-auto space-y-4">
-            {learningPhases.map((phase, i) => (
-              <div key={phase.id} id={`phase-${phase.id}`} className="scroll-mt-24">
-                <PhaseSection phase={phase} index={i} />
-              </div>
-            ))}
+          {/* Active phase */}
+          <div className="max-w-3xl mx-auto">
+            <PhaseSection phase={learningPhases[activePhase]} index={activePhase} />
           </div>
         </div>
       </section>
