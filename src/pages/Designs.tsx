@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Github, ExternalLink, Cpu, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Github, ExternalLink, Cpu, ArrowRight, CheckCircle2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,9 +18,14 @@ const Designs = () => {
             className="max-w-3xl mx-auto text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Reference <span className="text-gradient">SoC Designs</span></h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               Proven ARM Cortex-M based architectures ready to fork, extend, and build upon. Each design includes full RTL source, documentation, and synthesis scripts.
             </p>
+            <Button asChild className="rounded-full">
+              <Link to="/designs/submit">
+                <Plus className="h-4 w-4 mr-2" /> Submit Your SoC
+              </Link>
+            </Button>
           </motion.div>
 
           <div className="space-y-16 max-w-4xl mx-auto">
