@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 interface JoinCommunityDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onComplete?: () => void;
 }
 
 const STEPS = [
@@ -20,7 +21,7 @@ const STEPS = [
   { label: "ORCID", icon: GraduationCap },
 ];
 
-const JoinCommunityDialog = ({ open, onOpenChange }: JoinCommunityDialogProps) => {
+const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDialogProps) => {
   const [step, setStep] = useState(0);
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
@@ -62,7 +63,7 @@ const JoinCommunityDialog = ({ open, onOpenChange }: JoinCommunityDialogProps) =
   };
 
   const handleSubmit = () => {
-    // For now just close — backend integration later
+    onComplete?.();
     handleClose(false);
   };
 

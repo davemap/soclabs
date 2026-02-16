@@ -19,9 +19,10 @@ import Layout from "@/components/Layout";
 import { referenceDesigns, technologies, communityMembers } from "@/data/mockData";
 import { interests } from "@/data/interests";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const stepLabels = [
+  "Sign Up",
   "Project Details",
   "Reference SoC",
   "Target & Timeline",
@@ -60,6 +61,7 @@ const slideVariants = {
 const StartProject = () => {
   const { toast } = useToast();
   const [joinOpen, setJoinOpen] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
 
@@ -123,14 +125,15 @@ const StartProject = () => {
   const removeEmailInvite = (email: string) => setEmailInvites((prev) => prev.filter((e) => e !== email));
 
   const canProceed = () => {
-    if (step === 0) return title.trim().length > 0;
-    if (step === 1) return referenceSoc.length > 0;
+    if (step === 0) return isSignedUp;
+    if (step === 1) return title.trim().length > 0;
+    if (step === 2) return referenceSoc.length > 0;
     return true;
   };
 
   const goNext = () => {
     if (!canProceed()) {
-      toast({ title: "Please complete this step", description: step === 0 ? "Project title is required." : "Please select a reference SoC.", variant: "destructive" });
+      toast({ title: "Please complete this step", description: step === 0 ? "Please sign up first." : step === 1 ? "Project title is required." : "Please select a reference SoC.", variant: "destructive" });
       return;
     }
     if (step < TOTAL_STEPS - 1) { setDirection(1); setStep((s) => s + 1); }
@@ -205,21 +208,6 @@ const StartProject = () => {
             </div>
           </div>
 
-          {/* Account CTA */}
-          <Card className="mb-8 border-primary/20 bg-primary/5">
-            <CardContent className="p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex-1">
-                <h3 className="font-display font-semibold text-sm mb-1">Create an Account</h3>
-                <p className="text-xs text-muted-foreground">
-                  Sign up to save your project, collaborate with the community, and track progress.
-                </p>
-              </div>
-              <Button size="sm" className="rounded-full" onClick={() => setJoinOpen(true)}>
-                Sign Up <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
-            </CardContent>
-          </Card>
-
           {/* Step Content */}
           <div className="min-h-[380px]">
             <AnimatePresence mode="wait" custom={direction}>
@@ -233,6 +221,32 @@ const StartProject = () => {
                 transition={{ duration: 0.25, ease: "easeInOut" }}
               >
                 {step === 0 && (
+                  <Card>
+                    <CardContent className="p-8 text-center space-y-6">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center">
+                        <UserPlus className="h-8 w-8 text-primary" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-display font-bold mb-2">Create Your Account</h2>
+                        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+                          Sign up to save your project, collaborate with the community, and track progress. You'll need an account before starting your project.
+                        </p>
+                      </div>
+                      {isSignedUp ? (
+                        <div className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary/10 text-primary font-medium">
+                          <Check className="h-5 w-5" />
+                          Account created — you're ready to go!
+                        </div>
+                      ) : (
+                        <Button size="lg" className="rounded-full px-10" onClick={() => setJoinOpen(true)}>
+                          Sign Up <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {step === 1 && (
                   <Card>
                     <CardContent className="p-6 space-y-5">
                       <h2 className="text-lg font-display font-semibold">Project Details</h2>
@@ -248,7 +262,7 @@ const StartProject = () => {
                   </Card>
                 )}
 
-                {step === 1 && (
+                {step === 2 && (
                   <Card>
                     <CardContent className="p-6 space-y-5">
                       <h2 className="text-lg font-display font-semibold">Reference SoC *</h2>
@@ -275,7 +289,7 @@ const StartProject = () => {
                   </Card>
                 )}
 
-                {step === 2 && (
+                {step === 3 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -335,7 +349,7 @@ const StartProject = () => {
                   </div>
                 )}
 
-                {step === 3 && (
+                {step === 4 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -407,7 +421,7 @@ const StartProject = () => {
                   </div>
                 )}
 
-                {step === 4 && (
+                {step === 5 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -517,7 +531,7 @@ const StartProject = () => {
           </div>
         </div>
       </section>
-      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} onComplete={() => setIsSignedUp(true)} />
     </Layout>
   );
 };
