@@ -19,7 +19,7 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative overflow-hidden circuit-dots">
+      <section className="relative overflow-hidden subtle-grid">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="container mx-auto px-4 py-24 md:py-36 relative">
           <motion.div
@@ -28,19 +28,19 @@ const Index = () => {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto text-center"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium mb-6">
               <Cpu className="h-3 w-3" />
               Open-Source Silicon Community
             </div>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
               Build Your Own{" "}
-              <span className="text-gradient glow-text">System-on-Chip</span>
+              <span className="text-gradient">System-on-Chip</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="glow-cyan">
+              <Button asChild size="lg">
                 <Link to="/designs">
                   Explore Designs <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -54,7 +54,7 @@ const Index = () => {
       </section>
 
       {/* Stats */}
-      <section className="border-y border-border bg-card/30">
+      <section className="border-y border-border bg-muted/30">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
@@ -100,19 +100,19 @@ const Index = () => {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Card className="h-full border-border hover:border-primary/50 transition-colors bg-card/80">
+                <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <h3 className="text-xl font-bold text-foreground">{design.name}</h3>
+                        <h3 className="text-xl font-bold">{design.name}</h3>
                         <p className="text-sm text-primary font-mono">{design.tagline}</p>
                       </div>
-                      <Cpu className="h-8 w-8 text-primary/50" />
+                      <Cpu className="h-8 w-8 text-primary/40" />
                     </div>
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{design.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {design.features.slice(0, 3).map((f) => (
-                        <span key={f} className="text-xs px-2 py-1 rounded bg-primary/10 text-primary font-mono">
+                        <span key={f} className="text-xs px-2 py-1 rounded-md bg-primary/10 text-primary font-medium">
                           {f}
                         </span>
                       ))}
@@ -136,7 +136,7 @@ const Index = () => {
       </section>
 
       {/* Why Join */}
-      <section className="py-20 bg-card/30 border-y border-border">
+      <section className="py-20 bg-muted/30 border-y border-border">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Why Join SoC Labs?</h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -184,13 +184,13 @@ const Index = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="max-w-xl mx-auto p-8 rounded-xl border border-primary/20 bg-gradient-to-b from-primary/5 to-transparent"
+            className="max-w-xl mx-auto p-8 rounded-xl border border-primary/15 bg-gradient-to-b from-primary/5 to-transparent"
           >
             <h2 className="text-2xl font-bold mb-3">Ready to Build Your SoC?</h2>
             <p className="text-muted-foreground mb-6">
               Join our community, fork a reference design, and start building custom silicon today.
             </p>
-            <Button asChild size="lg" className="glow-cyan">
+            <Button asChild size="lg">
               <Link to="/about#join">
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

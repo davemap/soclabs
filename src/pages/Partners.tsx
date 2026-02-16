@@ -30,7 +30,7 @@ const Partners = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
               >
-                <Card className="h-full border-border bg-card/80 hover:border-primary/30 transition-colors">
+                <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardContent className="p-6 flex flex-col h-full">
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                       <span className="text-primary font-bold font-mono text-lg">{partner.name[0]}</span>

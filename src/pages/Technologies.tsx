@@ -38,7 +38,7 @@ const Technologies = () => {
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.05 }}
                     >
-                      <Card className="border-border bg-card/80 hover:border-primary/30 transition-colors">
+                      <Card className="hover:shadow-md transition-shadow">
                         <CardContent className="p-5">
                           <h3 className="font-semibold mb-1">{tech.name}</h3>
                           <p className="text-sm text-muted-foreground">{tech.description}</p>
@@ -56,7 +56,7 @@ const Technologies = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="rounded-xl border border-border bg-card/80 p-6"
+              className="rounded-xl border border-border bg-card p-6 shadow-sm"
             >
               <h2 className="text-xl font-bold mb-3">FPGA Prototyping Process</h2>
               <ol className="space-y-3">
@@ -81,7 +81,7 @@ const Technologies = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="rounded-xl border border-border bg-card/80 p-6"
+              className="rounded-xl border border-border bg-card p-6 shadow-sm"
             >
               <h2 className="text-xl font-bold mb-3">ASIC Tapeout Process</h2>
               <ol className="space-y-3">

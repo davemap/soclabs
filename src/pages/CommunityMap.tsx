@@ -27,7 +27,7 @@ const CommunityMap = () => {
             </p>
           </motion.div>
 
-          <div className="relative max-w-5xl mx-auto rounded-xl border border-border bg-card/50 overflow-hidden">
+          <div className="relative max-w-5xl mx-auto rounded-xl border border-border bg-card overflow-hidden shadow-sm">
             <ComposableMap
               projectionConfig={{ scale: 147 }}
               className="w-full h-auto"
@@ -39,12 +39,12 @@ const CommunityMap = () => {
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill="hsl(220, 15%, 14%)"
-                      stroke="hsl(220, 15%, 20%)"
+                      fill="hsl(210, 15%, 93%)"
+                      stroke="hsl(210, 15%, 85%)"
                       strokeWidth={0.5}
                       style={{
                         default: { outline: "none" },
-                        hover: { fill: "hsl(220, 15%, 18%)", outline: "none" },
+                        hover: { fill: "hsl(210, 15%, 88%)", outline: "none" },
                         pressed: { outline: "none" },
                       }}
                     />
@@ -58,11 +58,11 @@ const CommunityMap = () => {
                   onClick={() => setSelected(member)}
                   style={{ cursor: "pointer" }}
                 >
-                  <circle
-                    r={5}
-                    fill="hsl(190, 95%, 50%)"
-                    stroke="hsl(190, 95%, 50%)"
-                    strokeWidth={2}
+                    <circle
+                      r={5}
+                      fill="hsl(210, 100%, 45%)"
+                      stroke="hsl(210, 100%, 45%)"
+                      strokeWidth={2}
                     opacity={0.8}
                     className="animate-pulse-glow"
                   />
@@ -78,7 +78,7 @@ const CommunityMap = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 rounded-lg border border-primary/30 bg-card p-5 shadow-xl"
+                  className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 rounded-lg border border-border bg-card p-5 shadow-xl"
                 >
                   <button
                     onClick={() => setSelected(null)}

@@ -52,10 +52,10 @@ const LearningHub = () => {
                       className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
                         i === activeStage
-                          ? "border-primary bg-primary/20 glow-cyan"
+                          ? "border-primary bg-primary/20 shadow-md"
                           : i < activeStage
                           ? "border-primary bg-primary/10"
-                          : "border-border bg-card"
+                          : "border-border bg-background"
                       )}
                     >
                       <StepIcon className="h-4 w-4" />
@@ -75,7 +75,7 @@ const LearningHub = () => {
             transition={{ duration: 0.3 }}
             className="max-w-3xl mx-auto"
           >
-            <div className="rounded-xl border border-border bg-card/80 p-8">
+            <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Icon className="h-6 w-6 text-primary" />
