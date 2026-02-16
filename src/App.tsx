@@ -14,6 +14,7 @@ import Technologies from "./pages/Technologies";
 import Partners from "./pages/Partners";
 import MemberDetail from "./pages/MemberDetail";
 
+import StartProject from "./pages/StartProject";
 import About from "./pages/About";
 import Interests from "./pages/Interests";
 import InterestDetail from "./pages/InterestDetail";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/designs/submit" element={<SubmitDesign />} />
           <Route path="/designs/:id" element={<DesignDetail />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/start" element={<StartProject />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/learn" element={<LearningHub />} />
           <Route path="/technologies" element={<Technologies />} />
