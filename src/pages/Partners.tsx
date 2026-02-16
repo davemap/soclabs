@@ -24,7 +24,7 @@ const Partners = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Partner <span className="text-gradient">Organisations</span></h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Our <span className="text-gradient">Community</span></h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
               We work with leading organisations across academia, industry, and open-source to make custom silicon accessible.
             </p>
