@@ -8,15 +8,15 @@ import { referenceDesigns } from "@/data/mockData";
 const Designs = () => {
   return (
     <Layout>
-      <section className="py-20">
+      <section className="py-24">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl font-bold mb-4">Reference <span className="text-gradient">SoC Designs</span></h1>
-            <p className="text-lg text-muted-foreground">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Reference <span className="text-gradient">SoC Designs</span></h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Proven ARM Cortex-M based architectures ready to fork, extend, and build upon. Each design includes full RTL source, documentation, and synthesis scripts.
             </p>
           </motion.div>
@@ -31,23 +31,23 @@ const Designs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <CardContent className="p-8">
+                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-border/60">
+                  <CardContent className="p-8 md:p-10">
                     <div className="flex items-start gap-4 mb-6">
-                      <div className="p-3 rounded-lg bg-primary/10">
+                      <div className="p-3 rounded-xl bg-primary/10">
                         <Cpu className="h-8 w-8 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold">{design.name}</h2>
-                        <p className="text-primary font-mono text-sm">{design.tagline}</p>
+                        <h2 className="text-2xl font-display font-bold">{design.name}</h2>
+                        <p className="text-primary font-medium text-sm">{design.tagline}</p>
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground mb-6">{design.description}</p>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">{design.description}</p>
 
                     <div className="grid md:grid-cols-2 gap-6 mb-6">
                       <div>
-                        <h3 className="font-semibold mb-3 text-sm text-foreground">Key Features</h3>
+                        <h3 className="font-display font-semibold mb-3 text-sm text-foreground">Key Features</h3>
                         <ul className="space-y-2">
                           {design.features.map((f) => (
                             <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -58,11 +58,11 @@ const Designs = () => {
                         </ul>
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-3 text-sm text-foreground">Use Cases</h3>
+                        <h3 className="font-display font-semibold mb-3 text-sm text-foreground">Use Cases</h3>
                         <ul className="space-y-2">
                           {design.useCases.map((u) => (
                             <li key={u} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <ArrowRight className="h-3 w-3 mt-1 text-primary shrink-0" />
+                              <ArrowRight className="h-3 w-3 mt-1 text-coral shrink-0" />
                               {u}
                             </li>
                           ))}
@@ -71,12 +71,12 @@ const Designs = () => {
                     </div>
 
                     <div className="flex gap-3">
-                      <Button asChild>
+                      <Button asChild className="rounded-full">
                         <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
                           <Github className="h-4 w-4 mr-2" /> View on GitHub
                         </a>
                       </Button>
-                      <Button asChild variant="outline">
+                      <Button asChild variant="outline" className="rounded-full">
                         <a href={design.docsUrl}>
                           <ExternalLink className="h-4 w-4 mr-2" /> Documentation
                         </a>
