@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Github, Calendar, Tag, Search, Filter, ArrowRight } from "lucide-react";
+import { Github, Calendar, Tag, Search, Filter, ArrowRight, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,9 +60,14 @@ const Projects = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Community <span className="text-gradient">Projects</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               Explore what our community has built. Each project extends a SoC Labs reference design with custom accelerators and peripherals.
             </p>
+            <Button asChild size="lg" className="rounded-full px-8">
+              <Link to="/projects/start">
+                <Rocket className="h-4 w-4 mr-2" /> Start a Project
+              </Link>
+            </Button>
           </motion.div>
 
           {/* Search & Filters */}
