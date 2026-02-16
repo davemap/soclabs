@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { to: "/", label: "Home" },
   { to: "/designs", label: "Designs" },
   { to: "/projects", label: "Projects" },
   { to: "/learn", label: "Learning Hub" },
@@ -22,7 +21,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-electric/10 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2.5 font-nav font-bold text-lg tracking-tight">
+        <Link to="/" className="flex items-center gap-2.5 font-nav font-bold text-lg tracking-tight mr-6">
           <div className="w-8 h-8 rounded-lg bg-electric flex items-center justify-center shadow-md shadow-electric/30">
             <Cpu className="h-4 w-4 text-primary-foreground" />
           </div>
