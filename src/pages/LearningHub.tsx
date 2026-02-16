@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
+import ScrollReveal from "@/components/ScrollReveal";
 import { designStages } from "@/data/mockData";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -30,7 +31,7 @@ const LearningHub = () => {
           </motion.div>
 
           {/* Timeline stepper */}
-          <div className="max-w-4xl mx-auto mb-12">
+          <ScrollReveal className="max-w-4xl mx-auto mb-12">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
               <div
@@ -65,7 +66,7 @@ const LearningHub = () => {
                 );
               })}
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Stage content */}
           <motion.div

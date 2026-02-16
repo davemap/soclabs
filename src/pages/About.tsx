@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Layout from "@/components/Layout";
+import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
 
 const About = () => {
@@ -37,17 +38,12 @@ const About = () => {
               { title: "Community-Driven", desc: "Built by and for the academic community. Share your projects, learn from others, and collaborate across borders.", color: "text-coral" },
               { title: "Real Silicon", desc: "We don't stop at simulation. Through shuttle programmes and FPGA platforms, your designs can become real chips.", color: "text-violet" },
             ].map((v, i) => (
-              <motion.div
-                key={v.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <h3 className={`font-display font-bold text-lg mb-2 ${v.color}`}>{v.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
-              </motion.div>
+              <ScrollReveal key={v.title} delay={i * 0.1}>
+                <div className="text-center">
+                  <h3 className={`font-display font-bold text-lg mb-2 ${v.color}`}>{v.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{v.desc}</p>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -56,34 +52,26 @@ const About = () => {
       {/* Interests CTA */}
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5"
-          >
-            <h2 className="text-2xl font-display font-bold mb-3">Find Your Focus</h2>
-            <p className="text-muted-foreground mb-6 leading-relaxed">
-              Explore technologies, research fields, and activities — and connect with people who share your interests.
-            </p>
-            <Button asChild className="rounded-full px-8">
-              <Link to="/interests">
-                Browse Interests <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </motion.div>
+          <ScrollReveal>
+            <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
+              <h2 className="text-2xl font-display font-bold mb-3">Find Your Focus</h2>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Explore technologies, research fields, and activities — and connect with people who share your interests.
+              </p>
+              <Button asChild className="rounded-full px-8">
+                <Link to="/interests">
+                  Browse Interests <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* Join form */}
       <section id="join" className="py-24 bg-muted/40 accent-stripe border-t border-border">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="max-w-lg mx-auto"
-          >
+          <ScrollReveal className="max-w-lg mx-auto">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
                 <Mail className="h-6 w-6" />
@@ -122,7 +110,7 @@ const About = () => {
                 Register Interest <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>
-          </motion.div>
+          </ScrollReveal>
         </div>
       </section>
     </Layout>
