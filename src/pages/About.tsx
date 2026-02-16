@@ -1,36 +1,21 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mail, ArrowRight, Check } from "lucide-react";
+import { Mail, ArrowRight, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
+import { interests } from "@/data/interests";
 
-const interestCategories = [
-  {
-    label: "Technologies",
-    items: [
-      "ARM Cortex-M0", "ARM Cortex-M3", "RISC-V", "FPGA Design",
-      "ASIC Tapeout", "Open Source EDA", "SystemVerilog", "Chisel/FIRRTL",
-    ],
-  },
-  {
-    label: "Research Fields",
-    items: [
-      "Machine Learning Accelerators", "Cryptography & Security", "DSP & Signal Processing",
-      "Low-Power Design", "IoT & Edge Computing", "Neuromorphic Computing",
-      "Formal Verification", "High-Level Synthesis",
-    ],
-  },
-  {
-    label: "Activities",
-    items: [
-      "Learning & Tutorials", "Community Projects", "ASIC Shuttle Programmes",
-      "FPGA Prototyping", "Mentoring", "Publishing & Research",
-    ],
-  },
-];
+const categories = ["Technologies", "Research Fields", "Activities"] as const;
+
+const categoryStyles = {
+  Technologies: { active: "bg-primary text-primary-foreground border-primary", inactive: "border-primary/20 text-primary hover:bg-primary/10" },
+  "Research Fields": { active: "bg-coral text-coral-foreground border-coral", inactive: "border-coral/20 text-coral hover:bg-coral/10" },
+  Activities: { active: "bg-violet text-violet-foreground border-violet", inactive: "border-violet/20 text-violet hover:bg-violet/10" },
+};
 
 const About = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
@@ -101,42 +86,50 @@ const About = () => {
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-3">Register Your <span className="text-gradient">Interests</span></h2>
               <p className="text-muted-foreground max-w-xl mx-auto">
-                Select the technologies, research fields, and activities you're interested in. We'll connect you with relevant projects, people, and opportunities.
+                Select the technologies, research fields, and activities you're interested in. Click on any interest to explore related people and projects.
               </p>
             </div>
 
             <div className="space-y-8">
-              {interestCategories.map((category, catIdx) => {
-                const colorClasses = [
-                  { active: "bg-primary text-primary-foreground border-primary", inactive: "border-primary/20 text-primary hover:bg-primary/10" },
-                  { active: "bg-coral text-coral-foreground border-coral", inactive: "border-coral/20 text-coral hover:bg-coral/10" },
-                  { active: "bg-violet text-violet-foreground border-violet", inactive: "border-violet/20 text-violet hover:bg-violet/10" },
-                ][catIdx];
+              {categories.map((category, catIdx) => {
+                const styles = categoryStyles[category];
+                const categoryInterests = interests.filter((i) => i.category === category);
 
                 return (
                   <motion.div
-                    key={category.label}
+                    key={category}
                     initial={{ opacity: 0, y: 15 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: catIdx * 0.1 }}
                   >
-                    <h3 className="font-display font-semibold text-sm mb-3 text-foreground">{category.label}</h3>
+                    <h3 className="font-display font-semibold text-sm mb-3 text-foreground">{category}</h3>
                     <div className="flex flex-wrap gap-2">
-                      {category.items.map((interest) => {
-                        const isSelected = selectedInterests.includes(interest);
+                      {categoryInterests.map((interest) => {
+                        const isSelected = selectedInterests.includes(interest.name);
                         return (
-                          <button
-                            key={interest}
-                            onClick={() => toggleInterest(interest)}
-                            className={cn(
-                              "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-sm font-medium transition-all duration-200",
-                              isSelected ? colorClasses.active : colorClasses.inactive
-                            )}
-                          >
-                            {isSelected && <Check className="h-3.5 w-3.5" />}
-                            {interest}
-                          </button>
+                          <div key={interest.slug} className="flex items-center gap-0">
+                            <button
+                              onClick={() => toggleInterest(interest.name)}
+                              className={cn(
+                                "inline-flex items-center gap-1.5 pl-3.5 pr-2 py-2 rounded-l-full border border-r-0 text-sm font-medium transition-all duration-200",
+                                isSelected ? styles.active : styles.inactive
+                              )}
+                            >
+                              {isSelected && <Check className="h-3.5 w-3.5" />}
+                              {interest.name}
+                            </button>
+                            <Link
+                              to={`/interests/${interest.slug}`}
+                              className={cn(
+                                "inline-flex items-center px-2 py-2 rounded-r-full border text-sm transition-all duration-200",
+                                isSelected ? styles.active : styles.inactive
+                              )}
+                              title={`Explore ${interest.name}`}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Link>
+                          </div>
                         );
                       })}
                     </div>
