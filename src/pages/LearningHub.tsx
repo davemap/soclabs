@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ArrowRight } from "lucide-react";
+import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -151,6 +151,13 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
 };
 
 const LearningHub = () => {
+  const [activePhase, setActivePhase] = useState(0);
+
+  const goTo = (index: number) => {
+    setActivePhase(index);
+    document.getElementById(`phase-${learningPhases[index].id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <Layout>
       <section className="py-24">
@@ -168,30 +175,73 @@ const LearningHub = () => {
             </p>
           </motion.div>
 
-          {/* Phase overview bar */}
+          {/* Progress stepper with left/right arrows */}
           <ScrollReveal className="max-w-4xl mx-auto mb-12">
-            <div className="flex items-center justify-between gap-1 overflow-x-auto pb-2">
-              {learningPhases.map((phase, i) => {
-                const Icon = iconMap[phase.icon] || Cpu;
-                return (
-                  <a
-                    key={phase.id}
-                    href={`#phase-${phase.id}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById(`phase-${phase.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }}
-                    className="flex flex-col items-center gap-1.5 px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors group min-w-[60px]"
-                  >
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-muted group-hover:bg-primary/10 transition-colors">
-                      <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                    <span className="text-[10px] font-display font-medium text-muted-foreground group-hover:text-foreground transition-colors text-center">
-                      {phase.shortTitle}
-                    </span>
-                  </a>
-                );
-              })}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => activePhase > 0 && goTo(activePhase - 1)}
+                disabled={activePhase === 0}
+                className={cn(
+                  "p-2 rounded-lg border transition-all shrink-0",
+                  activePhase === 0
+                    ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
+                )}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <div className="flex-1 relative">
+                <div className="flex items-center justify-between relative">
+                  {/* Track background */}
+                  <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
+                  {/* Active track */}
+                  <div
+                    className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
+                    style={{ width: `${(activePhase / (learningPhases.length - 1)) * 100}%` }}
+                  />
+                  {learningPhases.map((phase, i) => {
+                    const Icon = iconMap[phase.icon] || Cpu;
+                    return (
+                      <button
+                        key={phase.id}
+                        onClick={() => goTo(i)}
+                        className={cn(
+                          "relative z-10 flex flex-col items-center gap-2 group",
+                          i <= activePhase ? "text-primary" : "text-muted-foreground"
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
+                            i === activePhase
+                              ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+                              : i < activePhase
+                              ? "border-primary bg-primary/10"
+                              : "border-border bg-background"
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span className="text-xs font-display font-medium hidden sm:block">{phase.shortTitle}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <button
+                onClick={() => activePhase < learningPhases.length - 1 && goTo(activePhase + 1)}
+                disabled={activePhase === learningPhases.length - 1}
+                className={cn(
+                  "p-2 rounded-lg border transition-all shrink-0",
+                  activePhase === learningPhases.length - 1
+                    ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
+                )}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
             </div>
           </ScrollReveal>
 
