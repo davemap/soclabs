@@ -36,8 +36,8 @@ const Navbar = () => {
               className={cn(
                 "px-3 py-2 text-sm rounded-lg transition-all font-nav",
                 location.pathname === link.to
-                  ? "text-primary bg-primary/10 font-semibold"
-                  : "text-foreground hover:text-foreground hover:bg-muted"
+                  ? "text-primary-foreground bg-primary/20 font-semibold"
+                  : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
               )}
             >
               {link.label}
@@ -51,13 +51,13 @@ const Navbar = () => {
           </Button>
         </div>
 
-        <button className="lg:hidden text-foreground" onClick={() => setOpen(!open)}>
+        <button className="lg:hidden text-primary-foreground" onClick={() => setOpen(!open)}>
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
       {open && (
-        <div className="lg:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
+        <div className="lg:hidden border-t border-white/10 bg-[hsl(var(--nav-bg)/0.98)] backdrop-blur-xl">
           <div className="container mx-auto px-4 py-4 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -67,8 +67,8 @@ const Navbar = () => {
                 className={cn(
                   "px-3 py-2.5 text-sm rounded-lg transition-all font-nav",
                   location.pathname === link.to
-                    ? "text-primary bg-primary/10 font-semibold"
-                    : "text-foreground hover:text-foreground hover:bg-muted"
+                    ? "text-primary-foreground bg-primary/20 font-semibold"
+                    : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                 )}
               >
                 {link.label}
