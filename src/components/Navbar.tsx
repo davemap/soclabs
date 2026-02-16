@@ -37,7 +37,7 @@ const Navbar = () => {
                 "px-3 py-2 text-sm rounded-lg transition-all font-nav",
                 location.pathname === link.to
                   ? "text-primary bg-primary/10 font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  : "text-foreground hover:text-foreground hover:bg-muted"
               )}
             >
               {link.label}
@@ -68,7 +68,7 @@ const Navbar = () => {
                   "px-3 py-2.5 text-sm rounded-lg transition-all font-nav",
                   location.pathname === link.to
                     ? "text-primary bg-primary/10 font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    : "text-foreground hover:text-foreground hover:bg-muted"
                 )}
               >
                 {link.label}
