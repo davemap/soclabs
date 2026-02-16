@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2.5 font-nav font-bold text-lg">
-              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+              <div className="w-7 h-7 rounded-md bg-electric flex items-center justify-center shadow-sm shadow-electric/30">
                 <Cpu className="h-3.5 w-3.5 text-primary-foreground" />
               </div>
               <span className="text-gradient">SoC Labs</span>
@@ -41,9 +41,9 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-semibold text-sm mb-3 text-foreground">Connect</h4>
             <div className="flex gap-3">
-              <a href="#" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-all"><Github className="h-4 w-4" /></a>
-              <a href="#" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-all"><Twitter className="h-4 w-4" /></a>
-              <a href="#" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-all"><Mail className="h-4 w-4" /></a>
+              <a href="#" className="w-9 h-9 rounded-lg bg-electric/10 flex items-center justify-center text-electric hover:bg-electric hover:text-electric-foreground transition-all"><Github className="h-4 w-4" /></a>
+              <a href="#" className="w-9 h-9 rounded-lg bg-electric/10 flex items-center justify-center text-electric hover:bg-electric hover:text-electric-foreground transition-all"><Twitter className="h-4 w-4" /></a>
+              <a href="#" className="w-9 h-9 rounded-lg bg-electric/10 flex items-center justify-center text-electric hover:bg-electric hover:text-electric-foreground transition-all"><Mail className="h-4 w-4" /></a>
             </div>
           </div>
         </div>
