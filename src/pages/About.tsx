@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
+import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 
 const About = () => {
+  const [joinOpen, setJoinOpen] = useState(false);
+
   return (
     <Layout>
       {/* Mission */}
@@ -68,51 +70,25 @@ const About = () => {
         </div>
       </section>
 
-      {/* Join form */}
+      {/* Join CTA */}
       <section id="join" className="py-24 bg-muted/40 accent-stripe border-t border-border">
         <div className="container mx-auto px-4">
-          <ScrollReveal className="max-w-lg mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
-                <Mail className="h-6 w-6" />
-              </div>
-              <h2 className="text-3xl font-display font-bold mb-2">Join the Community</h2>
-              <p className="text-muted-foreground">
-                Interested in building custom silicon? Register your interest and we'll get in touch.
-              </p>
+          <ScrollReveal className="max-w-lg mx-auto text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
+              <Mail className="h-6 w-6" />
             </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-              }}
-              className="space-y-4 rounded-2xl border border-border/60 bg-card p-7 shadow-sm"
-            >
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Name</label>
-                  <Input placeholder="Your name" className="bg-background rounded-lg" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Institution</label>
-                  <Input placeholder="University / Organisation" className="bg-background rounded-lg" />
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Email</label>
-                <Input type="email" placeholder="you@example.com" className="bg-background rounded-lg" />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">Tell us about your interest</label>
-                <Textarea placeholder="What would you like to build? What's your experience level?" className="bg-background rounded-lg" rows={4} />
-              </div>
-              <Button type="submit" className="w-full rounded-full">
-                Register Interest <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </form>
+            <h2 className="text-3xl font-display font-bold mb-2">Join the Community</h2>
+            <p className="text-muted-foreground mb-6">
+              Interested in building custom silicon? Sign up and become part of SoC Labs.
+            </p>
+            <Button className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
+              Join Community <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </ScrollReveal>
         </div>
       </section>
+
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </Layout>
   );
 };

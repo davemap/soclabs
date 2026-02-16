@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 
 const navLinks = [
   { to: "/designs", label: "Reference Designs" },
@@ -16,6 +17,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
   const location = useLocation();
 
   return (
@@ -46,8 +48,8 @@ const Navbar = () => {
         </div>
 
         <div className="hidden lg:block">
-          <Button asChild size="sm" className="rounded-full px-5">
-            <Link to="/about#join">Join Community</Link>
+          <Button size="sm" className="rounded-full px-5" onClick={() => setJoinOpen(true)}>
+            Join Community
           </Button>
         </div>
 
@@ -74,12 +76,13 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Button asChild size="sm" className="mt-2 rounded-full">
-              <Link to="/about#join" onClick={() => setOpen(false)}>Join Community</Link>
+            <Button size="sm" className="mt-2 rounded-full" onClick={() => { setOpen(false); setJoinOpen(true); }}>
+              Join Community
             </Button>
           </div>
         </div>
       )}
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </nav>
   );
 };
