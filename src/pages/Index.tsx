@@ -47,7 +47,7 @@ const Index = () => {
       </section>
 
       {/* Reference Designs */}
-      <section className="py-24">
+      <section className="py-24 bg-secondary/5 border-y border-border/50">
         <div className="container mx-auto px-4">
           <ScrollReveal className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
