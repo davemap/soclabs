@@ -101,6 +101,7 @@ const Interests = () => {
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(15);
 
   const toggleInterest = (name: string) => {
     setSelectedInterests((prev) =>
@@ -230,7 +231,7 @@ const Interests = () => {
 
             <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence mode="popLayout">
-                {filteredInterests.map((interest) => (
+                {filteredInterests.slice(0, visibleCount).map((interest) => (
                   <InterestCard
                     key={interest.slug}
                     interest={interest}
@@ -240,6 +241,18 @@ const Interests = () => {
                 ))}
               </AnimatePresence>
             </motion.div>
+
+            {visibleCount < filteredInterests.length && (
+              <div className="text-center mt-8">
+                <Button
+                  variant="outline"
+                  className="rounded-full px-8"
+                  onClick={() => setVisibleCount((v) => v + 15)}
+                >
+                  Show more ({filteredInterests.length - visibleCount} remaining)
+                </Button>
+              </div>
+            )}
 
             {filteredInterests.length === 0 && (
               <div className="text-center py-16">
