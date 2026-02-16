@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
+import ScrollReveal from "@/components/ScrollReveal";
 import { communityProjects } from "@/data/mockData";
 
 const referenceSocs = ["All", "NanoSoC", "EcoSoC"];
@@ -37,11 +38,11 @@ const Projects = () => {
   const statusColor = (status: string) => {
     switch (status) {
       case "Completed":
-        return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20";
+        return "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
       case "In Progress":
-        return "bg-amber-500/10 text-amber-600 border-amber-500/20";
+        return "bg-amber-500/15 text-amber-400 border-amber-500/30";
       case "Planning":
-        return "bg-blue-500/10 text-blue-600 border-blue-500/20";
+        return "bg-blue-500/15 text-blue-400 border-blue-500/30";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -98,13 +99,7 @@ const Projects = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {filtered.map((project, i) => (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
-                >
+                <ScrollReveal key={project.id} delay={i * 0.05}>
                   <Link to={`/projects/${project.id}`} className="block h-full">
                     <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60 group cursor-pointer">
                       <CardContent className="p-6 flex flex-col h-full">
@@ -161,7 +156,7 @@ const Projects = () => {
                       </CardContent>
                     </Card>
                   </Link>
-                </motion.div>
+                </ScrollReveal>
               ))}
             </div>
           )}

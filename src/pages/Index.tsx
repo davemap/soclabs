@@ -4,16 +4,8 @@ import { ArrowRight, Github, Cpu, Users, GraduationCap, Globe, Sparkles } from "
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
+import ScrollReveal from "@/components/ScrollReveal";
 import { referenceDesigns, stats } from "@/data/mockData";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5 },
-  }),
-};
 
 const Index = () => {
   return (
@@ -62,18 +54,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-14">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="text-center"
-              >
+              <ScrollReveal key={stat.label} delay={i * 0.1} className="text-center">
                 <div className="text-4xl md:text-5xl font-display font-bold text-gradient">{stat.value}</div>
                 <div className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</div>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -82,28 +66,16 @@ const Index = () => {
       {/* Reference Designs */}
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
-          >
+          <ScrollReveal className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Start with our proven architectures. Fork, extend, and build your custom accelerators on top.
             </p>
-          </motion.div>
+          </ScrollReveal>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {referenceDesigns.map((design, i) => (
-              <motion.div
-                key={design.id}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-              >
+              <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                 <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60">
                   <CardContent className="p-7">
                     <div className="flex items-start justify-between mb-4">
@@ -135,7 +107,7 @@ const Index = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -144,7 +116,9 @@ const Index = () => {
       {/* Why Join */}
       <section className="py-24 bg-muted/40 accent-stripe border-y border-border">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
+          <ScrollReveal>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
+          </ScrollReveal>
           <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
             {[
               {
@@ -166,21 +140,15 @@ const Index = () => {
                 color: "bg-violet/10 text-violet",
               },
             ].map((item, i) => (
-              <motion.div
-                key={item.title}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${item.color} mb-5`}>
-                  <item.icon className="h-6 w-6" />
+              <ScrollReveal key={item.title} delay={i * 0.12}>
+                <div className="text-center">
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${item.color} mb-5`}>
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
-                <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </motion.div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -189,22 +157,19 @@ const Index = () => {
       {/* CTA */}
       <section className="py-24">
         <div className="container mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5"
-          >
-            <h2 className="text-3xl font-display font-bold mb-4">Ready to Build Your SoC?</h2>
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              Join our community, fork a reference design, and start building custom silicon today.
-            </p>
-            <Button asChild size="lg" className="rounded-full px-8">
-              <Link to="/about#join">
-                Get Started <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </motion.div>
+          <ScrollReveal>
+            <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
+              <h2 className="text-3xl font-display font-bold mb-4">Ready to Build Your SoC?</h2>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
+                Join our community, fork a reference design, and start building custom silicon today.
+              </p>
+              <Button asChild size="lg" className="rounded-full px-8">
+                <Link to="/about#join">
+                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
     </Layout>
