@@ -8,7 +8,7 @@ import { referenceDesigns } from "@/data/mockData";
 const Designs = () => {
   return (
     <Layout>
-      <section className="py-20 circuit-dots">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -31,7 +31,7 @@ const Designs = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="border-border bg-card/80 overflow-hidden">
+                <Card className="overflow-hidden hover:shadow-lg transition-shadow">
                   <CardContent className="p-8">
                     <div className="flex items-start gap-4 mb-6">
                       <div className="p-3 rounded-lg bg-primary/10">
@@ -71,7 +71,7 @@ const Designs = () => {
                     </div>
 
                     <div className="flex gap-3">
-                      <Button asChild className="glow-cyan">
+                      <Button asChild>
                         <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
                           <Github className="h-4 w-4 mr-2" /> View on GitHub
                         </a>

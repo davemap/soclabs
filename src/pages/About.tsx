@@ -9,7 +9,7 @@ const About = () => {
   return (
     <Layout>
       {/* Mission */}
-      <section className="py-20 circuit-dots">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -28,7 +28,7 @@ const About = () => {
       </section>
 
       {/* Values */}
-      <section className="py-16 border-y border-border bg-card/30">
+      <section className="py-16 border-y border-border bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
@@ -76,7 +76,7 @@ const About = () => {
                 e.preventDefault();
                 // Static form — no backend yet
               }}
-              className="space-y-4 rounded-xl border border-border bg-card/80 p-6"
+              className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm"
             >
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -96,7 +96,7 @@ const About = () => {
                 <label className="text-sm font-medium mb-1 block">Tell us about your interest</label>
                 <Textarea placeholder="What would you like to build? What's your experience level?" className="bg-background" rows={4} />
               </div>
-              <Button type="submit" className="w-full glow-cyan">
+              <Button type="submit" className="w-full">
                 Register Interest <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </form>

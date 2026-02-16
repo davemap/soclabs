@@ -31,7 +31,7 @@ const Projects = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="h-full border-border hover:border-primary/50 transition-colors bg-card/80">
+                <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardContent className="p-6 flex flex-col h-full">
                     <h3 className="text-lg font-bold mb-1">{project.title}</h3>
                     <p className="text-sm text-primary font-mono mb-1">{project.author}</p>
