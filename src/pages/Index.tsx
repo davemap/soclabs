@@ -37,8 +37,8 @@ const Index = () => {
             </p>
             <div className="flex justify-center">
               <Button asChild size="lg" className="rounded-full px-8 text-base">
-                <Link to="/designs">
-                  Explore Designs <ArrowRight className="ml-2 h-4 w-4" />
+                <Link to="/projects">
+                  Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
@@ -95,7 +95,7 @@ const Index = () => {
           </div>
           <ScrollReveal className="text-center mt-10">
             <Button asChild variant="outline" size="lg" className="rounded-full px-8">
-              <Link to="/designs">View All Designs <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              <Link to="/designs">View All Reference SoC's <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </ScrollReveal>
         </div>
