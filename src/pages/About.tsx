@@ -1,11 +1,48 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, ArrowRight } from "lucide-react";
+import { Mail, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 
+const interestCategories = [
+  {
+    label: "Technologies",
+    items: [
+      "ARM Cortex-M0", "ARM Cortex-M3", "RISC-V", "FPGA Design",
+      "ASIC Tapeout", "Open Source EDA", "SystemVerilog", "Chisel/FIRRTL",
+    ],
+  },
+  {
+    label: "Research Fields",
+    items: [
+      "Machine Learning Accelerators", "Cryptography & Security", "DSP & Signal Processing",
+      "Low-Power Design", "IoT & Edge Computing", "Neuromorphic Computing",
+      "Formal Verification", "High-Level Synthesis",
+    ],
+  },
+  {
+    label: "Activities",
+    items: [
+      "Learning & Tutorials", "Community Projects", "ASIC Shuttle Programmes",
+      "FPGA Prototyping", "Mentoring", "Publishing & Research",
+    ],
+  },
+];
+
 const About = () => {
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  const toggleInterest = (interest: string) => {
+    setSelectedInterests((prev) =>
+      prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
   return (
     <Layout>
       {/* Mission */}
@@ -52,8 +89,77 @@ const About = () => {
         </div>
       </section>
 
+      {/* Interests */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
+          >
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-display font-bold mb-3">Register Your <span className="text-gradient">Interests</span></h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                Select the technologies, research fields, and activities you're interested in. We'll connect you with relevant projects, people, and opportunities.
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              {interestCategories.map((category, catIdx) => {
+                const colorClasses = [
+                  { active: "bg-primary text-primary-foreground border-primary", inactive: "border-primary/20 text-primary hover:bg-primary/10" },
+                  { active: "bg-coral text-coral-foreground border-coral", inactive: "border-coral/20 text-coral hover:bg-coral/10" },
+                  { active: "bg-violet text-violet-foreground border-violet", inactive: "border-violet/20 text-violet hover:bg-violet/10" },
+                ][catIdx];
+
+                return (
+                  <motion.div
+                    key={category.label}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: catIdx * 0.1 }}
+                  >
+                    <h3 className="font-display font-semibold text-sm mb-3 text-foreground">{category.label}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {category.items.map((interest) => {
+                        const isSelected = selectedInterests.includes(interest);
+                        return (
+                          <button
+                            key={interest}
+                            onClick={() => toggleInterest(interest)}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-sm font-medium transition-all duration-200",
+                              isSelected ? colorClasses.active : colorClasses.inactive
+                            )}
+                          >
+                            {isSelected && <Check className="h-3.5 w-3.5" />}
+                            {interest}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {selectedInterests.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/15 text-sm text-primary font-medium text-center"
+              >
+                {selectedInterests.length} interest{selectedInterests.length !== 1 ? "s" : ""} selected — fill in the form below to register
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+      </section>
+
       {/* Join form */}
-      <section id="join" className="py-24">
+      <section id="join" className="py-24 bg-muted/40 accent-stripe border-t border-border">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -91,6 +197,20 @@ const About = () => {
                 <label className="text-sm font-medium mb-1 block">Email</label>
                 <Input type="email" placeholder="you@example.com" className="bg-background rounded-lg" />
               </div>
+
+              {selectedInterests.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Your Interests</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedInterests.map((interest) => (
+                      <span key={interest} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                        {interest}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="text-sm font-medium mb-1 block">Tell us about your interest</label>
                 <Textarea placeholder="What would you like to build? What's your experience level?" className="bg-background rounded-lg" rows={4} />
