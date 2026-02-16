@@ -93,6 +93,20 @@ const DesignDetail = () => {
                 </div>
               </div>
             )}
+
+            {/* Get Started */}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild className="rounded-full">
+                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" /> Getting Started Guide
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-full">
+                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4 mr-2" /> View on GitHub
+                </a>
+              </Button>
+            </div>
           </motion.div>
 
           <div className="max-w-4xl space-y-12">
@@ -167,23 +181,6 @@ const DesignDetail = () => {
                 </div>
               </motion.div>
             )}
-
-            {/* Getting Started & Links */}
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-              <h2 className="text-2xl font-display font-bold mb-4">Get Started</h2>
-              <div className="flex flex-wrap gap-3">
-                <Button asChild className="rounded-full">
-                  <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" /> Getting Started Guide
-                  </a>
-                </Button>
-                <Button asChild variant="outline" className="rounded-full">
-                  <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 mr-2" /> View on GitHub
-                  </a>
-                </Button>
-              </div>
-            </motion.div>
 
             {/* Community Projects */}
             {relatedProjects.length > 0 && (
