@@ -469,7 +469,7 @@ export const learningPhases: LearningPhase[] = [
   {
     id: "tapeout",
     title: "Tapeout",
-    shortTitle: "Tape",
+    shortTitle: "Tapeout",
     description: "Prepare and submit your final design database (GDSII) for fabrication through a shuttle service.",
     icon: "Zap",
     topics: [
