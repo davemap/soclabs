@@ -42,7 +42,7 @@
     --violet-foreground: 0 0% 100%;
     --amber: 38 92% 58%;
     --amber-foreground: 38 92% 10%;
-    --electric: 209 57% 33%;
+    --electric: 210 100% 60%;
     --electric-foreground: 0 0% 100%;
 
     --sidebar-background: 220 16% 12%;
@@ -73,7 +73,7 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(209 57% 45%), hsl(168 75% 50%));
+    background-image: linear-gradient(135deg, hsl(210 100% 60%), hsl(168 75% 50%));
   }
 
   .text-gradient-warm {
@@ -83,18 +83,18 @@
 
   .text-gradient-electric {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(209 57% 45%), hsl(260 55% 68%));
+    background-image: linear-gradient(135deg, hsl(210 100% 60%), hsl(260 55% 68%));
   }
 
   .bg-gradient-hero {
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(209 57% 33% / 0.2), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210 100% 60% / 0.12), transparent),
       radial-gradient(ellipse 60% 40% at 80% 50%, hsl(168 75% 44% / 0.1), transparent),
       radial-gradient(ellipse 50% 30% at 20% 80%, hsl(260 55% 68% / 0.06), transparent);
   }
 
   .mesh-dots {
-    background-image: radial-gradient(circle, hsl(209 57% 33% / 0.12) 1px, transparent 1px);
+    background-image: radial-gradient(circle, hsl(210 100% 60% / 0.08) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
