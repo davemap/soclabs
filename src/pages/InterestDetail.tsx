@@ -1,0 +1,202 @@
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import Layout from "@/components/Layout";
+import { interests } from "@/data/interests";
+import { communityMembers, communityProjects } from "@/data/mockData";
+
+const categoryColor: Record<string, string> = {
+  Technologies: "bg-primary/10 text-primary",
+  "Research Fields": "bg-coral/10 text-coral",
+  Activities: "bg-violet/10 text-violet",
+};
+
+const InterestDetail = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const interest = interests.find((i) => i.slug === slug);
+
+  if (!interest) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-24 text-center">
+          <h1 className="text-2xl font-display font-bold mb-4">Interest not found</h1>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link to="/about">← Back to About</Link>
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
+  const relatedMembers = communityMembers.filter((m) =>
+    m.expertise.some((e) => interest.relatedMemberExpertise.includes(e))
+  );
+
+  const relatedProjects = communityProjects.filter((p) =>
+    p.tags.some((t) => interest.relatedProjectTags.includes(t))
+  );
+
+  return (
+    <Layout>
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-3xl mx-auto mb-16"
+          >
+            <Link
+              to="/about"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to Interests
+            </Link>
+
+            <div className="flex items-start gap-3 mb-4">
+              <span className={`text-xs px-3 py-1 rounded-full font-semibold ${categoryColor[interest.category]}`}>
+                {interest.category}
+              </span>
+            </div>
+
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{interest.name}</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">{interest.description}</p>
+          </motion.div>
+
+          {/* People */}
+          <div className="max-w-4xl mx-auto mb-20">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-2 mb-6"
+            >
+              <Users className="h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-display font-bold">People</h2>
+              <span className="text-sm text-muted-foreground ml-1">({relatedMembers.length})</span>
+            </motion.div>
+
+            {relatedMembers.length > 0 ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {relatedMembers.map((member, i) => (
+                  <motion.div
+                    key={member.name}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span className="text-primary font-display font-bold text-sm">
+                              {member.name.split(" ").map((n) => n[0]).join("")}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <h3 className="font-display font-bold text-sm truncate">{member.name}</h3>
+                            <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {member.expertise.map((e) => (
+                            <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
+                              {e}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {member.projects.map((p) => (
+                            <span key={p} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                              {p}
+                            </span>
+                          ))}
+                        </div>
+                        {member.url && member.url !== "#" && (
+                          <a href={member.url} className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium mt-3">
+                            View Profile <ExternalLink className="h-3 w-3" />
+                          </a>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">No community members have registered this interest yet.</p>
+                <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
+                  <Link to="/about#join">Be the first to join</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Projects */}
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="flex items-center gap-2 mb-6"
+            >
+              <FolderOpen className="h-5 w-5 text-coral" />
+              <h2 className="text-2xl font-display font-bold">Projects</h2>
+              <span className="text-sm text-muted-foreground ml-1">({relatedProjects.length})</span>
+            </motion.div>
+
+            {relatedProjects.length > 0 ? (
+              <div className="grid sm:grid-cols-2 gap-5">
+                {relatedProjects.map((project, i) => (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 15 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
+                      <CardContent className="p-5 flex flex-col h-full">
+                        <h3 className="font-display font-bold mb-1">{project.title}</h3>
+                        <p className="text-sm text-primary font-medium mb-0.5">{project.author}</p>
+                        <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
+                        <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed line-clamp-3">{project.description}</p>
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          {project.tags.map((tag) => (
+                            <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                              <Tag className="h-2.5 w-2.5" />{tag}
+                            </span>
+                          ))}
+                        </div>
+                        <Button asChild size="sm" variant="ghost" className="self-start">
+                          <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                            <Github className="h-4 w-4 mr-1" /> View Repo
+                          </a>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                <FolderOpen className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">No projects are associated with this interest yet.</p>
+                <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
+                  <Link to="/projects">Browse all projects</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </Layout>
+  );
+};
+
+export default InterestDetail;
