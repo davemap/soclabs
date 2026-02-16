@@ -1,20 +1,156 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ArrowRight } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import { designStages } from "@/data/mockData";
+import { learningPhases, LearningPhase, LearningTopic } from "@/data/mockData";
 
 const iconMap: Record<string, React.ElementType> = {
   FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
 };
 
-const LearningHub = () => {
-  const [activeStage, setActiveStage] = useState(0);
-  const stage = designStages[activeStage];
-  const Icon = iconMap[stage.icon] || Cpu;
+const TopicCard = ({ topic, isActive, onClick }: { topic: LearningTopic; isActive: boolean; onClick: () => void }) => (
+  <div id={topic.id} className="scroll-mt-24">
+    <button
+      onClick={onClick}
+      className={cn(
+        "w-full text-left rounded-xl border transition-all duration-300 p-4 group",
+        isActive
+          ? "border-primary/40 bg-primary/5 shadow-sm"
+          : "border-border/40 bg-card/50 hover:border-border hover:bg-card"
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <div className={cn(
+          "mt-0.5 transition-transform duration-200",
+          isActive && "rotate-90"
+        )}>
+          <ChevronRight className="h-4 w-4 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="font-display font-semibold text-sm mb-1">{topic.title}</h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">{topic.summary}</p>
+        </div>
+      </div>
+    </button>
+    <AnimatePresence>
+      {isActive && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="overflow-hidden"
+        >
+          <div className="pl-11 pr-4 py-4 text-sm text-muted-foreground leading-relaxed">
+            {topic.content}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+);
 
+const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  const Icon = iconMap[phase.icon] || Cpu;
+
+  const toggleTopic = useCallback((topicId: string) => {
+    setActiveTopic((prev) => (prev === topicId ? null : topicId));
+  }, []);
+
+  return (
+    <ScrollReveal delay={index * 0.06}>
+      <div className={cn(
+        "rounded-2xl border transition-all duration-300",
+        isOpen ? "border-primary/30 bg-card shadow-md" : "border-border/60 bg-card/80 hover:border-border"
+      )}>
+        {/* Phase header */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full text-left p-6 md:p-7 flex items-center gap-4"
+        >
+          <div className={cn(
+            "p-3 rounded-xl transition-colors",
+            isOpen ? "bg-primary/15" : "bg-muted"
+          )}>
+            <Icon className={cn("h-5 w-5", isOpen ? "text-primary" : "text-muted-foreground")} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs text-primary font-semibold font-display">Phase {index + 1}</span>
+              <span className="text-xs text-muted-foreground">· {phase.topics.length} topics</span>
+            </div>
+            <h2 className="text-xl font-display font-bold">{phase.title}</h2>
+            {!isOpen && (
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{phase.description}</p>
+            )}
+          </div>
+          <ChevronDown className={cn(
+            "h-5 w-5 text-muted-foreground transition-transform duration-300 shrink-0",
+            isOpen && "rotate-180"
+          )} />
+        </button>
+
+        {/* Phase content */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="px-6 md:px-7 pb-6 md:pb-7">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">{phase.description}</p>
+
+                {/* Quick nav */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {phase.topics.map((topic) => (
+                    <a
+                      key={topic.id}
+                      href={`#${topic.id}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveTopic(topic.id);
+                        document.getElementById(topic.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }}
+                      className={cn(
+                        "text-xs px-3 py-1.5 rounded-full border transition-all",
+                        activeTopic === topic.id
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
+                      )}
+                    >
+                      {topic.title}
+                    </a>
+                  ))}
+                </div>
+
+                {/* Topic cards */}
+                <div className="space-y-3">
+                  {phase.topics.map((topic) => (
+                    <TopicCard
+                      key={topic.id}
+                      topic={topic}
+                      isActive={activeTopic === topic.id}
+                      onClick={() => toggleTopic(topic.id)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </ScrollReveal>
+  );
+};
+
+const LearningHub = () => {
   return (
     <Layout>
       <section className="py-24">
@@ -24,102 +160,49 @@ const LearningHub = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Hardware Design <span className="text-gradient">Learning Hub</span></h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
+              Hardware Design <span className="text-gradient">Learning Hub</span>
+            </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              A step-by-step guide through the stages of digital hardware design — from specification to silicon.
+              A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
           </motion.div>
 
-          {/* Timeline stepper */}
+          {/* Phase overview bar */}
           <ScrollReveal className="max-w-4xl mx-auto mb-12">
-            <div className="flex items-center justify-between relative">
-              <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
-              <div
-                className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
-                style={{ width: `${(activeStage / (designStages.length - 1)) * 100}%` }}
-              />
-              {designStages.map((s, i) => {
-                const StepIcon = iconMap[s.icon] || Cpu;
+            <div className="flex items-center justify-between gap-1 overflow-x-auto pb-2">
+              {learningPhases.map((phase, i) => {
+                const Icon = iconMap[phase.icon] || Cpu;
                 return (
-                  <button
-                    key={s.id}
-                    onClick={() => setActiveStage(i)}
-                    className={cn(
-                      "relative z-10 flex flex-col items-center gap-2 group",
-                      i <= activeStage ? "text-primary" : "text-muted-foreground"
-                    )}
+                  <a
+                    key={phase.id}
+                    href={`#phase-${phase.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById(`phase-${phase.id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                    className="flex flex-col items-center gap-1.5 px-2 py-2 rounded-lg hover:bg-muted/50 transition-colors group min-w-[60px]"
                   >
-                    <div
-                      className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-                        i === activeStage
-                          ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-                          : i < activeStage
-                          ? "border-primary bg-primary/10"
-                          : "border-border bg-background"
-                      )}
-                    >
-                      <StepIcon className="h-4 w-4" />
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-muted group-hover:bg-primary/10 transition-colors">
+                      <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
-                    <span className="text-xs font-display font-medium hidden sm:block">{s.shortTitle}</span>
-                  </button>
+                    <span className="text-[10px] font-display font-medium text-muted-foreground group-hover:text-foreground transition-colors text-center">
+                      {phase.shortTitle}
+                    </span>
+                  </a>
                 );
               })}
             </div>
           </ScrollReveal>
 
-          {/* Stage content */}
-          <motion.div
-            key={stage.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-3xl mx-auto"
-          >
-            <div className="rounded-2xl border border-border/60 bg-card p-8 md:p-10 shadow-sm">
-              <div className="flex items-center gap-3 mb-5">
-                <div className="p-3 rounded-xl bg-primary/10">
-                  <Icon className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-display font-bold">{stage.title}</h2>
-                  <p className="text-sm text-primary font-medium">Stage {activeStage + 1} of {designStages.length}</p>
-                </div>
+          {/* Phase sections */}
+          <div className="max-w-3xl mx-auto space-y-4">
+            {learningPhases.map((phase, i) => (
+              <div key={phase.id} id={`phase-${phase.id}`} className="scroll-mt-24">
+                <PhaseSection phase={phase} index={i} />
               </div>
-
-              <p className="text-muted-foreground mb-6 leading-relaxed">{stage.description}</p>
-
-              <h3 className="font-display font-semibold text-sm mb-3">Key Activities</h3>
-              <ul className="space-y-2 mb-8">
-                {stage.details.map((d) => (
-                  <li key={d} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <ArrowRight className="h-3 w-3 mt-1 text-primary shrink-0" />
-                    {d}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex gap-3">
-                {activeStage > 0 && (
-                  <button
-                    onClick={() => setActiveStage(activeStage - 1)}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    ← {designStages[activeStage - 1].title}
-                  </button>
-                )}
-                <div className="flex-1" />
-                {activeStage < designStages.length - 1 && (
-                  <button
-                    onClick={() => setActiveStage(activeStage + 1)}
-                    className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
-                  >
-                    {designStages[activeStage + 1].title} →
-                  </button>
-                )}
-              </div>
-            </div>
-          </motion.div>
+            ))}
+          </div>
         </div>
       </section>
     </Layout>
