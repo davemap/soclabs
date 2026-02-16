@@ -5,17 +5,19 @@ export interface Interest {
   description: string;
   relatedMemberExpertise: string[];
   relatedProjectTags: string[];
+  /** If set, links this interest to a technology on the Technologies page */
+  technologyName?: string;
 }
 
 export const interests: Interest[] = [
   // Technologies
-  { slug: "arm-cortex-m0", name: "ARM Cortex-M0", category: "Technologies", description: "Ultra-low-power 32-bit processor ideal for education, prototyping, and small embedded designs. Available through the ARM DesignStart programme.", relatedMemberExpertise: ["Processor Design", "FPGA Design", "Low Power Design"], relatedProjectTags: ["NanoSoC"] },
-  { slug: "arm-cortex-m3", name: "ARM Cortex-M3", category: "Technologies", description: "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production-grade SoC designs.", relatedMemberExpertise: ["Processor Design", "SoC Integration"], relatedProjectTags: ["EcoSoC"] },
+  { slug: "arm-cortex-m0", name: "ARM Cortex-M0", category: "Technologies", description: "Ultra-low-power 32-bit processor ideal for education, prototyping, and small embedded designs. Available through the ARM DesignStart programme.", relatedMemberExpertise: ["Processor Design", "FPGA Design", "Low Power Design"], relatedProjectTags: ["NanoSoC"], technologyName: "ARM Cortex-M0" },
+  { slug: "arm-cortex-m3", name: "ARM Cortex-M3", category: "Technologies", description: "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production-grade SoC designs.", relatedMemberExpertise: ["Processor Design", "SoC Integration"], relatedProjectTags: ["EcoSoC"], technologyName: "ARM Cortex-M3" },
   { slug: "risc-v", name: "RISC-V", category: "Technologies", description: "An open-standard instruction set architecture enabling fully open processor designs without licensing fees.", relatedMemberExpertise: ["Processor Design"], relatedProjectTags: [] },
-  { slug: "fpga-design", name: "FPGA Design", category: "Technologies", description: "Field-Programmable Gate Arrays allow rapid prototyping and testing of digital designs on real hardware before committing to silicon.", relatedMemberExpertise: ["FPGA Design"], relatedProjectTags: ["FPGA"] },
-  { slug: "asic-tapeout", name: "ASIC Tapeout", category: "Technologies", description: "The process of taking a verified digital design through physical implementation and submitting it for fabrication on a silicon wafer.", relatedMemberExpertise: ["ASIC Design"], relatedProjectTags: ["ASIC"] },
-  { slug: "open-source-eda", name: "Open Source EDA", category: "Technologies", description: "Open-source electronic design automation tools like Yosys and OpenROAD enabling fully transparent chip design flows.", relatedMemberExpertise: [], relatedProjectTags: [] },
-  { slug: "systemverilog", name: "SystemVerilog", category: "Technologies", description: "Industry-standard hardware description and verification language used for RTL design and testbench development.", relatedMemberExpertise: ["Verification"], relatedProjectTags: [] },
+  { slug: "fpga-design", name: "FPGA Design", category: "Technologies", description: "Field-Programmable Gate Arrays allow rapid prototyping and testing of digital designs on real hardware before committing to silicon.", relatedMemberExpertise: ["FPGA Design"], relatedProjectTags: ["FPGA"], technologyName: "Vivado / Quartus" },
+  { slug: "asic-tapeout", name: "ASIC Tapeout", category: "Technologies", description: "The process of taking a verified digital design through physical implementation and submitting it for fabrication on a silicon wafer.", relatedMemberExpertise: ["ASIC Design"], relatedProjectTags: ["ASIC"], technologyName: "Cadence / Synopsys" },
+  { slug: "open-source-eda", name: "Open Source EDA", category: "Technologies", description: "Open-source electronic design automation tools like Yosys and OpenROAD enabling fully transparent chip design flows.", relatedMemberExpertise: [], relatedProjectTags: [], technologyName: "Yosys + OpenROAD" },
+  { slug: "systemverilog", name: "SystemVerilog", category: "Technologies", description: "Industry-standard hardware description and verification language used for RTL design and testbench development.", relatedMemberExpertise: ["Verification"], relatedProjectTags: [], technologyName: "UVM / cocotb" },
   { slug: "chisel-firrtl", name: "Chisel/FIRRTL", category: "Technologies", description: "A modern hardware construction language embedded in Scala, enabling productive and parameterisable hardware design.", relatedMemberExpertise: [], relatedProjectTags: [] },
 
   // Research Fields

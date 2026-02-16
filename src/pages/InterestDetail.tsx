@@ -1,11 +1,11 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink } from "lucide-react";
+import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import { interests } from "@/data/interests";
-import { communityMembers, communityProjects } from "@/data/mockData";
+import { communityMembers, communityProjects, technologies } from "@/data/mockData";
 
 const categoryColor: Record<string, string> = {
   Technologies: "bg-primary/10 text-primary",
@@ -23,7 +23,7 @@ const InterestDetail = () => {
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-2xl font-display font-bold mb-4">Interest not found</h1>
           <Button asChild variant="outline" className="rounded-full">
-            <Link to="/about">← Back to About</Link>
+            <Link to="/interests">← Back to Interests</Link>
           </Button>
         </div>
       </Layout>
@@ -38,6 +38,10 @@ const InterestDetail = () => {
     p.tags.some((t) => interest.relatedProjectTags.includes(t))
   );
 
+  const linkedTechnology = interest.technologyName
+    ? technologies.find((t) => t.name === interest.technologyName)
+    : null;
+
   return (
     <Layout>
       <section className="py-24">
@@ -49,7 +53,7 @@ const InterestDetail = () => {
             className="max-w-3xl mx-auto mb-16"
           >
             <Link
-              to="/about"
+              to="/interests"
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Back to Interests
@@ -64,6 +68,38 @@ const InterestDetail = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{interest.name}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">{interest.description}</p>
           </motion.div>
+
+          {/* Linked Technology */}
+          {linkedTechnology && (
+            <div className="max-w-4xl mx-auto mb-16">
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="flex items-center gap-2 mb-4"
+              >
+                <Wrench className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-display font-bold">Related Technology</h2>
+              </motion.div>
+
+              <Card className="border-border/60 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="font-display font-bold text-lg mb-1">{linkedTechnology.name}</h3>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{linkedTechnology.category}</span>
+                      <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{linkedTechnology.description}</p>
+                    </div>
+                  </div>
+                  <Button asChild variant="outline" size="sm" className="rounded-full mt-4">
+                    <Link to="/technologies">
+                      View all Technologies <ExternalLink className="h-3 w-3 ml-1" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
           {/* People */}
           <div className="max-w-4xl mx-auto mb-20">
@@ -116,11 +152,6 @@ const InterestDetail = () => {
                             </span>
                           ))}
                         </div>
-                        {member.url && member.url !== "#" && (
-                          <a href={member.url} className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium mt-3">
-                            View Profile <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
