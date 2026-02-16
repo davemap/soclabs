@@ -61,43 +61,44 @@ const DesignDetail = () => {
             </Link>
           </motion.div>
 
-          {/* Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mb-12">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-3 rounded-xl bg-primary/10">
-                <Cpu className="h-8 w-8 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-4xl md:text-5xl font-display font-bold">{design.name}</h1>
-                <p className="text-primary font-medium">{design.tagline}</p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary">{design.processor}</Badge>
-              <Badge variant="secondary">{design.busArchitecture}</Badge>
-              {design.targetTechnology.map((t) => (
-                <Badge key={t} variant="outline">{t}</Badge>
-              ))}
-            </div>
-            {design.provenIn && design.provenIn.length > 0 && (
-              <div className="mt-4 p-4 rounded-lg border border-border bg-muted/30">
-                <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Silicon Proven
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {design.provenIn.map((p) => (
-                    <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-amber-500/50 text-amber-400" : "border-emerald-500/50 text-emerald-400"}`}>
-                      {p.type}: {p.details}
-                    </Badge>
+          <div className="flex gap-8 items-start">
+            {/* Main column */}
+            <div className="flex-1 min-w-0">
+              {/* Header */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mb-12">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-3 rounded-xl bg-primary/10">
+                    <Cpu className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-display font-bold">{design.name}</h1>
+                    <p className="text-primary font-medium">{design.tagline}</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <Badge variant="secondary">{design.processor}</Badge>
+                  <Badge variant="secondary">{design.busArchitecture}</Badge>
+                  {design.targetTechnology.map((t) => (
+                    <Badge key={t} variant="outline">{t}</Badge>
                   ))}
                 </div>
-              </div>
-            )}
-          </motion.div>
+                {design.provenIn && design.provenIn.length > 0 && (
+                  <div className="mt-4 p-4 rounded-lg border border-border bg-muted/30">
+                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Silicon Proven
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {design.provenIn.map((p) => (
+                        <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-amber-500/50 text-amber-400" : "border-emerald-500/50 text-emerald-400"}`}>
+                          {p.type}: {p.details}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
 
-          <div className="flex gap-8 items-start">
-            {/* Main content */}
-            <div className="flex-1 min-w-0 max-w-4xl space-y-12">
+              <div className="max-w-4xl space-y-12">
               {/* Architecture Overview */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-2xl font-display font-bold mb-4">Architecture Overview</h2>
@@ -194,6 +195,7 @@ const DesignDetail = () => {
                   </div>
                 </motion.div>
               )}
+              </div>
             </div>
 
             {/* Sticky sidebar */}
