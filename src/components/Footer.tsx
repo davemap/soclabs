@@ -13,8 +13,8 @@ const Footer = () => {
               </div>
               <span className="text-gradient">SoC Labs</span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Empowering academics and students to build custom System-on-Chip designs around ARM Cortex microprocessors.
+            <p className="text-sm text-muted-foreground leading-relaxed">Empowering academics and students to build custom System-on-Chip designs around arm IP.
+
             </p>
           </div>
 
@@ -52,8 +52,8 @@ const Footer = () => {
           © {new Date().getFullYear()} SoC Labs. All rights reserved.
         </div>
       </div>
-    </footer>
-  );
+    </footer>);
+
 };
 
 export default Footer;
