@@ -11,6 +11,7 @@ import Technologies from "./pages/Technologies";
 import Partners from "./pages/Partners";
 import CommunityMap from "./pages/CommunityMap";
 import About from "./pages/About";
+import Interests from "./pages/Interests";
 import InterestDetail from "./pages/InterestDetail";
 import NotFound from "./pages/NotFound";
 
@@ -30,8 +31,9 @@ const App = () => (
           <Route path="/technologies" element={<Technologies />} />
           <Route path="/partners" element={<Partners />} />
           <Route path="/map" element={<CommunityMap />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/interests" element={<Interests />} />
           <Route path="/interests/:slug" element={<InterestDetail />} />
+          <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -10,6 +10,7 @@ const navLinks = [
   { to: "/projects", label: "Projects" },
   { to: "/learn", label: "Learning Hub" },
   { to: "/technologies", label: "Technologies" },
+  { to: "/interests", label: "Interests" },
   { to: "/partners", label: "Partners" },
   { to: "/map", label: "Community Map" },
   { to: "/about", label: "About" },
