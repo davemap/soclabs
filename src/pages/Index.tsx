@@ -23,7 +23,7 @@ const Index = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-electric/30 bg-electric/10 text-electric text-xs font-semibold mb-8"
             >
               <Sparkles className="h-3.5 w-3.5" />
               Open-Source Silicon Community
@@ -76,15 +76,15 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {referenceDesigns.map((design, i) => (
               <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
-                <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60">
+                <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
                   <CardContent className="p-7">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-display font-bold">{design.name}</h3>
                         <p className="text-sm text-primary font-medium">{design.tagline}</p>
                       </div>
-                      <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Cpu className="h-5 w-5 text-primary" />
+                      <div className="w-11 h-11 rounded-xl bg-electric/10 flex items-center justify-center">
+                        <Cpu className="h-5 w-5 text-electric" />
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
