@@ -18,14 +18,9 @@ const Designs = () => {
             className="max-w-3xl mx-auto text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Reference <span className="text-gradient">SoC Designs</span></h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Proven ARM Cortex-M based architectures ready to fork, extend, and build upon. Each design includes full RTL source, documentation, and synthesis scripts.
             </p>
-            <Button asChild className="rounded-full">
-              <Link to="/designs/submit">
-                <Plus className="h-4 w-4 mr-2" /> Submit Your SoC
-              </Link>
-            </Button>
           </motion.div>
 
           <div className="space-y-16 max-w-4xl mx-auto">
@@ -105,6 +100,28 @@ const Designs = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Submit CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto mt-20 text-center"
+          >
+            <Card className="border-dashed border-2 border-primary/30 bg-primary/5">
+              <CardContent className="p-10">
+                <h2 className="text-2xl font-display font-bold mb-2">Have your own SoC platform?</h2>
+                <p className="text-muted-foreground mb-6">
+                  Submit your reference SoC design to be featured in the SoC Labs registry and share it with the community.
+                </p>
+                <Button asChild size="lg" className="rounded-full">
+                  <Link to="/designs/submit">
+                    <Plus className="h-4 w-4 mr-2" /> Submit Your Reference SoC
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </section>
     </Layout>
