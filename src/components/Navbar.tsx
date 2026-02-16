@@ -12,7 +12,6 @@ const navLinks = [
   { to: "/technologies", label: "Technologies" },
   { to: "/interests", label: "Interests" },
   { to: "/partners", label: "Community" },
-  { to: "/map", label: "Community Map" },
   { to: "/about", label: "About" },
 ];
 
