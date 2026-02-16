@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Github, ExternalLink, Cpu, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,13 +73,13 @@ const Designs = () => {
 
                     <div className="flex gap-3">
                       <Button asChild className="rounded-full">
-                        <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="h-4 w-4 mr-2" /> View on GitHub
-                        </a>
+                        <Link to={`/designs/${design.id}`}>
+                          <ArrowRight className="h-4 w-4 mr-2" /> Explore Design
+                        </Link>
                       </Button>
                       <Button asChild variant="outline" className="rounded-full">
-                        <a href={design.docsUrl}>
-                          <ExternalLink className="h-4 w-4 mr-2" /> Documentation
+                        <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                          <Github className="h-4 w-4 mr-2" /> GitHub
                         </a>
                       </Button>
                     </div>
