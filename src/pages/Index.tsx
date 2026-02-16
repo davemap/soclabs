@@ -35,81 +35,14 @@ const Index = () => {
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
               SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Button asChild size="lg" className="rounded-full px-8 text-base">
                 <Link to="/designs">
                   Explore Designs <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-8 text-base">
-                <Link to="/about#join">Join the Community</Link>
-              </Button>
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="border-y border-border">
-        <div className="container mx-auto px-4 py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <ScrollReveal key={stat.label} delay={i * 0.1} className="text-center">
-                <div className="text-4xl md:text-5xl font-display font-bold text-gradient">{stat.value}</div>
-                <div className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Reference Designs */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <ScrollReveal className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Start with our proven architectures. Fork, extend, and build your custom accelerators on top.
-            </p>
-          </ScrollReveal>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {referenceDesigns.map((design, i) => (
-              <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
-                <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
-                  <CardContent className="p-7">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-display font-bold">{design.name}</h3>
-                        <p className="text-sm text-primary font-medium">{design.tagline}</p>
-                      </div>
-                      <div className="w-11 h-11 rounded-xl bg-electric/10 flex items-center justify-center">
-                        <Cpu className="h-5 w-5 text-electric" />
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {design.features.slice(0, 3).map((f) => (
-                        <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex gap-3">
-                      <Button asChild size="sm" variant="outline" className="rounded-full">
-                        <Link to={`/designs#${design.id}`}>Learn More</Link>
-                      </Button>
-                      <Button asChild size="sm" variant="ghost">
-                        <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="h-4 w-4 mr-1" /> GitHub
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScrollReveal>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -148,6 +81,25 @@ const Index = () => {
                   <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
+              </ScrollReveal>
+            ))}
+          </div>
+          <ScrollReveal className="text-center mt-12">
+            <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
+              <Link to="/about#join">Join the Community</Link>
+            </Button>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="border-y border-border">
+        <div className="container mx-auto px-4 py-14">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, i) => (
+              <ScrollReveal key={stat.label} delay={i * 0.1} className="text-center">
+                <div className="text-4xl md:text-5xl font-display font-bold text-gradient">{stat.value}</div>
+                <div className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</div>
               </ScrollReveal>
             ))}
           </div>
