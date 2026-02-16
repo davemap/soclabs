@@ -1,17 +1,18 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, X, ArrowRight, Building2, GraduationCap, MapPin } from "lucide-react";
+import { ExternalLink, X, ArrowRight, Building2, GraduationCap, MapPin, Filter } from "lucide-react";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { partners, communityMembers } from "@/data/mockData";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-type AcademicPartner = (typeof partners)[number] & { coordinates?: [number, number] };
+type Partner = (typeof partners)[number];
 
 const industryColors = [
   "bg-primary/10 text-primary",
@@ -22,15 +23,26 @@ const industryColors = [
   "bg-coral/10 text-coral",
 ];
 
+type MapFilter = "all" | "academic" | "industry";
+
 const Partners = () => {
-  const [selectedPartner, setSelectedPartner] = useState<AcademicPartner | null>(null);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [mapFilter, setMapFilter] = useState<MapFilter>("all");
+  const [highlightedOrg, setHighlightedOrg] = useState<string | null>(null);
 
   const industryPartners = useMemo(() => partners.filter((p) => p.type === "industry"), []);
   const academicPartners = useMemo(() => partners.filter((p) => p.type === "academic"), []);
 
-  // Find community members associated with each academic institution
-  const getMembersForInstitution = (name: string) =>
-    communityMembers.filter((m) => m.institution === name);
+  const mapPartners = useMemo(() => {
+    return partners.filter((p) => {
+      if (!p.coordinates) return false;
+      if (mapFilter === "all") return true;
+      return p.type === mapFilter;
+    });
+  }, [mapFilter]);
+
+  const getMembersForOrg = (orgId: string) =>
+    communityMembers.filter((m) => m.organisations?.includes(orgId));
 
   return (
     <Layout>
@@ -50,15 +62,31 @@ const Partners = () => {
             </p>
           </motion.div>
 
-          {/* Global Map — Academic Institutions */}
-          <ScrollReveal className="max-w-5xl mx-auto mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <MapPin className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-display font-bold">Global Academic <span className="text-gradient">Network</span></h2>
+          {/* Global Map */}
+          <ScrollReveal className="max-w-5xl mx-auto mb-6">
+            <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                <h2 className="text-2xl font-display font-bold">Global <span className="text-gradient">Network</span></h2>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+                {(["all", "academic", "industry"] as MapFilter[]).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => { setMapFilter(f); setSelectedPartner(null); }}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-xs font-medium transition-all border",
+                      mapFilter === f
+                        ? "bg-foreground text-background border-foreground"
+                        : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
+                    )}
+                  >
+                    {f === "all" ? "All" : f === "academic" ? "Academic" : "Industry"}
+                  </button>
+                ))}
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-6">
-              Our academic partners span the globe. Click on a pin to learn more about each institution.
-            </p>
           </ScrollReveal>
 
           <ScrollReveal className="max-w-5xl mx-auto mb-20">
@@ -86,26 +114,37 @@ const Partners = () => {
                     ))
                   }
                 </Geographies>
-                {academicPartners.map((partner) =>
-                  partner.coordinates ? (
-                    <Marker
-                      key={partner.name}
-                      coordinates={partner.coordinates}
-                      onClick={() => setSelectedPartner(partner)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <circle
-                        r={6}
-                        fill="hsl(210, 100%, 60%)"
-                        stroke="hsl(210, 100%, 80%)"
-                        strokeWidth={2}
-                        opacity={0.9}
-                      />
-                      <circle r={12} fill="transparent" />
-                    </Marker>
-                  ) : null
-                )}
+                {mapPartners.map((partner) => (
+                  <Marker
+                    key={partner.id}
+                    coordinates={partner.coordinates!}
+                    onClick={() => setSelectedPartner(partner)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <circle
+                      r={highlightedOrg === partner.id ? 8 : 6}
+                      fill={partner.type === "academic" ? "hsl(210, 100%, 60%)" : "hsl(15, 85%, 62%)"}
+                      stroke={highlightedOrg === partner.id ? "hsl(0, 0%, 100%)" : partner.type === "academic" ? "hsl(210, 100%, 80%)" : "hsl(15, 85%, 80%)"}
+                      strokeWidth={highlightedOrg === partner.id ? 3 : 2}
+                      opacity={0.9}
+                      className={highlightedOrg === partner.id ? "" : ""}
+                    />
+                    <circle r={12} fill="transparent" />
+                  </Marker>
+                ))}
               </ComposableMap>
+
+              {/* Legend */}
+              <div className="absolute top-3 left-3 flex gap-3">
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[hsl(210,100%,60%)]" />
+                  Academic
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[hsl(15,85%,62%)]" />
+                  Industry
+                </div>
+              </div>
 
               {/* Info popup */}
               <AnimatePresence>
@@ -123,23 +162,27 @@ const Partners = () => {
                       <X className="h-4 w-4" />
                     </button>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <GraduationCap className="h-5 w-5 text-primary" />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${selectedPartner.type === "academic" ? "bg-primary/10" : "bg-coral/10"}`}>
+                        {selectedPartner.type === "academic" ? (
+                          <GraduationCap className="h-5 w-5 text-primary" />
+                        ) : (
+                          <Building2 className="h-5 w-5 text-coral" />
+                        )}
                       </div>
                       <div>
                         <h3 className="font-display font-bold text-lg">{selectedPartner.name}</h3>
+                        <span className="text-xs text-muted-foreground capitalize">{selectedPartner.type} partner</span>
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                       {selectedPartner.description}
                     </p>
 
-                    {/* Members at this institution */}
-                    {getMembersForInstitution(selectedPartner.name).length > 0 && (
+                    {getMembersForOrg(selectedPartner.id).length > 0 && (
                       <div className="mb-4">
                         <p className="text-xs font-display font-semibold text-foreground mb-2">Members</p>
-                        <div className="space-y-2">
-                          {getMembersForInstitution(selectedPartner.name).map((member) => (
+                        <div className="space-y-1.5">
+                          {getMembersForOrg(selectedPartner.id).map((member) => (
                             <Link
                               key={member.id}
                               to={`/community/${member.id}`}
@@ -157,14 +200,12 @@ const Partners = () => {
                       </div>
                     )}
 
-                    <a
-                      href={selectedPartner.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <Link
+                      to={`/partners/${selectedPartner.id}`}
                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
                     >
-                      Visit Website <ExternalLink className="h-3 w-3" />
-                    </a>
+                      View Organisation <ArrowRight className="h-3 w-3" />
+                    </Link>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -183,44 +224,50 @@ const Partners = () => {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {academicPartners.map((partner, i) => {
-                const members = getMembersForInstitution(partner.name);
+                const members = getMembersForOrg(partner.id);
                 return (
-                  <ScrollReveal key={partner.name} delay={i * 0.06}>
-                    <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60">
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
-                          <GraduationCap className="h-5 w-5 text-primary" />
-                        </div>
-                        <h3 className="font-display font-bold text-lg mb-2">{partner.name}</h3>
-                        <p className="text-sm text-muted-foreground flex-1 mb-4 leading-relaxed">{partner.description}</p>
-
-                        {members.length > 0 && (
-                          <div className="mb-4">
-                            <p className="text-xs font-display font-semibold mb-2">{members.length} member{members.length !== 1 ? "s" : ""}</p>
-                            <div className="flex -space-x-2">
-                              {members.slice(0, 5).map((m) => (
-                                <Link
-                                  key={m.id}
-                                  to={`/community/${m.id}`}
-                                  className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card flex items-center justify-center hover:z-10 hover:scale-110 transition-transform"
-                                  title={m.name}
-                                >
-                                  <span className="text-primary font-display font-bold text-[10px]">
-                                    {m.name.split(" ").map((n) => n[0]).join("")}
-                                  </span>
-                                </Link>
-                              ))}
-                            </div>
+                  <ScrollReveal key={partner.id} delay={i * 0.06}>
+                    <Link
+                      to={`/partners/${partner.id}`}
+                      onMouseEnter={() => setHighlightedOrg(partner.id)}
+                      onMouseLeave={() => setHighlightedOrg(null)}
+                    >
+                      <Card className={cn(
+                        "h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60",
+                        highlightedOrg === partner.id && "border-primary/40 shadow-lg"
+                      )}>
+                        <CardContent className="p-6 flex flex-col h-full">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
+                            <GraduationCap className="h-5 w-5 text-primary" />
                           </div>
-                        )}
+                          <h3 className="font-display font-bold text-lg mb-2">{partner.name}</h3>
+                          <p className="text-sm text-muted-foreground flex-1 mb-4 leading-relaxed">{partner.description}</p>
 
-                        <Button asChild variant="ghost" size="sm" className="self-start">
-                          <a href={partner.url} target="_blank" rel="noopener noreferrer">
-                            Visit Website <ExternalLink className="h-3 w-3 ml-1" />
-                          </a>
-                        </Button>
-                      </CardContent>
-                    </Card>
+                          {members.length > 0 && (
+                            <div className="mb-4">
+                              <p className="text-xs font-display font-semibold mb-2">{members.length} member{members.length !== 1 ? "s" : ""}</p>
+                              <div className="flex -space-x-2">
+                                {members.slice(0, 5).map((m) => (
+                                  <div
+                                    key={m.id}
+                                    className="w-8 h-8 rounded-full bg-primary/10 border-2 border-card flex items-center justify-center"
+                                    title={m.name}
+                                  >
+                                    <span className="text-primary font-display font-bold text-[10px]">
+                                      {m.name.split(" ").map((n) => n[0]).join("")}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <span className="text-xs text-primary font-medium inline-flex items-center gap-1">
+                            View details <ArrowRight className="h-3 w-3" />
+                          </span>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </ScrollReveal>
                 );
               })}
@@ -238,24 +285,54 @@ const Partners = () => {
             </ScrollReveal>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {industryPartners.map((partner, i) => (
-                <ScrollReveal key={partner.name} delay={i * 0.06}>
-                  <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60">
-                    <CardContent className="p-6 flex flex-col h-full">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${industryColors[i % industryColors.length]}`}>
-                        <span className="font-display font-bold text-lg">{partner.name[0]}</span>
-                      </div>
-                      <h3 className="font-display font-bold text-lg mb-2">{partner.name}</h3>
-                      <p className="text-sm text-muted-foreground flex-1 mb-4 leading-relaxed">{partner.description}</p>
-                      <Button asChild variant="ghost" size="sm" className="self-start">
-                        <a href={partner.url} target="_blank" rel="noopener noreferrer">
-                          Visit Website <ExternalLink className="h-3 w-3 ml-1" />
-                        </a>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </ScrollReveal>
-              ))}
+              {industryPartners.map((partner, i) => {
+                const members = getMembersForOrg(partner.id);
+                return (
+                  <ScrollReveal key={partner.id} delay={i * 0.06}>
+                    <Link
+                      to={`/partners/${partner.id}`}
+                      onMouseEnter={() => setHighlightedOrg(partner.id)}
+                      onMouseLeave={() => setHighlightedOrg(null)}
+                    >
+                      <Card className={cn(
+                        "h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60",
+                        highlightedOrg === partner.id && "border-coral/40 shadow-lg"
+                      )}>
+                        <CardContent className="p-6 flex flex-col h-full">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${industryColors[i % industryColors.length]}`}>
+                            <span className="font-display font-bold text-lg">{partner.name[0]}</span>
+                          </div>
+                          <h3 className="font-display font-bold text-lg mb-2">{partner.name}</h3>
+                          <p className="text-sm text-muted-foreground flex-1 mb-4 leading-relaxed">{partner.description}</p>
+
+                          {members.length > 0 && (
+                            <div className="mb-4">
+                              <p className="text-xs font-display font-semibold mb-2">{members.length} collaborator{members.length !== 1 ? "s" : ""}</p>
+                              <div className="flex -space-x-2">
+                                {members.slice(0, 5).map((m) => (
+                                  <div
+                                    key={m.id}
+                                    className="w-8 h-8 rounded-full bg-coral/10 border-2 border-card flex items-center justify-center"
+                                    title={m.name}
+                                  >
+                                    <span className="text-coral font-display font-bold text-[10px]">
+                                      {m.name.split(" ").map((n) => n[0]).join("")}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          <span className="text-xs text-coral font-medium inline-flex items-center gap-1">
+                            View details <ArrowRight className="h-3 w-3" />
+                          </span>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
         </div>
