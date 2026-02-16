@@ -9,15 +9,15 @@ import { communityProjects } from "@/data/mockData";
 const Projects = () => {
   return (
     <Layout>
-      <section className="py-20">
+      <section className="py-24">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl font-bold mb-4">Community <span className="text-gradient">Projects</span></h1>
-            <p className="text-lg text-muted-foreground">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Community <span className="text-gradient">Projects</span></h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Explore what our community has built. Each project extends a SoC Labs reference design with custom accelerators and peripherals.
             </p>
           </motion.div>
@@ -31,16 +31,16 @@ const Projects = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
               >
-                <Card className="h-full hover:shadow-lg transition-shadow">
+                <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60">
                   <CardContent className="p-6 flex flex-col h-full">
-                    <h3 className="text-lg font-bold mb-1">{project.title}</h3>
-                    <p className="text-sm text-primary font-mono mb-1">{project.author}</p>
+                    <h3 className="text-lg font-display font-bold mb-1">{project.title}</h3>
+                    <p className="text-sm text-primary font-medium mb-1">{project.author}</p>
                     <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
-                    <p className="text-sm text-muted-foreground mb-4 flex-1">{project.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed">{project.description}</p>
 
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {project.tags.map((tag) => (
-                        <span key={tag} className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">
+                        <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
                           <Tag className="h-2.5 w-2.5" />{tag}
                         </span>
                       ))}

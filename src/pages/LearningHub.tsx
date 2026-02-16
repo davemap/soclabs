@@ -16,15 +16,15 @@ const LearningHub = () => {
 
   return (
     <Layout>
-      <section className="py-20">
+      <section className="py-24">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl font-bold mb-4">Hardware Design <span className="text-gradient">Learning Hub</span></h1>
-            <p className="text-lg text-muted-foreground">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Hardware Design <span className="text-gradient">Learning Hub</span></h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
               A step-by-step guide through the stages of digital hardware design — from specification to silicon.
             </p>
           </motion.div>
@@ -50,9 +50,9 @@ const LearningHub = () => {
                   >
                     <div
                       className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all",
+                        "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
                         i === activeStage
-                          ? "border-primary bg-primary/20 shadow-md"
+                          ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
                           : i < activeStage
                           ? "border-primary bg-primary/10"
                           : "border-border bg-background"
@@ -60,7 +60,7 @@ const LearningHub = () => {
                     >
                       <StepIcon className="h-4 w-4" />
                     </div>
-                    <span className="text-xs font-mono hidden sm:block">{s.shortTitle}</span>
+                    <span className="text-xs font-display font-medium hidden sm:block">{s.shortTitle}</span>
                   </button>
                 );
               })}
@@ -75,20 +75,20 @@ const LearningHub = () => {
             transition={{ duration: 0.3 }}
             className="max-w-3xl mx-auto"
           >
-            <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-primary/10">
+            <div className="rounded-2xl border border-border/60 bg-card p-8 md:p-10 shadow-sm">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-3 rounded-xl bg-primary/10">
                   <Icon className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">{stage.title}</h2>
-                  <p className="text-sm text-primary font-mono">Stage {activeStage + 1} of {designStages.length}</p>
+                  <h2 className="text-2xl font-display font-bold">{stage.title}</h2>
+                  <p className="text-sm text-primary font-medium">Stage {activeStage + 1} of {designStages.length}</p>
                 </div>
               </div>
 
-              <p className="text-muted-foreground mb-6">{stage.description}</p>
+              <p className="text-muted-foreground mb-6 leading-relaxed">{stage.description}</p>
 
-              <h3 className="font-semibold text-sm mb-3">Key Activities</h3>
+              <h3 className="font-display font-semibold text-sm mb-3">Key Activities</h3>
               <ul className="space-y-2 mb-8">
                 {stage.details.map((d) => (
                   <li key={d} className="flex items-start gap-2 text-sm text-muted-foreground">
@@ -111,7 +111,7 @@ const LearningHub = () => {
                 {activeStage < designStages.length - 1 && (
                   <button
                     onClick={() => setActiveStage(activeStage + 1)}
-                    className="text-sm text-primary hover:text-primary/80 transition-colors"
+                    className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
                   >
                     {designStages[activeStage + 1].title} →
                   </button>
