@@ -610,41 +610,105 @@ export const technologies = [
 ];
 
 export const partners = [
+  // Industry Partners
   {
     name: "ARM",
+    type: "industry" as const,
     description: "Provider of processor IP through the DesignStart programme, enabling academic access to Cortex-M processors.",
     url: "https://www.arm.com",
     logo: "/placeholder.svg",
   },
   {
     name: "Europractice",
+    type: "industry" as const,
     description: "ASIC fabrication service providing multi-project wafer (MPW) shuttle access for academic and research institutions.",
     url: "https://europractice-ic.com",
     logo: "/placeholder.svg",
   },
   {
     name: "UKRI",
+    type: "industry" as const,
     description: "UK Research and Innovation — funding body supporting research infrastructure and collaborative projects.",
     url: "https://www.ukri.org",
     logo: "/placeholder.svg",
   },
   {
     name: "IEEE",
+    type: "industry" as const,
     description: "Professional association supporting standards development and knowledge sharing in electronics and computing.",
     url: "https://www.ieee.org",
     logo: "/placeholder.svg",
   },
   {
     name: "Google",
+    type: "industry" as const,
     description: "Supporting open-source silicon initiatives and providing shuttle access through the Google-sponsored OpenMPW programme.",
     url: "https://developers.google.com",
     logo: "/placeholder.svg",
   },
   {
     name: "efabless",
+    type: "industry" as const,
     description: "Platform for open-source chip design and fabrication, providing access to shuttle programmes.",
     url: "https://efabless.com",
     logo: "/placeholder.svg",
+  },
+  // Academic Partners
+  {
+    name: "Imperial College London",
+    type: "academic" as const,
+    description: "Leading research in embedded intelligence and hardware-software co-design for edge AI applications.",
+    url: "https://www.imperial.ac.uk",
+    logo: "/placeholder.svg",
+    coordinates: [-0.1749, 51.4988] as [number, number],
+  },
+  {
+    name: "University of Cape Town",
+    type: "academic" as const,
+    description: "Pioneering hardware security research with a focus on lightweight cryptographic implementations for IoT.",
+    url: "https://www.uct.ac.za",
+    logo: "/placeholder.svg",
+    coordinates: [18.4601, -33.9577] as [number, number],
+  },
+  {
+    name: "ETH Zürich",
+    type: "academic" as const,
+    description: "World-class research in reconfigurable computing and digital signal processing architectures.",
+    url: "https://ethz.ch",
+    logo: "/placeholder.svg",
+    coordinates: [8.5482, 47.3769] as [number, number],
+  },
+  {
+    name: "University of Tokyo",
+    type: "academic" as const,
+    description: "Research in heterogeneous multi-ISA architectures and advanced processor design methodologies.",
+    url: "https://www.u-tokyo.ac.jp/en/",
+    logo: "/placeholder.svg",
+    coordinates: [139.7671, 35.6812] as [number, number],
+  },
+  {
+    name: "MIT",
+    type: "academic" as const,
+    description: "Energy-efficient circuits research spanning digital and mixed-signal power management for IoT devices.",
+    url: "https://www.mit.edu",
+    logo: "/placeholder.svg",
+    coordinates: [-71.0942, 42.3601] as [number, number],
+  },
+  {
+    name: "IIT Bombay",
+    type: "academic" as const,
+    description: "Expert research in on-chip communication architectures and SoC integration methodologies.",
+    url: "https://www.iitb.ac.in",
+    logo: "/placeholder.svg",
+    coordinates: [72.8544, 19.0222] as [number, number],
+  },
+  {
+    name: "TU Munich",
+    type: "academic" as const,
+    description: "Safety-critical hardware design research targeting automotive ISO 26262 compliance.",
+    url: "https://www.tum.de/en/",
+    logo: "/placeholder.svg",
+    coordinates: [11.5820, 48.1351] as [number, number],
   },
 ];
 
