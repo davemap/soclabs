@@ -33,7 +33,6 @@ const Footer = () => {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link to="/interests" className="hover:text-primary transition-colors">Interests</Link></li>
               <li><Link to="/partners" className="hover:text-primary transition-colors">Community</Link></li>
-              <li><Link to="/map" className="hover:text-primary transition-colors">Global Map</Link></li>
               <li><Link to="/about" className="hover:text-primary transition-colors">About Us</Link></li>
               <li><Link to="/about#join" className="hover:text-primary transition-colors">Join</Link></li>
             </ul>
