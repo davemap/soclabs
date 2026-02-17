@@ -37,6 +37,7 @@ interface MilestoneTrackerProps {
   technology?: string;
   isFloating?: boolean;
   isSticky?: boolean;
+  compact?: boolean;
 }
 
 const progressColor = (p: number) => {
@@ -102,12 +103,14 @@ const PhaseNode = ({
   progress,
   milestones,
   onPhaseClick,
+  compact,
 }: {
   phase: typeof siliconValidationPhase;
   phaseKey: string;
   progress: number;
   milestones: Milestone[];
   onPhaseClick?: (phase: string, taskIndex?: number) => void;
+  compact?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const timeout = useRef<ReturnType<typeof setTimeout>>();
@@ -162,7 +165,7 @@ const PhaseNode = ({
       </span>
 
       {/* Hover dropdown */}
-      {open && phaseTasks.length > 0 && (
+      {!compact && open && phaseTasks.length > 0 && (
         <div
           className="absolute top-full mt-1 w-56 z-50"
           onMouseEnter={show}
@@ -214,7 +217,7 @@ const PhaseNode = ({
   );
 };
 
-const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, technology, isFloating, isSticky = true }: MilestoneTrackerProps) => {
+const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, technology, isFloating, isSticky = true, compact = false }: MilestoneTrackerProps) => {
   const hiddenPhases = technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
   const visiblePhaseKeys = phaseKeys.filter((k) => !hiddenPhases.has(k));
   const activeIndex = visiblePhaseKeys.reduce((max, key, i) => {
@@ -229,7 +232,8 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
    return (
     <div
       className={cn(
-        "z-30 mb-10",
+        "z-30",
+        compact ? "mb-0" : "mb-10",
         isSticky ? "sticky top-24" : "relative"
       )}
     >
@@ -245,10 +249,11 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
         transition={{ delay: 0.05 }}
         className={cn(
           "relative rounded-xl border bg-card/95 backdrop-blur-md px-4 py-3 shadow-sm",
+          compact && "rounded-b-none border-b-0",
           techBorderClass
         )}
       >
-      <div className="text-xs font-display font-semibold text-muted-foreground mb-2">Project Progress</div>
+      {!compact && <div className="text-xs font-display font-semibold text-muted-foreground mb-2">Project Progress</div>}
       <div className="relative flex items-start justify-between">
         <div className="absolute top-[25px] left-[25px] right-[25px] h-[3px] rounded-full bg-primary/20" />
         <div
@@ -271,6 +276,7 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
               progress={progress}
               milestones={milestones}
               onPhaseClick={onPhaseClick}
+              compact={compact}
             />
           );
         })}

@@ -351,6 +351,7 @@ const ProjectDetail = () => {
                           technology={project.technology}
                           isFloating={false}
                           isSticky={false}
+                          compact
                         />
                       )
                     }
