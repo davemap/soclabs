@@ -94,7 +94,7 @@ const LearningTopicDetail = () => {
                         return (
                           <Link
                             key={p.id}
-                            to={`/learn?phase=${p.id}`}
+                            to={`/learn/${p.id}/${p.topics[0].id}`}
                             className={cn(
                               "relative z-10 flex flex-col items-center gap-2 group",
                               i <= phaseIndex ? "text-primary" : "text-muted-foreground"
