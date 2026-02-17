@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -59,6 +58,9 @@ interface ProjectMilestonesProps {
   onEditUpdate?: (index: number, field: string, value: any) => void;
   onEditSave?: () => void;
   editSaving?: boolean;
+  isOwner?: boolean;
+  onCompleteTask?: (milestoneIndex: number) => void;
+  onCompletePhase?: (phase: string) => void;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -131,7 +133,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -215,8 +217,8 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
       phase,
       label: phaseLabels[phase] || phase,
       tasks: editMode && editMilestones
-        ? editMilestones.map((m, i) => ({ ...m, originalIndex: i })).filter((m) => m.phase === phase)
-        : milestones.filter((m) => m.phase === phase).map((m, i) => ({ ...m, originalIndex: -1 })),
+        ? editMilestones.map((m, i) => ({ ...m, originalIndex: i, globalIndex: i })).filter((m) => m.phase === phase)
+        : milestones.map((m, i) => ({ ...m, originalIndex: -1, globalIndex: i })).filter((m) => m.phase === phase),
       greyedOut: greyedOutPhases.has(phase),
     }))
     .filter((g) => g.tasks.length > 0 || g.greyedOut || editMode);
@@ -360,6 +362,18 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     <span className="hidden sm:inline">Learn</span>
                   </Link>
                 )}
+                {!editMode && isOwner && onCompletePhase && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 rounded-full h-7 text-[11px] gap-1"
+                    disabled={tasks.length === 0 || !tasks.every((t) => t.done)}
+                    onClick={(e) => { e.stopPropagation(); onCompletePhase(phase); }}
+                  >
+                    <CheckCheck className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Complete Phase</span>
+                  </Button>
+                )}
                 {editMode && onEditAdd && (
                   <button
                     onClick={(e) => { e.stopPropagation(); onEditAdd(phase); if (!isExpanded) togglePhase(phase); }}
@@ -487,9 +501,10 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
 
                         return (
                           <div key={i} className="rounded-lg border border-border/30 overflow-hidden">
+                            <div className="flex items-center gap-0">
                             <button
                               onClick={() => toggleTask(taskKey)}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/20 transition-colors"
+                              className="flex-1 flex items-center gap-2.5 px-3 py-2 text-left hover:bg-muted/20 transition-colors min-w-0"
                             >
                               {task.done ? (
                                 <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
@@ -527,6 +542,16 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                 )}
                               />
                             </button>
+                            {!task.done && isOwner && onCompleteTask && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); onCompleteTask(task.globalIndex); }}
+                                className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 mr-1 text-[11px] font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-md transition-colors"
+                              >
+                                <CheckCheck className="h-3.5 w-3.5" />
+                                <span className="hidden sm:inline">Complete</span>
+                              </button>
+                            )}
+                            </div>
 
                             <AnimatePresence>
                               {taskExpanded && (

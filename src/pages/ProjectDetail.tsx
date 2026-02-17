@@ -21,6 +21,7 @@ import ProjectMilestonesManager from "@/components/project-manage/ProjectMilesto
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
 import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
+import CompleteTaskDialog from "@/components/project-manage/CompleteTaskDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -253,7 +254,69 @@ const ProjectDetail = () => {
   const [addTaskDialogPhase, setAddTaskDialogPhase] = useState<string | null>(null);
   const [projectCollaborators, setProjectCollaborators] = useState<{ user_id: string; full_name: string | null; username: string | null }[]>([]);
 
-  // Fetch collaborators (owner + accepted join requests)
+  // Complete task/phase dialog state
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [completeDialogTitle, setCompleteDialogTitle] = useState("");
+  const [completeDialogSubtitle, setCompleteDialogSubtitle] = useState("");
+  const [completeTarget, setCompleteTarget] = useState<{ type: "task"; index: number } | { type: "phase"; phase: string } | null>(null);
+
+  const handleCompleteTask = (milestoneIndex: number) => {
+    const m = dbMilestones[milestoneIndex];
+    if (!m) return;
+    setCompleteTarget({ type: "task", index: milestoneIndex });
+    setCompleteDialogTitle("Complete Task");
+    setCompleteDialogSubtitle(m.task);
+    setCompleteDialogOpen(true);
+  };
+
+  const handleCompletePhase = (phase: string) => {
+    const phaseLabels: Record<string, string> = {
+      architecture: "Architecture", rtl: "RTL Design", verification: "Verification",
+      synthesis: "Synthesis", "physical-design": "Physical Design", tapeout: "Tapeout",
+      "silicon-validation": "Silicon Validation",
+    };
+    setCompleteTarget({ type: "phase", phase });
+    setCompleteDialogTitle("Complete Phase");
+    setCompleteDialogSubtitle(phaseLabels[phase] || phase);
+    setCompleteDialogOpen(true);
+  };
+
+  const handleCompleteSubmit = async (data: { completed_date: string; effort_rating: number; uncertainty_rating: number }) => {
+    if (!completeTarget || !dbProject) return;
+    try {
+      if (completeTarget.type === "task") {
+        const m = dbMilestones[completeTarget.index];
+        if (m) {
+          await supabase.from("project_milestones").update({
+            done: true,
+            completed_date: data.completed_date,
+            effort_rating: data.effort_rating,
+            uncertainty_rating: data.uncertainty_rating,
+          }).eq("id", m.id);
+        }
+      } else {
+        // Complete all tasks in the phase
+        const phaseMilestones = dbMilestones.filter((m: any) => m.phase === completeTarget.phase);
+        for (const m of phaseMilestones) {
+          if (!m.done) {
+            await supabase.from("project_milestones").update({
+              done: true,
+              completed_date: data.completed_date,
+              effort_rating: data.effort_rating,
+              uncertainty_rating: data.uncertainty_rating,
+            }).eq("id", m.id);
+          }
+        }
+      }
+      toast.success(completeTarget.type === "task" ? "Task completed!" : "Phase completed!");
+      refreshMilestones();
+    } catch {
+      toast.error("Failed to complete");
+    }
+    setCompleteDialogOpen(false);
+    setCompleteTarget(null);
+  };
+
   useEffect(() => {
     if (!dbProject) return;
     const fetchCollabs = async () => {
@@ -773,7 +836,7 @@ const ProjectDetail = () => {
             {/* DB Milestones display / inline edit */}
             <div id="project-milestones">
               <ProjectMilestones
-                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
+                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, effort: m.effort_rating, uncertainty: m.uncertainty_rating, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
                 expandPhase={expandPhase}
                 expandTaskIndex={expandTaskIndex}
                 technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
@@ -799,6 +862,9 @@ const ProjectDetail = () => {
                 onEditUpdate={handleEditMilestoneUpdate}
                 onEditSave={handleEditMilestonesSave}
                 editSaving={savingMilestones}
+                isOwner={isOwner}
+                onCompleteTask={handleCompleteTask}
+                onCompletePhase={handleCompletePhase}
               />
               {addTaskDialogPhase && (
                 <AddMilestoneTaskDialog
@@ -814,6 +880,13 @@ const ProjectDetail = () => {
                   onSubmit={handleDialogSubmit}
                 />
               )}
+              <CompleteTaskDialog
+                open={completeDialogOpen}
+                onOpenChange={setCompleteDialogOpen}
+                title={completeDialogTitle}
+                subtitle={completeDialogSubtitle}
+                onSubmit={handleCompleteSubmit}
+              />
             </div>
 
             {/* Join Request Form for non-owners */}
