@@ -6,9 +6,11 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const About = () => {
   const [joinOpen, setJoinOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <Layout>
@@ -83,22 +85,24 @@ const About = () => {
       </section>
 
       {/* Join CTA */}
-      <section id="join" className="py-24 bg-muted/40 accent-stripe border-t border-border">
-        <div className="container mx-auto px-4">
-          <ScrollReveal className="max-w-lg mx-auto text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
-              <Mail className="h-6 w-6" />
-            </div>
-            <h2 className="text-3xl font-display font-bold mb-2">Join the Community</h2>
-            <p className="text-muted-foreground mb-6">
-              Interested in building custom silicon? Sign up and become part of SoC Labs.
-            </p>
-            <Button className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
-              Join Community <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </ScrollReveal>
-        </div>
-      </section>
+      {!user && (
+        <section id="join" className="py-24 bg-muted/40 accent-stripe border-t border-border">
+          <div className="container mx-auto px-4">
+            <ScrollReveal className="max-w-lg mx-auto text-center">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-4">
+                <Mail className="h-6 w-6" />
+              </div>
+              <h2 className="text-3xl font-display font-bold mb-2">Join the Community</h2>
+              <p className="text-muted-foreground mb-6">
+                Interested in building custom silicon? Sign up and become part of SoC Labs.
+              </p>
+              <Button className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
+                Join Community <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </ScrollReveal>
+          </div>
+        </section>
+      )}
 
       <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </Layout>

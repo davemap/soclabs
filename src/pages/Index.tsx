@@ -8,6 +8,7 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
+import { useAuth } from "@/hooks/useAuth";
 
 import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
 import imgAsicTapeout from "@/assets/news/asic-tapeout.jpg";
@@ -28,6 +29,7 @@ const articleImages: Record<string, string> = {
 };
 
 const Index = () => {
+  const { user } = useAuth();
   return (
     <Layout>
       {/* Hero */}
@@ -173,12 +175,13 @@ const Index = () => {
               </div>
             </div>
           </ScrollReveal>
-
-          <ScrollReveal className="text-center mt-12">
-            <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
-              <Link to="/about#join">Join the Community</Link>
-            </Button>
-          </ScrollReveal>
+          {!user && (
+            <ScrollReveal className="text-center mt-12">
+              <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
+                <Link to="/about#join">Join the Community</Link>
+              </Button>
+            </ScrollReveal>
+          )}
         </div>
       </section>
 
