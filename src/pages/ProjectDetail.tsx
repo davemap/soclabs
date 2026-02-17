@@ -282,68 +282,70 @@ const ProjectDetail = () => {
 
             {/* Sticky author sidebar */}
             <aside className="hidden lg:block w-56 shrink-0">
-              <div className="sticky top-24 rounded-xl border border-border/60 bg-card p-4 shadow-sm">
-                <div className="flex flex-col items-center text-center">
-                  <Avatar className="h-16 w-16 mb-3">
-                    <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  {author ? (
-                    <Link
-                      to={`/community/${author.id}`}
-                      className="text-sm font-display font-bold hover:text-primary transition-colors"
-                    >
-                      {project.author}
-                    </Link>
-                  ) : (
-                    <span className="text-sm font-display font-bold">{project.author}</span>
+              <div className="sticky top-24 space-y-3">
+                <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                  <div className="flex flex-col items-center text-center">
+                    <Avatar className="h-16 w-16 mb-3">
+                      <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    {author ? (
+                      <Link
+                        to={`/community/${author.id}`}
+                        className="text-sm font-display font-bold hover:text-primary transition-colors"
+                      >
+                        {project.author}
+                      </Link>
+                    ) : (
+                      <span className="text-sm font-display font-bold">{project.author}</span>
+                    )}
+                    <span className="text-xs text-muted-foreground mt-0.5">{project.institution}</span>
+                  </div>
+
+                  {author && (
+                    <>
+                      <div className="border-t border-border/60 mt-3 pt-3">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Expertise</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {author.expertise.map((e) => (
+                            <Badge key={e} variant="secondary" className="text-[10px] px-2 py-0.5">
+                              {e}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border-t border-border/60 mt-3 pt-3">
+                        <Button asChild variant="outline" size="sm" className="w-full rounded-lg justify-start">
+                          <Link to={`/community/${author.id}`}>
+                            <User className="h-3.5 w-3.5 mr-2" /> View Profile
+                          </Link>
+                        </Button>
+                      </div>
+                    </>
                   )}
-                  <span className="text-xs text-muted-foreground mt-0.5">{project.institution}</span>
                 </div>
 
-                {author && (
-                  <>
-                    <div className="border-t border-border/60 mt-3 pt-3">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Expertise</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {author.expertise.map((e) => (
-                          <Badge key={e} variant="secondary" className="text-[10px] px-2 py-0.5">
-                            {e}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="border-t border-border/60 mt-3 pt-3">
-                      <Button asChild variant="outline" size="sm" className="w-full rounded-lg justify-start">
-                        <Link to={`/community/${author.id}`}>
-                          <User className="h-3.5 w-3.5 mr-2" /> View Profile
-                        </Link>
-                      </Button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Links card */}
-              <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm mt-3">
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
-                <div className="flex flex-col gap-2">
-                  <Button asChild size="sm" className="w-full rounded-lg">
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Github className="h-4 w-4 mr-2" /> Repository
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-                  </Button>
-                  {project.docsUrl && (
-                    <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
-                      <a href={project.docsUrl} target="_blank" rel="noopener noreferrer">
-                        <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                {/* Links card */}
+                <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
+                  <div className="flex flex-col gap-2">
+                    <Button asChild size="sm" className="w-full rounded-lg">
+                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                        <Github className="h-4 w-4 mr-2" /> Repository
                         <ExternalLink className="h-3 w-3 ml-1" />
                       </a>
                     </Button>
-                  )}
+                    {project.docsUrl && (
+                      <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
+                        <a href={project.docsUrl} target="_blank" rel="noopener noreferrer">
+                          <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                          <ExternalLink className="h-3 w-3 ml-1" />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </aside>
