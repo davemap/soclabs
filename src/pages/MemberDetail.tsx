@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Building2, FolderOpen, Heart, ExternalLink, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { communityMembers, communityProjects, partners } from "@/data/mockData";
 import { interests } from "@/data/interests";
 
 const MemberDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const member = communityMembers.find((m) => m.id === id);
 
@@ -18,8 +19,8 @@ const MemberDetail = () => {
         <section className="py-24">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl font-display font-bold mb-4">Member not found</h1>
-            <Button asChild variant="outline">
-              <Link to="/partners"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Community</Link>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
             </Button>
           </div>
         </section>
@@ -59,12 +60,12 @@ const MemberDetail = () => {
       <section className="py-24">
         <div className="container mx-auto px-4 max-w-4xl">
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <Link
-              to="/partners"
+            <button
+              onClick={() => navigate(-1)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Community
-            </Link>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
           </motion.div>
 
           {/* Profile Header */}

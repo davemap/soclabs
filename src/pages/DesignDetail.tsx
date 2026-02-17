@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ const blockTypeColor: Record<string, string> = {
 };
 
 const DesignDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const design = referenceDesigns.find((d) => d.id === id);
 
@@ -34,9 +35,9 @@ const DesignDetail = () => {
       <Layout>
         <div className="container mx-auto px-4 py-32 text-center">
           <h1 className="text-3xl font-display font-bold mb-4">Design Not Found</h1>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link to="/designs"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Designs</Link>
-          </Button>
+            <Button variant="outline" className="rounded-full" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
+            </Button>
         </div>
       </Layout>
     );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { allNewsTags, type NewsTag } from "@/data/newsData";
 import { useToast } from "@/hooks/use-toast";
 
 const SubmitNews = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedTags, setSelectedTags] = useState<NewsTag[]>([]);
 
@@ -34,10 +35,8 @@ const SubmitNews = () => {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-2xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Button asChild variant="ghost" size="sm" className="mb-8 -ml-2 rounded-full">
-              <Link to="/news">
-                <ArrowLeft className="mr-1 h-4 w-4" /> Back to News
-              </Link>
+            <Button variant="ghost" size="sm" className="mb-8 -ml-2 rounded-full" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Button>
 
             <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">Submit a News Article</h1>

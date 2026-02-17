@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const statusColor = (status: string) => {
 };
 
 const ProjectDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
@@ -33,10 +34,8 @@ const ProjectDetail = () => {
         <section className="py-24">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-3xl font-display font-bold mb-4">Project not found</h1>
-            <Button asChild variant="outline">
-              <Link to="/projects">
-                <ArrowLeft className="h-4 w-4 mr-2" /> Back to Projects
-              </Link>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
             </Button>
           </div>
         </section>
@@ -57,12 +56,12 @@ const ProjectDetail = () => {
         <div className="container mx-auto px-4 max-w-5xl">
           {/* Back link */}
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <Link
-              to="/projects"
+            <button
+              onClick={() => navigate(-1)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Projects
-            </Link>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
           </motion.div>
 
           <div className="flex gap-8">

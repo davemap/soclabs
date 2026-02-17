@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Calendar, User, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 
 const NewsDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const article = newsArticles.find((a) => a.id === id);
 
@@ -17,10 +18,8 @@ const NewsDetail = () => {
       <Layout>
         <div className="container mx-auto px-4 py-32 text-center">
           <h1 className="text-3xl font-display font-bold mb-4">Article Not Found</h1>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link to="/news">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to News
-            </Link>
+          <Button variant="outline" className="rounded-full" onClick={() => navigate(-1)}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
           </Button>
         </div>
       </Layout>
@@ -32,10 +31,8 @@ const NewsDetail = () => {
       <article className="py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Button asChild variant="ghost" size="sm" className="mb-8 -ml-2 rounded-full">
-              <Link to="/news">
-                <ArrowLeft className="mr-1 h-4 w-4" /> Back to News
-              </Link>
+            <Button variant="ghost" size="sm" className="mb-8 -ml-2 rounded-full" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Button>
 
             <div className="flex flex-wrap gap-2 mb-4">

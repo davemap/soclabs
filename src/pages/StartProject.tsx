@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -151,12 +151,12 @@ const StartProject = () => {
       <section className="py-24">
         <div className="container mx-auto px-4 max-w-3xl">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Link
-              to="/projects"
+            <button
+              onClick={() => window.history.back()}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Projects
-            </Link>
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">

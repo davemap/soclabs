@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, GraduationCap, Building2, Users, FolderOpen, Github, Tag } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { partners, communityMembers, communityProjects } from "@/data/mockData";
 
 const OrganisationDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const org = partners.find((p) => p.id === id);
 
@@ -17,7 +18,7 @@ const OrganisationDetail = () => {
       <Layout>
         <div className="py-24 text-center">
           <h1 className="text-2xl font-display font-bold mb-4">Organisation not found</h1>
-          <Link to="/partners" className="text-primary hover:underline">← Back to Community</Link>
+          <button onClick={() => navigate(-1)} className="text-primary hover:underline">← Go Back</button>
         </div>
       </Layout>
     );
@@ -34,12 +35,12 @@ const OrganisationDetail = () => {
     <Layout>
       <section className="py-24">
         <div className="container mx-auto px-4">
-          <Link
-            to="/partners"
+          <button
+            onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to Community
-          </Link>
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
 
           {/* Header */}
           <motion.div
