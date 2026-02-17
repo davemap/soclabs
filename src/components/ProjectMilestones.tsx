@@ -35,6 +35,11 @@ interface EditableMilestone {
   task: string;
   done: boolean;
   sort_order: number;
+  blurb?: string;
+  assignee_id?: string | null;
+  start_date?: string | null;
+  projected_end_date?: string | null;
+  learning_topic_ids?: string[];
 }
 
 interface ProjectMilestonesProps {
@@ -412,31 +417,61 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                             <p className="text-xs text-muted-foreground py-2 px-1">No tasks yet. Click "Add" above to get started.</p>
                           )}
                           {tasks.map((task) => (
-                            <div key={task.originalIndex} className="flex items-center gap-2 rounded-lg bg-muted/30 px-3 py-2">
-                              <button
-                                type="button"
-                                onClick={() => onEditUpdate?.(task.originalIndex, "done", !task.done)}
-                                className="shrink-0"
-                              >
-                                {task.done ? (
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                ) : (
-                                  <Circle className="h-4 w-4 text-muted-foreground/40" />
-                                )}
-                              </button>
-                              <Input
-                                placeholder="Task description..."
-                                value={task.task}
-                                onChange={(e) => onEditUpdate?.(task.originalIndex, "task", e.target.value)}
-                                className="flex-1 h-8 text-sm border-none bg-transparent shadow-none focus-visible:ring-0 px-1"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => onEditRemove?.(task.originalIndex)}
-                                className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                              </button>
+                            <div key={task.originalIndex} className="rounded-lg bg-muted/30 px-3 py-2 space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => onEditUpdate?.(task.originalIndex, "done", !task.done)}
+                                  className="shrink-0"
+                                >
+                                  {task.done ? (
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                  ) : (
+                                    <Circle className="h-4 w-4 text-muted-foreground/40" />
+                                  )}
+                                </button>
+                                <span className="flex-1 text-sm font-medium truncate">{task.task}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => onEditRemove?.(task.originalIndex)}
+                                  className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                                </button>
+                              </div>
+                              {(task.blurb || task.start_date || task.projected_end_date || (task.learning_topic_ids && task.learning_topic_ids.length > 0)) && (
+                                <div className="pl-6 space-y-1">
+                                  {task.blurb && (
+                                    <p className="text-xs text-muted-foreground line-clamp-2">{task.blurb}</p>
+                                  )}
+                                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground">
+                                    {task.start_date && (
+                                      <span className="flex items-center gap-0.5">
+                                        <Calendar className="h-3 w-3" /> {task.start_date}
+                                      </span>
+                                    )}
+                                    {task.projected_end_date && (
+                                      <span className="flex items-center gap-0.5">→ {task.projected_end_date}</span>
+                                    )}
+                                  </div>
+                                  {task.learning_topic_ids && task.learning_topic_ids.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {task.learning_topic_ids.map((topicId: string) => {
+                                        let title = topicId;
+                                        for (const lp of learningPhases) {
+                                          const t = lp.topics.find((tp) => tp.id === topicId);
+                                          if (t) { title = t.title; break; }
+                                        }
+                                        return (
+                                          <span key={topicId} className="text-[10px] px-1.5 py-0.5 rounded bg-primary/8 text-primary">
+                                            {title}
+                                          </span>
+                                        );
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </>

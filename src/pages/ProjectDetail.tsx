@@ -20,6 +20,7 @@ import ProjectMilestonesManager from "@/components/project-manage/ProjectMilesto
 
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
+import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
@@ -247,19 +248,60 @@ const ProjectDetail = () => {
   }, [hasUnsavedChanges]);
 
   // Inline edit state for milestones
-  const [editMilestones, setEditMilestones] = useState<{ id?: string; phase: string; task: string; done: boolean; sort_order: number }[]>([]);
+  const [editMilestones, setEditMilestones] = useState<{ id?: string; phase: string; task: string; done: boolean; sort_order: number; blurb?: string; assignee_id?: string | null; start_date?: string | null; projected_end_date?: string | null; learning_topic_ids?: string[] }[]>([]);
   const [savingMilestones, setSavingMilestones] = useState(false);
+  const [addTaskDialogPhase, setAddTaskDialogPhase] = useState<string | null>(null);
+  const [projectCollaborators, setProjectCollaborators] = useState<{ user_id: string; full_name: string | null; username: string | null }[]>([]);
+
+  // Fetch collaborators (owner + accepted join requests)
+  useEffect(() => {
+    if (!dbProject) return;
+    const fetchCollabs = async () => {
+      const collabs: { user_id: string; full_name: string | null; username: string | null }[] = [];
+      // Add owner
+      const { data: ownerProfile } = await supabase.from("profiles").select("user_id, full_name, username").eq("user_id", dbProject.user_id).maybeSingle();
+      if (ownerProfile) collabs.push(ownerProfile);
+      // Add accepted members
+      const { data: accepted } = await supabase.from("project_join_requests").select("user_id").eq("project_id", dbProject.id).eq("status", "accepted");
+      if (accepted) {
+        for (const req of accepted) {
+          if (req.user_id !== dbProject.user_id) {
+            const { data: profile } = await supabase.from("profiles").select("user_id, full_name, username").eq("user_id", req.user_id).maybeSingle();
+            if (profile) collabs.push(profile);
+          }
+        }
+      }
+      setProjectCollaborators(collabs);
+    };
+    fetchCollabs();
+  }, [dbProject]);
 
   useEffect(() => {
     if (editMode && dbMilestones.length > 0) {
-      setEditMilestones(dbMilestones.map((m: any) => ({ id: m.id, phase: m.phase, task: m.task, done: m.done, sort_order: m.sort_order })));
+      setEditMilestones(dbMilestones.map((m: any) => ({ id: m.id, phase: m.phase, task: m.task, done: m.done, sort_order: m.sort_order, blurb: m.blurb || "", assignee_id: m.assignee_id || null, start_date: m.start_date || null, projected_end_date: m.projected_end_date || null, learning_topic_ids: m.learning_topic_ids || [] })));
     } else if (editMode) {
       setEditMilestones([]);
     }
   }, [editMode, dbMilestones]);
 
   const handleEditMilestoneAdd = (phase: string) => {
-    setEditMilestones(prev => [...prev, { phase, task: "", done: false, sort_order: prev.length }]);
+    setAddTaskDialogPhase(phase);
+  };
+
+  const handleDialogSubmit = (data: any) => {
+    if (!addTaskDialogPhase) return;
+    setEditMilestones(prev => [...prev, {
+      phase: addTaskDialogPhase,
+      task: data.task,
+      done: false,
+      sort_order: prev.length,
+      blurb: data.blurb,
+      assignee_id: data.assignee_id === "unassigned" ? null : data.assignee_id,
+      start_date: data.start_date,
+      projected_end_date: data.projected_end_date,
+      learning_topic_ids: data.learning_topic_ids,
+    }]);
+    setAddTaskDialogPhase(null);
   };
 
   const handleEditMilestoneRemove = async (index: number) => {
@@ -282,10 +324,21 @@ const ProjectDetail = () => {
       for (let i = 0; i < editMilestones.length; i++) {
         const m = editMilestones[i];
         if (!m.task.trim()) continue;
+        const payload = {
+          phase: m.phase,
+          task: m.task,
+          done: m.done,
+          sort_order: i,
+          blurb: m.blurb || "",
+          assignee_id: m.assignee_id || null,
+          start_date: m.start_date || null,
+          projected_end_date: m.projected_end_date || null,
+          learning_topic_ids: m.learning_topic_ids || [],
+        };
         if (m.id) {
-          await supabase.from("project_milestones").update({ phase: m.phase, task: m.task, done: m.done, sort_order: i }).eq("id", m.id);
+          await supabase.from("project_milestones").update(payload).eq("id", m.id);
         } else {
-          const { data } = await supabase.from("project_milestones").insert({ project_id: dbProject?.id, phase: m.phase, task: m.task, done: m.done, sort_order: i }).select().single();
+          const { data } = await supabase.from("project_milestones").insert({ project_id: dbProject?.id, ...payload }).select().single();
           if (data) editMilestones[i] = { ...m, id: data.id, sort_order: i };
         }
       }
@@ -720,7 +773,7 @@ const ProjectDetail = () => {
             {/* DB Milestones display / inline edit */}
             <div id="project-milestones">
               <ProjectMilestones
-                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
                 expandPhase={expandPhase}
                 expandTaskIndex={expandTaskIndex}
                 technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
@@ -747,6 +800,20 @@ const ProjectDetail = () => {
                 onEditSave={handleEditMilestonesSave}
                 editSaving={savingMilestones}
               />
+              {addTaskDialogPhase && (
+                <AddMilestoneTaskDialog
+                  open={!!addTaskDialogPhase}
+                  onOpenChange={(v) => { if (!v) setAddTaskDialogPhase(null); }}
+                  phase={addTaskDialogPhase}
+                  phaseLabel={{
+                    architecture: "Architecture", rtl: "RTL Design", verification: "Verification",
+                    synthesis: "Synthesis", "physical-design": "Physical Design", tapeout: "Tapeout",
+                    "silicon-validation": "Silicon Validation",
+                  }[addTaskDialogPhase] || addTaskDialogPhase}
+                  collaborators={projectCollaborators}
+                  onSubmit={handleDialogSubmit}
+                />
+              )}
             </div>
 
             {/* Join Request Form for non-owners */}
