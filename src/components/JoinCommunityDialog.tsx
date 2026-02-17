@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowRight, ArrowLeft, Check, User, Mail, Building2, GraduationCap } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, User, Mail, Building2, GraduationCap, Lock } from "lucide-react";
 import { partners } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface JoinCommunityDialogProps {
   open: boolean;
@@ -26,18 +29,24 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([]);
   const [isIndependent, setIsIndependent] = useState(false);
   const [orcid, setOrcid] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const reset = () => {
     setStep(0);
     setUsername("");
     setName("");
     setEmail("");
+    setPassword("");
     setSelectedOrgs([]);
     setIsIndependent(false);
     setOrcid("");
+    setLoading(false);
   };
 
   const handleClose = (val: boolean) => {
@@ -55,16 +64,46 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
   const canNext = () => {
     switch (step) {
       case 0: return username.trim().length >= 3;
-      case 1: return name.trim().length > 0 && email.includes("@");
+      case 1: return name.trim().length > 0 && email.includes("@") && password.length >= 6;
       case 2: return isIndependent || selectedOrgs.length > 0;
       case 3: return true;
       default: return false;
     }
   };
 
-  const handleSubmit = () => {
-    onComplete?.();
-    handleClose(false);
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            username,
+            full_name: name,
+            orcid: orcid || undefined,
+            organisations: isIndependent ? [] : selectedOrgs,
+            is_independent: isIndependent,
+          },
+        },
+      });
+      if (error) throw error;
+      toast({
+        title: "Check your email",
+        description: "We've sent you a confirmation link to verify your account.",
+      });
+      onComplete?.();
+      handleClose(false);
+    } catch (error: any) {
+      toast({
+        title: "Error creating account",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -114,7 +153,7 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
             </DialogTitle>
             <DialogDescription>
               {step === 0 && "Pick a unique username for your SoC Labs profile."}
-              {step === 1 && "Tell us your name and how to reach you."}
+              {step === 1 && "Tell us your name, email, and set a password."}
               {step === 2 && "Select any organisations you're affiliated with."}
               {step === 3 && "Link your ORCID identifier if you have one (optional)."}
             </DialogDescription>
@@ -137,7 +176,7 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
             </div>
           )}
 
-          {/* Step 1: Name & Email */}
+          {/* Step 1: Name, Email & Password */}
           {step === 1 && (
             <div className="space-y-4">
               <div className="space-y-2">
@@ -152,14 +191,32 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-background rounded-lg"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-background rounded-lg pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Min 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-background rounded-lg pl-10"
+                    minLength={6}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -246,6 +303,19 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
             </div>
           )}
 
+          {/* Already have account link */}
+          {step <= 1 && (
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              Already have an account?{" "}
+              <button
+                onClick={() => { handleClose(false); navigate("/auth"); }}
+                className="text-primary hover:underline font-medium"
+              >
+                Sign in
+              </button>
+            </p>
+          )}
+
           {/* Navigation */}
           <div className="flex justify-between mt-8">
             <Button
@@ -271,9 +341,10 @@ const JoinCommunityDialog = ({ open, onOpenChange, onComplete }: JoinCommunityDi
               <Button
                 size="sm"
                 onClick={handleSubmit}
+                disabled={loading}
                 className="rounded-full px-5"
               >
-                Join SoC Labs <Check className="h-4 w-4 ml-1" />
+                {loading ? "Creating..." : "Join SoC Labs"} <Check className="h-4 w-4 ml-1" />
               </Button>
             )}
           </div>

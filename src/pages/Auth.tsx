@@ -8,12 +8,13 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -22,26 +23,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link to verify your account.",
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        toast({ title: "Welcome back!", description: "You've signed in successfully." });
-        navigate("/");
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      toast({ title: "Welcome back!", description: "You've signed in successfully." });
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
@@ -65,13 +53,9 @@ const Auth = () => {
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <Cpu className="h-6 w-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-display font-bold mb-2">
-                {isSignUp ? "Create an Account" : "Welcome Back"}
-              </h1>
+              <h1 className="text-2xl font-display font-bold mb-2">Welcome Back</h1>
               <p className="text-sm text-muted-foreground">
-                {isSignUp
-                  ? "Join the SoC Labs community"
-                  : "Sign in to your SoC Labs account"}
+                Sign in to your SoC Labs account
               </p>
             </div>
 
@@ -110,32 +94,18 @@ const Auth = () => {
               </div>
 
               <Button type="submit" className="w-full rounded-full" disabled={loading}>
-                {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
+                {loading ? "Please wait..." : "Sign In"}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
-              {isSignUp ? (
-                <>
-                  Already have an account?{" "}
-                  <button
-                    onClick={() => setIsSignUp(false)}
-                    className="text-primary hover:underline font-medium"
-                  >
-                    Sign in
-                  </button>
-                </>
-              ) : (
-                <>
-                  Don't have an account?{" "}
-                  <button
-                    onClick={() => setIsSignUp(true)}
-                    className="text-primary hover:underline font-medium"
-                  >
-                    Create one
-                  </button>
-                </>
-              )}
+              Don't have an account?{" "}
+              <button
+                onClick={() => setJoinOpen(true)}
+                className="text-primary hover:underline font-medium"
+              >
+                Join the Community
+              </button>
             </div>
 
             <div className="mt-4 text-center">
@@ -149,6 +119,7 @@ const Auth = () => {
           </motion.div>
         </div>
       </section>
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </Layout>
   );
 };
