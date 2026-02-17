@@ -206,7 +206,7 @@ const ProjectDetail = () => {
     return (
       <Layout>
         <article className="py-24">
-          <div className="container mx-auto px-4 max-w-4xl">
+          <div className="container mx-auto px-4 max-w-5xl">
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center justify-between mb-8">
               <button
                 onClick={() => navigate(-1)}
@@ -226,6 +226,9 @@ const ProjectDetail = () => {
                 </Button>
               )}
             </motion.div>
+
+            <div className="flex gap-8">
+              <div className="flex-1 min-w-0">
 
             <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
               <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -522,6 +525,70 @@ const ProjectDetail = () => {
             )}
 
             <CommentsThreads pageId={`project-${dbProject.id}`} />
+              </div>
+
+              {/* Sticky author & resources sidebar */}
+              <aside className="hidden lg:block w-56 shrink-0">
+                <div className="sticky top-24 space-y-3">
+                  {/* Author card */}
+                  <div className="rounded-xl border bg-card p-4 shadow-sm">
+                    <div className="flex flex-col items-center text-center">
+                      <Avatar className="h-16 w-16 mb-3">
+                        <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
+                          {(dbProject.profile?.full_name || dbProject.profile?.username || "U")
+                            .split(" ")
+                            .filter((w: string) => /^[A-Z]/i.test(w))
+                            .map((w: string) => w[0].toUpperCase())
+                            .join("")
+                            .slice(0, 2) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-display font-bold">
+                        {dbProject.profile?.full_name || dbProject.profile?.username || "Community Member"}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-0.5">Project Owner</span>
+                    </div>
+                  </div>
+
+                  {/* Resources card */}
+                  {(dbProject.github_url || dbProject.docs_url) && (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
+                      <div className="flex flex-col gap-2">
+                        {dbProject.github_url && (
+                          <Button asChild size="sm" className="w-full rounded-lg">
+                            <a href={dbProject.github_url} target="_blank" rel="noopener noreferrer">
+                              <Github className="h-4 w-4 mr-2" /> Repository
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                          </Button>
+                        )}
+                        {dbProject.docs_url && (
+                          <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
+                            <a href={dbProject.docs_url} target="_blank" rel="noopener noreferrer">
+                              <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Technologies card */}
+                  {dbProject.technologies?.length > 0 && (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Technologies</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {dbProject.technologies.map((t: string) => (
+                          <Badge key={t} variant="secondary" className="text-[10px] px-2 py-0.5">{t}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </div>
           </div>
         </article>
       </Layout>
