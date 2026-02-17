@@ -9,6 +9,24 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { referenceDesigns, stats } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
 
+import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
+import imgAsicTapeout from "@/assets/news/asic-tapeout.jpg";
+import imgDesignComp from "@/assets/news/design-competition.jpg";
+import imgRiscvSummit from "@/assets/news/riscv-summit.jpg";
+import imgMlAccel from "@/assets/news/ml-accelerator.jpg";
+import imgOpenEda from "@/assets/news/open-eda.jpg";
+import imgDvfs from "@/assets/news/dvfs-power.jpg";
+
+const articleImages: Record<string, string> = {
+  "nanosoc-fpga-workshop-2026": imgFpgaWorkshop,
+  "ecosoc-tapeout-tsmc-28nm": imgAsicTapeout,
+  "design-competition-2026": imgDesignComp,
+  "risc-v-summit-talk": imgRiscvSummit,
+  "ml-accelerator-tinyml-benchmark": imgMlAccel,
+  "open-eda-flow-yosys": imgOpenEda,
+  "dvfs-controller-results": imgDvfs,
+};
+
 const Index = () => {
   return (
     <Layout>
@@ -181,27 +199,35 @@ const Index = () => {
               .map((article, i) => (
                 <ScrollReveal key={article.id} delay={i * 0.12}>
                   <Link to={`/news/${article.id}`} className="block h-full">
-                    <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
-                      <CardContent className="p-6 flex flex-col h-full">
-                        <div className="flex flex-wrap gap-1.5 mb-3">
-                          {article.tags.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="secondary" className="text-[10px]">
-                              {tag}
-                            </Badge>
-                          ))}
+                    <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 overflow-hidden">
+                        <div className="relative h-36 overflow-hidden bg-muted">
+                          <img
+                            src={articleImages[article.id] || "/placeholder.svg"}
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
                         </div>
-                        <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
-                          <span className="flex items-center gap-1">
-                            <User className="h-3 w-3" /> {article.author}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />{" "}
-                            {new Date(article.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
-                          </span>
-                        </div>
-                      </CardContent>
+                        <CardContent className="p-5 flex flex-col flex-1">
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {article.tags.slice(0, 2).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-[10px]">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
+                          <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" /> {article.author}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />{" "}
+                              {new Date(article.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                            </span>
+                          </div>
+                        </CardContent>
                     </Card>
                   </Link>
                 </ScrollReveal>
