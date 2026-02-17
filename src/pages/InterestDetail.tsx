@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink, Wrench, Check } from "lucide-react";
+import { ArrowLeft, Users, FolderOpen, Tag, ExternalLink, Wrench, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -227,26 +227,26 @@ const InterestDetail = () => {
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
-                      <CardContent className="p-5 flex flex-col h-full">
-                        <h3 className="font-display font-bold mb-1">{project.title}</h3>
-                        <p className="text-sm text-primary font-medium mb-0.5">{project.author}</p>
-                        <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
-                        <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed line-clamp-3">{project.description}</p>
-                        <div className="flex flex-wrap gap-1.5 mb-4">
-                          {project.tags.map((tag) => (
-                            <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
-                              <Tag className="h-2.5 w-2.5" />{tag}
-                            </span>
-                          ))}
-                        </div>
-                        <Button asChild size="sm" variant="ghost" className="self-start">
-                          <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                            <Github className="h-4 w-4 mr-1" /> View Repo
-                          </a>
-                        </Button>
-                      </CardContent>
-                    </Card>
+                    <Link to={`/projects/${project.id}`}>
+                      <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60 group">
+                        <CardContent className="p-5 flex flex-col h-full">
+                          <h3 className="font-display font-bold mb-1 group-hover:text-primary transition-colors">{project.title}</h3>
+                          <p className="text-sm text-primary font-medium mb-0.5">{project.author}</p>
+                          <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
+                          <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed line-clamp-3">{project.description}</p>
+                          <div className="flex flex-wrap gap-1.5 mb-4">
+                            {project.tags.map((tag) => (
+                              <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                                <Tag className="h-2.5 w-2.5" />{tag}
+                              </span>
+                            ))}
+                          </div>
+                          <span className="text-xs text-muted-foreground group-hover:text-primary transition-colors inline-flex items-center gap-1 self-start">
+                            <FolderOpen className="h-3.5 w-3.5" /> View Project
+                          </span>
+                        </CardContent>
+                      </Card>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
