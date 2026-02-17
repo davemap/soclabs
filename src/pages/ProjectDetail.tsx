@@ -326,20 +326,31 @@ const ProjectDetail = () => {
                 </motion.div>
               )}
 
-              {/* Sticky container: tracker + milestones only */}
+              {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
                 <div id="project-milestones">
-                  {project.phaseProgress && (
-                    <MilestoneTracker
-                      phaseProgress={project.phaseProgress}
-                      milestones={project.milestones}
-                      onPhaseClick={handlePhaseClick}
-                      technology={project.technology}
-                      isFloating={false}
-                      isSticky={true}
-                    />
-                  )}
-                  <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} expandTopicId={expandTopicId} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
+                  <ProjectMilestones
+                    milestones={project.milestones}
+                    expandPhase={expandPhase}
+                    expandTaskIndex={expandTaskIndex}
+                    expandTopicId={expandTopicId}
+                    phaseEffort={project.phaseEffort}
+                    phaseUncertainty={project.phaseUncertainty}
+                    phaseDates={project.phaseDates}
+                    technology={project.technology}
+                    trackerSlot={
+                      project.phaseProgress && (
+                        <MilestoneTracker
+                          phaseProgress={project.phaseProgress}
+                          milestones={project.milestones}
+                          onPhaseClick={handlePhaseClick}
+                          technology={project.technology}
+                          isFloating={false}
+                          isSticky={false}
+                        />
+                      )
+                    }
+                  />
                 </div>
               )}
 

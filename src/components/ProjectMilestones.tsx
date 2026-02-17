@@ -36,6 +36,7 @@ interface ProjectMilestonesProps {
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
   technology?: string;
+  trackerSlot?: React.ReactNode;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -108,7 +109,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -220,6 +221,8 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
           </button>
         )}
       </div>
+
+      {trackerSlot}
 
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden divide-y divide-border/40">
         {grouped.map(({ phase, label, tasks, greyedOut }) => {
