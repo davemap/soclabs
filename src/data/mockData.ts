@@ -352,6 +352,13 @@ export const learningPhases: LearningPhase[] = [
     icon: "FileText",
     topics: [
       {
+        id: "architecture-overview",
+        title: "Overview",
+        summary: "An introduction to the Architecture phase and what you'll learn.",
+        content:
+          "The Architecture phase is where you define the high-level blueprint of your System-on-Chip. You'll decide which functional blocks to include, how they connect, how memory is organised, and how clocks and power are managed. Getting architecture right is critical — mistakes here ripple through every downstream phase. This overview introduces the key decisions you'll make: system partitioning, bus architecture, memory mapping, IP selection, and power/clocking strategy.",
+      },
+      {
         id: "system-partitioning",
         title: "System Partitioning",
         summary: "Decide what goes on-chip vs off-chip and how subsystems interact.",
@@ -397,6 +404,13 @@ export const learningPhases: LearningPhase[] = [
     icon: "Code",
     topics: [
       {
+        id: "rtl-overview",
+        title: "Overview",
+        summary: "An introduction to the RTL Design phase and what you'll learn.",
+        content:
+          "The RTL Design phase is where your architecture becomes real hardware description code. You'll write synthesisable Verilog or SystemVerilog that defines the behaviour of every block in your SoC. This phase covers coding conventions, FSM design patterns, interface protocol implementation, parameterisation for reuse, and designing for testability. Clean, well-structured RTL is the foundation for successful verification, synthesis, and tapeout.",
+      },
+      {
         id: "coding-style",
         title: "Coding Style & Conventions",
         summary: "Establish RTL coding standards for a clean, synthesisable codebase.",
@@ -440,6 +454,13 @@ export const learningPhases: LearningPhase[] = [
     description: "Rigorously test your design to ensure it meets the specification before committing to silicon.",
     icon: "CheckCircle",
     topics: [
+      {
+        id: "verification-overview",
+        title: "Overview",
+        summary: "An introduction to the Verification phase and what you'll learn.",
+        content:
+          "Verification is often the most time-consuming phase of hardware design — and the most important. A bug that reaches silicon costs orders of magnitude more to fix than one caught in simulation. This phase covers building structured testbench environments, constrained-random stimulus generation, functional coverage measurement, formal verification techniques, and setting up regression and CI/CD pipelines for your design.",
+      },
       {
         id: "testbench-architecture",
         title: "Testbench Architecture",
@@ -486,6 +507,13 @@ export const learningPhases: LearningPhase[] = [
     icon: "Cpu",
     topics: [
       {
+        id: "synthesis-overview",
+        title: "Overview",
+        summary: "An introduction to the Synthesis phase and what you'll learn.",
+        content:
+          "Synthesis transforms your RTL code into an optimised gate-level netlist — the bridge between abstract hardware description and physical implementation. You'll learn to write timing constraints, choose synthesis strategies that balance area, speed, and power, close timing on critical paths, and run lint and CDC checks to catch structural issues before they become silicon bugs.",
+      },
+      {
         id: "constraints",
         title: "Timing Constraints (SDC)",
         summary: "Write Synopsys Design Constraints to guide synthesis optimisation.",
@@ -523,6 +551,13 @@ export const learningPhases: LearningPhase[] = [
       "Transform your gate-level netlist into a physical layout ready for fabrication — floorplanning, placement, routing, and sign-off.",
     icon: "CircuitBoard",
     topics: [
+      {
+        id: "physical-design-overview",
+        title: "Overview",
+        summary: "An introduction to the Physical Design phase and what you'll learn.",
+        content:
+          "Physical Design turns your gate-level netlist into a real chip layout. This is where abstract logic becomes geometric shapes on silicon — floorplanning decides where blocks go, placement positions every standard cell, clock tree synthesis ensures timing coherence, routing connects everything with metal wires, and power analysis verifies robust power delivery. Each step requires iterative refinement to meet timing, area, and power targets.",
+      },
       {
         id: "floorplanning",
         title: "Floorplanning",
@@ -568,6 +603,13 @@ export const learningPhases: LearningPhase[] = [
     icon: "Zap",
     topics: [
       {
+        id: "tapeout-overview",
+        title: "Overview",
+        summary: "An introduction to the Tapeout phase and what you'll learn.",
+        content:
+          "Tapeout is the point of no return — once your GDSII is submitted for fabrication, there's no going back. This phase covers the final sign-off checks (DRC, LVS, ERC), static timing analysis across all process corners, shuttle service submission procedures, and packaging and test planning. Meticulous attention to detail here is what separates a successful chip from an expensive paperweight.",
+      },
+      {
         id: "signoff-checks",
         title: "Sign-off Checks (DRC/LVS/ERC)",
         summary: "Run final verification checks required by the foundry.",
@@ -604,6 +646,13 @@ export const learningPhases: LearningPhase[] = [
     description: "Validate your fabricated chips — bring-up, characterisation, and debugging on real silicon.",
     icon: "Cpu",
     topics: [
+      {
+        id: "silicon-validation-overview",
+        title: "Overview",
+        summary: "An introduction to the Silicon Validation phase and what you'll learn.",
+        content:
+          "Silicon Validation is where your design meets reality. After months of simulation, synthesis, and fabrication, you finally have physical chips to test. This phase covers the methodical bring-up process, functional testing against specifications, performance characterisation across voltage and temperature, debugging techniques for silicon bugs, and documenting results and errata for future design iterations.",
+      },
       {
         id: "bring-up",
         title: "Silicon Bring-up",
