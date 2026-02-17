@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -87,7 +87,10 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
 };
 
 const LearningHub = () => {
-  const [activePhase, setActivePhase] = useState(0);
+  const [searchParams] = useSearchParams();
+  const phaseParam = searchParams.get("phase");
+  const initialIndex = phaseParam ? learningPhases.findIndex((p) => p.id === phaseParam) : 0;
+  const [activePhase, setActivePhase] = useState(Math.max(0, initialIndex));
 
   const goTo = (index: number) => {
     setActivePhase(index);
