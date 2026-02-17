@@ -1,14 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu } from "lucide-react";
 import { learningPhases } from "@/data/mockData";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const iconMap: Record<string, React.ElementType> = {
-  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
-};
+import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
 
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
@@ -89,59 +86,16 @@ const LearningTopicDetail = () => {
                         className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
                         style={{ width: `${(phaseIndex / (learningPhases.length - 1)) * 100}%` }}
                       />
-                      {learningPhases.map((p, i) => {
-                        const Icon = iconMap[p.icon] || Cpu;
-                        const nonOverviewTopics = p.topics.filter((t) => !t.id.endsWith("-overview"));
-                        return (
-                          <div key={p.id} className="relative z-10 flex flex-col items-center gap-2 group/phase">
-                            <Link
-                              to={`/learn/${p.id}/${p.topics[0].id}`}
-                              className={cn(
-                                "flex flex-col items-center gap-2",
-                                i <= phaseIndex ? "text-primary" : "text-muted-foreground"
-                              )}
-                            >
-                              <div
-                                className={cn(
-                                  "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-                                  i === phaseIndex
-                                    ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-                                    : i < phaseIndex
-                                    ? "border-primary bg-primary/10"
-                                    : "border-border bg-background"
-                                )}
-                              >
-                                <Icon className="h-4 w-4" />
-                              </div>
-                              <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
-                            </Link>
-                            {/* Hover dropdown showing topics */}
-                            <div className="absolute top-full mt-1 hidden group-hover/phase:block w-56 z-50">
-                              <div className="pt-2">
-                                <div className="rounded-xl border border-border/60 bg-card shadow-xl p-3 space-y-0.5">
-                                  <div className="text-xs font-display font-bold text-foreground mb-2 px-1">
-                                    {p.title}
-                                  </div>
-                                  {nonOverviewTopics.map((t) => (
-                                    <Link
-                                      key={t.id}
-                                      to={`/learn/${p.id}/${t.id}`}
-                                      className={cn(
-                                        "block px-2 py-1.5 rounded-lg text-xs transition-all",
-                                        t.id === topicId && p.id === phaseId
-                                          ? "bg-primary/10 text-primary font-medium"
-                                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                      )}
-                                    >
-                                      {t.title}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                      {learningPhases.map((p, i) => (
+                        <PhaseStepperIcon
+                          key={p.id}
+                          phase={p}
+                          index={i}
+                          activeIndex={phaseIndex}
+                          currentPhaseId={phaseId}
+                          currentTopicId={topicId}
+                        />
+                      ))}
                     </div>
                   </div>
 

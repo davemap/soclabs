@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { learningPhases, LearningPhase } from "@/data/mockData";
-
-const iconMap: Record<string, React.ElementType> = {
-  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
-};
+import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 
 const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
   const [expanded, setExpanded] = useState(true);
@@ -136,33 +133,15 @@ const LearningHub = () => {
                     className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
                     style={{ width: `${(activePhase / (learningPhases.length - 1)) * 100}%` }}
                   />
-                  {learningPhases.map((phase, i) => {
-                    const Icon = iconMap[phase.icon] || Cpu;
-                    return (
-                      <button
-                        key={phase.id}
-                        onClick={() => goTo(i)}
-                        className={cn(
-                          "relative z-10 flex flex-col items-center gap-2 group",
-                          i <= activePhase ? "text-primary" : "text-muted-foreground"
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-                            i === activePhase
-                              ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-                              : i < activePhase
-                              ? "border-primary bg-primary/10"
-                              : "border-border bg-background"
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <span className="text-xs font-display font-medium hidden sm:block">{phase.shortTitle}</span>
-                      </button>
-                    );
-                  })}
+                  {learningPhases.map((phase, i) => (
+                    <PhaseStepperIcon
+                      key={phase.id}
+                      phase={phase}
+                      index={i}
+                      activeIndex={activePhase}
+                      onSelect={goTo}
+                    />
+                  ))}
                 </div>
               </div>
 
