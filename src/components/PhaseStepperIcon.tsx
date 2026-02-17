@@ -41,17 +41,21 @@ const PhaseStepperIcon = ({
   }, []);
 
   const iconContent = (
-    <div
-      className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-        index === activeIndex
-          ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-          : index < activeIndex
-          ? "border-primary bg-primary/10"
-          : "border-border bg-background"
-      )}
-    >
-      <Icon className="h-4 w-4" />
+    <div className="relative w-10 h-10 rounded-xl">
+      {/* Opaque background layer to block the track line */}
+      <div className="absolute inset-0 rounded-xl bg-background" />
+      <div
+        className={cn(
+          "relative w-full h-full rounded-xl flex items-center justify-center border-2 transition-all",
+          index === activeIndex
+            ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+            : index < activeIndex
+            ? "border-primary bg-primary/10"
+            : "border-border"
+        )}
+      >
+        <Icon className="h-4 w-4" />
+      </div>
     </div>
   );
 
