@@ -154,10 +154,13 @@ const Projects = () => {
                                 {phaseKeys.map((key) => {
                                   const phaseMilestones = project.milestones?.filter((m) => m.phase === key) || [];
                                   const total = phaseMilestones.length;
+                                  const now = new Date();
                                   const doneCount = phaseMilestones.filter((m) => m.done).length;
-                                  const inProgressCount = total - doneCount;
+                                  const inProgressCount = phaseMilestones.filter((m) => !m.done && m.startDate && new Date(m.startDate) <= now).length;
+                                  const notStartedCount = total - doneCount - inProgressCount;
                                   const donePct = total > 0 ? (doneCount / total) * 100 : 0;
                                   const inProgressPct = total > 0 ? (inProgressCount / total) * 100 : 0;
+                                  const notStartedPct = total > 0 ? (notStartedCount / total) * 100 : 0;
                                   const p = project.phaseProgress?.[key] || 0;
 
                                   return (
@@ -165,29 +168,28 @@ const Projects = () => {
                                       <TooltipTrigger asChild>
                                         <Link
                                           to={`/projects/${project.id}?phase=${key}`}
-                                          className={`flex-1 rounded-full overflow-hidden cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all ${
-                                            total > 0
-                                              ? doneCount === total
-                                                ? "bg-emerald-500"
-                                                : doneCount > 0
-                                                  ? "bg-amber-500"
-                                                  : "bg-muted/40"
-                                              : p === 100
-                                                ? "bg-emerald-500"
-                                                : p > 0
-                                                  ? "bg-amber-500"
-                                                  : "bg-muted/40"
-                                          }`}
+                                          className="flex-1 rounded-full overflow-hidden bg-muted/40 cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
                                           onClick={(e) => e.stopPropagation()}
                                         >
-                                          <div className="h-full" />
+                                          {total > 0 ? (
+                                            <div className="flex h-full">
+                                              <div className="h-full bg-emerald-500 transition-all" style={{ width: `${donePct}%` }} />
+                                              <div className="h-full bg-amber-500 transition-all" style={{ width: `${inProgressPct}%` }} />
+                                              {/* remaining space is grey (bg-muted/40 from parent) */}
+                                            </div>
+                                          ) : (
+                                            <div
+                                              className={`h-full transition-all ${p === 100 ? "bg-emerald-500" : p > 0 ? "bg-amber-500" : ""}`}
+                                              style={{ width: `${p}%` }}
+                                            />
+                                          )}
                                         </Link>
                                       </TooltipTrigger>
                                       <TooltipContent side="top" className="text-xs px-3 py-1.5">
                                         <span className="font-semibold">{phaseLabels[key] || key}</span>
                                         {total > 0 ? (
                                           <span className="ml-1.5 tabular-nums opacity-80">
-                                            {doneCount}/{total} done
+                                            {doneCount}✓ {inProgressCount}⏳ {notStartedCount}○
                                           </span>
                                         ) : (
                                           <span className="ml-1.5 tabular-nums opacity-80">{p}%</span>
