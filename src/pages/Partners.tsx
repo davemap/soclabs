@@ -11,6 +11,24 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { partners, communityMembers } from "@/data/mockData";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 
+import logoImperial from "@/assets/logos/imperial-college-london.jpg";
+import logoCapeTown from "@/assets/logos/university-of-cape-town.png";
+import logoETH from "@/assets/logos/eth-zurich.png";
+import logoTokyo from "@/assets/logos/university-of-tokyo.png";
+import logoMIT from "@/assets/logos/mit.png";
+import logoIITBombay from "@/assets/logos/iit-bombay.png";
+import logoTUMunich from "@/assets/logos/tu-munich.svg";
+
+const universityLogos: Record<string, string> = {
+  "imperial-college-london": logoImperial,
+  "university-of-cape-town": logoCapeTown,
+  "eth-zurich": logoETH,
+  "university-of-tokyo": logoTokyo,
+  "mit": logoMIT,
+  "iit-bombay": logoIITBombay,
+  "tu-munich": logoTUMunich,
+};
+
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 type Partner = (typeof partners)[number];
@@ -343,9 +361,15 @@ const Partners = () => {
                           highlightedOrg === partner.id && "border-primary/40 shadow-lg"
                         )}>
                           <CardContent className="p-6 flex flex-col h-full">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
-                              <GraduationCap className="h-5 w-5 text-primary" />
-                            </div>
+                            {universityLogos[partner.id] ? (
+                              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-background border border-border/40 overflow-hidden p-1.5">
+                                <img src={universityLogos[partner.id]} alt={`${partner.name} logo`} className="w-full h-full object-contain" />
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10">
+                                <GraduationCap className="h-5 w-5 text-primary" />
+                              </div>
+                            )}
                             <h3 className="font-display font-bold text-lg mb-1">{partner.name}</h3>
                             <p className="text-xs text-muted-foreground mb-2">{partner.country}</p>
                             <p className="text-sm text-muted-foreground flex-1 mb-4 leading-relaxed">{partner.description}</p>
