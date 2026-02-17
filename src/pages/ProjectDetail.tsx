@@ -303,6 +303,20 @@ const ProjectDetail = () => {
               </div>
             )}
 
+            {/* DB Content sections display (for everyone) */}
+            {dbContent.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
+                <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+                  {dbContent.map((section: any) => (
+                    <div key={section.id} className="mb-8">
+                      {section.title && <h2>{section.title}</h2>}
+                      <ReactMarkdown>{section.body}</ReactMarkdown>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
             {dbProject.target_technology && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-xl border bg-muted/30 p-5 mb-10">
                 <h3 className="text-sm font-display font-bold mb-2">Target Technology</h3>
@@ -362,20 +376,6 @@ const ProjectDetail = () => {
                   }
                 />
               </div>
-            )}
-
-            {/* DB Content sections display (for everyone) */}
-            {dbContent.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
-                <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
-                  {dbContent.map((section: any) => (
-                    <div key={section.id} className="mb-8">
-                      {section.title && <h2>{section.title}</h2>}
-                      <ReactMarkdown>{section.body}</ReactMarkdown>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
             )}
 
             {/* Join Request Form for non-owners */}
