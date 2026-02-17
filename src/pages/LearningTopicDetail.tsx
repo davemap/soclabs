@@ -72,7 +72,7 @@ const LearningTopicDetail = () => {
                   return (
                     <Link
                       key={p.id}
-                      to="/learn"
+                      to={`/learn?phase=${p.id}`}
                       className={cn(
                         "relative z-10 flex flex-col items-center gap-2 group",
                         i <= phaseIndex ? "text-primary" : "text-muted-foreground"
