@@ -291,7 +291,7 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} />
+                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} />
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />
