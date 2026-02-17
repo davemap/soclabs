@@ -221,12 +221,14 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
   }, 0);
 
    return (
-    <div className={cn(
-      "z-30 mb-10 transition-all duration-300",
-      isFloating ? "sticky top-24" : "relative"
-    )}>
+    <div className="sticky top-24 z-30 mb-10">
       {isFloating && (
-        <div className="absolute -inset-3 bg-background/80 backdrop-blur-md rounded-2xl" />
+        <>
+          {/* Solid cover above the bar to hide old content between navbar and tracker */}
+          <div className="absolute -top-28 left-0 right-0 h-28 bg-background" />
+          {/* Blur halo around the tracker */}
+          <div className="absolute -inset-3 bg-background/80 backdrop-blur-md rounded-2xl" />
+        </>
       )}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
