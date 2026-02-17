@@ -27,8 +27,8 @@ const Designs = () => {
           <div className="space-y-16 max-w-4xl mx-auto">
             {referenceDesigns.map((design, i) => (
               <ScrollReveal key={design.id} delay={i * 0.1}>
-                <div id={design.id}>
-                  <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border-border/60">
+                <Link to={`/designs/${design.id}`} id={design.id} className="block">
+                  <Card className="overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60 cursor-pointer">
                     <CardContent className="p-8 md:p-10">
                       <div className="flex items-start gap-4 mb-6">
                         <div className="p-3 rounded-xl bg-primary/10">
@@ -92,7 +92,7 @@ const Designs = () => {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </Link>
               </ScrollReveal>
             ))}
           </div>
