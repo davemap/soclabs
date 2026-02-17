@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
@@ -74,32 +74,6 @@ const ProjectDetail = () => {
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
   const referenceSoc = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
-  const trackerSentinelRef = useRef<HTMLDivElement>(null);
-  const floatThresholdRef = useRef<number | null>(null);
-  const [isFloating, setIsFloating] = useState(false);
-  const milestonesEndRef = useRef<HTMLDivElement>(null);
-
-  // Track scroll position to detect when tracker should float
-  useEffect(() => {
-    const sentinel = trackerSentinelRef.current;
-    if (!sentinel) return;
-
-    const captureThreshold = () => {
-      if (floatThresholdRef.current === null) {
-        floatThresholdRef.current = sentinel.getBoundingClientRect().top + window.scrollY - 96;
-      }
-    };
-
-    requestAnimationFrame(captureThreshold);
-
-    const handleScroll = () => {
-      if (floatThresholdRef.current === null) return;
-      setIsFloating(window.scrollY > floatThresholdRef.current);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
   const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
   const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
 
@@ -199,8 +173,6 @@ const ProjectDetail = () => {
                 </p>
               </motion.header>
 
-              {/* Sentinel to detect when tracker starts floating */}
-              <div ref={trackerSentinelRef} className="h-0" />
 
               {/* Non-sticky milestone tracker in its original position */}
               {project.phaseProgress && (
@@ -363,7 +335,7 @@ const ProjectDetail = () => {
                       milestones={project.milestones}
                       onPhaseClick={handlePhaseClick}
                       technology={project.technology}
-                      isFloating={isFloating}
+                      isFloating={false}
                       isSticky={true}
                     />
                   )}
