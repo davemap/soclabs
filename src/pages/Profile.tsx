@@ -215,9 +215,19 @@ const Profile = () => {
                     <h2 className="text-xl font-semibold truncate">
                       {profile?.full_name || profile?.username || "User"}
                     </h2>
+                    {profile?.username && (
+                      <p className="text-sm text-muted-foreground truncate">@{profile.username}</p>
+                    )}
                     <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
                     {profile?.orcid && (
-                      <p className="text-xs text-muted-foreground mt-1">ORCID: {profile.orcid}</p>
+                      <a
+                        href={`https://orcid.org/${profile.orcid}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                      >
+                        ORCID: {profile.orcid}
+                      </a>
                     )}
                   </div>
                 </div>
