@@ -844,17 +844,6 @@ const ProjectDetail = () => {
                     </div>
                   )}
 
-                  {/* Technologies card */}
-                  {dbProject.technologies?.length > 0 && (
-                    <div className="rounded-xl border bg-card p-4 shadow-sm">
-                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Technologies</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {dbProject.technologies.map((t: string) => (
-                          <Badge key={t} variant="secondary" className="text-[10px] px-2 py-0.5">{t}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </aside>
             </div>
