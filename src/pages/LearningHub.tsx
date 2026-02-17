@@ -25,17 +25,19 @@ const weightedAvg = (values: number[]): number => {
 
 const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
   if (!effort || !uncertainty) return null;
+  const eRound = Math.round(effort);
+  const uRound = Math.round(uncertainty);
   return (
     <div className="flex items-center gap-1 shrink-0">
       <div className="flex gap-px" title={`Effort: ${effort}/5`}>
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= effort ? effortColors[effort - 1] : "bg-muted/20")} />
+          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= eRound ? effortColors[Math.max(0, eRound - 1)] : "bg-muted/20")} />
         ))}
       </div>
       <div className="w-px h-3 bg-border/40 mx-0.5" />
       <div className="flex gap-px" title={`Uncertainty: ${uncertainty}/5`}>
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uncertainty ? uncertaintyColors[uncertainty - 1] : "bg-muted/20")} />
+          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uRound ? uncertaintyColors[Math.max(0, uRound - 1)] : "bg-muted/20")} />
         ))}
       </div>
     </div>
