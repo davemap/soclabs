@@ -704,160 +704,69 @@ const ProjectDetail = () => {
               />
             </div>
 
-            {/* Target Technology card */}
-            {(dbProject.target_technology || (editMode && isOwner)) && (
+            {/* Target Technology card - edit mode only in main content */}
+            {editMode && isOwner && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
-                {editMode && isOwner ? (
-                  <div className="rounded-xl border bg-card p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                        <CircuitBoard className="h-4 w-4 text-primary" /> Target Technology
-                      </h3>
-                      <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTargetTech} disabled={savingTech}>
-                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
-                      </Button>
-                    </div>
-                    <div className="flex gap-2 mb-3">
-                      {["FPGA", "ASIC", "Undecided"].map((t) => (
-                        <button key={t} type="button"
-                          onClick={() => { setEditTech(t); setEditFpga(""); setEditAsic(""); }}
-                          className={cn("flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
-                            editTech === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"
-                          )}>
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-                    {editTech === "FPGA" && (
-                      <Select value={editFpga} onValueChange={setEditFpga}>
-                        <SelectTrigger><SelectValue placeholder="Select FPGA family" /></SelectTrigger>
-                        <SelectContent>
-                          {fpgaFamilies.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {editTech === "ASIC" && (
-                      <Select value={editAsic} onValueChange={setEditAsic}>
-                        <SelectTrigger><SelectValue placeholder="Select process node" /></SelectTrigger>
-                        <SelectContent>
-                          {asicProcessNodes.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
-                        </SelectContent>
-                      </Select>
-                    )}
+                <div className="rounded-xl border bg-card p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-display font-bold flex items-center gap-2">
+                      <CircuitBoard className="h-4 w-4 text-primary" /> Target Technology
+                    </h3>
+                    <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTargetTech} disabled={savingTech}>
+                      <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
+                    </Button>
                   </div>
-                ) : (() => {
-                  const isFpga = dbProject.target_technology === "FPGA";
-                  const isAsic = dbProject.target_technology === "ASIC";
-                  const accentClass = isFpga
-                    ? "border-sky-500/30 bg-sky-500/5"
-                    : isAsic
-                      ? "border-violet-500/30 bg-violet-500/5"
-                      : "border-border bg-muted/30";
-                  const iconBgClass = isFpga
-                    ? "bg-sky-500/10 text-sky-600"
-                    : isAsic
-                      ? "bg-violet-500/10 text-violet-600"
-                      : "bg-muted text-muted-foreground";
-                  const badgeClass = isFpga
-                    ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
-                    : isAsic
-                      ? "bg-violet-500/10 text-violet-600 border-violet-500/20"
-                      : "bg-muted text-muted-foreground border-border";
-                  return (
-                    <div className={cn("rounded-xl border p-5", accentClass)}>
-                      <div className="flex items-start gap-4">
-                        <div className={cn("p-3 rounded-xl shrink-0", iconBgClass)}>
-                          <CircuitBoard className="h-6 w-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-display font-bold mb-1">Target Technology</h3>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="outline" className={badgeClass}>
-                              {dbProject.target_technology}
-                            </Badge>
-                            {dbProject.fpga_family && (
-                              <Badge variant="outline" className="text-xs">
-                                {dbProject.fpga_family}
-                              </Badge>
-                            )}
-                            {dbProject.asic_process && (
-                              <Badge variant="outline" className="text-xs">
-                                {dbProject.asic_process}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
+                  <div className="flex gap-2 mb-3">
+                    {["FPGA", "ASIC", "Undecided"].map((t) => (
+                      <button key={t} type="button"
+                        onClick={() => { setEditTech(t); setEditFpga(""); setEditAsic(""); }}
+                        className={cn("flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
+                          editTech === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"
+                        )}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                  {editTech === "FPGA" && (
+                    <Select value={editFpga} onValueChange={setEditFpga}>
+                      <SelectTrigger><SelectValue placeholder="Select FPGA family" /></SelectTrigger>
+                      <SelectContent>
+                        {fpgaFamilies.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {editTech === "ASIC" && (
+                    <Select value={editAsic} onValueChange={setEditAsic}>
+                      <SelectTrigger><SelectValue placeholder="Select process node" /></SelectTrigger>
+                      <SelectContent>
+                        {asicProcessNodes.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </motion.div>
             )}
 
-            {/* Timeframe visual bar */}
-            {(dbProject.timeframe || (editMode && isOwner)) && (
+            {/* Timeframe - edit mode only in main content */}
+            {editMode && isOwner && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
-                {editMode && isOwner ? (
-                  <div className="rounded-xl border bg-card p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" /> Project Timeline
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-primary">{editTimeframeSteps[editTimeIdx[0]]?.label}</span>
-                        <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTimeline} disabled={savingTime}>
-                          <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
-                        </Button>
-                      </div>
-                    </div>
-                    <Slider value={editTimeIdx} onValueChange={setEditTimeIdx} min={0} max={6} step={1} className="w-full mb-2" />
-                    <div className="flex justify-between text-[10px] text-muted-foreground px-1">
-                      {editTimeframeSteps.map((s) => (<span key={s.value}>{s.label}</span>))}
+                <div className="rounded-xl border bg-card p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-display font-bold flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-primary" /> Project Timeline
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-primary">{editTimeframeSteps[editTimeIdx[0]]?.label}</span>
+                      <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTimeline} disabled={savingTime}>
+                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
+                      </Button>
                     </div>
                   </div>
-                ) : (() => {
-                  const timeframeSteps = ["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Unknown"];
-                  const currentIndex = timeframeSteps.indexOf(dbProject.timeframe);
-                  const knownSteps = timeframeSteps.filter(s => s !== "Unknown");
-                  const isUnknown = dbProject.timeframe === "Unknown" || currentIndex === -1;
-                  return (
-                    <div className="rounded-xl border bg-card p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-primary" /> Project Timeline
-                        </h3>
-                        <span className="text-sm font-semibold text-primary">{dbProject.timeframe}</span>
-                      </div>
-                      {isUnknown ? (
-                        <p className="text-xs text-muted-foreground">Timeline not yet determined</p>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="relative h-2 rounded-full bg-muted overflow-hidden">
-                            <motion.div
-                              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary/80 to-primary"
-                              initial={{ width: 0 }}
-                              animate={{ width: `${((currentIndex + 1) / knownSteps.length) * 100}%` }}
-                              transition={{ duration: 0.8, ease: "easeOut" }}
-                            />
-                          </div>
-                          <div className="flex justify-between">
-                            {knownSteps.map((step, i) => (
-                              <span
-                                key={step}
-                                className={cn(
-                                  "text-[10px] font-medium",
-                                  i <= currentIndex ? "text-primary" : "text-muted-foreground/50"
-                                )}
-                              >
-                                {step}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
+                  <Slider value={editTimeIdx} onValueChange={setEditTimeIdx} min={0} max={6} step={1} className="w-full mb-2" />
+                  <div className="flex justify-between text-[10px] text-muted-foreground px-1">
+                    {editTimeframeSteps.map((s) => (<span key={s.value}>{s.label}</span>))}
+                  </div>
+                </div>
               </motion.div>
             )}
 
@@ -1103,6 +1012,33 @@ const ProjectDetail = () => {
                             </a>
                           </Button>
                         )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Target Technology - minimal sidebar */}
+                  {dbProject.target_technology && !editMode && (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Technology</h4>
+                      <div className="flex items-center gap-2">
+                        <CircuitBoard className="h-4 w-4 text-primary shrink-0" />
+                        <span className="text-sm font-medium">{dbProject.target_technology}</span>
+                      </div>
+                      {(dbProject.fpga_family || dbProject.asic_process) && (
+                        <p className="text-xs text-muted-foreground mt-1 ml-6">
+                          {dbProject.fpga_family || dbProject.asic_process}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Timeline - minimal sidebar */}
+                  {dbProject.timeframe && !editMode && (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Timeline</h4>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-primary shrink-0" />
+                        <span className="text-sm font-medium">{dbProject.timeframe}</span>
                       </div>
                     </div>
                   )}
