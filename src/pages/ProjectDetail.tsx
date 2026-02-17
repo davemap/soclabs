@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,34 @@ import ProjectMilestonesManager from "@/components/project-manage/ProjectMilesto
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+
+const fpgaFamilies = [
+  "Xilinx Artix-7", "Xilinx Kintex-7", "Xilinx Zynq-7000", "Xilinx UltraScale+",
+  "Intel Cyclone V", "Intel Cyclone 10", "Intel Arria 10", "Intel Stratix 10",
+  "Lattice iCE40", "Lattice ECP5", "Gowin GW1N", "Undecided",
+];
+const asicProcessNodes = [
+  "TSMC 180nm", "TSMC 130nm", "TSMC 65nm", "TSMC 40nm", "TSMC 28nm",
+  "GlobalFoundries 180nm", "GlobalFoundries 130nm", "GlobalFoundries 22nm",
+  "SkyWater 130nm", "IHP 130nm", "Undecided",
+];
+const editTimeframeSteps = [
+  { value: 0, label: "1 Month" },
+  { value: 1, label: "3 Months" },
+  { value: 2, label: "6 Months" },
+  { value: 3, label: "1 Year" },
+  { value: 4, label: "2 Years" },
+  { value: 5, label: "3 Years" },
+  { value: 6, label: "Unknown" },
+];
+const timeframeLabelToIndex = (label: string | null): number => {
+  if (!label) return 3;
+  const idx = editTimeframeSteps.findIndex((s) => s.label === label);
+  return idx >= 0 ? idx : 3;
+};
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -121,6 +148,49 @@ const ProjectDetail = () => {
   const [dbContent, setDbContent] = useState<any[]>([]);
   const [dbMilestones, setDbMilestones] = useState<any[]>([]);
   const [editMode, setEditMode] = useState(false);
+
+  // Inline edit state for target technology
+  const [editTech, setEditTech] = useState("");
+  const [editFpga, setEditFpga] = useState("");
+  const [editAsic, setEditAsic] = useState("");
+  const [savingTech, setSavingTech] = useState(false);
+
+  // Inline edit state for timeline
+  const [editTimeIdx, setEditTimeIdx] = useState<number[]>([3]);
+  const [savingTime, setSavingTime] = useState(false);
+
+  // Sync inline edit state when dbProject changes or edit mode is toggled
+  useEffect(() => {
+    if (dbProject && editMode) {
+      setEditTech(dbProject.target_technology || "");
+      setEditFpga(dbProject.fpga_family || "");
+      setEditAsic(dbProject.asic_process || "");
+      setEditTimeIdx([timeframeLabelToIndex(dbProject.timeframe)]);
+    }
+  }, [dbProject, editMode]);
+
+  const saveTargetTech = async () => {
+    if (!dbProject) return;
+    setSavingTech(true);
+    const { error } = await supabase.from("projects").update({
+      target_technology: editTech,
+      fpga_family: editTech === "FPGA" ? editFpga : "",
+      asic_process: editTech === "ASIC" ? editAsic : "",
+    }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Target technology updated"); refreshDbProject(); }
+    setSavingTech(false);
+  };
+
+  const saveTimeline = async () => {
+    if (!dbProject) return;
+    setSavingTime(true);
+    const label = editTimeframeSteps[editTimeIdx[0]]?.label ?? "1 Year";
+    const { error } = await supabase.from("projects").update({ timeframe: label }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Timeline updated"); refreshDbProject(); }
+    setSavingTime(false);
+  };
 
   // Fetch join request status and content for DB projects
   useEffect(() => {
@@ -307,9 +377,47 @@ const ProjectDetail = () => {
             )}
 
             {/* Target Technology card */}
-            {dbProject.target_technology && (
+            {(dbProject.target_technology || (editMode && isOwner)) && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
-                {(() => {
+                {editMode && isOwner ? (
+                  <div className="rounded-xl border bg-card p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-display font-bold flex items-center gap-2">
+                        <CircuitBoard className="h-4 w-4 text-primary" /> Target Technology
+                      </h3>
+                      <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTargetTech} disabled={savingTech}>
+                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
+                      </Button>
+                    </div>
+                    <div className="flex gap-2 mb-3">
+                      {["FPGA", "ASIC", "Undecided"].map((t) => (
+                        <button key={t} type="button"
+                          onClick={() => { setEditTech(t); setEditFpga(""); setEditAsic(""); }}
+                          className={cn("flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
+                            editTech === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"
+                          )}>
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                    {editTech === "FPGA" && (
+                      <Select value={editFpga} onValueChange={setEditFpga}>
+                        <SelectTrigger><SelectValue placeholder="Select FPGA family" /></SelectTrigger>
+                        <SelectContent>
+                          {fpgaFamilies.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    {editTech === "ASIC" && (
+                      <Select value={editAsic} onValueChange={setEditAsic}>
+                        <SelectTrigger><SelectValue placeholder="Select process node" /></SelectTrigger>
+                        <SelectContent>
+                          {asicProcessNodes.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                ) : (() => {
                   const isFpga = dbProject.target_technology === "FPGA";
                   const isAsic = dbProject.target_technology === "ASIC";
                   const accentClass = isFpga
@@ -359,9 +467,27 @@ const ProjectDetail = () => {
             )}
 
             {/* Timeframe visual bar */}
-            {dbProject.timeframe && (
+            {(dbProject.timeframe || (editMode && isOwner)) && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
-                {(() => {
+                {editMode && isOwner ? (
+                  <div className="rounded-xl border bg-card p-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-display font-bold flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-primary" /> Project Timeline
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-primary">{editTimeframeSteps[editTimeIdx[0]]?.label}</span>
+                        <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTimeline} disabled={savingTime}>
+                          <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
+                        </Button>
+                      </div>
+                    </div>
+                    <Slider value={editTimeIdx} onValueChange={setEditTimeIdx} min={0} max={6} step={1} className="w-full mb-2" />
+                    <div className="flex justify-between text-[10px] text-muted-foreground px-1">
+                      {editTimeframeSteps.map((s) => (<span key={s.value}>{s.label}</span>))}
+                    </div>
+                  </div>
+                ) : (() => {
                   const timeframeSteps = ["1 Month", "3 Months", "6 Months", "9 Months", "12 Months", "18 Months", "Unknown"];
                   const currentIndex = timeframeSteps.indexOf(dbProject.timeframe);
                   const knownSteps = timeframeSteps.filter(s => s !== "Unknown");
