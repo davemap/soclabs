@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu, Flame, HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -23,24 +24,45 @@ const weightedAvg = (values: number[]): number => {
   return divisor > 0 ? Math.round((weighted / divisor) * 10) / 10 : 0;
 };
 
+const effortTooltip = "Effort represents how much work is involved in completing this task or phase.";
+const uncertaintyTooltip = "Uncertainty represents the flexibility in duration. High uncertainty means the task could take much longer or shorter than expected — it's hard to predict upfront. Low uncertainty indicates a straightforward task with few unexpected complications.";
+
 const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
   if (!effort || !uncertainty) return null;
   const eRound = Math.round(effort);
   const uRound = Math.round(uncertainty);
   return (
-    <div className="flex items-center gap-1 shrink-0">
-      <div className="flex gap-px" title={`Effort: ${effort}/5`}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= eRound ? effortColors[Math.max(0, eRound - 1)] : "bg-muted/20")} />
-        ))}
+    <TooltipProvider delayDuration={200}>
+      <div className="flex items-center gap-1 shrink-0">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex gap-px cursor-help">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= eRound ? effortColors[Math.max(0, eRound - 1)] : "bg-muted/20")} />
+              ))}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs text-xs">
+            <p className="font-semibold mb-1">Effort: {effort}/5</p>
+            <p>{effortTooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+        <div className="w-px h-3 bg-border/40 mx-0.5" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex gap-px cursor-help">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uRound ? uncertaintyColors[Math.max(0, uRound - 1)] : "bg-muted/20")} />
+              ))}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs text-xs">
+            <p className="font-semibold mb-1">Uncertainty: {uncertainty}/5</p>
+            <p>{uncertaintyTooltip}</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
-      <div className="w-px h-3 bg-border/40 mx-0.5" />
-      <div className="flex gap-px" title={`Uncertainty: ${uncertainty}/5`}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uRound ? uncertaintyColors[Math.max(0, uRound - 1)] : "bg-muted/20")} />
-        ))}
-      </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
@@ -102,33 +124,53 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
 
                 {/* Phase average effort & uncertainty */}
                 <div className="flex flex-col sm:flex-row gap-3 mb-5 p-4 rounded-xl border border-border/40 bg-muted/5">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Flame className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-[11px] font-display font-semibold text-foreground">Effort</span>
-                      <span className="text-[11px] text-muted-foreground ml-auto">{avgEffort}/5</span>
+                  <TooltipProvider delayDuration={200}>
+                    <div className="flex-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="cursor-help">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <Flame className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span className="text-[11px] font-display font-semibold text-foreground">Effort</span>
+                              <span className="text-[11px] text-muted-foreground ml-auto">{avgEffort}/5</span>
+                            </div>
+                            <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
+                              <div
+                                className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
+                                style={{ width: `${(avgEffort / 5) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs text-xs">
+                          <p>{effortTooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                    <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
-                      <div
-                        className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
-                        style={{ width: `${(avgEffort / 5) * 100}%` }}
-                      />
+                    <div className="w-px bg-border/40 hidden sm:block" />
+                    <div className="flex-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div className="cursor-help">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                              <span className="text-[11px] font-display font-semibold text-foreground">Uncertainty</span>
+                              <span className="text-[11px] text-muted-foreground ml-auto">{avgUncertainty}/5</span>
+                            </div>
+                            <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
+                              <div
+                                className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
+                                style={{ width: `${(avgUncertainty / 5) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs text-xs">
+                          <p>{uncertaintyTooltip}</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                  </div>
-                  <div className="w-px bg-border/40 hidden sm:block" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-[11px] font-display font-semibold text-foreground">Uncertainty</span>
-                      <span className="text-[11px] text-muted-foreground ml-auto">{avgUncertainty}/5</span>
-                    </div>
-                    <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
-                      <div
-                        className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
-                        style={{ width: `${(avgUncertainty / 5) * 100}%` }}
-                      />
-                    </div>
-                  </div>
+                  </TooltipProvider>
                 </div>
 
                 {/* Topic tree */}
