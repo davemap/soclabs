@@ -1046,6 +1046,16 @@ const ProjectDetail = () => {
               );
             })()}
 
+            {/* Join Requests Manager - shown in edit mode */}
+            {isOwner && editMode && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mt-6">
+                <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                  <UserPlus className="h-5 w-5 text-primary" /> Join Requests
+                </h2>
+                <ProjectJoinRequestsManager projectId={dbProject.id} />
+              </motion.div>
+            )}
+
             {/* Join Request Form for non-owners */}
             {user && !isOwner && !existingRequest && (
               <div id="join-request-section" className="rounded-xl border bg-card p-6 mt-10 mb-10">
@@ -1065,28 +1075,13 @@ const ProjectDetail = () => {
               </div>
             )}
 
-            {/* Owner Management Tabs */}
+            {/* Owner Management - Settings */}
             {isOwner && editMode && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 mb-10">
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-primary" /> Manage Project
+                  <Settings className="h-5 w-5 text-primary" /> Project Settings
                 </h2>
-                <Tabs defaultValue="requests" className="w-full">
-                  <TabsList className="w-full justify-start">
-                    <TabsTrigger value="requests" className="gap-1.5">
-                      <Users className="h-3.5 w-3.5" /> Requests
-                    </TabsTrigger>
-                    <TabsTrigger value="settings" className="gap-1.5">
-                      <Settings className="h-3.5 w-3.5" /> Settings
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="requests" className="mt-4">
-                    <ProjectJoinRequestsManager projectId={dbProject.id} />
-                  </TabsContent>
-                  <TabsContent value="settings" className="mt-4">
-                    <ProjectSettingsManager project={dbProject} onUpdate={refreshDbProject} />
-                  </TabsContent>
-                </Tabs>
+                <ProjectSettingsManager project={dbProject} onUpdate={refreshDbProject} />
               </motion.div>
             )}
 
