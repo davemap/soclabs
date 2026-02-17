@@ -25,7 +25,7 @@ const articleImages: Record<string, string> = {
   "risc-v-summit-talk": imgRiscvSummit,
   "ml-accelerator-tinyml-benchmark": imgMlAccel,
   "open-eda-flow-yosys": imgOpenEda,
-  "dvfs-controller-results": imgDvfs,
+  "dvfs-controller-results": imgDvfs
 };
 
 const Index = () => {
@@ -39,17 +39,17 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-electric/30 bg-electric/10 text-electric text-xs font-semibold mb-8"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              Open-Source Silicon Community
-            </motion.div>
+            className="max-w-3xl mx-auto text-center">
+
+            
+
+
+
+
+
+
+
+
             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1]">
               Build Your Own{" "}
               <span className="text-gradient">System-on-Chip</span>
@@ -79,8 +79,8 @@ const Index = () => {
           </ScrollReveal>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {referenceDesigns.slice(0, 4).map((design, i) => (
-              <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
+            {referenceDesigns.slice(0, 4).map((design, i) =>
+            <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                 <Link to={`/designs/${design.id}`} className="block h-full">
                   <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 cursor-pointer">
                     <CardContent className="p-7">
@@ -95,11 +95,11 @@ const Index = () => {
                       </div>
                       <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
                       <div className="flex flex-wrap gap-2 mb-5">
-                        {design.features.slice(0, 3).map((f) => (
-                          <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                        {design.features.slice(0, 3).map((f) =>
+                      <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
                             {f}
                           </span>
-                        ))}
+                      )}
                       </div>
                       <span className="text-xs text-primary font-medium inline-flex items-center gap-1">
                         View details <ArrowRight className="h-3 w-3" />
@@ -108,7 +108,7 @@ const Index = () => {
                   </Card>
                 </Link>
               </ScrollReveal>
-            ))}
+            )}
           </div>
           <ScrollReveal className="text-center mt-10">
             <Button asChild variant="outline" size="lg" className="rounded-full px-8">
@@ -126,26 +126,26 @@ const Index = () => {
           </ScrollReveal>
           <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
             {[
-              {
-                icon: GraduationCap,
-                title: "Learn by Building",
-                desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert community support.",
-                color: "bg-primary/10 text-primary",
-              },
-              {
-                icon: Users,
-                title: "Global Community",
-                desc: "Connect with researchers, students, and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                color: "bg-coral/10 text-coral",
-              },
-              {
-                icon: Globe,
-                title: "Silicon Access",
-                desc: "Access ASIC shuttle programmes and FPGA platforms to take your designs from simulation to real hardware.",
-                color: "bg-violet/10 text-violet",
-              },
-            ].map((item, i) => (
-              <ScrollReveal key={item.title} delay={i * 0.12}>
+            {
+              icon: GraduationCap,
+              title: "Learn by Building",
+              desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert community support.",
+              color: "bg-primary/10 text-primary"
+            },
+            {
+              icon: Users,
+              title: "Global Community",
+              desc: "Connect with researchers, students, and engineers across 28+ countries. Share knowledge, collaborate on projects.",
+              color: "bg-coral/10 text-coral"
+            },
+            {
+              icon: Globe,
+              title: "Silicon Access",
+              desc: "Access ASIC shuttle programmes and FPGA platforms to take your designs from simulation to real hardware.",
+              color: "bg-violet/10 text-violet"
+            }].
+            map((item, i) =>
+            <ScrollReveal key={item.title} delay={i * 0.12}>
                 <div className="text-center">
                   <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${item.color} mb-5`}>
                     <item.icon className="h-6 w-6" />
@@ -154,7 +154,7 @@ const Index = () => {
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
               </ScrollReveal>
-            ))}
+            )}
           </div>
 
           {/* Floating Stats Bar */}
@@ -162,26 +162,26 @@ const Index = () => {
             <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-background/80 backdrop-blur-sm shadow-lg p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { label: "Community Members", value: communityMembers.length },
-                  { label: "Organisations", value: partners.length },
-                  { label: "Countries", value: new Set(partners.map((p) => p.country).filter(Boolean)).size },
-                  { label: "Projects Built", value: communityProjects.length },
-                ].map((stat) => (
-                  <div key={stat.label} className="text-center">
+                { label: "Community Members", value: communityMembers.length },
+                { label: "Organisations", value: partners.length },
+                { label: "Countries", value: new Set(partners.map((p) => p.country).filter(Boolean)).size },
+                { label: "Projects Built", value: communityProjects.length }].
+                map((stat) =>
+                <div key={stat.label} className="text-center">
                     <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
                     <div className="text-xs text-muted-foreground mt-1 font-medium">{stat.label}</div>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </ScrollReveal>
-          {!user && (
-            <ScrollReveal className="text-center mt-12">
+          {!user &&
+          <ScrollReveal className="text-center mt-12">
               <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
                 <Link to="/about#join">Join the Community</Link>
               </Button>
             </ScrollReveal>
-          )}
+          }
         </div>
       </section>
 
@@ -196,28 +196,28 @@ const Index = () => {
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[...newsArticles]
-              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .slice(0, 3)
-              .map((article, i) => (
-                <ScrollReveal key={article.id} delay={i * 0.12}>
+            {[...newsArticles].
+            sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).
+            slice(0, 3).
+            map((article, i) =>
+            <ScrollReveal key={article.id} delay={i * 0.12}>
                   <Link to={`/news/${article.id}`} className="block h-full">
                     <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 overflow-hidden">
                         <div className="relative h-36 overflow-hidden bg-muted">
                           <img
-                            src={articleImages[article.id] || "/placeholder.svg"}
-                            alt={article.title}
-                            className="w-full h-full object-cover"
-                          />
+                      src={articleImages[article.id] || "/placeholder.svg"}
+                      alt={article.title}
+                      className="w-full h-full object-cover" />
+
                           <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
                         </div>
                         <CardContent className="p-5 flex flex-col flex-1">
                           <div className="flex flex-wrap gap-1.5 mb-3">
-                            {article.tags.slice(0, 2).map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-[10px]">
+                            {article.tags.slice(0, 2).map((tag) =>
+                      <Badge key={tag} variant="secondary" className="text-[10px]">
                                 {tag}
                               </Badge>
-                            ))}
+                      )}
                           </div>
                           <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
                           <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
@@ -234,7 +234,7 @@ const Index = () => {
                     </Card>
                   </Link>
                 </ScrollReveal>
-              ))}
+            )}
           </div>
 
           <ScrollReveal className="text-center mt-10">
@@ -263,8 +263,8 @@ const Index = () => {
           </ScrollReveal>
         </div>
       </section>
-    </Layout>
-  );
+    </Layout>);
+
 };
 
 export default Index;
