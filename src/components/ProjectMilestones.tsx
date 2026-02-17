@@ -263,10 +263,11 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                 {learningPhase && (
                   <Link
                     to={`/learn/${learningPhase.id}/${learningPhase.topics[0].id}`}
-                    className="shrink-0 p-3 hover:bg-muted/30 transition-colors"
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary hover:bg-muted/30 rounded-md transition-colors"
                     title={`Learn about ${label}`}
                   >
-                    <BookOpen className="h-3.5 w-3.5 text-muted-foreground hover:text-primary transition-colors" />
+                    <BookOpen className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Learn</span>
                   </Link>
                 )}
               </div>
