@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, X, ArrowRight, Building2, GraduationCap, MapPin, Filter, Globe } from "lucide-react";
+import { ExternalLink, X, ArrowRight, Building2, GraduationCap, MapPin, Filter, Globe, UserPlus } from "lucide-react";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { partners, communityMembers } from "@/data/mockData";
+import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -34,6 +35,7 @@ const Partners = () => {
     coordinates: [0, 0],
     zoom: 1,
   });
+  const [joinOpen, setJoinOpen] = useState(false);
 
   const industryPartners = useMemo(() => partners.filter((p) => p.type === "industry"), []);
   const academicPartners = useMemo(() => partners.filter((p) => p.type === "academic"), []);
@@ -98,9 +100,12 @@ const Partners = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Our <span className="text-gradient">Community</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               We work with leading organisations across academia, industry, and open-source to make custom silicon accessible.
             </p>
+            <Button size="lg" className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
+              <UserPlus className="mr-2 h-4 w-4" /> Join the Community
+            </Button>
           </motion.div>
 
           {/* Global Map */}
@@ -439,6 +444,7 @@ const Partners = () => {
           </div>
         </div>
       </section>
+      <JoinCommunityDialog open={joinOpen} onOpenChange={setJoinOpen} />
     </Layout>
   );
 };
