@@ -36,6 +36,7 @@ interface MilestoneTrackerProps {
   onPhaseClick?: (phase: string, taskIndex?: number) => void;
   technology?: string;
   isFloating?: boolean;
+  isSticky?: boolean;
 }
 
 const progressColor = (p: number) => {
@@ -213,7 +214,7 @@ const PhaseNode = ({
   );
 };
 
-const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, technology, isFloating }: MilestoneTrackerProps) => {
+const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, technology, isFloating, isSticky = true }: MilestoneTrackerProps) => {
   const hiddenPhases = technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
   const visiblePhaseKeys = phaseKeys.filter((k) => !hiddenPhases.has(k));
   const activeIndex = visiblePhaseKeys.reduce((max, key, i) => {
@@ -221,8 +222,13 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
   }, 0);
 
    return (
-    <div className="sticky top-24 z-30 mb-10">
-      {isFloating && (
+    <div
+      className={cn(
+        "z-30 mb-10",
+        isSticky ? "sticky top-24" : "relative"
+      )}
+    >
+      {isFloating && isSticky && (
         <>
           {/* Solid cover above the bar to hide old content between navbar and tracker */}
           <div className="absolute -top-28 left-0 right-0 h-28 bg-background" />
