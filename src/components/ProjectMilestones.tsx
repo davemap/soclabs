@@ -36,7 +36,7 @@ interface ProjectMilestonesProps {
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
   technology?: string;
-  trackerSlot?: React.ReactNode;
+  trackerSlot?: React.ReactNode | ((togglePhase: (phase: string) => void, expandedPhases: Set<string>) => React.ReactNode);
 }
 
 const phaseLabels: Record<string, string> = {
@@ -222,7 +222,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
         )}
       </div>
 
-      {trackerSlot}
+      {typeof trackerSlot === "function" ? trackerSlot(togglePhase, expandedPhases) : trackerSlot}
 
       <div className={cn("rounded-xl border bg-card overflow-hidden divide-y divide-border/40", trackerSlot && "rounded-t-none border-t-0", technology === "FPGA" ? "border-sky-500/40" : "border-violet-500/40")}>
         {grouped.map(({ phase, label, tasks, greyedOut }) => {

@@ -343,17 +343,21 @@ const ProjectDetail = () => {
                     phaseDates={project.phaseDates}
                     technology={project.technology}
                     trackerSlot={
-                      project.phaseProgress && (
-                        <MilestoneTracker
-                          phaseProgress={project.phaseProgress}
-                          milestones={project.milestones}
-                          onPhaseClick={handlePhaseClick}
-                          technology={project.technology}
-                          isFloating={false}
-                          isSticky={false}
-                          compact
-                        />
-                      )
+                      project.phaseProgress
+                        ? (togglePhase, expandedPhases) => (
+                            <MilestoneTracker
+                              phaseProgress={project.phaseProgress!}
+                              milestones={project.milestones}
+                              onPhaseClick={(phase) => {
+                                togglePhase(phase);
+                              }}
+                              technology={project.technology}
+                              isFloating={false}
+                              isSticky={false}
+                              compact
+                            />
+                          )
+                        : undefined
                     }
                   />
                 </div>
