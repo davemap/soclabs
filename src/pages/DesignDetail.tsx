@@ -84,15 +84,37 @@ const DesignDetail = () => {
                   ))}
                 </div>
                 {design.provenIn && design.provenIn.length > 0 && (
-                  <div className="mt-4 p-4 rounded-lg border border-border bg-muted/30">
-                    <h3 className="text-sm font-semibold mb-2 flex items-center gap-1.5">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-400" /> Silicon Proven
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mt-6 rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="p-2 rounded-lg bg-emerald-500/15">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                      </div>
+                      <h3 className="text-lg font-display font-bold text-emerald-400">Silicon Proven</h3>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-3">
                       {design.provenIn.map((p) => (
-                        <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-amber-500/50 text-amber-400" : "border-emerald-500/50 text-emerald-400"}`}>
-                          {p.type}: {p.details}
-                        </Badge>
+                        <div
+                          key={p.details}
+                          className={`flex items-center gap-3 rounded-xl border p-4 ${
+                            p.type === "ASIC"
+                              ? "border-amber-500/30 bg-amber-500/5"
+                              : "border-emerald-500/20 bg-emerald-500/5"
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold ${
+                            p.type === "ASIC"
+                              ? "bg-amber-500/15 text-amber-400"
+                              : "bg-emerald-500/15 text-emerald-400"
+                          }`}>
+                            {p.type}
+                          </div>
+                          <div>
+                            <p className={`text-sm font-semibold ${
+                              p.type === "ASIC" ? "text-amber-400" : "text-emerald-400"
+                            }`}>{p.type} Fabrication</p>
+                            <p className="text-xs text-muted-foreground">{p.details}</p>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>
