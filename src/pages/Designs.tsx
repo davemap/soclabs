@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { referenceDesigns } from "@/data/mockData";
-import SoCComparison from "@/components/SoCComparison";
+import SoCComparisonDialog from "@/components/SoCComparison";
 
 const Designs = () => {
   const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const toggleCompare = (id: string) => {
     setCompareIds((prev) =>
@@ -154,19 +155,17 @@ const Designs = () => {
             })}
           </div>
 
-          {/* Comparison Table */}
-          {compareIds.length >= 2 && (
-            <ScrollReveal className="max-w-5xl mx-auto mt-16">
-              <SoCComparison
-                selectedIds={compareIds}
-                onToggle={toggleCompare}
-                onClear={clearCompare}
-              />
-            </ScrollReveal>
-          )}
+          {/* Comparison Dialog */}
+          <SoCComparisonDialog
+            open={compareOpen}
+            onOpenChange={setCompareOpen}
+            selectedIds={compareIds}
+            onToggle={toggleCompare}
+            onClear={() => { clearCompare(); setCompareOpen(false); }}
+          />
 
           {/* Floating compare bar */}
-          {compareIds.length >= 1 && compareIds.length < referenceDesigns.length && (
+          {compareIds.length >= 1 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -181,10 +180,7 @@ const Designs = () => {
                   <Button
                     size="sm"
                     className="rounded-full"
-                    onClick={() => {
-                      const el = document.querySelector('[data-compare-table]');
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }}
+                    onClick={() => setCompareOpen(true)}
                   >
                     View Comparison
                   </Button>
