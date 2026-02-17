@@ -25,7 +25,7 @@ interface MilestoneRow {
   sort_order: number;
 }
 
-export default function ProjectMilestonesManager({ projectId }: { projectId: string }) {
+export default function ProjectMilestonesManager({ projectId, onSave }: { projectId: string; onSave?: () => void }) {
   const [milestones, setMilestones] = useState<MilestoneRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -92,6 +92,7 @@ export default function ProjectMilestonesManager({ projectId }: { projectId: str
       }
       setMilestones([...milestones]);
       toast.success("Milestones saved");
+      onSave?.();
     } catch {
       toast.error("Failed to save milestones");
     }
