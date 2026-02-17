@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -303,6 +303,55 @@ const ProjectDetail = () => {
               </div>
             )}
 
+            {/* Timeframe visual bar */}
+            {dbProject.timeframe && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-10">
+                {(() => {
+                  const timeframeSteps = ["1 Month", "3 Months", "6 Months", "9 Months", "12 Months", "18 Months", "Unknown"];
+                  const currentIndex = timeframeSteps.indexOf(dbProject.timeframe);
+                  const knownSteps = timeframeSteps.filter(s => s !== "Unknown");
+                  const isUnknown = dbProject.timeframe === "Unknown" || currentIndex === -1;
+                  return (
+                    <div className="rounded-xl border bg-card p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-display font-bold flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" /> Project Timeline
+                        </h3>
+                        <span className="text-sm font-semibold text-primary">{dbProject.timeframe}</span>
+                      </div>
+                      {isUnknown ? (
+                        <p className="text-xs text-muted-foreground">Timeline not yet determined</p>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="relative h-2 rounded-full bg-muted overflow-hidden">
+                            <motion.div
+                              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary/80 to-primary"
+                              initial={{ width: 0 }}
+                              animate={{ width: `${((currentIndex + 1) / knownSteps.length) * 100}%` }}
+                              transition={{ duration: 0.8, ease: "easeOut" }}
+                            />
+                          </div>
+                          <div className="flex justify-between">
+                            {knownSteps.map((step, i) => (
+                              <span
+                                key={step}
+                                className={cn(
+                                  "text-[10px] font-medium",
+                                  i <= currentIndex ? "text-primary" : "text-muted-foreground/50"
+                                )}
+                              >
+                                {step.replace(" Months", "mo").replace(" Month", "mo")}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </motion.div>
+            )}
+
             {/* DB Content sections display (for everyone) */}
             {dbContent.length > 0 && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
@@ -317,17 +366,55 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
+            {/* Target Technology card */}
             {dbProject.target_technology && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-xl border bg-muted/30 p-5 mb-10">
-                <h3 className="text-sm font-display font-bold mb-2">Target Technology</h3>
-                <p className="text-sm text-muted-foreground">
-                  {dbProject.target_technology}
-                  {dbProject.fpga_family && ` — ${dbProject.fpga_family}`}
-                  {dbProject.asic_process && ` — ${dbProject.asic_process}`}
-                </p>
-                {dbProject.timeframe && (
-                  <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
-                )}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
+                {(() => {
+                  const isFpga = dbProject.target_technology === "FPGA";
+                  const isAsic = dbProject.target_technology === "ASIC";
+                  const accentClass = isFpga
+                    ? "border-sky-500/30 bg-sky-500/5"
+                    : isAsic
+                      ? "border-violet-500/30 bg-violet-500/5"
+                      : "border-border bg-muted/30";
+                  const iconBgClass = isFpga
+                    ? "bg-sky-500/10 text-sky-600"
+                    : isAsic
+                      ? "bg-violet-500/10 text-violet-600"
+                      : "bg-muted text-muted-foreground";
+                  const badgeClass = isFpga
+                    ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
+                    : isAsic
+                      ? "bg-violet-500/10 text-violet-600 border-violet-500/20"
+                      : "bg-muted text-muted-foreground border-border";
+                  return (
+                    <div className={cn("rounded-xl border p-5", accentClass)}>
+                      <div className="flex items-start gap-4">
+                        <div className={cn("p-3 rounded-xl shrink-0", iconBgClass)}>
+                          <CircuitBoard className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-display font-bold mb-1">Target Technology</h3>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className={badgeClass}>
+                              {dbProject.target_technology}
+                            </Badge>
+                            {dbProject.fpga_family && (
+                              <Badge variant="outline" className="text-xs">
+                                {dbProject.fpga_family}
+                              </Badge>
+                            )}
+                            {dbProject.asic_process && (
+                              <Badge variant="outline" className="text-xs">
+                                {dbProject.asic_process}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
               </motion.div>
             )}
 
