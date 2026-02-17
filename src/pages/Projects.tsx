@@ -187,13 +187,9 @@ const Projects = () => {
                                       </TooltipTrigger>
                                       <TooltipContent side="top" className="text-xs px-3 py-1.5">
                                         <span className="font-semibold">{phaseLabels[key] || key}</span>
-                                        {total > 0 ? (
-                                          <span className="ml-1.5 tabular-nums opacity-80">
-                                            {doneCount}✓ {inProgressCount}⏳ {notStartedCount}○
-                                          </span>
-                                        ) : (
-                                          <span className="ml-1.5 tabular-nums opacity-80">{p}%</span>
-                                        )}
+                                        <span className="ml-1.5 tabular-nums opacity-80">
+                                          {total > 0 ? `${doneCount}/${total} done` : `${p}%`}
+                                        </span>
                                       </TooltipContent>
                                     </Tooltip>
                                   );
