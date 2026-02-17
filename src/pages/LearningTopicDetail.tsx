@@ -300,7 +300,7 @@ const LearningTopicDetail = () => {
                         {ratings.map((r) => (
                           <Link
                             key={r.projectId}
-                            to={`/projects/${r.projectId}`}
+                            to={`/projects/${r.projectId}?topic=${topic.id}`}
                             className="flex flex-col gap-2.5 px-4 py-3 rounded-xl bg-muted/5 hover:bg-muted/15 border border-border/20 hover:border-border/40 transition-all group/proj shrink-0 w-44"
                           >
                             <span className="text-xs text-muted-foreground group-hover/proj:text-foreground transition-colors font-display font-semibold leading-tight line-clamp-2 min-h-[2rem]">

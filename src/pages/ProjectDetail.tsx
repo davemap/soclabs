@@ -30,10 +30,12 @@ const ProjectDetail = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [expandPhase, setExpandPhase] = useState<string | null>(null);
   const [expandTaskIndex, setExpandTaskIndex] = useState<number | undefined>(undefined);
+  const [expandTopicId, setExpandTopicId] = useState<string | null>(null);
 
-  // Handle ?phase= query param from project cards
+  // Handle ?phase= and ?topic= query params
   useEffect(() => {
     const phase = searchParams.get("phase");
+    const topic = searchParams.get("topic");
     if (phase) {
       setExpandPhase(phase);
       setSearchParams({}, { replace: true });
@@ -41,6 +43,17 @@ const ProjectDetail = () => {
         const el = document.getElementById(`milestone-phase-${phase}`);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300);
+    }
+    if (topic) {
+      setExpandTopicId(topic);
+      setSearchParams({}, { replace: true });
+      // Scroll to milestones section
+      setTimeout(() => {
+        const el = document.getElementById("project-milestones");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }, 300);
     }
@@ -309,7 +322,9 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
+                <div id="project-milestones">
+                  <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} expandTopicId={expandTopicId} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
+                </div>
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />
