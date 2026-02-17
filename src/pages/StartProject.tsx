@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -61,6 +62,7 @@ const slideVariants = {
 
 const StartProject = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
@@ -148,8 +150,42 @@ const StartProject = () => {
   };
   const goBack = () => { if (step > 0) { setDirection(-1); setStep((s) => s - 1); } };
 
-  const handleSubmit = () => {
-    toast({ title: "Project created!", description: "Your project page has been set up. Create an account to manage it." });
+  const handleSubmit = async () => {
+    if (!user) {
+      toast({ title: "Please sign in first", variant: "destructive" });
+      return;
+    }
+
+    const timeframeLabel = timeframeSteps[timeframeIndex[0]]?.label ?? "";
+
+    const { data, error } = await supabase
+      .from("projects")
+      .insert({
+        user_id: user.id,
+        title: title.trim(),
+        description: description.trim(),
+        reference_soc: referenceSoc,
+        target_technology: targetTechnology,
+        fpga_family: fpgaFamily,
+        asic_process: asicProcess,
+        timeframe: timeframeLabel,
+        github_url: githubUrl.trim(),
+        docs_url: docsUrl.trim(),
+        interests: selectedInterests,
+        technologies: selectedTechnologies,
+        invited_members: invitedMembers,
+        email_invites: emailInvites,
+      })
+      .select("id")
+      .single();
+
+    if (error) {
+      toast({ title: "Error creating project", description: error.message, variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "Project created!", description: "Your project page is ready." });
+    navigate(`/projects/${data.id}`);
   };
 
   const currentTimeframeLabel = timeframeSteps[timeframeIndex[0]]?.label ?? "1 Year";
