@@ -122,7 +122,11 @@ const LearningTopicDetail = () => {
     p.topics.map((t) => ({ phaseId: p.id, topicId: t.id, title: t.title, phaseTitle: p.shortTitle }))
   );
   const globalIndex = allTopics.findIndex((t) => t.phaseId === phaseId && t.topicId === topicId);
-  const prev = globalIndex > 0 ? allTopics[globalIndex - 1] : null;
+  const rawPrev = globalIndex > 0 ? allTopics[globalIndex - 1] : null;
+  // If previous topic is in a different phase, jump to that phase's overview instead
+  const prev = rawPrev && rawPrev.phaseId !== phaseId
+    ? allTopics.find((t) => t.phaseId === rawPrev.phaseId && t.topicId.endsWith("-overview")) ?? rawPrev
+    : rawPrev;
   const next = globalIndex < allTopics.length - 1 ? allTopics[globalIndex + 1] : null;
 
   return (
