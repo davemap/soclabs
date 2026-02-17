@@ -8,65 +8,82 @@ const iconMap: Record<string, React.ElementType> = {
   FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
 };
 
-// Phase keys matching learningPhases ids
 const phaseKeys = ["architecture", "rtl", "verification", "synthesis", "fpga", "asic"];
 
 interface MilestoneTrackerProps {
   phaseProgress: Record<string, number>;
 }
 
-const RadialProgress = ({
+/** Returns an HSL color string interpolating from deep red (0%) → amber (50%) → green (100%) */
+const progressColor = (p: number) => {
+  if (p === 0) return "hsl(0 0% 60% / 0.25)";
+  // Hue: 0 (red) → 45 (amber) → 142 (green)
+  const hue = p < 50 ? (p / 50) * 45 : 45 + ((p - 50) / 50) * 97;
+  const sat = 60 + (p / 100) * 12; // 60-72%
+  const light = 42 + (p / 100) * 6; // 42-48%
+  return `hsl(${Math.round(hue)} ${Math.round(sat)}% ${Math.round(light)}%)`;
+};
+
+const progressColorLight = (p: number) => {
+  if (p === 0) return "transparent";
+  const hue = p < 50 ? (p / 50) * 45 : 45 + ((p - 50) / 50) * 97;
+  return `hsl(${Math.round(hue)} 60% 50% / 0.12)`;
+};
+
+/**
+ * Rounded-rect progress ring using a <rect> with rx/ry and stroke-dasharray.
+ */
+const RoundedRectProgress = ({
   progress,
-  size = 52,
-  strokeWidth = 3,
+  size = 50,
+  radius = 10,
+  strokeWidth = 2.5,
   children,
 }: {
   progress: number;
   size?: number;
+  radius?: number;
   strokeWidth?: number;
   children: React.ReactNode;
 }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
-
-  // Color based on progress
-  const getColor = (p: number) => {
-    if (p === 0) return "hsl(var(--muted-foreground) / 0.2)";
-    if (p < 30) return "hsl(var(--primary) / 0.4)";
-    if (p < 70) return "hsl(var(--primary) / 0.7)";
-    if (p < 100) return "hsl(var(--primary) / 0.85)";
-    return "hsl(var(--primary))";
-  };
+  const inset = strokeWidth / 2;
+  const rectW = size - strokeWidth;
+  const rectH = size - strokeWidth;
+  // Perimeter of a rounded rect ≈ 2*(w + h) - 8*r + 2*π*r
+  const perimeter = 2 * (rectW + rectH) - 8 * radius + 2 * Math.PI * radius;
+  const offset = perimeter - (progress / 100) * perimeter;
+  const color = progressColor(progress);
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="absolute inset-0 -rotate-90"
-      >
+      <svg width={size} height={size} className="absolute inset-0">
         {/* Track */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
+        <rect
+          x={inset}
+          y={inset}
+          width={rectW}
+          height={rectH}
+          rx={radius}
+          ry={radius}
           fill="none"
-          stroke="hsl(var(--border) / 0.4)"
+          stroke="hsl(var(--border) / 0.3)"
           strokeWidth={strokeWidth}
         />
-        {/* Progress arc */}
+        {/* Progress */}
         {progress > 0 && (
-          <motion.circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
+          <motion.rect
+            x={inset}
+            y={inset}
+            width={rectW}
+            height={rectH}
+            rx={radius}
+            ry={radius}
             fill="none"
-            stroke={getColor(progress)}
+            stroke={color}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
+            strokeDasharray={perimeter}
+            initial={{ strokeDashoffset: perimeter }}
             animate={{ strokeDashoffset: offset }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           />
@@ -80,7 +97,6 @@ const RadialProgress = ({
 };
 
 const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
-  // Determine furthest active phase
   const activeIndex = phaseKeys.reduce((max, key, i) => {
     return (phaseProgress[key] || 0) > 0 ? i : max;
   }, 0);
@@ -90,18 +106,20 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="mb-10"
+      className="rounded-xl border border-border/60 bg-muted/20 p-5 mb-10"
     >
-      <h3 className="text-sm font-display font-bold mb-4 text-muted-foreground uppercase tracking-wider">
+      <h3 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-5">
         Design Progress
       </h3>
       <div className="relative flex items-start justify-between">
-        {/* Connecting track line */}
-        <div className="absolute top-[26px] left-[26px] right-[26px] h-[2px] bg-border/40" />
+        {/* Track line */}
+        <div className="absolute top-[25px] left-[25px] right-[25px] h-px bg-border/40" />
         <div
-          className="absolute top-[26px] left-[26px] h-[2px] bg-primary/40 transition-all duration-500"
+          className="absolute top-[25px] left-[25px] h-px transition-all duration-500"
           style={{
-            width: `calc(${(activeIndex / (phaseKeys.length - 1)) * 100}% - 52px + ${activeIndex === phaseKeys.length - 1 ? "52px" : "26px"})`,
+            width: `calc(${(activeIndex / (phaseKeys.length - 1)) * 100}% - 50px + ${activeIndex === phaseKeys.length - 1 ? "50px" : "25px"})`,
+            background: progressColor(phaseProgress[phaseKeys[activeIndex]] || 0),
+            opacity: 0.5,
           }}
         />
 
@@ -110,33 +128,31 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
           if (!phaseKey) return null;
           const progress = phaseProgress[phaseKey] || 0;
           const Icon = iconMap[phase.icon] || Cpu;
+          const color = progressColor(progress);
 
           return (
-            <div key={phase.id} className="relative z-10 flex flex-col items-center gap-1.5">
-              <Link to={`/learn/${phase.id}/${phase.topics[0].id}`}>
-                <RadialProgress progress={progress}>
+            <div key={phase.id} className="relative z-10 flex flex-col items-center gap-1">
+              <Link to={`/learn/${phase.id}/${phase.topics[0].id}`} className="group">
+                <RoundedRectProgress progress={progress}>
                   <div
                     className={cn(
-                      "w-9 h-9 rounded-lg flex items-center justify-center border transition-all",
-                      progress === 100
-                        ? "border-primary bg-primary/15 text-primary"
-                        : progress > 0
-                        ? "border-primary/50 bg-primary/10 text-primary/80"
-                        : "border-border bg-background text-muted-foreground"
+                      "w-[34px] h-[34px] rounded-lg flex items-center justify-center transition-all group-hover:scale-105",
                     )}
+                    style={{
+                      background: progressColorLight(progress),
+                      color: progress > 0 ? color : "hsl(var(--muted-foreground))",
+                    }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-3.5 w-3.5" />
                   </div>
-                </RadialProgress>
+                </RoundedRectProgress>
               </Link>
-              <span className="text-[10px] font-display font-medium text-muted-foreground hidden sm:block">
+              <span className="text-[10px] font-display font-medium text-muted-foreground hidden sm:block mt-0.5">
                 {phase.shortTitle}
               </span>
               <span
-                className={cn(
-                  "text-[10px] font-bold",
-                  progress === 100 ? "text-primary" : progress > 0 ? "text-primary/70" : "text-muted-foreground/50"
-                )}
+                className="text-[10px] font-bold tabular-nums"
+                style={{ color: progress > 0 ? color : "hsl(var(--muted-foreground) / 0.4)" }}
               >
                 {progress}%
               </span>
