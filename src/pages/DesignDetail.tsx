@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2 } from "lucide-react";
+import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2, Tag, GitBranch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -244,6 +244,24 @@ const DesignDetail = () => {
             <aside className="hidden lg:block w-56 shrink-0 sticky top-24">
               <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
                 <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
+                {(design.version || design.branch) && (
+                  <div className="space-y-2 pb-2 border-b border-border/40">
+                    {design.version && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-muted-foreground">Version</span>
+                        <span className="ml-auto font-mono font-semibold text-foreground">{design.version}</span>
+                      </div>
+                    )}
+                    {design.branch && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-muted-foreground">Branch</span>
+                        <span className="ml-auto font-mono font-semibold text-foreground">{design.branch}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <Button asChild className="w-full rounded-lg justify-start" size="sm">
                   <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 mr-2" /> Docs & Guide
