@@ -31,6 +31,7 @@ const Profile = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -48,13 +49,14 @@ const Profile = () => {
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchDbProjects();
       setNewEmail(user.email ?? "");
     }
   }, [user]);
 
   const fetchProfile = async () => {
     if (!user) return;
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", user.id)
@@ -62,6 +64,17 @@ const Profile = () => {
 
     if (data) setProfile(data as Profile);
     setLoadingProfile(false);
+  };
+
+  const fetchDbProjects = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("projects")
+      .select("id, title, description, status")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (data) setDbProjects(data);
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,11 +166,17 @@ const Profile = () => {
     (m) => profile?.username && m.id === profile.username
   );
 
-  const userProjects = matchedMember
+  const mockProjects = matchedMember
     ? communityProjects.filter(
         (p) => p.authorId === matchedMember.id || p.collaboratorIds?.includes(matchedMember.id)
       )
     : [];
+
+  // Combine mock + real database projects
+  const allProjects = [
+    ...dbProjects.map((p) => ({ id: p.id, title: p.title, description: p.description, status: p.status, isDb: true })),
+    ...mockProjects.map((p) => ({ id: p.id, title: p.title, description: p.description, status: p.status, isDb: false })),
+  ];
 
   const userOrgs = matchedMember
     ? partners.filter((o) => matchedMember.organisations.includes(o.id))
@@ -311,9 +330,9 @@ const Profile = () => {
             {/* Projects */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-4">My Projects</h3>
-              {userProjects.length > 0 ? (
+              {allProjects.length > 0 ? (
                 <div className="space-y-3">
-                  {userProjects.map((p) => (
+                  {allProjects.map((p) => (
                     <Link key={p.id} to={`/projects/${p.id}`}>
                       <Card className="hover:border-primary/30 transition-colors cursor-pointer">
                         <CardContent className="py-4 flex items-center justify-between">

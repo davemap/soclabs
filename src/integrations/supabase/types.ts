@@ -47,6 +47,69 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          asic_process: string | null
+          created_at: string
+          description: string | null
+          docs_url: string | null
+          email_invites: string[] | null
+          fpga_family: string | null
+          github_url: string | null
+          id: string
+          interests: string[] | null
+          invited_members: string[] | null
+          reference_soc: string
+          status: string
+          target_technology: string | null
+          technologies: string[] | null
+          timeframe: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asic_process?: string | null
+          created_at?: string
+          description?: string | null
+          docs_url?: string | null
+          email_invites?: string[] | null
+          fpga_family?: string | null
+          github_url?: string | null
+          id?: string
+          interests?: string[] | null
+          invited_members?: string[] | null
+          reference_soc: string
+          status?: string
+          target_technology?: string | null
+          technologies?: string[] | null
+          timeframe?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asic_process?: string | null
+          created_at?: string
+          description?: string | null
+          docs_url?: string | null
+          email_invites?: string[] | null
+          fpga_family?: string | null
+          github_url?: string | null
+          id?: string
+          interests?: string[] | null
+          invited_members?: string[] | null
+          reference_soc?: string
+          status?: string
+          target_technology?: string | null
+          technologies?: string[] | null
+          timeframe?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

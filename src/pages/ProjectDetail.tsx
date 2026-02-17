@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 import MilestoneTracker from "@/components/MilestoneTracker";
 import ProjectMilestones from "@/components/ProjectMilestones";
+import { supabase } from "@/integrations/supabase/client";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -71,13 +72,149 @@ const ProjectDetail = () => {
     }, 100);
   }, []);
   const { id } = useParams<{ id: string }>();
-  const project = communityProjects.find((p) => p.id === id);
+  const mockProject = communityProjects.find((p) => p.id === id);
+  const [dbProject, setDbProject] = useState<any>(null);
+  const [dbLoading, setDbLoading] = useState(!mockProject);
+
+  useEffect(() => {
+    if (!mockProject && id) {
+      supabase
+        .from("projects")
+        .select("*, profiles!projects_user_id_fkey(username, full_name)")
+        .eq("id", id)
+        .maybeSingle()
+        .then(({ data }) => {
+          setDbProject(data);
+          setDbLoading(false);
+        });
+    }
+  }, [id, mockProject]);
+
+  // Use mock project if found, otherwise use database project
+  const project = mockProject || null;
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
-  const referenceSoc = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
+  const referenceSocDesign = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
   const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
   const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
 
-  if (!project) {
+  // If we have a database project but no mock project, render a simplified view
+  if (!project && dbProject) {
+    const dbRefSoc = referenceDesigns.find((d) => d.id === dbProject.reference_soc);
+    return (
+      <Layout>
+        <article className="py-24">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+              <button
+                onClick={() => navigate(-1)}
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+            </motion.div>
+
+            <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <Badge variant="outline" className={statusColor(dbProject.status)}>{dbProject.status}</Badge>
+                {dbRefSoc && <Badge variant="outline">{dbRefSoc.name}</Badge>}
+                {dbProject.target_technology && <Badge variant="outline">{dbProject.target_technology}</Badge>}
+              </div>
+
+              <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{dbProject.title}</h1>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+                <span className="font-medium text-foreground">
+                  {dbProject.profiles?.full_name || dbProject.profiles?.username || "Community Member"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {new Date(dbProject.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                </span>
+              </div>
+
+              {dbProject.interests?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {dbProject.interests.map((tag: string) => (
+                    <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                      <Tag className="h-2.5 w-2.5" />{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {dbProject.description && (
+                <p className="text-lg text-muted-foreground leading-relaxed mb-4">{dbProject.description}</p>
+              )}
+
+              <div className="flex flex-wrap gap-3 mt-6">
+                {dbProject.github_url && (
+                  <Button asChild variant="outline" size="sm" className="rounded-full">
+                    <a href={dbProject.github_url} target="_blank" rel="noreferrer">
+                      <Github className="h-4 w-4 mr-2" /> GitHub
+                    </a>
+                  </Button>
+                )}
+                {dbProject.docs_url && (
+                  <Button asChild variant="outline" size="sm" className="rounded-full">
+                    <a href={dbProject.docs_url} target="_blank" rel="noreferrer">
+                      <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </motion.header>
+
+            {dbRefSoc && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
+                <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
+                <Link to={`/designs/${dbRefSoc.id}`} className="block group">
+                  <div className="rounded-xl border bg-card p-5 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-xl bg-primary/10 shrink-0">
+                        <Cpu className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{dbRefSoc.name}</h3>
+                        <p className="text-sm text-muted-foreground">{dbRefSoc.tagline}</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            )}
+
+            {dbProject.target_technology && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-xl border bg-muted/30 p-5 mb-10">
+                <h3 className="text-sm font-display font-bold mb-2">Target Technology</h3>
+                <p className="text-sm text-muted-foreground">
+                  {dbProject.target_technology}
+                  {dbProject.fpga_family && ` — ${dbProject.fpga_family}`}
+                  {dbProject.asic_process && ` — ${dbProject.asic_process}`}
+                </p>
+                {dbProject.timeframe && (
+                  <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
+                )}
+              </motion.div>
+            )}
+
+            <CommentsThreads pageId={`project-${dbProject.id}`} />
+          </div>
+        </article>
+      </Layout>
+    );
+  }
+
+  if (!project && !dbProject) {
+    if (dbLoading) {
+      return (
+        <Layout>
+          <div className="py-24 flex items-center justify-center min-h-[60vh]">
+            <p className="text-muted-foreground">Loading project...</p>
+          </div>
+        </Layout>
+      );
+    }
     return (
       <Layout>
         <section className="py-24">
@@ -91,6 +228,8 @@ const ProjectDetail = () => {
       </Layout>
     );
   }
+
+  if (!project) return null;
 
   const isFpga = project.technology === "FPGA";
   const techBorder = isFpga ? "border-sky-500/40" : "border-violet-500/40";
@@ -314,7 +453,7 @@ const ProjectDetail = () => {
               )}
 
               {/* Reference SoC card */}
-              {referenceSoc && (
+              {referenceSocDesign && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -322,18 +461,18 @@ const ProjectDetail = () => {
                   className="mt-10 mb-10"
                 >
                   <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
-                  <Link to={`/designs/${referenceSoc.id}`} className="block group">
+                  <Link to={`/designs/${referenceSocDesign.id}`} className="block group">
                     <div className={`rounded-xl border bg-card p-5 ${techBorder} ${techBorderHover} hover:shadow-lg transition-all duration-300`}>
                       <div className="flex items-center gap-4">
                         <div className="p-3 rounded-xl bg-primary/10 shrink-0">
                           <Cpu className="h-6 w-6 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{referenceSoc.name}</h3>
-                          <p className="text-sm text-muted-foreground">{referenceSoc.tagline}</p>
+                          <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{referenceSocDesign.name}</h3>
+                          <p className="text-sm text-muted-foreground">{referenceSocDesign.tagline}</p>
                           <div className="flex flex-wrap gap-1.5 mt-2">
-                            <Badge variant="secondary" className="text-xs">{referenceSoc.processor}</Badge>
-                            <Badge variant="outline" className="text-xs">{referenceSoc.busArchitecture}</Badge>
+                            <Badge variant="secondary" className="text-xs">{referenceSocDesign.processor}</Badge>
+                            <Badge variant="outline" className="text-xs">{referenceSocDesign.busArchitecture}</Badge>
                           </div>
                         </div>
                         <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
