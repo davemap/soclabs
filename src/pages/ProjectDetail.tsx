@@ -291,7 +291,7 @@ const ProjectDetail = () => {
 
             {/* Non-sticky milestone tracker (same as mock projects) */}
             {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
-              <div className="mb-10">
+              <div className="mb-4">
                 <MilestoneTracker
                   phaseProgress={milestonePhaseProgress}
                   milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
@@ -305,7 +305,7 @@ const ProjectDetail = () => {
 
             {/* Target Technology card */}
             {dbProject.target_technology && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
                 {(() => {
                   const isFpga = dbProject.target_technology === "FPGA";
                   const isAsic = dbProject.target_technology === "ASIC";
