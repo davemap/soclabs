@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsM
 import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
 import CompleteTaskDialog from "@/components/project-manage/CompleteTaskDialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
@@ -909,11 +910,12 @@ const ProjectDetail = () => {
             </div>
 
             {/* Collaborators section */}
-            {projectCollaborators.length > 0 && (
+            {(projectCollaborators.length > 0 || (editMode && isOwner)) && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-6">
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                   <Users className="h-5 w-5 text-primary" /> Collaborators
                 </h2>
+                {projectCollaborators.length > 0 && (
                 <div className="grid sm:grid-cols-2 gap-3">
                   {projectCollaborators.map((collab) => {
                     const initials = (collab.full_name || collab.username || "U")
@@ -965,6 +967,10 @@ const ProjectDetail = () => {
                     );
                   })}
                 </div>
+                )}
+                {editMode && isOwner && (
+                  <InviteCollaboratorInput projectId={dbProject.id} existingEmails={dbProject.email_invites || []} onInvited={refreshDbProject} />
+                )}
               </motion.div>
             )}
 
@@ -1581,6 +1587,74 @@ const ProjectDetail = () => {
         </div>
       </article>
     </Layout>
+  );
+};
+
+const InviteCollaboratorInput = ({ projectId, existingEmails, onInvited }: { projectId: string; existingEmails: string[]; onInvited: () => void }) => {
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleInvite = async () => {
+    const trimmed = email.trim().toLowerCase();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (existingEmails.includes(trimmed)) {
+      toast.error("This email has already been invited");
+      return;
+    }
+    setSending(true);
+    const { error } = await supabase
+      .from("projects")
+      .update({ email_invites: [...existingEmails, trimmed] })
+      .eq("id", projectId);
+    setSending(false);
+    if (error) toast.error("Failed to send invite");
+    else {
+      toast.success(`Invitation added for ${trimmed}`);
+      setEmail("");
+      onInvited();
+    }
+  };
+
+  return (
+    <div className="mt-3">
+      {existingEmails.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {existingEmails.map((e) => (
+            <Badge key={e} variant="outline" className="text-xs gap-1.5 pr-1">
+              <Mail className="h-3 w-3" />
+              {e}
+              <button
+                onClick={async () => {
+                  const newEmails = existingEmails.filter((x) => x !== e);
+                  const { error } = await supabase.from("projects").update({ email_invites: newEmails }).eq("id", projectId);
+                  if (error) toast.error("Failed to remove");
+                  else { toast.success("Invite removed"); onInvited(); }
+                }}
+                className="ml-0.5 p-0.5 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="Invite by email address..."
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleInvite()}
+          className="flex-1"
+        />
+        <Button size="sm" onClick={handleInvite} disabled={sending} className="shrink-0">
+          <UserPlus className="h-4 w-4 mr-1" /> {sending ? "Inviting..." : "Invite"}
+        </Button>
+      </div>
+    </div>
   );
 };
 
