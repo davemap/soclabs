@@ -8,6 +8,24 @@ import { newsArticles } from "@/data/newsData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 
+import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
+import imgAsicTapeout from "@/assets/news/asic-tapeout.jpg";
+import imgDesignComp from "@/assets/news/design-competition.jpg";
+import imgRiscvSummit from "@/assets/news/riscv-summit.jpg";
+import imgMlAccel from "@/assets/news/ml-accelerator.jpg";
+import imgOpenEda from "@/assets/news/open-eda.jpg";
+import imgDvfs from "@/assets/news/dvfs-power.jpg";
+
+const articleImages: Record<string, string> = {
+  "nanosoc-fpga-workshop-2026": imgFpgaWorkshop,
+  "ecosoc-tapeout-tsmc-28nm": imgAsicTapeout,
+  "design-competition-2026": imgDesignComp,
+  "risc-v-summit-talk": imgRiscvSummit,
+  "ml-accelerator-tinyml-benchmark": imgMlAccel,
+  "open-eda-flow-yosys": imgOpenEda,
+  "dvfs-controller-results": imgDvfs,
+};
+
 const NewsDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -64,6 +82,16 @@ const NewsDetail = () => {
                 })}
               </span>
             </div>
+
+            {articleImages[article.id] && (
+              <div className="rounded-xl overflow-hidden mb-10">
+                <img
+                  src={articleImages[article.id]}
+                  alt={article.title}
+                  className="w-full h-64 md:h-80 object-cover"
+                />
+              </div>
+            )}
 
             <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-display prose-headings:font-bold prose-a:text-primary">
               <ReactMarkdown>{article.content}</ReactMarkdown>
