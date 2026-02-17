@@ -34,32 +34,75 @@ const Projects = () => {
   const [dbProjects, setDbProjects] = useState<any[]>([]);
 
   useEffect(() => {
-    supabase
-      .from("projects")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) {
-          // Map DB projects to match the shape used by mock projects
-          const mapped = data.map((p) => ({
-            id: p.id,
-            title: p.title,
-            author: "",
-            institution: "",
-            description: p.description || "",
-            referenceSoc: referenceDesigns.find((d) => d.id === p.reference_soc)?.name || p.reference_soc,
-            technology: p.target_technology || "Undecided",
-            status: p.status,
-            tags: [...(p.interests || []), ...(p.technologies || [])],
-            date: p.created_at,
-            githubUrl: p.github_url || "",
-            phaseProgress: {} as Record<string, number>,
-            milestones: [],
-            _fromDb: true,
-          }));
-          setDbProjects(mapped);
+    const fetchProjects = async () => {
+      const { data: projects } = await supabase
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (!projects || projects.length === 0) return;
+
+      const projectIds = projects.map((p) => p.id);
+
+      const [{ data: milestones }, { data: phaseCompletions }] = await Promise.all([
+        supabase
+          .from("project_milestones")
+          .select("*")
+          .in("project_id", projectIds)
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("project_phase_completions")
+          .select("*")
+          .in("project_id", projectIds),
+      ]);
+
+      const mapped = projects.map((p) => {
+        const pMilestones = (milestones || []).filter((m) => m.project_id === p.id);
+        const pCompletions = (phaseCompletions || []).filter((c) => c.project_id === p.id);
+        const allPhaseKeys = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
+        const hiddenPhases = p.target_technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
+        const visiblePhases = allPhaseKeys.filter((k) => !hiddenPhases.has(k));
+
+        const phaseProgress: Record<string, number> = {};
+        for (const phase of visiblePhases) {
+          const phaseCompleted = pCompletions.some((c) => c.phase === phase);
+          if (phaseCompleted) {
+            phaseProgress[phase] = 100;
+          } else {
+            const tasks = pMilestones.filter((m) => m.phase === phase);
+            if (tasks.length > 0) {
+              const doneCount = tasks.filter((m) => m.done).length;
+              phaseProgress[phase] = Math.round((doneCount / tasks.length) * 100);
+            } else {
+              phaseProgress[phase] = 0;
+            }
+          }
         }
+
+        return {
+          id: p.id,
+          title: p.title,
+          author: "",
+          institution: "",
+          description: p.description || "",
+          referenceSoc: referenceDesigns.find((d) => d.id === p.reference_soc)?.name || p.reference_soc,
+          technology: p.target_technology || "Undecided",
+          status: p.status,
+          tags: [...(p.interests || []), ...(p.technologies || [])],
+          date: p.created_at,
+          githubUrl: p.github_url || "",
+          phaseProgress,
+          milestones: pMilestones.map((m) => ({
+            phase: m.phase,
+            task: m.task,
+            done: m.done,
+            startDate: m.start_date,
+          })),
+          _fromDb: true,
+        };
       });
+      setDbProjects(mapped);
+    };
+    fetchProjects();
   }, []);
 
   // Merge mock + DB projects, avoiding duplicates by id
