@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useParams, Link, useNavigate, useSearchParams, useBlocker } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -224,6 +224,47 @@ const ProjectDetail = () => {
     setSavingDesc(false);
   };
 
+  // Track unsaved changes
+  const hasUnsavedChanges = useMemo(() => {
+    if (!dbProject || !editMode) return false;
+    return (
+      editTitle !== (dbProject.title || "") ||
+      editDesc !== (dbProject.description || "") ||
+      editTech !== (dbProject.target_technology || "") ||
+      editFpga !== (dbProject.fpga_family || "") ||
+      editAsic !== (dbProject.asic_process || "") ||
+      editTimeframeSteps[editTimeIdx[0]]?.label !== (dbProject.timeframe || "")
+    );
+  }, [dbProject, editMode, editTitle, editDesc, editTech, editFpga, editAsic, editTimeIdx]);
+
+  // Warn on browser close / refresh
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [hasUnsavedChanges]);
+
+  // Block react-router navigation
+  const blocker = useBlocker(hasUnsavedChanges);
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      if (window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
+        blocker.proceed();
+      } else {
+        blocker.reset();
+      }
+    }
+  }, [blocker]);
+
+  // Wrap "Done Editing" toggle with unsaved check
+  const handleToggleEditMode = useCallback(() => {
+    if (editMode && hasUnsavedChanges) {
+      if (!window.confirm("You have unsaved changes. Are you sure you want to exit edit mode?")) return;
+    }
+    setEditMode(!editMode);
+  }, [editMode, hasUnsavedChanges]);
+
   // Fetch join request status and content for DB projects
   useEffect(() => {
     if (dbProject && user && user.id !== dbProject.user_id) {
@@ -321,7 +362,7 @@ const ProjectDetail = () => {
                   variant={editMode ? "default" : "outline"}
                   size="sm"
                   className="rounded-full"
-                  onClick={() => setEditMode(!editMode)}
+                  onClick={handleToggleEditMode}
                 >
                   <Settings className="h-4 w-4 mr-1.5" />
                   {editMode ? "Done Editing" : "Edit This Page"}
