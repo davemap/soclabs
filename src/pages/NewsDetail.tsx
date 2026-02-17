@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { newsArticles } from "@/data/newsData";
 import ReactMarkdown from "react-markdown";
+import CommentsThreads from "@/components/CommentsThreads";
 
 const NewsDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,6 +71,8 @@ const NewsDetail = () => {
             <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-display prose-headings:font-bold prose-a:text-primary">
               <ReactMarkdown>{article.content}</ReactMarkdown>
             </div>
+
+            <CommentsThreads pageId={`news-${article.id}`} />
           </motion.div>
         </div>
       </article>

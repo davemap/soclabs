@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { communityProjects } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
+import CommentsThreads from "@/components/CommentsThreads";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -142,6 +143,8 @@ const ProjectDetail = () => {
           >
             <ReactMarkdown>{project.content}</ReactMarkdown>
           </motion.div>
+
+          <CommentsThreads pageId={`project-${project.id}`} />
         </div>
       </article>
     </Layout>
