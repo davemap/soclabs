@@ -424,41 +424,6 @@ const LearningTopicDetail = () => {
                 </motion.div>
               )}
 
-              {/* Prev / Next navigation */}
-              <div className="flex items-stretch gap-4">
-                {prev ? (
-                  <Link
-                    to={`/learn/${prev.phaseId}/${prev.topicId}`}
-                    className="flex-1 group rounded-xl border border-border/40 bg-card/50 p-4 hover:border-border transition-all"
-                  >
-                    <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
-                      <ChevronLeft className="h-3 w-3" /> Previous
-                    </div>
-                    <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors">
-                      {prev.title}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{prev.phaseTitle}</div>
-                  </Link>
-                ) : (
-                  <div className="flex-1" />
-                )}
-                {next ? (
-                  <Link
-                    to={`/learn/${next.phaseId}/${next.topicId}`}
-                    className="flex-1 group rounded-xl border border-border/40 bg-card/50 p-4 hover:border-border transition-all text-right"
-                  >
-                    <div className="text-xs text-muted-foreground mb-1 flex items-center justify-end gap-1">
-                      Next <ChevronRight className="h-3 w-3" />
-                    </div>
-                    <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors">
-                      {next.title}
-                    </div>
-                    <div className="text-xs text-muted-foreground">{next.phaseTitle}</div>
-                  </Link>
-                ) : (
-                  <div className="flex-1" />
-                )}
-              </div>
             </div>
 
             {/* Floating sidebar - topics in this phase */}
@@ -468,7 +433,7 @@ const LearningTopicDetail = () => {
                   <BookOpen className="h-4 w-4 text-primary" />
                   {phase.title} Topics
                 </h3>
-                <div className="relative pl-3 border-l-2 border-primary/20 space-y-0.5">
+              <div className="relative pl-3 border-l-2 border-primary/20 space-y-0.5">
                   {phase.topics.map((t, i) => (
                     <Link
                       key={t.id}
@@ -480,7 +445,6 @@ const LearningTopicDetail = () => {
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
                     >
-                      {/* Branch dot */}
                       <div className={cn(
                         "absolute -left-[calc(0.75rem+3px)] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 transition-colors",
                         t.id === topicId
@@ -495,6 +459,40 @@ const LearningTopicDetail = () => {
                       )}
                     </Link>
                   ))}
+                </div>
+
+                {/* Prev / Next buttons */}
+                <div className="flex gap-1 mt-4 pt-4 border-t border-border/40">
+                  {prev ? (
+                    <Link
+                      to={`/learn/${prev.phaseId}/${prev.topicId}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border/40 bg-card/50 hover:border-border hover:bg-muted/50 transition-all text-xs text-muted-foreground hover:text-foreground"
+                      title={prev.title}
+                    >
+                      <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">Prev</span>
+                    </Link>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border/20 text-xs text-muted-foreground/30 cursor-not-allowed">
+                      <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+                      <span>Prev</span>
+                    </div>
+                  )}
+                  {next ? (
+                    <Link
+                      to={`/learn/${next.phaseId}/${next.topicId}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border/40 bg-card/50 hover:border-border hover:bg-muted/50 transition-all text-xs text-muted-foreground hover:text-foreground"
+                      title={next.title}
+                    >
+                      <span className="truncate">Next</span>
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                    </Link>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border/20 text-xs text-muted-foreground/30 cursor-not-allowed">
+                      <span>Next</span>
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+                    </div>
+                  )}
                 </div>
               </div>
             </aside>
