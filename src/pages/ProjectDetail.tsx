@@ -661,10 +661,10 @@ const ProjectDetail = () => {
                   </div>
                 </div>
               ) : dbProject.description ? (
-                <p className="text-lg text-muted-foreground leading-relaxed mb-4">{dbProject.description}</p>
+                <p className="text-lg text-muted-foreground leading-relaxed mb-1">{dbProject.description}</p>
               ) : null}
 
-              <div className="flex flex-wrap gap-3 mt-6">
+              <div className="flex flex-wrap gap-3 mt-2">
                 {user && !isOwner && !existingRequest && (
                   <Button variant="default" size="sm" className="rounded-full" onClick={() => document.getElementById("join-request-section")?.scrollIntoView({ behavior: "smooth" })}>
                     <UserPlus className="h-4 w-4 mr-2" /> Request to Join
