@@ -11,6 +11,7 @@ const navLinks = [
   { to: "/learn", label: "Learning Hub" },
   { to: "/technologies", label: "Technologies" },
   { to: "/interests", label: "Interests" },
+  { to: "/news", label: "News" },
   { to: "/partners", label: "Community" },
   { to: "/about", label: "About" },
 ];
