@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,8 @@ export default function ProjectContentManager({ projectId, onSave }: { projectId
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     supabase
@@ -48,6 +50,37 @@ export default function ProjectContentManager({ projectId, onSave }: { projectId
     }
     setSections((prev) => prev.filter((_, i) => i !== index));
     toast.success("Section removed");
+  };
+
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) {
+      setDragIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+    setSections((prev) => {
+      const updated = [...prev];
+      const [moved] = updated.splice(dragIndex, 1);
+      updated.splice(dropIndex, 0, moved);
+      return updated.map((s, i) => ({ ...s, sort_order: i }));
+    });
+    setDragIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
   };
 
   const saveAll = async () => {
@@ -103,10 +136,24 @@ export default function ProjectContentManager({ projectId, onSave }: { projectId
       )}
 
       {sections.map((section, i) => (
-        <Card key={section.id || `new-${i}`}>
+        <Card
+          key={section.id || `new-${i}`}
+          draggable
+          onDragStart={() => handleDragStart(i)}
+          onDragOver={(e) => handleDragOver(e, i)}
+          onDrop={(e) => handleDrop(e, i)}
+          onDragEnd={handleDragEnd}
+          className={`transition-all duration-200 ${
+            dragIndex === i ? "opacity-40 scale-[0.98]" : ""
+          } ${
+            dragOverIndex === i && dragIndex !== i
+              ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background"
+              : ""
+          }`}
+        >
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
+              <GripVertical className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab active:cursor-grabbing" />
               <Input
                 placeholder="Section title (e.g. Architecture Overview)"
                 value={section.title}
