@@ -691,71 +691,6 @@ const ProjectDetail = () => {
               />
             </div>
 
-            {/* Target Technology card - edit mode only in main content */}
-            {editMode && isOwner && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-4">
-                <div className="rounded-xl border bg-card p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                      <CircuitBoard className="h-4 w-4 text-primary" /> Target Technology
-                    </h3>
-                    <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTargetTech} disabled={savingTech}>
-                      <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
-                    </Button>
-                  </div>
-                  <div className="flex gap-2 mb-3">
-                    {["FPGA", "ASIC", "Undecided"].map((t) => (
-                      <button key={t} type="button"
-                        onClick={() => { setEditTech(t); setEditFpga(""); setEditAsic(""); }}
-                        className={cn("flex-1 py-2 px-3 rounded-lg border text-sm font-medium transition-all",
-                          editTech === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"
-                        )}>
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                  {editTech === "FPGA" && (
-                    <Select value={editFpga} onValueChange={setEditFpga}>
-                      <SelectTrigger><SelectValue placeholder="Select FPGA family" /></SelectTrigger>
-                      <SelectContent>
-                        {fpgaFamilies.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  {editTech === "ASIC" && (
-                    <Select value={editAsic} onValueChange={setEditAsic}>
-                      <SelectTrigger><SelectValue placeholder="Select process node" /></SelectTrigger>
-                      <SelectContent>
-                        {asicProcessNodes.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Timeframe - edit mode only in main content */}
-            {editMode && isOwner && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-4">
-                <div className="rounded-xl border bg-card p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-display font-bold flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" /> Project Timeline
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-primary">{editTimeframeSteps[editTimeIdx[0]]?.label}</span>
-                      <Button size="sm" variant="outline" className="rounded-full h-8" onClick={saveTimeline} disabled={savingTime}>
-                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
-                      </Button>
-                    </div>
-                  </div>
-                  <Slider value={editTimeIdx} onValueChange={setEditTimeIdx} min={0} max={6} step={1} className="w-full mb-2" />
-                  <div className="flex justify-between text-[10px] text-muted-foreground px-1">
-                    {editTimeframeSteps.map((s) => (<span key={s.value}>{s.label}</span>))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
 
             {/* Project Image */}
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }} className="mb-4">
@@ -1167,8 +1102,42 @@ const ProjectDetail = () => {
                     </div>
                   ) : editMode ? null : null}
 
-                  {/* Target Technology - minimal sidebar */}
-                  {dbProject.target_technology && !editMode && (
+                  {/* Target Technology - sidebar */}
+                  {editMode && isOwner ? (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm space-y-3">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Technology</h4>
+                      <div className="flex flex-col gap-1.5">
+                        {["FPGA", "ASIC", "Undecided"].map((t) => (
+                          <button key={t} type="button"
+                            onClick={() => { setEditTech(t); setEditFpga(""); setEditAsic(""); }}
+                            className={cn("py-1.5 px-3 rounded-lg border text-xs font-medium transition-all",
+                              editTech === t ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"
+                            )}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                      {editTech === "FPGA" && (
+                        <Select value={editFpga} onValueChange={setEditFpga}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="FPGA family" /></SelectTrigger>
+                          <SelectContent>
+                            {fpgaFamilies.map((f) => (<SelectItem key={f} value={f}>{f}</SelectItem>))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      {editTech === "ASIC" && (
+                        <Select value={editAsic} onValueChange={setEditAsic}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Process node" /></SelectTrigger>
+                          <SelectContent>
+                            {asicProcessNodes.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <Button size="sm" className="w-full" onClick={saveTargetTech} disabled={savingTech}>
+                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
+                      </Button>
+                    </div>
+                  ) : dbProject.target_technology ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Technology</h4>
                       <div className="flex items-center gap-2">
@@ -1181,10 +1150,23 @@ const ProjectDetail = () => {
                         </p>
                       )}
                     </div>
-                  )}
+                  ) : null}
 
-                  {/* Timeline - minimal sidebar */}
-                  {dbProject.timeframe && !editMode && (
+                  {/* Timeline - sidebar */}
+                  {editMode && isOwner ? (
+                    <div className="rounded-xl border bg-card p-4 shadow-sm space-y-3">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Timeline</h4>
+                      <span className="text-sm font-semibold text-primary">{editTimeframeSteps[editTimeIdx[0]]?.label}</span>
+                      <Slider value={editTimeIdx} onValueChange={setEditTimeIdx} min={0} max={6} step={1} className="w-full" />
+                      <div className="flex justify-between text-[9px] text-muted-foreground">
+                        <span>{editTimeframeSteps[0]?.label}</span>
+                        <span>{editTimeframeSteps[6]?.label}</span>
+                      </div>
+                      <Button size="sm" className="w-full" onClick={saveTimeline} disabled={savingTime}>
+                        <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
+                      </Button>
+                    </div>
+                  ) : dbProject.timeframe ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Timeline</h4>
                       <div className="flex items-center gap-2">
@@ -1192,7 +1174,7 @@ const ProjectDetail = () => {
                         <span className="text-sm font-medium">{dbProject.timeframe}</span>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                 </div>
               </aside>
