@@ -8,16 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import { interests, Interest } from "@/data/interests";
+import { interests as allInterests, Interest } from "@/data/interests";
+
+// Filter out Technologies — those are now on the Technologies page
+const interests = allInterests.filter((i) => i.category !== "Technologies");
 import { toast } from "sonner";
 
 const categories = [
-{
-  key: "Technologies" as const,
-  label: "Technologies",
-  icon: Cpu,
-  count: interests.filter((i) => i.category === "Technologies").length
-},
 {
   key: "Research Fields" as const,
   label: "Research Fields",

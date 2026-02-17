@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { technologies } from "@/data/mockData";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const categories = [...new Set(technologies.map((t) => t.category))];
 
@@ -16,6 +20,16 @@ const categoryColors: Record<string, string> = {
 };
 
 const Technologies = () => {
+  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+
+  const toggleTech = (name: string) => {
+    setSelectedTechs((prev) =>
+      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name]
+    );
+  };
+
+  const selectedCount = selectedTechs.length;
+
   return (
     <Layout>
       <section className="py-24">
@@ -27,7 +41,7 @@ const Technologies = () => {
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Technologies & <span className="text-gradient">Tools</span></h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              An overview of the platforms, tools, and IP available to design, verify, and fabricate your SoC.
+              An overview of the platforms, tools, and IP available to design, verify, and fabricate your SoC. Select the technologies that interest you.
             </p>
           </motion.div>
 
@@ -39,18 +53,40 @@ const Technologies = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 {technologies
                   .filter((t) => t.category === cat)
-                  .map((tech, i) => (
-                    <ScrollReveal key={tech.name} delay={i * 0.06}>
-                      <Link to={`/technologies/${tech.id}`}>
-                        <Card className="hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
-                          <CardContent className="p-5">
-                            <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">{tech.description}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    </ScrollReveal>
-                  ))}
+                  .map((tech, i) => {
+                    const isSelected = selectedTechs.includes(tech.name);
+                    return (
+                      <ScrollReveal key={tech.name} delay={i * 0.06}>
+                        <div className="relative">
+                          <Link to={`/technologies/${tech.id}`}>
+                            <Card className={cn(
+                              "hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+                              isSelected
+                                ? "border-primary/40 shadow-md shadow-primary/10 bg-primary/[0.02]"
+                                : "border-border/60"
+                            )}>
+                              <CardContent className="p-5 pr-14">
+                                <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{tech.description}</p>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                          <button
+                            onClick={() => toggleTech(tech.name)}
+                            className={cn(
+                              "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
+                              isSelected
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border/60 hover:border-primary/50"
+                            )}
+                            title={isSelected ? "Interest registered" : `Register interest in ${tech.name}`}
+                          >
+                            {isSelected && <Check className="h-3.5 w-3.5" />}
+                          </button>
+                        </div>
+                      </ScrollReveal>
+                    );
+                  })}
               </div>
             </ScrollReveal>
           ))}
@@ -101,6 +137,32 @@ const Technologies = () => {
           </div>
         </div>
       </section>
+
+      {/* Floating CTA for selected technologies */}
+      <AnimatePresence>
+        {selectedCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40"
+          >
+            <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-xl shadow-primary/10">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">
+                  {selectedCount} technolog{selectedCount !== 1 ? "ies" : "y"} selected
+                </span>
+              </div>
+              <Button asChild size="sm" className="rounded-full px-5">
+                <Link to="/about#join">
+                  Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                </Link>
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 };
