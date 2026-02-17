@@ -111,16 +111,7 @@ const ProjectDetail = () => {
                   </span>
                 </div>
 
-                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  {project.description}
-                </p>
-
-                {/* Milestone tracker */}
-                {project.phaseProgress && (
-                  <MilestoneTracker phaseProgress={project.phaseProgress} />
-                )}
-
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 mb-4">
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
@@ -131,6 +122,15 @@ const ProjectDetail = () => {
                     </span>
                   ))}
                 </div>
+
+                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+                  {project.description}
+                </p>
+
+                {/* Milestone tracker */}
+                {project.phaseProgress && (
+                  <MilestoneTracker phaseProgress={project.phaseProgress} />
+                )}
               </motion.header>
 
               {/* Project image */}
