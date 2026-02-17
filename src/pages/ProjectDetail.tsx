@@ -440,9 +440,12 @@ const ProjectDetail = () => {
               )}
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-                <span className="font-medium text-foreground">
+                <Link
+                  to={`/community/${dbProject.user_id}`}
+                  className="font-medium text-foreground hover:text-primary transition-colors"
+                >
                   {dbProject.profile?.full_name || dbProject.profile?.username || "Community Member"}
-                </span>
+                </Link>
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5" />
                   {new Date(dbProject.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
