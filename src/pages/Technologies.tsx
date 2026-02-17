@@ -195,47 +195,38 @@ const Technologies = () => {
                         {/* EDA Phase progress bar */}
                         {group.key === "EDA Tooling" && (
                           <div className="mb-2">
-                            <div className="relative flex items-center justify-between rounded-xl border border-violet/20 bg-card/80 px-4 py-3">
+                            <div className="relative flex items-center justify-between rounded-2xl border-2 border-violet/30 bg-gradient-to-r from-violet/5 via-card to-violet/5 px-6 py-4 shadow-sm shadow-violet/5">
                               {/* Connecting line */}
-                              <div className="absolute top-1/2 left-[30px] right-[30px] h-[2px] bg-violet/10 -translate-y-1/2" />
-                              {edaPhaseOrder.map((phaseName, pi) => {
+                              <div className="absolute top-1/2 left-[40px] right-[40px] h-[3px] rounded-full bg-violet/15 -translate-y-1/2" />
+                              {edaPhaseOrder.map((phaseName) => {
                                 const phaseId = edaCategoryToPhaseId[phaseName];
                                 const phase = learningPhases.find((p) => p.id === phaseId);
                                 if (!phase) return null;
                                 const PhaseIcon = phaseIconMap[phase.icon] || Cpu;
                                 const isActive = activeEdaPhase === phaseName;
-                                const toolCount = technologies.filter(
-                                  (t) => (t as any).group === "EDA Tooling" && t.category === phaseName
-                                ).length;
 
                                 return (
                                   <button
                                     key={phaseName}
                                     onClick={() => setActiveEdaPhase(isActive ? null : phaseName)}
-                                    className="relative z-10 flex flex-col items-center gap-1 group/phase"
-                                    title={`${phaseName} (${toolCount} tools)`}
+                                    className="relative z-10 flex flex-col items-center gap-1.5 group/phase"
+                                    title={phaseName}
                                   >
                                     <div
                                       className={cn(
-                                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 border-2",
+                                        "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 border-2",
                                         isActive
-                                          ? "bg-violet/15 border-violet text-violet scale-110 shadow-md shadow-violet/20"
-                                          : "bg-card border-border/40 text-muted-foreground hover:border-violet/40 hover:text-violet"
+                                          ? "bg-violet/20 border-violet text-violet scale-110 shadow-lg shadow-violet/25"
+                                          : "bg-card border-border/50 text-muted-foreground hover:border-violet/50 hover:text-violet hover:bg-violet/5"
                                       )}
                                     >
                                       <PhaseIcon className="h-4 w-4" />
                                     </div>
                                     <span className={cn(
-                                      "text-[10px] font-display font-medium transition-colors hidden sm:block",
-                                      isActive ? "text-violet" : "text-muted-foreground"
+                                      "text-[10px] font-display font-semibold transition-colors hidden sm:block",
+                                      isActive ? "text-violet" : "text-muted-foreground/70"
                                     )}>
                                       {phase.shortTitle}
-                                    </span>
-                                    <span className={cn(
-                                      "text-[9px] font-semibold",
-                                      isActive ? "text-violet" : "text-muted-foreground/50"
-                                    )}>
-                                      {toolCount}
                                     </span>
                                   </button>
                                 );
