@@ -120,7 +120,7 @@ const ProjectDetail = () => {
                   <MilestoneTracker phaseProgress={project.phaseProgress} />
                 )}
 
-                <div className="flex flex-wrap gap-1.5 mb-6">
+                <div className="flex flex-wrap gap-1.5">
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
@@ -131,13 +131,6 @@ const ProjectDetail = () => {
                     </span>
                   ))}
                 </div>
-
-                <Button asChild size="sm" variant="outline">
-                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 mr-2" /> View Repository
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
-                </Button>
               </motion.header>
 
               {/* Project image */}
@@ -325,6 +318,15 @@ const ProjectDetail = () => {
                     </div>
                   </>
                 )}
+
+                <div className="border-t border-border/60 mt-3 pt-3">
+                  <Button asChild size="sm" className="w-full rounded-lg">
+                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                      <Github className="h-4 w-4 mr-2" /> View Repository
+                      <ExternalLink className="h-3 w-3 ml-1" />
+                    </a>
+                  </Button>
+                </div>
               </div>
             </aside>
           </div>
