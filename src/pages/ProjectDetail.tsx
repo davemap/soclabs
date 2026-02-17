@@ -289,26 +289,6 @@ const ProjectDetail = () => {
               </div>
             </motion.header>
 
-            {dbRefSoc && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
-                <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
-                <Link to={`/designs/${dbRefSoc.id}`} className="block group">
-                  <div className="rounded-xl border bg-card p-5 hover:shadow-lg transition-all duration-300">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-xl bg-primary/10 shrink-0">
-                        <Cpu className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{dbRefSoc.name}</h3>
-                        <p className="text-sm text-muted-foreground">{dbRefSoc.tagline}</p>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            )}
-
             {/* Non-sticky milestone tracker (same as mock projects) */}
             {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
               <div className="mb-10">
@@ -334,6 +314,26 @@ const ProjectDetail = () => {
                 {dbProject.timeframe && (
                   <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
                 )}
+              </motion.div>
+            )}
+
+            {dbRefSoc && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
+                <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
+                <Link to={`/designs/${dbRefSoc.id}`} className="block group">
+                  <div className="rounded-xl border bg-card p-5 hover:shadow-lg transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-xl bg-primary/10 shrink-0">
+                        <Cpu className="h-6 w-6 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{dbRefSoc.name}</h3>
+                        <p className="text-sm text-muted-foreground">{dbRefSoc.tagline}</p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             )}
 
