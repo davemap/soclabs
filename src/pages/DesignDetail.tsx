@@ -97,20 +97,20 @@ const DesignDetail = () => {
                           key={p.details}
                           className={`flex items-center gap-3 rounded-xl border p-4 ${
                             p.type === "ASIC"
-                              ? "border-amber-500/30 bg-amber-500/5"
-                              : "border-emerald-500/20 bg-emerald-500/5"
+                              ? "border-violet-500/30 bg-violet-500/5"
+                              : "border-sky-500/30 bg-sky-500/5"
                           }`}
                         >
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold ${
                             p.type === "ASIC"
-                              ? "bg-amber-500/15 text-amber-400"
-                              : "bg-emerald-500/15 text-emerald-400"
+                              ? "bg-violet-500/15 text-violet-400"
+                              : "bg-sky-500/15 text-sky-400"
                           }`}>
                             {p.type}
                           </div>
                           <div>
                             <p className={`text-sm font-semibold ${
-                              p.type === "ASIC" ? "text-amber-400" : "text-emerald-400"
+                              p.type === "ASIC" ? "text-violet-400" : "text-sky-400"
                             }`}>{p.type} Fabrication</p>
                             <p className="text-xs text-muted-foreground">{p.details}</p>
                           </div>
