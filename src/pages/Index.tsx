@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import { referenceDesigns, stats } from "@/data/mockData";
+import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
 
 import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
@@ -164,7 +164,12 @@ const Index = () => {
           <ScrollReveal className="mt-16">
             <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-background/80 backdrop-blur-sm shadow-lg p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {stats.map((stat, i) => (
+                {[
+                  { label: "Community Members", value: communityMembers.length },
+                  { label: "Organisations", value: partners.length },
+                  { label: "Countries", value: new Set(partners.map((p) => p.country).filter(Boolean)).size },
+                  { label: "Projects Built", value: communityProjects.length },
+                ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
                     <div className="text-xs text-muted-foreground mt-1 font-medium">{stat.label}</div>
