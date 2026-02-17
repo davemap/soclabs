@@ -39,8 +39,8 @@ const phaseLabels: Record<string, string> = {
   rtl: "RTL Design",
   verification: "Verification",
   synthesis: "Synthesis",
-  fpga: "FPGA Prototyping",
-  asic: "ASIC Tapeout",
+  "physical-design": "Physical Design",
+  tapeout: "Tapeout",
   "silicon-validation": "Silicon Validation",
 };
 
@@ -143,7 +143,7 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
     });
   };
 
-  const phaseOrder = ["architecture", "rtl", "verification", "synthesis", "fpga", "asic", "silicon-validation"];
+  const phaseOrder = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
   const grouped = phaseOrder
     .map((phase) => ({
       phase,

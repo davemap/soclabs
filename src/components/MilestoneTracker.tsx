@@ -10,7 +10,7 @@ const iconMap: Record<string, React.ElementType> = {
   FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical,
 };
 
-const phaseKeys = ["architecture", "rtl", "verification", "synthesis", "fpga", "asic", "silicon-validation"];
+const phaseKeys = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
 
 const siliconValidationPhase = {
   id: "silicon-validation",
@@ -25,8 +25,8 @@ const phaseLabels: Record<string, string> = {
   rtl: "RTL Design",
   verification: "Verification",
   synthesis: "Synthesis",
-  fpga: "FPGA Prototyping",
-  asic: "ASIC Tapeout",
+  "physical-design": "Physical Design",
+  tapeout: "Tapeout",
   "silicon-validation": "Silicon Validation",
 };
 
@@ -228,7 +228,7 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick }: Mile
           }}
         />
 
-        {[...learningPhases, siliconValidationPhase].map((phase, index) => {
+        {learningPhases.map((phase, index) => {
           const phaseKey = phaseKeys[index];
           if (!phaseKey) return null;
           const progress = phaseProgress[phaseKey] || 0;
