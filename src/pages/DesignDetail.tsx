@@ -178,7 +178,7 @@ const DesignDetail = () => {
                   <h2 className="text-2xl font-display font-bold mb-4">Technologies & Tools</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {relatedTechs.map((tech) => (
-                      <Link to="/technologies" key={tech.name}>
+                      <Link to={`/technologies/${tech.id}`} key={tech.name}>
                         <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40">
                           <CardContent className="p-5">
                             <div className="flex items-center justify-between mb-1">
