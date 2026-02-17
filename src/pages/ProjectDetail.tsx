@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -193,6 +193,26 @@ const ProjectDetail = () => {
     if (error) toast.error("Failed to save");
     else { toast.success("Timeline updated"); refreshDbProject(); }
     setSavingTime(false);
+  };
+
+  // Project image upload
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !dbProject) return;
+    setUploadingImage(true);
+    const ext = file.name.split('.').pop();
+    const path = `${dbProject.id}/cover.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    if (uploadError) { toast.error("Upload failed"); setUploadingImage(false); return; }
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { error } = await supabase.from("projects").update({ image_url: urlData.publicUrl }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to save image");
+    else { toast.success("Image updated"); refreshDbProject(); }
+    setUploadingImage(false);
+    if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
   // Inline edit state for title & description
@@ -840,6 +860,52 @@ const ProjectDetail = () => {
                 })()}
               </motion.div>
             )}
+
+            {/* Project Image */}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }} className="mb-10">
+              {editMode && isOwner ? (
+                <div>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageUpload}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="w-full rounded-xl border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 bg-card transition-colors overflow-hidden group"
+                  >
+                    {(dbProject as any).image_url ? (
+                      <div className="relative">
+                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-64 object-cover" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white">
+                          <Upload className="h-5 w-5" />
+                          <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Change Image"}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                        <ImageIcon className="h-10 w-10 mb-2 opacity-40" />
+                        <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Click to add a project image"}</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              ) : (dbProject as any).image_url ? (
+                <div className="rounded-xl border bg-card overflow-hidden">
+                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-64 object-cover" />
+                </div>
+              ) : (
+                <div className="rounded-xl border bg-card overflow-hidden">
+                  <div className="flex items-center justify-center py-16 text-muted-foreground">
+                    <ImageIcon className="h-10 w-10 opacity-20" />
+                  </div>
+                </div>
+              )}
+            </motion.div>
 
             {/* DB Content sections display / inline edit */}
             {editMode && isOwner ? (

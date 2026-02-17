@@ -198,6 +198,7 @@ export type Database = {
           fpga_family: string | null
           github_url: string | null
           id: string
+          image_url: string | null
           interests: string[] | null
           invited_members: string[] | null
           reference_soc: string
@@ -218,6 +219,7 @@ export type Database = {
           fpga_family?: string | null
           github_url?: string | null
           id?: string
+          image_url?: string | null
           interests?: string[] | null
           invited_members?: string[] | null
           reference_soc: string
@@ -238,6 +240,7 @@ export type Database = {
           fpga_family?: string | null
           github_url?: string | null
           id?: string
+          image_url?: string | null
           interests?: string[] | null
           invited_members?: string[] | null
           reference_soc?: string
