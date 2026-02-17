@@ -242,6 +242,7 @@ export type Database = {
           image_url: string | null
           interests: string[] | null
           invited_members: string[] | null
+          organisations: string[] | null
           reference_soc: string
           status: string
           target_technology: string | null
@@ -263,6 +264,7 @@ export type Database = {
           image_url?: string | null
           interests?: string[] | null
           invited_members?: string[] | null
+          organisations?: string[] | null
           reference_soc: string
           status?: string
           target_technology?: string | null
@@ -284,6 +286,7 @@ export type Database = {
           image_url?: string | null
           interests?: string[] | null
           invited_members?: string[] | null
+          organisations?: string[] | null
           reference_soc?: string
           status?: string
           target_technology?: string | null
