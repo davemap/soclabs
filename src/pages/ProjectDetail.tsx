@@ -599,7 +599,7 @@ const ProjectDetail = () => {
             <div className="flex gap-8">
               <div className="flex-1 min-w-0">
 
-            <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+            <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 <Badge variant="outline" className={statusColor(dbProject.status)}>{dbProject.status}</Badge>
                 {dbRefSoc && <Badge variant="outline">{dbRefSoc.name}</Badge>}
@@ -735,7 +735,7 @@ const ProjectDetail = () => {
 
             {/* Timeframe - edit mode only in main content */}
             {editMode && isOwner && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-4">
                 <div className="rounded-xl border bg-card p-5">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-display font-bold flex items-center gap-2">
@@ -757,7 +757,7 @@ const ProjectDetail = () => {
             )}
 
             {/* Project Image */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }} className="mb-10">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }} className="mb-4">
               {editMode && isOwner ? (
                 <div>
                   <input
@@ -804,11 +804,11 @@ const ProjectDetail = () => {
 
             {/* DB Content sections display / inline edit */}
             {editMode && isOwner ? (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-4">
                 <ProjectContentManager projectId={dbProject.id} onSave={refreshContent} />
               </motion.div>
             ) : dbContent.length > 0 ? (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-4">
                 <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
                   {dbContent.map((section: any) => (
                     <div key={section.id} className="mb-8">
@@ -821,7 +821,7 @@ const ProjectDetail = () => {
             ) : null}
 
             {dbRefSoc && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4">
                 <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
                 <Link to={`/designs/${dbRefSoc.id}`} className="block group">
                   <div className="rounded-xl border bg-card p-5 hover:shadow-lg transition-all duration-300">
@@ -910,7 +910,7 @@ const ProjectDetail = () => {
 
             {/* Collaborators section */}
             {projectCollaborators.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-6">
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                   <Users className="h-5 w-5 text-primary" /> Collaborators
                 </h2>
@@ -975,7 +975,7 @@ const ProjectDetail = () => {
                 .filter(Boolean);
               if (dbOrgs.length === 0 && !editMode) return null;
               return (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mt-10">
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mt-6">
                   <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                     <Building2 className="h-5 w-5 text-primary" /> Associated Organisations
                   </h2>
