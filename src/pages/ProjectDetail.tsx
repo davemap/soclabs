@@ -192,6 +192,38 @@ const ProjectDetail = () => {
     setSavingTime(false);
   };
 
+  // Inline edit state for title & description
+  const [editTitle, setEditTitle] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+  const [savingTitle, setSavingTitle] = useState(false);
+  const [savingDesc, setSavingDesc] = useState(false);
+
+  // Sync title/desc when entering edit mode
+  useEffect(() => {
+    if (dbProject && editMode) {
+      setEditTitle(dbProject.title || "");
+      setEditDesc(dbProject.description || "");
+    }
+  }, [dbProject, editMode]);
+
+  const saveTitle = async () => {
+    if (!dbProject || !editTitle.trim()) return;
+    setSavingTitle(true);
+    const { error } = await supabase.from("projects").update({ title: editTitle }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Title updated"); refreshDbProject(); }
+    setSavingTitle(false);
+  };
+
+  const saveDesc = async () => {
+    if (!dbProject) return;
+    setSavingDesc(true);
+    const { error } = await supabase.from("projects").update({ description: editDesc }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Description updated"); refreshDbProject(); }
+    setSavingDesc(false);
+  };
+
   // Fetch join request status and content for DB projects
   useEffect(() => {
     if (dbProject && user && user.id !== dbProject.user_id) {
@@ -307,7 +339,21 @@ const ProjectDetail = () => {
                 {dbProject.target_technology && <Badge variant="outline">{dbProject.target_technology}</Badge>}
               </div>
 
-              <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{dbProject.title}</h1>
+              {editMode && isOwner ? (
+                <div className="flex items-center gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="flex-1 text-3xl md:text-4xl font-display font-bold bg-transparent border-b-2 border-primary/30 focus:border-primary outline-none py-1"
+                  />
+                  <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0" onClick={saveTitle} disabled={savingTitle}>
+                    <Save className="h-3.5 w-3.5 mr-1" /> {savingTitle ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              ) : (
+                <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{dbProject.title}</h1>
+              )}
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
                 <span className="font-medium text-foreground">
@@ -329,9 +375,24 @@ const ProjectDetail = () => {
                 </div>
               )}
 
-              {dbProject.description && (
+              {editMode && isOwner ? (
+                <div className="mb-4">
+                  <div className="flex items-start gap-2">
+                    <Textarea
+                      value={editDesc}
+                      onChange={(e) => setEditDesc(e.target.value)}
+                      rows={3}
+                      className="flex-1 text-lg leading-relaxed"
+                      placeholder="Add a project description..."
+                    />
+                    <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0 mt-1" onClick={saveDesc} disabled={savingDesc}>
+                      <Save className="h-3.5 w-3.5 mr-1" /> {savingDesc ? "Saving..." : "Save"}
+                    </Button>
+                  </div>
+                </div>
+              ) : dbProject.description ? (
                 <p className="text-lg text-muted-foreground leading-relaxed mb-4">{dbProject.description}</p>
-              )}
+              ) : null}
 
               <div className="flex flex-wrap gap-3 mt-6">
                 {dbProject.github_url && (
