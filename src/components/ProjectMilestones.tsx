@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { communityMembers } from "@/data/mockData";
@@ -41,23 +42,38 @@ const uncertaintyColors = [
   "bg-sky-400", "bg-blue-400", "bg-violet-500", "bg-purple-500", "bg-fuchsia-500",
 ];
 
+const ratingTooltips: Record<string, string> = {
+  Effort: "Estimated work required to complete this task, from 1 (minimal) to 5 (extensive). Accounts for complexity, skill requirements, and resource needs.",
+  Uncertainty: "Risk level reflecting unknowns that could affect timeline or outcome, from 1 (well-understood) to 5 (highly unpredictable). Higher values suggest more research or prototyping may be needed.",
+};
+
 const RatingBar = ({ value, colors, label }: { value: number; colors: string[]; label: string }) => {
   const rounded = Math.round(value);
   return (
-    <div className="flex items-center gap-1.5" title={`${label}: ${value}/5`}>
-      <span className="text-[10px] text-muted-foreground w-5 shrink-0">{label}</span>
-      <div className="flex gap-px">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className={cn(
-              "w-2 h-3 rounded-sm transition-colors",
-              i <= rounded ? colors[Math.max(0, rounded - 1)] : "bg-muted/30"
-            )}
-          />
-        ))}
-      </div>
-    </div>
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-1.5 cursor-help">
+            <span className="text-[10px] text-muted-foreground shrink-0">{label}</span>
+            <div className="flex gap-px">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "w-2 h-3 rounded-sm transition-colors",
+                    i <= rounded ? colors[Math.max(0, rounded - 1)] : "bg-muted/30"
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[220px] text-xs">
+          <p className="font-semibold mb-0.5">{label}: {value}/5</p>
+          <p className="text-muted-foreground">{ratingTooltips[label]}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
@@ -177,8 +193,8 @@ const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) 
                 {/* Phase-level ratings */}
                 {avgEffort > 0 && (
                   <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <RatingBar value={avgEffort} colors={effortColors} label="E" />
-                    <RatingBar value={avgUnc} colors={uncertaintyColors} label="U" />
+                    <RatingBar value={avgEffort} colors={effortColors} label="Effort" />
+                    <RatingBar value={avgUnc} colors={uncertaintyColors} label="Uncertainty" />
                   </div>
                 )}
 
@@ -276,10 +292,10 @@ const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) 
                                     <div className="flex flex-wrap gap-x-6 gap-y-2">
                                       {/* Effort & Uncertainty */}
                                       {task.effort && (
-                                        <RatingBar value={task.effort} colors={effortColors} label="E" />
+                                        <RatingBar value={task.effort} colors={effortColors} label="Effort" />
                                       )}
                                       {task.uncertainty && (
-                                        <RatingBar value={task.uncertainty} colors={uncertaintyColors} label="U" />
+                                        <RatingBar value={task.uncertainty} colors={uncertaintyColors} label="Uncertainty" />
                                       )}
                                     </div>
 
