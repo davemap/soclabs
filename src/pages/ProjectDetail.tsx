@@ -1,11 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Layout from "@/components/Layout";
-import { communityProjects, communityMembers } from "@/data/mockData";
+import { communityProjects, communityMembers, referenceDesigns } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 
@@ -27,6 +27,7 @@ const ProjectDetail = () => {
   const { id } = useParams<{ id: string }>();
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
+  const referenceSoc = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
 
   if (!project) {
     return (
@@ -123,13 +124,36 @@ const ProjectDetail = () => {
                   ))}
                 </div>
 
-                <Button asChild size="sm" variant="outline">
-                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="h-4 w-4 mr-2" /> View Repository
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </a>
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                      <Github className="h-4 w-4 mr-2" /> View Repository
+                      <ExternalLink className="h-3 w-3 ml-1" />
+                    </a>
+                  </Button>
+                  {referenceSoc && (
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={`/designs/${referenceSoc.id}`}>
+                        <Cpu className="h-4 w-4 mr-2" /> {referenceSoc.name} Reference SoC
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </motion.header>
+
+              {/* Project image */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.08 }}
+                className="mb-10 rounded-xl border border-border/60 overflow-hidden bg-muted/20"
+              >
+                <img
+                  src="/placeholder.svg"
+                  alt={project.title}
+                  className="w-full h-64 object-cover"
+                />
+              </motion.div>
 
               {/* Architecture sidebar */}
               <motion.div
