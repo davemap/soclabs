@@ -79,37 +79,32 @@ const Index = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {referenceDesigns.slice(0, 4).map((design, i) => (
               <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
-                <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
-                  <CardContent className="p-7">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-xl font-display font-bold">{design.name}</h3>
-                        <p className="text-sm text-primary font-medium">{design.tagline}</p>
+                <Link to={`/designs/${design.id}`} className="block h-full">
+                  <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 cursor-pointer">
+                    <CardContent className="p-7">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h3 className="text-xl font-display font-bold">{design.name}</h3>
+                          <p className="text-sm text-primary font-medium">{design.tagline}</p>
+                        </div>
+                        <div className="w-11 h-11 rounded-xl bg-electric/10 flex items-center justify-center">
+                          <Cpu className="h-5 w-5 text-electric" />
+                        </div>
                       </div>
-                      <div className="w-11 h-11 rounded-xl bg-electric/10 flex items-center justify-center">
-                        <Cpu className="h-5 w-5 text-electric" />
+                      <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
+                      <div className="flex flex-wrap gap-2 mb-5">
+                        {design.features.slice(0, 3).map((f) => (
+                          <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                            {f}
+                          </span>
+                        ))}
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-5">
-                      {design.features.slice(0, 3).map((f) => (
-                        <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex gap-3">
-                      <Button asChild size="sm" variant="outline" className="rounded-full">
-                        <Link to={`/designs#${design.id}`}>Learn More</Link>
-                      </Button>
-                      <Button asChild size="sm" variant="ghost">
-                        <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="h-4 w-4 mr-1" /> GitHub
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <span className="text-xs text-primary font-medium inline-flex items-center gap-1">
+                        View details <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </CardContent>
+                  </Card>
+                </Link>
               </ScrollReveal>
             ))}
           </div>
