@@ -430,6 +430,34 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                   className="overflow-hidden"
                                 >
                                   <div className="px-3 pb-3 pt-1 space-y-2.5 border-t border-border/20">
+                                    {/* Learning topic links */}
+                                    {task.learningTopicIds && task.learningTopicIds.length > 0 && (() => {
+                                      const resolvedTopics = task.learningTopicIds!.map((topicId) => {
+                                        for (const lp of learningPhases) {
+                                          const topic = lp.topics.find((t) => t.id === topicId);
+                                          if (topic) return { phaseId: lp.id, topicId: topic.id, title: topic.title };
+                                        }
+                                        return null;
+                                      }).filter(Boolean) as { phaseId: string; topicId: string; title: string }[];
+
+                                      if (resolvedTopics.length === 0) return null;
+
+                                      return (
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                          <BookOpen className="h-3 w-3 text-muted-foreground shrink-0" />
+                                          {resolvedTopics.map((rt) => (
+                                            <Link
+                                              key={rt.topicId}
+                                              to={`/learn/${rt.phaseId}/${rt.topicId}`}
+                                              className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-md bg-primary/8 text-primary hover:bg-primary/15 transition-colors"
+                                            >
+                                              {rt.title}
+                                            </Link>
+                                          ))}
+                                        </div>
+                                      );
+                                    })()}
+
                                     {/* Blurb */}
                                     {task.blurb && (
                                       <p className="text-xs text-muted-foreground leading-relaxed">
@@ -486,34 +514,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                         <span>· {assignee.institution}</span>
                                       </Link>
                                     )}
-
-                                    {/* Learning topic links */}
-                                    {task.learningTopicIds && task.learningTopicIds.length > 0 && (() => {
-                                      const resolvedTopics = task.learningTopicIds!.map((topicId) => {
-                                        for (const lp of learningPhases) {
-                                          const topic = lp.topics.find((t) => t.id === topicId);
-                                          if (topic) return { phaseId: lp.id, topicId: topic.id, title: topic.title };
-                                        }
-                                        return null;
-                                      }).filter(Boolean) as { phaseId: string; topicId: string; title: string }[];
-
-                                      if (resolvedTopics.length === 0) return null;
-
-                                      return (
-                                        <div className="flex flex-wrap items-center gap-1.5">
-                                          <BookOpen className="h-3 w-3 text-muted-foreground shrink-0" />
-                                          {resolvedTopics.map((rt) => (
-                                            <Link
-                                              key={rt.topicId}
-                                              to={`/learn/${rt.phaseId}/${rt.topicId}`}
-                                              className="inline-flex items-center text-[10px] font-medium px-2 py-0.5 rounded-md bg-primary/8 text-primary hover:bg-primary/15 transition-colors"
-                                            >
-                                              {rt.title}
-                                            </Link>
-                                          ))}
-                                        </div>
-                                      );
-                                    })()}
                                   </div>
                                 </motion.div>
                               )}
