@@ -186,7 +186,13 @@ const Technologies = () => {
           {groups.map((group, gi) => {
             const Icon = group.icon;
             const subcats = getSubcategories(group.key);
-            const isGroupCollapsed = collapsedGroups.has(group.key);
+            const matchingTechCount = technologies.filter(
+              (t) => (t as any).group === group.key &&
+                (!search || t.name.toLowerCase().includes(search.toLowerCase()) || t.description.toLowerCase().includes(search.toLowerCase()))
+            ).length;
+            const isGroupCollapsed = search
+              ? matchingTechCount === 0
+              : collapsedGroups.has(group.key);
             const techCount = technologies.filter((t) => (t as any).group === group.key).length;
 
             return (
