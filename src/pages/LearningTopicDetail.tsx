@@ -296,19 +296,19 @@ const LearningTopicDetail = () => {
                           {ratings.length} project{ratings.length !== 1 ? "s" : ""}
                         </span>
                       </div>
-                      <div className="space-y-2">
+                      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent">
                         {ratings.map((r) => (
                           <Link
                             key={r.projectId}
                             to={`/projects/${r.projectId}`}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/5 hover:bg-muted/15 border border-border/20 hover:border-border/40 transition-all group/proj"
+                            className="flex flex-col gap-2.5 px-4 py-3 rounded-xl bg-muted/5 hover:bg-muted/15 border border-border/20 hover:border-border/40 transition-all group/proj shrink-0 w-44"
                           >
-                            <span className="text-sm text-muted-foreground group-hover/proj:text-foreground transition-colors truncate flex-1 font-display">
+                            <span className="text-xs text-muted-foreground group-hover/proj:text-foreground transition-colors font-display font-semibold leading-tight line-clamp-2 min-h-[2rem]">
                               {r.projectTitle}
                             </span>
-                            <div className="flex items-center gap-3 shrink-0">
+                            <div className="flex flex-col gap-1.5">
                               <div className="flex items-center gap-1.5">
-                                <Flame className="h-3 w-3 text-muted-foreground/60" />
+                                <Flame className="h-3 w-3 text-muted-foreground/60 shrink-0" />
                                 <div className="flex gap-px">
                                   {[1, 2, 3, 4, 5].map((v) => (
                                     <div key={`e${v}`} className={cn("w-1.5 h-3 rounded-sm", v <= r.effort ? effortColors[r.effort - 1] : "bg-muted/20")} />
@@ -316,9 +316,8 @@ const LearningTopicDetail = () => {
                                 </div>
                                 <span className="text-[10px] text-muted-foreground">{r.effort}/5</span>
                               </div>
-                              <div className="w-px h-4 bg-border/30" />
                               <div className="flex items-center gap-1.5">
-                                <HelpCircle className="h-3 w-3 text-muted-foreground/60" />
+                                <HelpCircle className="h-3 w-3 text-muted-foreground/60 shrink-0" />
                                 <div className="flex gap-px">
                                   {[1, 2, 3, 4, 5].map((v) => (
                                     <div key={`u${v}`} className={cn("w-1.5 h-3 rounded-sm", v <= r.uncertainty ? uncertaintyColors[r.uncertainty - 1] : "bg-muted/20")} />
