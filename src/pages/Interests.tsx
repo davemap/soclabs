@@ -13,8 +13,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { interests as allInterests, Interest } from "@/data/interests";
 import { toast } from "sonner";
 
-// Filter to Research Fields only
-const interests = allInterests.filter((i) => i.category === "Research Fields");
+// Filter to Discussions only
+const interests = allInterests.filter((i) => i.category === "Discussions");
 
 // Groups definition
 const groups = [
@@ -86,7 +86,7 @@ const Interests = () => {
 
   const handlePropose = () => {
     if (!proposalName.trim()) return;
-    toast.success("Research field proposed!", { description: `"${proposalName}" has been submitted for review.` });
+    toast.success("Discussion topic proposed!", { description: `"${proposalName}" has been submitted for review.` });
     setProposalName("");
     setProposalDescription("");
     setProposalOpen(false);
@@ -105,10 +105,10 @@ const Interests = () => {
             className="max-w-3xl mx-auto text-center mb-16"
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
-              Research <span className="text-gradient">Fields</span>
+              Community <span className="text-gradient">Discussions</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Explore research fields across the SoC Labs community. Select areas of interest to connect with like-minded people and projects.
+              Start conversations, spark collaboration, and find like-minded people across the SoC Labs community. Register interest in topics that matter to you and open the door to new partnerships.
             </p>
           </motion.div>
 
@@ -119,7 +119,7 @@ const Interests = () => {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search research fields..."
+                  placeholder="Search discussions..."
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
@@ -391,7 +391,7 @@ const Interests = () => {
                     <h3 className="font-display font-bold text-sm">Register Interest</h3>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button on each card to register your interest.
+                    Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button to register your interest and connect with others working in the same area.
                   </p>
                   {selectedCount > 0 && (
                     <div className="border-t border-border/40 pt-3 mt-3">
@@ -422,16 +422,16 @@ const Interests = () => {
                   )}
                 </div>
 
-                {/* Propose new research field */}
+                {/* Propose new discussion topic */}
                 <div className="rounded-xl border border-border/60 bg-card p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="p-2 rounded-lg bg-primary/10">
                       <Lightbulb className="h-4 w-4 text-primary" />
                     </div>
-                    <h3 className="font-display font-bold text-sm">Propose a Research Field</h3>
+                    <h3 className="font-display font-bold text-sm">Propose a Discussion</h3>
                   </div>
                   <p className="text-xs text-muted-foreground mb-4">
-                    Can't find what you're looking for? Suggest a new research field for the community.
+                    Can't find what you're looking for? Suggest a new discussion topic for the community to explore together.
                   </p>
 
                   <AnimatePresence>
@@ -443,7 +443,7 @@ const Interests = () => {
                         className="overflow-hidden space-y-3"
                       >
                         <Input
-                          placeholder="Research field name"
+                          placeholder="Discussion topic name"
                           value={proposalName}
                           onChange={(e) => setProposalName(e.target.value)}
                           className="text-sm h-9"
@@ -470,7 +470,7 @@ const Interests = () => {
                         className="w-full rounded-full text-xs"
                         onClick={() => setProposalOpen(true)}
                       >
-                        <Plus className="h-3.5 w-3.5 mr-1.5" /> Propose New Field
+                        <Plus className="h-3.5 w-3.5 mr-1.5" /> Propose New Topic
                       </Button>
                     )}
                   </AnimatePresence>
@@ -525,7 +525,7 @@ const Interests = () => {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">
-                  {selectedCount} field{selectedCount !== 1 ? "s" : ""} selected
+                  {selectedCount} topic{selectedCount !== 1 ? "s" : ""} selected
                 </span>
               </div>
               <Button asChild size="sm" className="rounded-full px-5">

@@ -51,7 +51,7 @@ const MemberDetail = () => {
 
   const categoryColor: Record<string, string> = {
     Technologies: "bg-primary/10 text-primary",
-    "Research Fields": "bg-coral/10 text-coral",
+    "Discussions": "bg-coral/10 text-coral",
     Activities: "bg-violet/10 text-violet",
   };
 
