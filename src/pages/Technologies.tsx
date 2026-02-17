@@ -152,11 +152,8 @@ const Technologies = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Technologies & <span className="text-gradient">Tools</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+            <p className="text-lg text-muted-foreground leading-relaxed">
               Explore the components, EDA tooling, and infrastructure available to design, verify, and fabricate your SoC.
-            </p>
-            <p className="text-sm text-muted-foreground/80 leading-relaxed max-w-xl mx-auto">
-              Click on any section below to expand it and browse available technologies. Use the <Check className="inline h-3.5 w-3.5 text-primary -mt-0.5" /> button on each card to register your interest — this helps us understand what the community wants to work with.
             </p>
           </motion.div>
 
@@ -567,14 +564,54 @@ const Technologies = () => {
         </div>
       </section>
 
-      {/* Floating CTA */}
+      {/* Floating register interest hint — right side */}
+      <div className="fixed top-32 right-6 z-40 hidden xl:block w-56">
+        <div className="rounded-xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-lg shadow-primary/5 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h3 className="font-display font-bold text-sm">Register Interest</h3>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+            Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button on each card to register your interest.
+          </p>
+          {selectedCount > 0 && (
+            <div className="border-t border-border/40 pt-3 mt-1">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
+              </div>
+              <div className="flex flex-wrap gap-1 mb-3">
+                {selectedTechs.slice(0, 5).map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => toggleTech(name)}
+                    className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                  >
+                    {name}
+                    <X className="h-2 w-2" />
+                  </button>
+                ))}
+                {selectedTechs.length > 5 && (
+                  <span className="text-[10px] text-muted-foreground">+{selectedTechs.length - 5} more</span>
+                )}
+              </div>
+              <Button asChild size="sm" className="w-full rounded-full text-xs">
+                <Link to="/about#join">
+                  Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                </Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Floating CTA — mobile/smaller screens */}
       <AnimatePresence>
         {selectedCount > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 xl:hidden"
           >
             <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-xl shadow-primary/10">
               <div className="flex items-center gap-2">
