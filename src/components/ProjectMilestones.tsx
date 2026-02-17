@@ -220,13 +220,34 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 )}
 
-                {/* Phase-level ratings - only shown when all tasks are done */}
-                {allDone && phaseEff > 0 && (
-                  <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <RatingBar value={phaseEff} colors={effortColors} label="Effort" />
-                    <RatingBar value={phaseUnc} colors={uncertaintyColors} label="Uncertainty" />
-                  </div>
-                )}
+                {/* Phase-level ratings */}
+                <div className="hidden sm:flex items-center gap-2 shrink-0">
+                  {allDone && phaseEff > 0 ? (
+                    <>
+                      <RatingBar value={phaseEff} colors={effortColors} label="Effort" />
+                      <RatingBar value={phaseUnc} colors={uncertaintyColors} label="Uncertainty" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-1.5 opacity-30">
+                        <span className="text-[10px] text-muted-foreground shrink-0">Effort</span>
+                        <div className="flex gap-px">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="w-2 h-3 rounded-sm bg-muted/40 border border-border/20" />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 opacity-30">
+                        <span className="text-[10px] text-muted-foreground shrink-0">Uncertainty</span>
+                        <div className="flex gap-px">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="w-2 h-3 rounded-sm bg-muted/40 border border-border/20" />
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
 
                 <span className={cn(
                   "text-xs font-medium px-2 py-0.5 rounded-full shrink-0",
