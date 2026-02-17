@@ -224,11 +224,10 @@ const LearningTopicDetail = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="mb-12"
+                  transition={{ delay: 0.15 }}
+                  className="mb-8"
                 >
-                  {/* Phase-level weighted averages */}
-                  <div className="flex flex-col sm:flex-row gap-4 mb-8 p-5 rounded-xl border border-border/40 bg-card/30">
+                  <div className="flex flex-col sm:flex-row gap-4 p-5 rounded-xl border border-border/40 bg-card/30">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Flame className="h-4 w-4 text-muted-foreground" />
@@ -259,7 +258,30 @@ const LearningTopicDetail = () => {
                       <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-uncertainty tasks</p>
                     </div>
                   </div>
+                </motion.div>
+                );
+              })()}
 
+              {/* Content */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="prose prose-invert max-w-none mb-12"
+              >
+                <div className="rounded-2xl border border-border/60 bg-card/50 p-6 md:p-8 text-sm md:text-base text-muted-foreground leading-relaxed">
+                  {topic.content}
+                </div>
+              </motion.div>
+
+              {/* Phase topics grid — only on overview pages, below content */}
+              {topic.id.endsWith("-overview") && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-12"
+                >
                   <h2 className="text-lg font-display font-bold mb-5">Topics in this phase</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {phase.topics
@@ -288,20 +310,7 @@ const LearningTopicDetail = () => {
                       ))}
                   </div>
                 </motion.div>
-                );
-              })()}
-
-              {/* Content */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="prose prose-invert max-w-none mb-12"
-              >
-                <div className="rounded-2xl border border-border/60 bg-card/50 p-6 md:p-8 text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {topic.content}
-                </div>
-              </motion.div>
+              )}
 
               {/* Prev / Next navigation */}
               <div className="flex items-stretch gap-4">
