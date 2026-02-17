@@ -103,10 +103,21 @@ const Projects = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {filtered.map((project, i) => (
+              {filtered.map((project, i) => {
+                const phaseKeys = project.technology === "FPGA"
+                  ? ["architecture", "rtl", "verification", "synthesis"]
+                  : ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
+                const totalProgress = phaseKeys.reduce((sum, k) => sum + (project.phaseProgress?.[k] || 0), 0);
+                const avgProgress = Math.round(totalProgress / phaseKeys.length);
+                const isFpga = project.technology === "FPGA";
+                const borderClass = isFpga
+                  ? "border-sky-500/40 hover:border-sky-500/70"
+                  : "border-violet-500/40 hover:border-violet-500/70";
+
+                return (
                 <ScrollReveal key={project.id} delay={i * 0.05}>
                   <Link to={`/projects/${project.id}`} className="block h-full">
-                    <Card className="h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-border/60 group cursor-pointer">
+                    <Card className={`h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer ${borderClass}`}>
                       <CardContent className="p-6 flex flex-col h-full">
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <h3 className="text-lg font-display font-bold group-hover:text-primary transition-colors">
@@ -120,6 +131,32 @@ const Projects = () => {
                           {project.description}
                         </p>
 
+                        {/* Mini progress bar */}
+                        {project.phaseProgress && (
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-medium text-muted-foreground">Progress</span>
+                              <span className="text-[10px] font-bold tabular-nums text-muted-foreground">{avgProgress}%</span>
+                            </div>
+                            <div className="flex gap-0.5 h-1.5 rounded-full overflow-hidden bg-muted/30">
+                              {phaseKeys.map((key) => {
+                                const p = project.phaseProgress?.[key] || 0;
+                                return (
+                                  <div
+                                    key={key}
+                                    className="flex-1 rounded-full overflow-hidden bg-muted/20"
+                                  >
+                                    <div
+                                      className={`h-full rounded-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
+                                      style={{ width: `${p}%` }}
+                                    />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="flex items-center gap-2 mb-3">
                           <Badge variant="outline" className={statusColor(project.status)}>
                             {project.status}
@@ -127,7 +164,7 @@ const Projects = () => {
                           <Badge variant="outline" className="text-xs">
                             {project.referenceSoc}
                           </Badge>
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" className={`text-xs ${isFpga ? "border-sky-500/30 text-sky-500" : "border-violet-500/30 text-violet-500"}`}>
                             {project.technology}
                           </Badge>
                         </div>
@@ -162,7 +199,8 @@ const Projects = () => {
                     </Card>
                   </Link>
                 </ScrollReveal>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
