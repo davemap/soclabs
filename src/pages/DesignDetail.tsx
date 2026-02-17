@@ -173,29 +173,48 @@ const DesignDetail = () => {
               )}
 
               {/* Community Projects */}
-              {relatedProjects.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
-                  <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
+                <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
+                {relatedProjects.length > 0 ? (
                   <div className="grid sm:grid-cols-2 gap-4">
                     {relatedProjects.map((project) => (
                       <Link to={`/projects/${project.id}`} key={project.id}>
                         <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
                           <CardContent className="p-5">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${
+                                  project.status === "Completed"
+                                    ? "border-green-500/30 text-green-400"
+                                    : project.status === "In Progress"
+                                    ? "border-primary/30 text-primary"
+                                    : "border-border text-muted-foreground"
+                                }`}
+                              >
+                                {project.status}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">{project.technology}</Badge>
+                            </div>
                             <h3 className="font-display font-semibold mb-1">{project.title}</h3>
                             <p className="text-xs text-primary mb-2">{project.author} — {project.institution}</p>
                             <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                            <div className="flex gap-2 mt-3">
-                              <Badge variant="outline" className="text-xs">{project.technology}</Badge>
-                              <Badge variant="secondary" className="text-xs">{project.status}</Badge>
-                            </div>
                           </CardContent>
                         </Card>
                       </Link>
                     ))}
                   </div>
-                </motion.div>
-              )}
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                    <Cpu className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">No community projects have been built on {design.name} yet.</p>
+                    <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
+                      <Link to="/projects/start">Start a project</Link>
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
               </div>
             </div>
 
