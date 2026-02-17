@@ -20,11 +20,18 @@ export interface Milestone {
   blurb?: string;
 }
 
+interface PhaseDateInfo {
+  startDate?: string;
+  projectedEndDate?: string;
+  completedDate?: string;
+}
+
 interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
   phaseEffort?: Record<string, number>;
   phaseUncertainty?: Record<string, number>;
+  phaseDates?: Record<string, PhaseDateInfo>;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -97,7 +104,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {} }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {} }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -169,6 +176,9 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
           const isExpanded = expandedPhases.has(phase);
           const allDone = done === tasks.length;
           const hasOverrun = tasks.some((t) => isOverrunning(t));
+          const phaseDateInfo = phaseDates[phase];
+          const phaseOverrun = phaseDateInfo && !phaseDateInfo.completedDate && phaseDateInfo.projectedEndDate && new Date() > new Date(phaseDateInfo.projectedEndDate);
+          const phaseCompletedLate = phaseDateInfo?.completedDate && phaseDateInfo?.projectedEndDate && new Date(phaseDateInfo.completedDate) > new Date(phaseDateInfo.projectedEndDate);
 
           // Phase-level effort/uncertainty set by author
           const phaseEff = phaseEffort[phase] || 0;
@@ -193,7 +203,7 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                   {label}
                 </span>
 
-                {hasOverrun && (
+                {(hasOverrun || phaseOverrun) && (
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 )}
 
@@ -226,7 +236,38 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-4 pb-3 space-y-1">
+                    <div className="px-4 pb-3 space-y-2">
+                      {/* Phase-level dates */}
+                      {phaseDateInfo && (
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground px-1 py-1.5 rounded-lg bg-muted/20">
+                          {phaseDateInfo.startDate && (
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Start: {formatDate(phaseDateInfo.startDate)}
+                            </span>
+                          )}
+                          {phaseDateInfo.projectedEndDate && (
+                            <span className={cn(
+                              "flex items-center gap-1",
+                              phaseOverrun && "text-amber-600 font-medium"
+                            )}>
+                              <Calendar className="h-3 w-3" />
+                              Target: {formatDate(phaseDateInfo.projectedEndDate)}
+                            </span>
+                          )}
+                          {phaseDateInfo.completedDate && (
+                            <span className={cn(
+                              "flex items-center gap-1",
+                              phaseCompletedLate ? "text-amber-600 font-medium" : "text-emerald-600"
+                            )}>
+                              <CheckCircle2 className="h-3 w-3" />
+                              Completed: {formatDate(phaseDateInfo.completedDate)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="space-y-1">
                       {tasks.map((task, i) => {
                         const taskKey = `${phase}-${i}`;
                         const taskExpanded = expandedTasks.has(taskKey);
@@ -352,6 +393,7 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                           </div>
                         );
                       })}
+                      </div>
                     </div>
                   </motion.div>
                 )}
