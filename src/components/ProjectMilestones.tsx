@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User } from "lucide-react";
@@ -21,6 +21,7 @@ export interface Milestone {
 
 interface ProjectMilestonesProps {
   milestones: Milestone[];
+  expandPhase?: string | null;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -78,9 +79,19 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (expandPhase) {
+      setExpandedPhases((prev) => {
+        const next = new Set(prev);
+        next.add(expandPhase);
+        return next;
+      });
+    }
+  }, [expandPhase]);
 
   const togglePhase = (phase: string) => {
     setExpandedPhases((prev) => {
@@ -128,6 +139,7 @@ const ProjectMilestones = ({ milestones }: ProjectMilestonesProps) => {
 
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden divide-y divide-border/40">
         {grouped.map(({ phase, label, tasks }) => {
+          const phaseId = `milestone-phase-${phase}`;
           const done = tasks.filter((t) => t.done).length;
           const isExpanded = expandedPhases.has(phase);
           const allDone = done === tasks.length;
@@ -140,7 +152,7 @@ const ProjectMilestones = ({ milestones }: ProjectMilestonesProps) => {
           const avgUnc = uncVals.length > 0 ? uncVals.reduce((a, b) => a + b, 0) / uncVals.length : 0;
 
           return (
-            <div key={phase}>
+            <div key={phase} id={phaseId}>
               <button
                 onClick={() => togglePhase(phase)}
                 className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"
