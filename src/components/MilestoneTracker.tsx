@@ -65,7 +65,7 @@ const RoundedRectProgress = ({
           height={rectH}
           rx={radius}
           ry={radius}
-          fill="none"
+          fill="hsl(var(--background))"
           stroke="hsl(var(--border) / 0.3)"
           strokeWidth={strokeWidth}
         />
@@ -106,20 +106,18 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="rounded-xl border border-border/60 bg-muted/20 p-5 mb-10"
+      className="rounded-xl border border-border/60 bg-muted/10 p-5 mb-10"
     >
       <h3 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-5">
         Design Progress
       </h3>
       <div className="relative flex items-start justify-between">
         {/* Track line */}
-        <div className="absolute top-[25px] left-[25px] right-[25px] h-px bg-border/40" />
+        <div className="absolute top-[25px] left-[25px] right-[25px] h-[3px] rounded-full bg-primary/20" />
         <div
-          className="absolute top-[25px] left-[25px] h-px transition-all duration-500"
+          className="absolute top-[25px] left-[25px] h-[3px] rounded-full bg-primary transition-all duration-500"
           style={{
             width: `calc(${(activeIndex / (phaseKeys.length - 1)) * 100}% - 50px + ${activeIndex === phaseKeys.length - 1 ? "50px" : "25px"})`,
-            background: progressColor(phaseProgress[phaseKeys[activeIndex]] || 0),
-            opacity: 0.5,
           }}
         />
 
@@ -137,11 +135,10 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
                   <div
                     className={cn(
                       "w-[34px] h-[34px] rounded-lg flex items-center justify-center transition-all group-hover:scale-105",
+                      progress > 0
+                        ? "bg-primary/15 text-primary"
+                        : "bg-card text-muted-foreground"
                     )}
-                    style={{
-                      background: progressColorLight(progress),
-                      color: progress > 0 ? color : "hsl(var(--muted-foreground))",
-                    }}
                   >
                     <Icon className="h-3.5 w-3.5" />
                   </div>
