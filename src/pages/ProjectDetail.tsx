@@ -323,8 +323,10 @@ const ProjectDetail = () => {
     const dbRefSoc = referenceDesigns.find((d) => d.id === dbProject.reference_soc);
     const isOwner = user?.id === dbProject.user_id;
 
-    // Compute milestone progress for tracker
+    // Compute milestone progress for tracker — always show all phases, default to 0%
+    const defaultPhases = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
     const milestonePhaseProgress: Record<string, number> = {};
+    defaultPhases.forEach((phase) => { milestonePhaseProgress[phase] = 0; });
     if (dbMilestones.length > 0) {
       const phases = [...new Set(dbMilestones.map((m: any) => m.phase))];
       phases.forEach((phase) => {
@@ -452,19 +454,17 @@ const ProjectDetail = () => {
               </div>
             </motion.header>
 
-            {/* Non-sticky milestone tracker (same as mock projects) */}
-            {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
-              <div className="mb-2">
-                <MilestoneTracker
-                  phaseProgress={milestonePhaseProgress}
-                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                  onPhaseClick={handlePhaseClick}
-                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                  isFloating={false}
-                  isSticky={false}
-                />
-              </div>
-            )}
+            {/* Non-sticky milestone tracker (always visible) */}
+            <div className="mb-2">
+              <MilestoneTracker
+                phaseProgress={milestonePhaseProgress}
+                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                onPhaseClick={handlePhaseClick}
+                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                isFloating={false}
+                isSticky={false}
+              />
+            </div>
 
             {/* Target Technology card */}
             {(dbProject.target_technology || (editMode && isOwner)) && (
@@ -661,32 +661,28 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {/* DB Milestones display (for everyone) */}
-            {dbMilestones.length > 0 && (
-              <div id="project-milestones">
-                <ProjectMilestones
-                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                  expandPhase={expandPhase}
-                  expandTaskIndex={expandTaskIndex}
-                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                  trackerSlot={
-                    Object.keys(milestonePhaseProgress).length > 0
-                      ? (togglePhase: (phase: string) => void) => (
-                          <MilestoneTracker
-                            phaseProgress={milestonePhaseProgress}
-                            milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                            onPhaseClick={(phase) => togglePhase(phase)}
-                            technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                            isFloating={false}
-                            isSticky={false}
-                            compact
-                          />
-                        )
-                      : undefined
-                  }
-                />
-              </div>
-            )}
+            {/* DB Milestones display (always visible) */}
+            <div id="project-milestones">
+              <ProjectMilestones
+                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                expandPhase={expandPhase}
+                expandTaskIndex={expandTaskIndex}
+                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                trackerSlot={
+                  (togglePhase: (phase: string) => void) => (
+                    <MilestoneTracker
+                      phaseProgress={milestonePhaseProgress}
+                      milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                      onPhaseClick={(phase) => togglePhase(phase)}
+                      technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                      isFloating={false}
+                      isSticky={false}
+                      compact
+                    />
+                  )
+                }
+              />
+            </div>
 
             {/* Join Request Form for non-owners */}
             {user && !isOwner && !existingRequest && (
