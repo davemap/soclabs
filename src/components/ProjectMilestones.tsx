@@ -262,7 +262,7 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                     <div className="px-4 pb-3 space-y-2">
                       {/* Phase-level dates */}
                       {phaseDateInfo && (
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground px-1 py-1.5 rounded-lg bg-muted/20">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground px-1 py-1.5 rounded-lg bg-muted/10">
                           {phaseDateInfo.startDate && (
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
