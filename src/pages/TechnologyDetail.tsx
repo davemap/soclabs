@@ -1,4 +1,5 @@
 import { useState } from "react";
+import CommentsThreads from "@/components/CommentsThreads";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, ArrowRight, Users, FolderOpen, Check, Tag, Github, Plus } from "lucide-react";
@@ -370,6 +371,8 @@ const TechnologyDetail = () => {
                 </div>
               )}
             </div>
+
+            <CommentsThreads pageId={`technology-${tech.id}`} />
           </div>
         </div>
       </section>
