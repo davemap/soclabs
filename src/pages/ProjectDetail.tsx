@@ -147,6 +147,7 @@ const ProjectDetail = () => {
                     phaseProgress={project.phaseProgress}
                     milestones={project.milestones}
                     onPhaseClick={handlePhaseClick}
+                    technology={project.technology}
                   />
                 )}
               </motion.header>
@@ -291,7 +292,7 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} />
+                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />

@@ -34,6 +34,7 @@ interface MilestoneTrackerProps {
   phaseProgress: Record<string, number>;
   milestones?: Milestone[];
   onPhaseClick?: (phase: string) => void;
+  technology?: string;
 }
 
 const progressColor = (p: number) => {
@@ -206,8 +207,10 @@ const PhaseNode = ({
   );
 };
 
-const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick }: MilestoneTrackerProps) => {
-  const activeIndex = phaseKeys.reduce((max, key, i) => {
+const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, technology }: MilestoneTrackerProps) => {
+  const hiddenPhases = technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
+  const visiblePhaseKeys = phaseKeys.filter((k) => !hiddenPhases.has(k));
+  const activeIndex = visiblePhaseKeys.reduce((max, key, i) => {
     return (phaseProgress[key] || 0) > 0 ? i : max;
   }, 0);
 
@@ -224,13 +227,13 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick }: Mile
         <div
           className="absolute top-[25px] left-[25px] h-[3px] rounded-full bg-primary transition-all duration-500"
           style={{
-            width: `calc(${(activeIndex / (phaseKeys.length - 1)) * 100}% - 50px + ${activeIndex === phaseKeys.length - 1 ? "50px" : "25px"})`,
+            width: `calc(${(activeIndex / (visiblePhaseKeys.length - 1)) * 100}% - 50px + ${activeIndex === visiblePhaseKeys.length - 1 ? "50px" : "25px"})`,
           }}
         />
 
-        {learningPhases.map((phase, index) => {
-          const phaseKey = phaseKeys[index];
-          if (!phaseKey) return null;
+        {visiblePhaseKeys.map((phaseKey, index) => {
+          const phase = learningPhases.find((p) => p.id === phaseKey);
+          if (!phase) return null;
           const progress = phaseProgress[phaseKey] || 0;
 
           return (
