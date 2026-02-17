@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/Layout";
 import { communityProjects, communityMembers, referenceDesigns, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
@@ -13,6 +14,13 @@ import CommentsThreads from "@/components/CommentsThreads";
 import MilestoneTracker from "@/components/MilestoneTracker";
 import ProjectMilestones from "@/components/ProjectMilestones";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import ProjectContentManager from "@/components/project-manage/ProjectContentManager";
+import ProjectMilestonesManager from "@/components/project-manage/ProjectMilestonesManager";
+import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
+import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -29,6 +37,7 @@ const statusColor = (status: string) => {
 
 const ProjectDetail = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [expandPhase, setExpandPhase] = useState<string | null>(null);
   const [expandTaskIndex, setExpandTaskIndex] = useState<number | undefined>(undefined);
@@ -105,9 +114,84 @@ const ProjectDetail = () => {
   const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
   const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
 
+  // Join request state
+  const [joinMessage, setJoinMessage] = useState("");
+  const [joinSending, setJoinSending] = useState(false);
+  const [existingRequest, setExistingRequest] = useState<any>(null);
+  const [dbContent, setDbContent] = useState<any[]>([]);
+  const [dbMilestones, setDbMilestones] = useState<any[]>([]);
+
+  // Fetch join request status and content for DB projects
+  useEffect(() => {
+    if (dbProject && user && user.id !== dbProject.user_id) {
+      supabase
+        .from("project_join_requests")
+        .select("*")
+        .eq("project_id", dbProject.id)
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => setExistingRequest(data));
+    }
+  }, [dbProject, user]);
+
+  useEffect(() => {
+    if (dbProject) {
+      supabase
+        .from("project_content")
+        .select("*")
+        .eq("project_id", dbProject.id)
+        .order("sort_order")
+        .then(({ data }) => setDbContent(data || []));
+      supabase
+        .from("project_milestones")
+        .select("*")
+        .eq("project_id", dbProject.id)
+        .order("sort_order")
+        .then(({ data }) => setDbMilestones(data || []));
+    }
+  }, [dbProject]);
+
+  const sendJoinRequest = async () => {
+    if (!user || !dbProject) return;
+    setJoinSending(true);
+    const { error } = await supabase
+      .from("project_join_requests")
+      .insert({ project_id: dbProject.id, user_id: user.id, message: joinMessage });
+    if (error) {
+      toast.error(error.code === "23505" ? "You already sent a request" : "Failed to send request");
+    } else {
+      toast.success("Join request sent!");
+      setExistingRequest({ status: "pending" });
+      setJoinMessage("");
+    }
+    setJoinSending(false);
+  };
+
+  const refreshDbProject = async () => {
+    if (!id) return;
+    const { data } = await supabase.from("projects").select("*").eq("id", id).maybeSingle();
+    if (data) {
+      const { data: profile } = await supabase.from("profiles").select("username, full_name").eq("user_id", data.user_id).maybeSingle();
+      setDbProject({ ...data, profile });
+    }
+  };
+
   // If we have a database project but no mock project, render a simplified view
   if (!project && dbProject) {
     const dbRefSoc = referenceDesigns.find((d) => d.id === dbProject.reference_soc);
+    const isOwner = user?.id === dbProject.user_id;
+
+    // Compute milestone progress for tracker
+    const milestonePhaseProgress: Record<string, number> = {};
+    if (dbMilestones.length > 0) {
+      const phases = [...new Set(dbMilestones.map((m: any) => m.phase))];
+      phases.forEach((phase) => {
+        const phaseTasks = dbMilestones.filter((m: any) => m.phase === phase);
+        const done = phaseTasks.filter((m: any) => m.done).length;
+        milestonePhaseProgress[phase] = Math.round((done / phaseTasks.length) * 100);
+      });
+    }
+
     return (
       <Layout>
         <article className="py-24">
@@ -169,6 +253,17 @@ const ProjectDetail = () => {
                     </a>
                   </Button>
                 )}
+                {/* Join Request Button for non-owners */}
+                {user && !isOwner && !existingRequest && (
+                  <Button variant="default" size="sm" className="rounded-full" onClick={() => document.getElementById("join-request-section")?.scrollIntoView({ behavior: "smooth" })}>
+                    <UserPlus className="h-4 w-4 mr-2" /> Request to Join
+                  </Button>
+                )}
+                {existingRequest && (
+                  <Badge variant="outline" className="text-xs">
+                    Join request: {existingRequest.status}
+                  </Badge>
+                )}
               </div>
             </motion.header>
 
@@ -203,6 +298,101 @@ const ProjectDetail = () => {
                 {dbProject.timeframe && (
                   <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
                 )}
+              </motion.div>
+            )}
+
+            {/* DB Milestones display (for everyone) */}
+            {dbMilestones.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mb-10">
+                <ProjectMilestones
+                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                  trackerSlot={
+                    Object.keys(milestonePhaseProgress).length > 0
+                      ? (togglePhase: (phase: string) => void) => (
+                          <MilestoneTracker
+                            phaseProgress={milestonePhaseProgress}
+                            milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                            onPhaseClick={(phase) => togglePhase(phase)}
+                            technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                            isFloating={false}
+                            isSticky={false}
+                            compact
+                          />
+                        )
+                      : undefined
+                  }
+                />
+              </motion.div>
+            )}
+
+            {/* DB Content sections display (for everyone) */}
+            {dbContent.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
+                <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+                  {dbContent.map((section: any) => (
+                    <div key={section.id} className="mb-8">
+                      {section.title && <h2>{section.title}</h2>}
+                      <ReactMarkdown>{section.body}</ReactMarkdown>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Join Request Form for non-owners */}
+            {user && !isOwner && !existingRequest && (
+              <div id="join-request-section" className="rounded-xl border bg-card p-6 mb-10">
+                <h3 className="text-lg font-display font-bold mb-3 flex items-center gap-2">
+                  <UserPlus className="h-5 w-5 text-primary" /> Request to Join This Project
+                </h3>
+                <Textarea
+                  placeholder="Introduce yourself and explain why you'd like to join... (optional)"
+                  value={joinMessage}
+                  onChange={(e) => setJoinMessage(e.target.value)}
+                  rows={3}
+                  className="mb-3"
+                />
+                <Button onClick={sendJoinRequest} disabled={joinSending}>
+                  {joinSending ? "Sending..." : "Send Join Request"}
+                </Button>
+              </div>
+            )}
+
+            {/* Owner Management Tabs */}
+            {isOwner && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-10">
+                <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-primary" /> Manage Project
+                </h2>
+                <Tabs defaultValue="content" className="w-full">
+                  <TabsList className="w-full justify-start">
+                    <TabsTrigger value="content" className="gap-1.5">
+                      <FileText className="h-3.5 w-3.5" /> Content
+                    </TabsTrigger>
+                    <TabsTrigger value="milestones" className="gap-1.5">
+                      <ListChecks className="h-3.5 w-3.5" /> Milestones
+                    </TabsTrigger>
+                    <TabsTrigger value="requests" className="gap-1.5">
+                      <Users className="h-3.5 w-3.5" /> Requests
+                    </TabsTrigger>
+                    <TabsTrigger value="settings" className="gap-1.5">
+                      <Settings className="h-3.5 w-3.5" /> Settings
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="content" className="mt-4">
+                    <ProjectContentManager projectId={dbProject.id} />
+                  </TabsContent>
+                  <TabsContent value="milestones" className="mt-4">
+                    <ProjectMilestonesManager projectId={dbProject.id} />
+                  </TabsContent>
+                  <TabsContent value="requests" className="mt-4">
+                    <ProjectJoinRequestsManager projectId={dbProject.id} />
+                  </TabsContent>
+                  <TabsContent value="settings" className="mt-4">
+                    <ProjectSettingsManager project={dbProject} onUpdate={refreshDbProject} />
+                  </TabsContent>
+                </Tabs>
               </motion.div>
             )}
 
