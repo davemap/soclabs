@@ -149,6 +149,7 @@ const Partners = () => {
                   onMoveEnd={handleMoveEnd}
                   minZoom={1}
                   maxZoom={12}
+                  translateExtent={[[-180, -90], [180, 90]]}
                 >
                   <Geographies geography={geoUrl}>
                     {({ geographies }) =>
