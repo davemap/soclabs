@@ -152,7 +152,14 @@ const Projects = () => {
                             <TooltipProvider delayDuration={100}>
                               <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-muted/30">
                                 {phaseKeys.map((key) => {
+                                  const phaseMilestones = project.milestones?.filter((m) => m.phase === key) || [];
+                                  const total = phaseMilestones.length;
+                                  const doneCount = phaseMilestones.filter((m) => m.done).length;
+                                  const inProgressCount = total - doneCount;
+                                  const donePct = total > 0 ? (doneCount / total) * 100 : 0;
+                                  const inProgressPct = total > 0 ? (inProgressCount / total) * 100 : 0;
                                   const p = project.phaseProgress?.[key] || 0;
+
                                   return (
                                     <Tooltip key={key}>
                                       <TooltipTrigger asChild>
@@ -161,15 +168,34 @@ const Projects = () => {
                                           className="flex-1 rounded-full overflow-hidden bg-muted/20 cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
                                           onClick={(e) => e.stopPropagation()}
                                         >
-                                          <div
-                                            className={`h-full rounded-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
-                                            style={{ width: `${p}%` }}
-                                          />
+                                          {total > 0 ? (
+                                            <div className="flex h-full">
+                                              <div
+                                                className="h-full bg-emerald-500 transition-all"
+                                                style={{ width: `${donePct}%` }}
+                                              />
+                                              <div
+                                                className="h-full bg-amber-500 transition-all"
+                                                style={{ width: `${inProgressPct}%` }}
+                                              />
+                                            </div>
+                                          ) : (
+                                            <div
+                                              className={`h-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
+                                              style={{ width: `${p}%` }}
+                                            />
+                                          )}
                                         </Link>
                                       </TooltipTrigger>
                                       <TooltipContent side="top" className="text-xs px-3 py-1.5">
                                         <span className="font-semibold">{phaseLabels[key] || key}</span>
-                                        <span className="ml-1.5 tabular-nums opacity-80">{p}%</span>
+                                        {total > 0 ? (
+                                          <span className="ml-1.5 tabular-nums opacity-80">
+                                            {doneCount}/{total} done
+                                          </span>
+                                        ) : (
+                                          <span className="ml-1.5 tabular-nums opacity-80">{p}%</span>
+                                        )}
                                       </TooltipContent>
                                     </Tooltip>
                                   );
