@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,8 +27,24 @@ const statusColor = (status: string) => {
 
 const ProjectDetail = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [expandPhase, setExpandPhase] = useState<string | null>(null);
   const [expandTaskIndex, setExpandTaskIndex] = useState<number | undefined>(undefined);
+
+  // Handle ?phase= query param from project cards
+  useEffect(() => {
+    const phase = searchParams.get("phase");
+    if (phase) {
+      setExpandPhase(phase);
+      setSearchParams({}, { replace: true });
+      setTimeout(() => {
+        const el = document.getElementById(`milestone-phase-${phase}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handlePhaseClick = useCallback((phase: string, taskIndex?: number) => {
     setExpandPhase(phase);
