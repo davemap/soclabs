@@ -1,10 +1,14 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, BookOpen } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap } from "lucide-react";
 import { learningPhases } from "@/data/mockData";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+const iconMap: Record<string, React.ElementType> = {
+  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
+};
 
 const LearningTopicDetail = () => {
   const { phaseId, topicId } = useParams();
@@ -54,6 +58,44 @@ const LearningTopicDetail = () => {
               <ChevronRight className="h-3.5 w-3.5" />
               <span className="text-foreground font-medium">{topic.title}</span>
             </nav>
+
+            {/* Phase progress stepper */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between relative">
+                <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
+                <div
+                  className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
+                  style={{ width: `${(phaseIndex / (learningPhases.length - 1)) * 100}%` }}
+                />
+                {learningPhases.map((p, i) => {
+                  const Icon = iconMap[p.icon] || Cpu;
+                  return (
+                    <Link
+                      key={p.id}
+                      to="/learn"
+                      className={cn(
+                        "relative z-10 flex flex-col items-center gap-2 group",
+                        i <= phaseIndex ? "text-primary" : "text-muted-foreground"
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
+                          i === phaseIndex
+                            ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+                            : i < phaseIndex
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-background"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Phase badge */}
             <div className="flex items-center gap-2 mb-4">
