@@ -106,8 +106,15 @@ const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) 
         next.add(expandPhase);
         return next;
       });
+      // Auto-expand all tasks within the clicked phase
+      const phaseTasks = milestones.filter((m) => m.phase === expandPhase);
+      setExpandedTasks((prev) => {
+        const next = new Set(prev);
+        phaseTasks.forEach((_, i) => next.add(`${expandPhase}-${i}`));
+        return next;
+      });
     }
-  }, [expandPhase]);
+  }, [expandPhase, milestones]);
 
   const togglePhase = (phase: string) => {
     setExpandedPhases((prev) => {
