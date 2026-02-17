@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck } from "lucide-react";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -61,6 +61,7 @@ interface ProjectMilestonesProps {
   isOwner?: boolean;
   onCompleteTask?: (milestoneIndex: number) => void;
   onCompletePhase?: (phase: string) => void;
+  onEditTask?: (index: number) => void;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -133,7 +134,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase, onEditTask }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -433,17 +434,13 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                           {tasks.map((task) => (
                             <div key={task.originalIndex} className="rounded-lg bg-muted/30 px-3 py-2 space-y-1.5">
                               <div className="flex items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => onEditUpdate?.(task.originalIndex, "done", !task.done)}
-                                  className="shrink-0"
-                                >
+                                <div className="shrink-0">
                                   {task.done ? (
                                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                   ) : (
                                     <Circle className="h-4 w-4 text-muted-foreground/40" />
                                   )}
-                                </button>
+                                </div>
                                 <span className="flex-1 text-sm font-medium truncate">{task.task}</span>
                                 {!task.done && isOwner && onCompleteTask && (
                                   <button
@@ -453,6 +450,16 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                   >
                                     <CheckCheck className="h-3.5 w-3.5" />
                                     <span className="hidden sm:inline">Complete</span>
+                                  </button>
+                                )}
+                                {onEditTask && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onEditTask(task.originalIndex)}
+                                    className="shrink-0 p-1 rounded hover:bg-primary/10 transition-colors"
+                                    title="Edit task"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5 text-muted-foreground hover:text-primary" />
                                   </button>
                                 )}
                                 <button
