@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Github, Calendar, Tag, Search, Filter, ArrowRight, Rocket } from "lucide-react";
@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import { communityProjects } from "@/data/mockData";
+import { communityProjects, referenceDesigns } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 
 const phaseLabels: Record<string, string> = {
   architecture: "Architecture",
@@ -30,9 +31,45 @@ const Projects = () => {
   const [socFilter, setSocFilter] = useState("All");
   const [techFilter, setTechFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [dbProjects, setDbProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("projects")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) {
+          // Map DB projects to match the shape used by mock projects
+          const mapped = data.map((p) => ({
+            id: p.id,
+            title: p.title,
+            author: "",
+            institution: "",
+            description: p.description || "",
+            referenceSoc: referenceDesigns.find((d) => d.id === p.reference_soc)?.name || p.reference_soc,
+            technology: p.target_technology || "Undecided",
+            status: p.status,
+            tags: [...(p.interests || []), ...(p.technologies || [])],
+            date: p.created_at,
+            githubUrl: p.github_url || "",
+            phaseProgress: {} as Record<string, number>,
+            milestones: [],
+            _fromDb: true,
+          }));
+          setDbProjects(mapped);
+        }
+      });
+  }, []);
+
+  // Merge mock + DB projects, avoiding duplicates by id
+  const allProjects = useMemo(() => {
+    const mockIds = new Set(communityProjects.map((p) => p.id));
+    return [...communityProjects, ...dbProjects.filter((p) => !mockIds.has(p.id))];
+  }, [dbProjects]);
 
   const filtered = useMemo(() => {
-    return communityProjects.filter((p) => {
+    return allProjects.filter((p) => {
       const matchesSearch =
         !search ||
         p.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -44,7 +81,7 @@ const Projects = () => {
       const matchesStatus = statusFilter === "All" || p.status === statusFilter;
       return matchesSearch && matchesSoc && matchesTech && matchesStatus;
     });
-  }, [search, socFilter, techFilter, statusFilter]);
+  }, [search, socFilter, techFilter, statusFilter, allProjects]);
 
   const statusColor = (status: string) => {
     switch (status) {
