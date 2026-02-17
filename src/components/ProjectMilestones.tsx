@@ -370,7 +370,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     size="sm"
                     variant="outline"
                     className="shrink-0 rounded-full h-7 text-[11px] gap-1"
-                    disabled={tasks.length === 0 || !tasks.every((t) => t.done)}
+                    disabled={tasks.length === 0}
                     onClick={(e) => { e.stopPropagation(); onCompletePhase(phase); }}
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
