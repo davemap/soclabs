@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User } from "lucide-react";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -162,12 +162,23 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
       transition={{ delay: 0.22 }}
       className="mt-10"
     >
-      <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
-        <ListChecks className="h-5 w-5 text-primary" /> Project Milestones
-        <span className="text-sm font-normal text-muted-foreground ml-auto">
+      <div className="flex items-center gap-2 mb-4">
+        <h2 className="text-xl font-display font-bold flex items-center gap-2">
+          <ListChecks className="h-5 w-5 text-primary" /> Project Milestones
+        </h2>
+        <span className="text-sm text-muted-foreground ml-auto">
           {totalDone}/{totalTasks} completed
         </span>
-      </h2>
+        {(expandedPhases.size > 0 || expandedTasks.size > 0) && (
+          <button
+            onClick={() => { setExpandedPhases(new Set()); setExpandedTasks(new Set()); }}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+          >
+            <ChevronsDownUp className="h-3.5 w-3.5" />
+            Collapse all
+          </button>
+        )}
+      </div>
 
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden divide-y divide-border/40">
         {grouped.map(({ phase, label, tasks }) => {
