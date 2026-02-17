@@ -221,6 +221,11 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
     return (phaseProgress[key] || 0) > 0 ? i : max;
   }, 0);
 
+  const isFpga = technology === "FPGA";
+  const techBorderClass = isFpga
+    ? "border-sky-500/40"
+    : "border-violet-500/40";
+
    return (
     <div
       className={cn(
@@ -230,9 +235,7 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
     >
       {isFloating && isSticky && (
         <>
-          {/* Solid cover above the bar to hide old content between navbar and tracker */}
           <div className="absolute -top-28 left-0 right-0 h-28 bg-background" />
-          {/* Blur halo around the tracker */}
           <div className="absolute -inset-3 bg-background/80 backdrop-blur-md rounded-2xl" />
         </>
       )}
@@ -240,7 +243,10 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="relative rounded-xl border border-border/60 bg-card/95 backdrop-blur-md px-4 py-3 shadow-sm"
+        className={cn(
+          "relative rounded-xl border bg-card/95 backdrop-blur-md px-4 py-3 shadow-sm",
+          techBorderClass
+        )}
       >
       <div className="text-xs font-display font-semibold text-muted-foreground mb-2">Project Progress</div>
       <div className="relative flex items-start justify-between">
