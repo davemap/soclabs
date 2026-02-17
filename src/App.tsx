@@ -15,6 +15,9 @@ import TechnologyDetail from "./pages/TechnologyDetail";
 import Partners from "./pages/Partners";
 import OrganisationDetail from "./pages/OrganisationDetail";
 import MemberDetail from "./pages/MemberDetail";
+import News from "./pages/News";
+import NewsDetail from "./pages/NewsDetail";
+import SubmitNews from "./pages/SubmitNews";
 
 import StartProject from "./pages/StartProject";
 import About from "./pages/About";
@@ -44,7 +47,9 @@ const App = () => (
           <Route path="/partners" element={<Partners />} />
            <Route path="/partners/:id" element={<OrganisationDetail />} />
           <Route path="/community/:id" element={<MemberDetail />} />
-          
+          <Route path="/news" element={<News />} />
+          <Route path="/news/submit" element={<SubmitNews />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/interests" element={<Interests />} />
           <Route path="/interests/:slug" element={<InterestDetail />} />
           <Route path="/about" element={<About />} />

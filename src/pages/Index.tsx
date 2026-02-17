@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Github, Cpu, Users, GraduationCap, Globe, Sparkles } from "lucide-react";
+import { ArrowRight, Github, Cpu, Users, GraduationCap, Globe, Sparkles, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { referenceDesigns, stats } from "@/data/mockData";
+import { newsArticles } from "@/data/newsData";
 
 const Index = () => {
   return (
@@ -157,6 +159,58 @@ const Index = () => {
           <ScrollReveal className="text-center mt-12">
             <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
               <Link to="/about#join">Join the Community</Link>
+            </Button>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Latest News */}
+      <section className="py-24 bg-secondary/5 border-y border-border/50">
+        <div className="container mx-auto px-4">
+          <ScrollReveal className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Latest News</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Stay up to date with community milestones, events, and research breakthroughs.
+            </p>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {[...newsArticles]
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .slice(0, 3)
+              .map((article, i) => (
+                <ScrollReveal key={article.id} delay={i * 0.12}>
+                  <Link to={`/news/${article.id}`} className="block h-full">
+                    <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
+                      <CardContent className="p-6 flex flex-col h-full">
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {article.tags.slice(0, 2).map((tag) => (
+                            <Badge key={tag} variant="secondary" className="text-[10px]">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
+                          <span className="flex items-center gap-1">
+                            <User className="h-3 w-3" /> {article.author}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />{" "}
+                            {new Date(article.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </ScrollReveal>
+              ))}
+          </div>
+
+          <ScrollReveal className="text-center mt-10">
+            <Button asChild variant="outline" size="lg" className="rounded-full px-8">
+              <Link to="/news">View All News <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </ScrollReveal>
         </div>
