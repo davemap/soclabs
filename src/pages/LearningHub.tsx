@@ -1,16 +1,55 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu, Flame, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { learningPhases, LearningPhase } from "@/data/mockData";
 import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 
+const effortColors = [
+  "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
+];
+const uncertaintyColors = [
+  "bg-sky-400", "bg-blue-400", "bg-violet-500", "bg-purple-500", "bg-fuchsia-500",
+];
+
+const weightedAvg = (values: number[]): number => {
+  if (values.length === 0) return 0;
+  const weighted = values.reduce((sum, v) => sum + v * v, 0);
+  const divisor = values.reduce((sum, v) => sum + v, 0);
+  return divisor > 0 ? Math.round((weighted / divisor) * 10) / 10 : 0;
+};
+
+const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
+  if (!effort || !uncertainty) return null;
+  return (
+    <div className="flex items-center gap-1 shrink-0">
+      <div className="flex gap-px" title={`Effort: ${effort}/5`}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= effort ? effortColors[effort - 1] : "bg-muted/20")} />
+        ))}
+      </div>
+      <div className="w-px h-3 bg-border/40 mx-0.5" />
+      <div className="flex gap-px" title={`Uncertainty: ${uncertainty}/5`}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uncertainty ? uncertaintyColors[uncertainty - 1] : "bg-muted/20")} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
   const [expanded, setExpanded] = useState(true);
   const Icon = iconMap[phase.icon] || Cpu;
+
+  const realTopics = phase.topics.filter((t) => !t.id.endsWith("-overview"));
+  const effortValues = realTopics.map((t) => t.effort ?? 0).filter(Boolean);
+  const uncertaintyValues = realTopics.map((t) => t.uncertainty ?? 0).filter(Boolean);
+  const avgEffort = weightedAvg(effortValues);
+  const avgUncertainty = weightedAvg(uncertaintyValues);
 
   return (
     <motion.div
@@ -50,6 +89,37 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
               <div className="px-6 md:px-7 pb-6 md:pb-7">
                 <p className="text-sm text-muted-foreground leading-relaxed mb-5">{phase.description}</p>
 
+                {/* Phase average effort & uncertainty */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-5 p-4 rounded-xl border border-border/40 bg-muted/5">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Flame className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-display font-semibold text-foreground">Effort</span>
+                      <span className="text-[11px] text-muted-foreground ml-auto">{avgEffort}/5</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
+                      <div
+                        className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
+                        style={{ width: `${(avgEffort / 5) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-px bg-border/40 hidden sm:block" />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <HelpCircle className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-[11px] font-display font-semibold text-foreground">Uncertainty</span>
+                      <span className="text-[11px] text-muted-foreground ml-auto">{avgUncertainty}/5</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted/20 overflow-hidden">
+                      <div
+                        className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
+                        style={{ width: `${(avgUncertainty / 5) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Topic tree */}
                 <div className="relative pl-4 border-l-2 border-primary/20 space-y-1">
                   {phase.topics.map((topic, i) => (
@@ -70,6 +140,9 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
                           {topic.summary}
                         </div>
                       </div>
+                      {!topic.id.endsWith("-overview") && (
+                        <MiniRatingBar effort={topic.effort} uncertainty={topic.uncertainty} />
+                      )}
                       <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary mt-0.5 shrink-0 transition-colors" />
                     </Link>
                   ))}
