@@ -362,7 +362,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     <span className="hidden sm:inline">Learn</span>
                   </Link>
                 )}
-                {!editMode && isOwner && onCompletePhase && (
+                {editMode && isOwner && onCompletePhase && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -445,6 +445,16 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                   )}
                                 </button>
                                 <span className="flex-1 text-sm font-medium truncate">{task.task}</span>
+                                {!task.done && isOwner && onCompleteTask && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onCompleteTask(task.globalIndex)}
+                                    className="shrink-0 flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-md transition-colors"
+                                  >
+                                    <CheckCheck className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">Complete</span>
+                                  </button>
+                                )}
                                 <button
                                   type="button"
                                   onClick={() => onEditRemove?.(task.originalIndex)}
@@ -542,15 +552,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                 )}
                               />
                             </button>
-                            {!task.done && isOwner && onCompleteTask && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); onCompleteTask(task.globalIndex); }}
-                                className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 mr-1 text-[11px] font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-md transition-colors"
-                              >
-                                <CheckCheck className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">Complete</span>
-                              </button>
-                            )}
                             </div>
 
                             <AnimatePresence>
