@@ -10,6 +10,7 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { partners, communityMembers } from "@/data/mockData";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 import logoImperial from "@/assets/logos/imperial-college-london.jpg";
 import logoCapeTown from "@/assets/logos/university-of-cape-town.png";
@@ -54,6 +55,7 @@ const Partners = () => {
     zoom: 1,
   });
   const [joinOpen, setJoinOpen] = useState(false);
+  const { user } = useAuth();
 
   const industryPartners = useMemo(() => partners.filter((p) => p.type === "industry"), []);
   const academicPartners = useMemo(() => partners.filter((p) => p.type === "academic"), []);
@@ -121,9 +123,11 @@ const Partners = () => {
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               We work with leading organisations across academia, industry, and open-source to make custom silicon accessible.
             </p>
-            <Button size="lg" className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
-              <UserPlus className="mr-2 h-4 w-4" /> Join the Community
-            </Button>
+            {!user && (
+              <Button size="lg" className="rounded-full px-8" onClick={() => setJoinOpen(true)}>
+                <UserPlus className="mr-2 h-4 w-4" /> Join the Community
+              </Button>
+            )}
           </motion.div>
 
           {/* Global Map */}
