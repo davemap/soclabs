@@ -125,32 +125,50 @@ export type Database = {
       }
       project_milestones: {
         Row: {
+          assignee_id: string | null
+          blurb: string | null
+          completed_date: string | null
           created_at: string
           done: boolean
           id: string
+          learning_topic_ids: string[] | null
           phase: string
           project_id: string
+          projected_end_date: string | null
           sort_order: number
+          start_date: string | null
           task: string
           updated_at: string
         }
         Insert: {
+          assignee_id?: string | null
+          blurb?: string | null
+          completed_date?: string | null
           created_at?: string
           done?: boolean
           id?: string
+          learning_topic_ids?: string[] | null
           phase: string
           project_id: string
+          projected_end_date?: string | null
           sort_order?: number
+          start_date?: string | null
           task: string
           updated_at?: string
         }
         Update: {
+          assignee_id?: string | null
+          blurb?: string | null
+          completed_date?: string | null
           created_at?: string
           done?: boolean
           id?: string
+          learning_topic_ids?: string[] | null
           phase?: string
           project_id?: string
+          projected_end_date?: string | null
           sort_order?: number
+          start_date?: string | null
           task?: string
           updated_at?: string
         }
