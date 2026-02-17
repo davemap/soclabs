@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Camera, Mail, Lock, Copy, Check, ExternalLink } from "lucide-react";
+import { Camera, Mail, Lock, Copy, Check, ExternalLink, Plus, Eye, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
@@ -249,6 +250,13 @@ const Profile = () => {
                       </a>
                     )}
                   </div>
+                  <div className="flex gap-2 mt-2">
+                    <Button size="sm" variant="outline" className="rounded-full" asChild>
+                      <Link to={`/community/${user?.id}`}>
+                        <Eye className="h-3.5 w-3.5 mr-1.5" /> View Public Profile
+                      </Link>
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -329,7 +337,14 @@ const Profile = () => {
 
             {/* Projects */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-4">My Projects</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">My Projects</h3>
+                <Button size="sm" className="rounded-full" asChild>
+                  <Link to="/projects/start">
+                    <Plus className="h-3.5 w-3.5 mr-1.5" /> Create New Project
+                  </Link>
+                </Button>
+              </div>
               {allProjects.length > 0 ? (
                 <div className="space-y-3">
                   {allProjects.map((p) => (
@@ -356,9 +371,11 @@ const Profile = () => {
 
             {/* Organisations */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-4">My Organisations</h3>
-              {userOrgs.length > 0 ? (
-                <div className="space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">My Organisations</h3>
+              </div>
+              {userOrgs.length > 0 && (
+                <div className="space-y-3 mb-4">
                   {userOrgs.map((o) => (
                     <Link key={o.id} to={`/partners/${o.id}`}>
                       <Card className="hover:border-primary/30 transition-colors cursor-pointer">
@@ -373,9 +390,35 @@ const Profile = () => {
                     </Link>
                   ))}
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No organisations associated with your account yet.</p>
               )}
+              <Card className="border-dashed">
+                <CardContent className="py-4">
+                  <div className="flex items-center gap-3">
+                    <Building2 className="h-5 w-5 text-muted-foreground shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium mb-1">Associate with an Organisation</p>
+                      <Select
+                        onValueChange={(orgId) => {
+                          if (orgId && !userOrgs.find((o) => o.id === orgId)) {
+                            navigate(`/partners/${orgId}`);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Browse organisations..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {partners.map((org) => (
+                            <SelectItem key={org.id} value={org.id}>
+                              {org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </motion.div>
         </div>
