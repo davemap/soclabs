@@ -1136,7 +1136,14 @@ const ProjectDetail = () => {
                   </div>
 
                   {/* Resources card */}
-                  {(dbProject.github_url || dbProject.docs_url) && (
+                  {editMode && isOwner ? (
+                    <SidebarResourcesEditor
+                      githubUrl={dbProject.github_url || ""}
+                      docsUrl={dbProject.docs_url || ""}
+                      projectId={dbProject.id}
+                      onSaved={refreshDbProject}
+                    />
+                  ) : (dbProject.github_url || dbProject.docs_url) ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
                       <div className="flex flex-col gap-2">
@@ -1158,7 +1165,7 @@ const ProjectDetail = () => {
                         )}
                       </div>
                     </div>
-                  )}
+                  ) : editMode ? null : null}
 
                   {/* Target Technology - minimal sidebar */}
                   {dbProject.target_technology && !editMode && (
@@ -1582,6 +1589,49 @@ const ProjectDetail = () => {
         </div>
       </article>
     </Layout>
+  );
+};
+
+const SidebarResourcesEditor = ({ githubUrl, docsUrl, projectId, onSaved }: { githubUrl: string; docsUrl: string; projectId: string; onSaved: () => void }) => {
+  const [github, setGithub] = useState(githubUrl);
+  const [docs, setDocs] = useState(docsUrl);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase.from("projects").update({ github_url: github.trim(), docs_url: docs.trim() }).eq("id", projectId);
+    setSaving(false);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Resources updated"); onSaved(); }
+  };
+
+  return (
+    <div className="rounded-xl border bg-card p-4 shadow-sm space-y-3">
+      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resources</h4>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Github className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Input
+            placeholder="GitHub URL"
+            value={github}
+            onChange={(e) => setGithub(e.target.value)}
+            className="h-8 text-xs"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <BookOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Input
+            placeholder="Documentation URL"
+            value={docs}
+            onChange={(e) => setDocs(e.target.value)}
+            className="h-8 text-xs"
+          />
+        </div>
+      </div>
+      <Button size="sm" className="w-full" onClick={handleSave} disabled={saving}>
+        <Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving..." : "Save"}
+      </Button>
+    </div>
   );
 };
 
