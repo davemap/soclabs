@@ -149,7 +149,6 @@ const Partners = () => {
                   onMoveEnd={handleMoveEnd}
                   minZoom={1}
                   maxZoom={12}
-                  translateExtent={[[-100, -50], [900, 500]]}
                 >
                   <Geographies geography={geoUrl}>
                     {({ geographies }) =>
@@ -190,23 +189,29 @@ const Partners = () => {
                       })
                     }
                   </Geographies>
-                  {mapPartners.map((partner) => (
-                    <Marker
-                      key={partner.id}
-                      coordinates={partner.coordinates!}
-                      onClick={() => setSelectedPartner(partner)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <circle
-                        r={highlightedOrg === partner.id ? 6 : 4}
-                        fill={partner.type === "academic" ? "hsl(210, 100%, 60%)" : "hsl(15, 85%, 62%)"}
-                        stroke={highlightedOrg === partner.id ? "hsl(0, 0%, 100%)" : partner.type === "academic" ? "hsl(210, 100%, 80%)" : "hsl(15, 85%, 80%)"}
-                        strokeWidth={highlightedOrg === partner.id ? 2 : 1.5}
-                        opacity={0.9}
-                      />
-                      <circle r={8} fill="transparent" />
-                    </Marker>
-                  ))}
+                  {mapPartners.map((partner) => {
+                    const baseR = highlightedOrg === partner.id ? 6 : 4;
+                    const r = baseR / position.zoom;
+                    const sw = (highlightedOrg === partner.id ? 2 : 1.5) / position.zoom;
+                    const hitR = 8 / position.zoom;
+                    return (
+                      <Marker
+                        key={partner.id}
+                        coordinates={partner.coordinates!}
+                        onClick={() => setSelectedPartner(partner)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <circle
+                          r={r}
+                          fill={partner.type === "academic" ? "hsl(210, 100%, 60%)" : "hsl(15, 85%, 62%)"}
+                          stroke={highlightedOrg === partner.id ? "hsl(0, 0%, 100%)" : partner.type === "academic" ? "hsl(210, 100%, 80%)" : "hsl(15, 85%, 80%)"}
+                          strokeWidth={sw}
+                          opacity={0.9}
+                        />
+                        <circle r={hitR} fill="transparent" />
+                      </Marker>
+                    );
+                  })}
                 </ZoomableGroup>
               </ComposableMap>
 
