@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -908,9 +908,141 @@ const ProjectDetail = () => {
               />
             </div>
 
+            {/* Collaborators section */}
+            {projectCollaborators.length > 0 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mt-10">
+                <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" /> Collaborators
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {projectCollaborators.map((collab) => {
+                    const initials = (collab.full_name || collab.username || "U")
+                      .split(" ")
+                      .filter((w: string) => /^[A-Z]/i.test(w))
+                      .map((w: string) => w[0].toUpperCase())
+                      .join("")
+                      .slice(0, 2) || "U";
+                    const isCollabOwner = collab.user_id === dbProject.user_id;
+                    return (
+                      <div key={collab.user_id} className="relative group">
+                        <Link to={`/community/${collab.user_id}`}>
+                          <div className="rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                            <Avatar className="h-10 w-10 shrink-0">
+                              <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">{initials}</AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-display font-bold truncate group-hover:text-primary transition-colors">
+                                {collab.full_name || collab.username || "Community Member"}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {isCollabOwner ? "Project Owner" : "Collaborator"}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                        {editMode && isOwner && !isCollabOwner && (
+                          <button
+                            onClick={async () => {
+                              const { error } = await supabase
+                                .from("project_join_requests")
+                                .update({ status: "removed" })
+                                .eq("project_id", dbProject.id)
+                                .eq("user_id", collab.user_id)
+                                .eq("status", "accepted");
+                              if (error) toast.error("Failed to remove");
+                              else {
+                                toast.success("Collaborator removed");
+                                setProjectCollaborators(prev => prev.filter(c => c.user_id !== collab.user_id));
+                              }
+                            }}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Remove collaborator"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Associated Organisations */}
+            {(() => {
+              const dbOrgs = (dbProject.organisations || [])
+                .map((orgId: string) => partners.find((p) => p.id === orgId))
+                .filter(Boolean);
+              if (dbOrgs.length === 0 && !editMode) return null;
+              return (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mt-10">
+                  <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-primary" /> Associated Organisations
+                  </h2>
+                  {dbOrgs.length > 0 && (
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {dbOrgs.map((org: any) => (
+                        <div key={org.id} className="relative group">
+                          <Link to={`/partners/${org.id}`}>
+                            <div className="rounded-xl border bg-card p-4 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                              <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
+                                <Building2 className="h-5 w-5 text-primary" />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-sm font-display font-bold truncate group-hover:text-primary transition-colors">{org.name}</p>
+                                <p className="text-xs text-muted-foreground truncate">{org.type || org.description}</p>
+                              </div>
+                            </div>
+                          </Link>
+                          {editMode && isOwner && (
+                            <button
+                              onClick={async () => {
+                                const newOrgs = (dbProject.organisations || []).filter((id: string) => id !== org.id);
+                                const { error } = await supabase.from("projects").update({ organisations: newOrgs }).eq("id", dbProject.id);
+                                if (error) toast.error("Failed to remove");
+                                else { toast.success("Organisation removed"); refreshDbProject(); }
+                              }}
+                              className="absolute top-2 right-2 p-1 rounded-full bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors opacity-0 group-hover:opacity-100"
+                              title="Remove organisation"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {editMode && isOwner && (
+                    <div className="mt-3">
+                      <Select
+                        onValueChange={async (orgId) => {
+                          const current = dbProject.organisations || [];
+                          if (current.includes(orgId)) return;
+                          const { error } = await supabase.from("projects").update({ organisations: [...current, orgId] }).eq("id", dbProject.id);
+                          if (error) toast.error("Failed to add");
+                          else { toast.success("Organisation added"); refreshDbProject(); }
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Add an organisation..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {partners
+                            .filter((p) => !(dbProject.organisations || []).includes(p.id))
+                            .map((p) => (
+                              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
+
             {/* Join Request Form for non-owners */}
             {user && !isOwner && !existingRequest && (
-              <div id="join-request-section" className="rounded-xl border bg-card p-6 mb-10">
+              <div id="join-request-section" className="rounded-xl border bg-card p-6 mt-10 mb-10">
                 <h3 className="text-lg font-display font-bold mb-3 flex items-center gap-2">
                   <UserPlus className="h-5 w-5 text-primary" /> Request to Join This Project
                 </h3>
@@ -961,21 +1093,45 @@ const ProjectDetail = () => {
                   {/* Author card */}
                   <div className="rounded-xl border bg-card p-4 shadow-sm">
                     <div className="flex flex-col items-center text-center">
-                      <Avatar className="h-16 w-16 mb-3">
-                        <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
-                          {(dbProject.profile?.full_name || dbProject.profile?.username || "U")
-                            .split(" ")
-                            .filter((w: string) => /^[A-Z]/i.test(w))
-                            .map((w: string) => w[0].toUpperCase())
-                            .join("")
-                            .slice(0, 2) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-display font-bold">
+                      <Link to={`/community/${dbProject.user_id}`} className="hover:opacity-80 transition-opacity">
+                        <Avatar className="h-16 w-16 mb-3">
+                          <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
+                            {(dbProject.profile?.full_name || dbProject.profile?.username || "U")
+                              .split(" ")
+                              .filter((w: string) => /^[A-Z]/i.test(w))
+                              .map((w: string) => w[0].toUpperCase())
+                              .join("")
+                              .slice(0, 2) || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
+                      <Link to={`/community/${dbProject.user_id}`} className="text-sm font-display font-bold hover:text-primary transition-colors">
                         {dbProject.profile?.full_name || dbProject.profile?.username || "Community Member"}
-                      </span>
+                      </Link>
                       <span className="text-xs text-muted-foreground mt-0.5">Project Owner</span>
                     </div>
+                    {/* Sidebar collaborators */}
+                    {projectCollaborators.filter(c => c.user_id !== dbProject.user_id).length > 0 && (
+                      <div className="border-t border-border/60 mt-3 pt-3">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Team</h4>
+                        <div className="space-y-2">
+                          {projectCollaborators
+                            .filter(c => c.user_id !== dbProject.user_id)
+                            .map(c => (
+                              <Link key={c.user_id} to={`/community/${c.user_id}`} className="flex items-center gap-2 group">
+                                <Avatar className="h-6 w-6 shrink-0">
+                                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
+                                    {(c.full_name || c.username || "U").split(" ").map((w: string) => w[0]?.toUpperCase()).join("").slice(0, 2)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="text-xs font-medium truncate group-hover:text-primary transition-colors">
+                                  {c.full_name || c.username}
+                                </span>
+                              </Link>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Resources card */}
