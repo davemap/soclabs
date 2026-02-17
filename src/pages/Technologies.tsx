@@ -157,23 +157,39 @@ const Technologies = () => {
             </p>
           </motion.div>
 
-          {/* Search bar */}
+          {/* Search bar + collapse toggle */}
           <div className="max-w-2xl mx-auto mb-12">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Search technologies..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  // Auto-expand all groups when searching
-                  if (e.target.value) {
-                    setCollapsedGroups(new Set());
-                  }
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search technologies..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    if (e.target.value) {
+                      setCollapsedGroups(new Set());
+                    }
+                  }}
+                  className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-card text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 px-3 rounded-xl text-xs whitespace-nowrap"
+                onClick={() => {
+                  const allCollapsed = collapsedGroups.size === groups.length;
+                  setCollapsedGroups(allCollapsed ? new Set() : new Set(groups.map(g => g.key)));
                 }}
-                className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-card text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
-              />
+              >
+                <ChevronDown className={cn(
+                  "h-4 w-4 mr-1.5 transition-transform",
+                  collapsedGroups.size === groups.length && "-rotate-90"
+                )} />
+                {collapsedGroups.size === groups.length ? "Expand All" : "Collapse All"}
+              </Button>
             </div>
           </div>
           <div className="max-w-6xl mx-auto flex gap-8">
@@ -458,6 +474,44 @@ const Technologies = () => {
             {/* Sticky sidebar */}
             <aside className="hidden lg:block w-64 shrink-0">
               <div className="sticky top-24 space-y-4">
+                {/* Register interest hint */}
+                <div className="rounded-xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-lg shadow-primary/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h3 className="font-display font-bold text-sm">Register Interest</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button on each card to register your interest.
+                  </p>
+                  {selectedCount > 0 && (
+                    <div className="border-t border-border/40 pt-3 mt-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {selectedTechs.slice(0, 5).map((name) => (
+                          <button
+                            key={name}
+                            onClick={() => toggleTech(name)}
+                            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                          >
+                            {name}
+                            <X className="h-2 w-2" />
+                          </button>
+                        ))}
+                        {selectedTechs.length > 5 && (
+                          <span className="text-[10px] text-muted-foreground">+{selectedTechs.length - 5} more</span>
+                        )}
+                      </div>
+                      <Button asChild size="sm" className="w-full rounded-full text-xs">
+                        <Link to="/about#join">
+                          Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 {/* Propose new technology card */}
                 <div className="rounded-xl border border-border/60 bg-card p-5">
                   <div className="flex items-center gap-2 mb-3">
@@ -563,46 +617,6 @@ const Technologies = () => {
           </div>
         </div>
       </section>
-
-      {/* Floating register interest hint — right side */}
-      <div className="fixed top-32 right-6 z-40 hidden xl:block w-56">
-        <div className="rounded-xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-lg shadow-primary/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <h3 className="font-display font-bold text-sm">Register Interest</h3>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-            Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button on each card to register your interest.
-          </p>
-          {selectedCount > 0 && (
-            <div className="border-t border-border/40 pt-3 mt-1">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
-              </div>
-              <div className="flex flex-wrap gap-1 mb-3">
-                {selectedTechs.slice(0, 5).map((name) => (
-                  <button
-                    key={name}
-                    onClick={() => toggleTech(name)}
-                    className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
-                  >
-                    {name}
-                    <X className="h-2 w-2" />
-                  </button>
-                ))}
-                {selectedTechs.length > 5 && (
-                  <span className="text-[10px] text-muted-foreground">+{selectedTechs.length - 5} more</span>
-                )}
-              </div>
-              <Button asChild size="sm" className="w-full rounded-full text-xs">
-                <Link to="/about#join">
-                  Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Floating CTA — mobile/smaller screens */}
       <AnimatePresence>
