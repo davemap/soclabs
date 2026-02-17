@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu, Flame, HelpCircle, Users } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu, Flame, HelpCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -142,70 +142,31 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
                       : topic.uncertainty;
 
                     return (
-                      <div key={topic.id} className="relative">
-                        <Link
-                          to={`/learn/${phase.id}/${topic.id}`}
-                          className="group flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-all relative"
-                        >
-                          {/* Branch connector */}
-                          <div className="absolute -left-[calc(1rem+1px)] top-1/2 w-4 h-px bg-primary/20" />
-                          <div className="absolute -left-[calc(1rem+3px)] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-primary/40 bg-background group-hover:border-primary group-hover:bg-primary/20 transition-colors" />
+                      <Link
+                        key={topic.id}
+                        to={`/learn/${phase.id}/${topic.id}`}
+                        className="group flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-all relative"
+                      >
+                        {/* Branch connector */}
+                        <div className="absolute -left-[calc(1rem+1px)] top-1/2 w-4 h-px bg-primary/20" />
+                        <div className="absolute -left-[calc(1rem+3px)] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-primary/40 bg-background group-hover:border-primary group-hover:bg-primary/20 transition-colors" />
 
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors">
-                              {topic.title}
-                            </div>
-                            <div className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                              {topic.summary}
-                            </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors">
+                            {topic.title}
                           </div>
-                          {!isOverview && (
-                            <MiniRatingBar
-                              effort={avgEffortFromProjects}
-                              uncertainty={avgUncertaintyFromProjects}
-                            />
-                          )}
-                          <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary mt-0.5 shrink-0 transition-colors" />
-                        </Link>
-
-                        {/* Project completions */}
-                        {!isOverview && ratings.length > 0 && (
-                          <div className="ml-6 mr-3 mb-2 mt-0.5">
-                            <div className="flex items-center gap-1.5 mb-1.5">
-                              <Users className="h-3 w-3 text-muted-foreground/60" />
-                              <span className="text-[10px] text-muted-foreground/60 font-display font-semibold">
-                                {ratings.length} project{ratings.length !== 1 ? "s" : ""} completed
-                              </span>
-                            </div>
-                            <div className="space-y-1">
-                              {ratings.map((r) => (
-                                <Link
-                                  key={r.projectId}
-                                  to={`/projects/${r.projectId}`}
-                                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-muted/5 hover:bg-muted/15 border border-border/20 hover:border-border/40 transition-all group/proj"
-                                >
-                                  <span className="text-[11px] text-muted-foreground group-hover/proj:text-foreground transition-colors truncate flex-1">
-                                    {r.projectTitle}
-                                  </span>
-                                  <div className="flex items-center gap-1 shrink-0">
-                                    <div className="flex gap-px" title={`Effort: ${r.effort}/5`}>
-                                      {[1, 2, 3, 4, 5].map((v) => (
-                                        <div key={`e${v}`} className={cn("w-1 h-2 rounded-sm", v <= r.effort ? effortColors[r.effort - 1] : "bg-muted/20")} />
-                                      ))}
-                                    </div>
-                                    <div className="w-px h-2 bg-border/30 mx-px" />
-                                    <div className="flex gap-px" title={`Uncertainty: ${r.uncertainty}/5`}>
-                                      {[1, 2, 3, 4, 5].map((v) => (
-                                        <div key={`u${v}`} className={cn("w-1 h-2 rounded-sm", v <= r.uncertainty ? uncertaintyColors[r.uncertainty - 1] : "bg-muted/20")} />
-                                      ))}
-                                    </div>
-                                  </div>
-                                </Link>
-                              ))}
-                            </div>
+                          <div className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+                            {topic.summary}
                           </div>
+                        </div>
+                        {!isOverview && (
+                          <MiniRatingBar
+                            effort={avgEffortFromProjects}
+                            uncertainty={avgUncertaintyFromProjects}
+                          />
                         )}
-                      </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary mt-0.5 shrink-0 transition-colors" />
+                      </Link>
                     );
                   })}
                 </div>

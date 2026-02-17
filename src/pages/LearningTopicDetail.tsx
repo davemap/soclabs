@@ -1,11 +1,12 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle, Users } from "lucide-react";
 import { learningPhases } from "@/data/mockData";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
+import { projectTopicRatings } from "@/data/projectTopicRatings";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -273,6 +274,66 @@ const LearningTopicDetail = () => {
                   {topic.content}
                 </div>
               </motion.div>
+
+              {/* Project completions — non-overview topics only */}
+              {!topic.id.endsWith("-overview") && (() => {
+                const ratings = projectTopicRatings[topic.id] || [];
+                if (ratings.length === 0) return null;
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="mb-12"
+                  >
+                    <div className="rounded-2xl border border-border/40 bg-card/30 p-5 md:p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Users className="h-4 w-4 text-primary" />
+                        <h3 className="text-sm font-display font-semibold">
+                          Projects that completed this task
+                        </h3>
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {ratings.length} project{ratings.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {ratings.map((r) => (
+                          <Link
+                            key={r.projectId}
+                            to={`/projects/${r.projectId}`}
+                            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/5 hover:bg-muted/15 border border-border/20 hover:border-border/40 transition-all group/proj"
+                          >
+                            <span className="text-sm text-muted-foreground group-hover/proj:text-foreground transition-colors truncate flex-1 font-display">
+                              {r.projectTitle}
+                            </span>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <div className="flex items-center gap-1.5">
+                                <Flame className="h-3 w-3 text-muted-foreground/60" />
+                                <div className="flex gap-px">
+                                  {[1, 2, 3, 4, 5].map((v) => (
+                                    <div key={`e${v}`} className={cn("w-1.5 h-3 rounded-sm", v <= r.effort ? effortColors[r.effort - 1] : "bg-muted/20")} />
+                                  ))}
+                                </div>
+                                <span className="text-[10px] text-muted-foreground">{r.effort}/5</span>
+                              </div>
+                              <div className="w-px h-4 bg-border/30" />
+                              <div className="flex items-center gap-1.5">
+                                <HelpCircle className="h-3 w-3 text-muted-foreground/60" />
+                                <div className="flex gap-px">
+                                  {[1, 2, 3, 4, 5].map((v) => (
+                                    <div key={`u${v}`} className={cn("w-1.5 h-3 rounded-sm", v <= r.uncertainty ? uncertaintyColors[r.uncertainty - 1] : "bg-muted/20")} />
+                                  ))}
+                                </div>
+                                <span className="text-[10px] text-muted-foreground">{r.uncertainty}/5</span>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })()}
 
               {/* Phase topics grid — only on overview pages, below content */}
               {topic.id.endsWith("-overview") && (
