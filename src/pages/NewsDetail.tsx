@@ -47,9 +47,7 @@ const NewsDetail = () => {
   }
 
   const author = communityMembers.find((m) => m.id === article.authorId);
-  const authorOrgs = author?.organisations || [];
-  const institutionOrg = partners.find((p) => authorOrgs.includes(p.id) && p.name === article.institution)
-    || partners.find((p) => authorOrgs.includes(p.id));
+  const institutionOrg = partners.find((p) => p.name === article.institution);
 
   return (
     <Layout>
