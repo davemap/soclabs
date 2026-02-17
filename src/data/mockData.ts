@@ -46,6 +46,8 @@ export const referenceDesigns = [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)" },
       { type: "FPGA", details: "Intel Cyclone V" },
     ],
+    integrationTime: "2–4 weeks",
+    relativeGateCount: "~15K",
   },
   {
     id: "ecosoc",
@@ -98,6 +100,8 @@ export const referenceDesigns = [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
       { type: "ASIC", details: "TSMC 65nm (via Europractice)" },
     ],
+    integrationTime: "4–8 weeks",
+    relativeGateCount: "~85K",
   },
   {
     id: "megasoc",
@@ -150,6 +154,8 @@ export const referenceDesigns = [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
       { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)" },
     ],
+    integrationTime: "8–16 weeks",
+    relativeGateCount: "~350K",
   },
 ];
 
