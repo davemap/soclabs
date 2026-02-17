@@ -171,16 +171,17 @@ const ProjectDetail = () => {
                   {project.description}
                 </p>
 
-                {/* Milestone tracker */}
-                {project.phaseProgress && (
-                  <MilestoneTracker
-                    phaseProgress={project.phaseProgress}
-                    milestones={project.milestones}
-                    onPhaseClick={handlePhaseClick}
-                    technology={project.technology}
-                  />
-                )}
               </motion.header>
+
+              {/* Floating milestone tracker */}
+              {project.phaseProgress && (
+                <MilestoneTracker
+                  phaseProgress={project.phaseProgress}
+                  milestones={project.milestones}
+                  onPhaseClick={handlePhaseClick}
+                  technology={project.technology}
+                />
+              )}
 
               {/* Project image */}
               <motion.div
