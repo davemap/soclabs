@@ -80,11 +80,19 @@ const ProjectDetail = () => {
     if (!mockProject && id) {
       supabase
         .from("projects")
-        .select("*, profiles!projects_user_id_fkey(username, full_name)")
+        .select("*")
         .eq("id", id)
         .maybeSingle()
-        .then(({ data }) => {
-          setDbProject(data);
+        .then(async ({ data }) => {
+          if (data) {
+            // Fetch the profile separately since there's no FK relationship
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("username, full_name")
+              .eq("user_id", data.user_id)
+              .maybeSingle();
+            setDbProject({ ...data, profile });
+          }
           setDbLoading(false);
         });
     }
