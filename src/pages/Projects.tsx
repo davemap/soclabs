@@ -115,9 +115,9 @@ const Projects = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {filtered.map((project, i) => {
-                const phaseKeys = project.technology === "FPGA"
-                  ? ["architecture", "rtl", "verification", "synthesis"]
-                  : ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
+                const allPhaseKeys = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
+                const hiddenPhases = project.technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
+                const phaseKeys = allPhaseKeys.filter((k) => !hiddenPhases.has(k));
                 const totalProgress = phaseKeys.reduce((sum, k) => sum + (project.phaseProgress?.[k] || 0), 0);
                 const avgProgress = Math.round(totalProgress / phaseKeys.length);
                 const isFpga = project.technology === "FPGA";
