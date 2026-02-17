@@ -24,6 +24,7 @@ import About from "./pages/About";
 import Interests from "./pages/Interests";
 import InterestDetail from "./pages/InterestDetail";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +59,7 @@ const App = () => (
           <Route path="/research/:slug" element={<InterestDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
