@@ -578,7 +578,7 @@ const ProjectDetail = () => {
                     </div>
                   </div>
                 ) : (() => {
-                  const timeframeSteps = ["1 Month", "3 Months", "6 Months", "9 Months", "12 Months", "18 Months", "Unknown"];
+                  const timeframeSteps = ["1 Month", "3 Months", "6 Months", "1 Year", "2 Years", "3 Years", "Unknown"];
                   const currentIndex = timeframeSteps.indexOf(dbProject.timeframe);
                   const knownSteps = timeframeSteps.filter(s => s !== "Unknown");
                   const isUnknown = dbProject.timeframe === "Unknown" || currentIndex === -1;
@@ -611,7 +611,7 @@ const ProjectDetail = () => {
                                   i <= currentIndex ? "text-primary" : "text-muted-foreground/50"
                                 )}
                               >
-                                {step.replace(" Months", "mo").replace(" Month", "mo")}
+                                {step}
                               </span>
                             ))}
                           </div>
