@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Cpu } from "lucide-react";
+import { Menu, X, Cpu, LogIn, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { to: "/designs", label: "Reference Designs" },
@@ -20,6 +21,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const location = useLocation();
+  const { user, loading, signOut } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-electric/10 bg-[hsl(var(--nav-bg)/0.95)] backdrop-blur-xl">
@@ -48,7 +50,35 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-2">
+          {!loading && (
+            user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-primary-foreground/70 max-w-[140px] truncate">
+                  {user.email}
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                  onClick={signOut}
+                >
+                  <LogOut className="h-4 w-4 mr-1" /> Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                asChild
+              >
+                <Link to="/auth">
+                  <LogIn className="h-4 w-4 mr-1" /> Sign In
+                </Link>
+              </Button>
+            )
+          )}
           <Button size="sm" className="rounded-full px-5" onClick={() => setJoinOpen(true)}>
             Join Community
           </Button>
@@ -77,7 +107,30 @@ const Navbar = () => {
                 {link.label}
               </Link>
             ))}
-            <Button size="sm" className="mt-2 rounded-full" onClick={() => { setOpen(false); setJoinOpen(true); }}>
+            {!loading && (
+              user ? (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="mt-2 rounded-full justify-start text-primary-foreground/80"
+                  onClick={() => { setOpen(false); signOut(); }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" /> Sign Out
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="mt-2 rounded-full justify-start text-primary-foreground/80"
+                  asChild
+                >
+                  <Link to="/auth" onClick={() => setOpen(false)}>
+                    <LogIn className="h-4 w-4 mr-2" /> Sign In
+                  </Link>
+                </Button>
+              )
+            )}
+            <Button size="sm" className="mt-1 rounded-full" onClick={() => { setOpen(false); setJoinOpen(true); }}>
               Join Community
             </Button>
           </div>

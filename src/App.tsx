@@ -19,11 +19,11 @@ import MemberDetail from "./pages/MemberDetail";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import SubmitNews from "./pages/SubmitNews";
-
 import StartProject from "./pages/StartProject";
 import About from "./pages/About";
 import Interests from "./pages/Interests";
 import InterestDetail from "./pages/InterestDetail";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -57,6 +57,7 @@ const App = () => (
           <Route path="/interests/:slug" element={<InterestDetail />} />
           <Route path="/research/:slug" element={<InterestDetail />} />
           <Route path="/about" element={<About />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
