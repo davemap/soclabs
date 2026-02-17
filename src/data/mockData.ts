@@ -13,15 +13,21 @@ export const referenceDesigns = [
       "Full RTL source available",
       "Extensive documentation & tutorials",
     ],
-    useCases: ["Educational projects", "Custom accelerator integration", "FPGA prototyping", "Research experimentation"],
-    githubUrl: "https://github.com/soclabs/nanosoc",
-    docsUrl: "https://docs.soclabs.org/nanosoc",
+    useCases: [
+      "Educational projects",
+      "Custom accelerator integration",
+      "FPGA prototyping",
+      "Research experimentation",
+    ],
+    githubUrl: "https://git.soton.ac.uk/soclabs/accelerator-project",
+    docsUrl: "https://nanosoc-project.readthedocs.io/en/latest/",
     image: "/placeholder.svg",
     processor: "ARM Cortex-M0",
     busArchitecture: "AHB-Lite",
     peripherals: ["GPIO", "UART", "Timer", "Watchdog"],
     targetTechnology: ["FPGA"],
-    architectureOverview: "NanoSoC is built around the ARM Cortex-M0 processor — the smallest ARM core — connected via an AHB-Lite bus to a set of essential peripherals. The design philosophy is simplicity: every block is fully documented and intended to be understood, modified, and extended by students and researchers.\n\nThe bus topology is a single-master AHB-Lite with a simple address decoder routing transactions to peripheral slaves. An extension port allows users to attach custom accelerators or additional peripherals without modifying the core interconnect.",
+    architectureOverview:
+      "NanoSoC is built around the ARM Cortex-M0 processor — the smallest ARM core — connected via an AHB-Lite bus to a set of essential peripherals. The design philosophy is simplicity: every block is fully documented and intended to be understood, modified, and extended by students and researchers.\n\nThe bus topology is a single-master AHB-Lite with a simple address decoder routing transactions to peripheral slaves. An extension port allows users to attach custom accelerators or additional peripherals without modifying the core interconnect.",
     blockDiagram: [
       { name: "ARM Cortex-M0", type: "processor" },
       { name: "AHB-Lite Bus", type: "interconnect" },
@@ -66,7 +72,8 @@ export const referenceDesigns = [
     busArchitecture: "Multi-layer AHB",
     peripherals: ["GPIO", "UART", "SPI", "I2C", "DMA Controller", "Timer", "Watchdog", "RTC"],
     targetTechnology: ["FPGA", "ASIC"],
-    architectureOverview: "EcoSoC is a production-grade SoC built around the ARM Cortex-M3 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
+    architectureOverview:
+      "EcoSoC is a production-grade SoC built around the ARM Cortex-M3 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
     blockDiagram: [
       { name: "ARM Cortex-M3", type: "processor" },
       { name: "AHB Bus Matrix", type: "interconnect" },
@@ -115,7 +122,8 @@ export const referenceDesigns = [
     busArchitecture: "Multi-layer AXI",
     peripherals: ["GPIO", "UART", "SPI", "I2C", "DMA Controller", "Timer", "Watchdog", "RTC"],
     targetTechnology: ["FPGA", "ASIC"],
-    architectureOverview: "megaSoC is a production-grade SoC built around the ARM Cortex-A53 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
+    architectureOverview:
+      "megaSoC is a production-grade SoC built around the ARM Cortex-A53 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
     blockDiagram: [
       { name: "ARM Cortex-A53", type: "processor" },
       { name: "AHB Bus Matrix", type: "interconnect" },
@@ -147,7 +155,8 @@ export const communityProjects = [
     institution: "Imperial College London",
     description:
       "A custom RISC-based accelerator for running TinyML inference workloads on the NanoSoC platform. Achieves 10x speedup over software-only execution for common CNN architectures.",
-    architecture: "Custom MAC array integrated via the AHB-Lite extension port. Includes a DMA-driven data path for efficient weight loading.",
+    architecture:
+      "Custom MAC array integrated via the AHB-Lite extension port. Includes a DMA-driven data path for efficient weight loading.",
     tags: ["Machine Learning", "Accelerator", "NanoSoC", "FPGA"],
     referenceSoc: "NanoSoC",
     technology: "FPGA",
@@ -163,7 +172,8 @@ export const communityProjects = [
     institution: "University of Cape Town",
     description:
       "An AES-128/256 and SHA-256 hardware accelerator designed for IoT security applications. Integrated into the EcoSoC accelerator slot with minimal area overhead.",
-    architecture: "Pipelined AES core with configurable key length. SHA-256 engine shares the datapath for area efficiency.",
+    architecture:
+      "Pipelined AES core with configurable key length. SHA-256 engine shares the datapath for area efficiency.",
     tags: ["Cryptography", "Security", "EcoSoC", "ASIC"],
     referenceSoc: "EcoSoC",
     technology: "ASIC",
@@ -179,7 +189,8 @@ export const communityProjects = [
     institution: "ETH Zürich",
     description:
       "A reconfigurable FIR/IIR filter bank for audio and sensor signal processing. Supports up to 8 parallel filter channels with programmable coefficients.",
-    architecture: "Shared multiply-accumulate units with time-division multiplexing. Coefficient memory mapped to the AHB address space.",
+    architecture:
+      "Shared multiply-accumulate units with time-division multiplexing. Coefficient memory mapped to the AHB address space.",
     tags: ["DSP", "Signal Processing", "NanoSoC", "FPGA"],
     referenceSoc: "NanoSoC",
     technology: "FPGA",
@@ -211,7 +222,8 @@ export const communityProjects = [
     institution: "MIT",
     description:
       "An intelligent power management unit for the EcoSoC that implements dynamic voltage and frequency scaling (DVFS) based on workload characterisation.",
-    architecture: "Digital controller with lookup-table-based DVFS policy engine. Monitors core activity counters to make scaling decisions.",
+    architecture:
+      "Digital controller with lookup-table-based DVFS policy engine. Monitors core activity counters to make scaling decisions.",
     tags: ["Low Power", "Power Management", "EcoSoC", "ASIC"],
     referenceSoc: "EcoSoC",
     technology: "ASIC",
@@ -330,38 +342,44 @@ export const learningPhases: LearningPhase[] = [
     id: "architecture",
     title: "Architecture",
     shortTitle: "Arch",
-    description: "Define the high-level architecture of your SoC — the building blocks, interconnects, and system-level decisions that shape everything downstream.",
+    description:
+      "Define the high-level architecture of your SoC — the building blocks, interconnects, and system-level decisions that shape everything downstream.",
     icon: "FileText",
     topics: [
       {
         id: "system-partitioning",
         title: "System Partitioning",
         summary: "Decide what goes on-chip vs off-chip and how subsystems interact.",
-        content: "System partitioning determines boundaries between hardware blocks, software responsibility, and external interfaces. Consider power domains, clock domains, and data bandwidth between partitions. A well-partitioned system simplifies verification and enables parallel development across teams.",
+        content:
+          "System partitioning determines boundaries between hardware blocks, software responsibility, and external interfaces. Consider power domains, clock domains, and data bandwidth between partitions. A well-partitioned system simplifies verification and enables parallel development across teams.",
       },
       {
         id: "bus-architecture",
         title: "Bus Architecture & Interconnect",
         summary: "Choose your on-chip bus protocol and interconnect topology.",
-        content: "Select from AMBA protocols (AHB, APB, AXI) based on bandwidth and complexity needs. AHB suits simple single-master systems, while AXI supports high-performance multi-master designs with out-of-order transactions. Consider crossbar vs shared-bus topologies and their area/performance trade-offs.",
+        content:
+          "Select from AMBA protocols (AHB, APB, AXI) based on bandwidth and complexity needs. AHB suits simple single-master systems, while AXI supports high-performance multi-master designs with out-of-order transactions. Consider crossbar vs shared-bus topologies and their area/performance trade-offs.",
       },
       {
         id: "memory-map",
         title: "Memory Map & Address Space",
         summary: "Plan the address space allocation for peripherals and memory.",
-        content: "Define a clean memory map that assigns address ranges to each peripheral, memory controller, and system register block. Follow ARM conventions for Cortex-M systems. Ensure no overlaps, leave room for future expansion, and document base addresses for software teams.",
+        content:
+          "Define a clean memory map that assigns address ranges to each peripheral, memory controller, and system register block. Follow ARM conventions for Cortex-M systems. Ensure no overlaps, leave room for future expansion, and document base addresses for software teams.",
       },
       {
         id: "ip-selection",
         title: "IP Block Selection",
         summary: "Choose which IP blocks to integrate — build, buy, or use open source.",
-        content: "Evaluate available IP for each function: processor cores (ARM DesignStart), communication interfaces (UART, SPI, I2C), timers, DMA controllers, and custom accelerators. Consider licensing terms, verification maturity, and integration effort for each block.",
+        content:
+          "Evaluate available IP for each function: processor cores (ARM DesignStart), communication interfaces (UART, SPI, I2C), timers, DMA controllers, and custom accelerators. Consider licensing terms, verification maturity, and integration effort for each block.",
       },
       {
         id: "power-clocking",
         title: "Power & Clocking Strategy",
         summary: "Plan clock generation, distribution, and power management.",
-        content: "Define clock domains, PLL/oscillator requirements, and clock gating strategy. For multi-domain designs, plan CDC (Clock Domain Crossing) synchronisers early. Consider power domains if targeting low-power operation, and plan reset sequencing across domains.",
+        content:
+          "Define clock domains, PLL/oscillator requirements, and clock gating strategy. For multi-domain designs, plan CDC (Clock Domain Crossing) synchronisers early. Consider power domains if targeting low-power operation, and plan reset sequencing across domains.",
       },
     ],
   },
@@ -369,38 +387,44 @@ export const learningPhases: LearningPhase[] = [
     id: "rtl",
     title: "RTL Design",
     shortTitle: "RTL",
-    description: "Write the Register Transfer Level code that describes your hardware in synthesisable Verilog or SystemVerilog.",
+    description:
+      "Write the Register Transfer Level code that describes your hardware in synthesisable Verilog or SystemVerilog.",
     icon: "Code",
     topics: [
       {
         id: "coding-style",
         title: "Coding Style & Conventions",
         summary: "Establish RTL coding standards for a clean, synthesisable codebase.",
-        content: "Use consistent naming conventions (snake_case for signals, UPPER_CASE for parameters). Always use non-blocking assignments in sequential blocks and blocking in combinational. Avoid latches by ensuring all branches are covered in combinational logic. Lint your code with tools like Verilator or Spyglass.",
+        content:
+          "Use consistent naming conventions (snake_case for signals, UPPER_CASE for parameters). Always use non-blocking assignments in sequential blocks and blocking in combinational. Avoid latches by ensuring all branches are covered in combinational logic. Lint your code with tools like Verilator or Spyglass.",
       },
       {
         id: "fsm-design",
         title: "Finite State Machine Design",
         summary: "Implement robust FSMs using proven design patterns.",
-        content: "Use two-process or three-process FSM patterns for clarity. Encode states using localparams or enums. Always include a default state and handle unexpected transitions. Consider one-hot vs binary encoding based on your target technology — one-hot is faster on FPGAs, binary saves area in ASICs.",
+        content:
+          "Use two-process or three-process FSM patterns for clarity. Encode states using localparams or enums. Always include a default state and handle unexpected transitions. Consider one-hot vs binary encoding based on your target technology — one-hot is faster on FPGAs, binary saves area in ASICs.",
       },
       {
         id: "interface-protocols",
         title: "Interface Protocol Implementation",
         summary: "Implement standard bus interfaces (AXI, AHB, APB) correctly.",
-        content: "Follow ARM AMBA specifications precisely — incorrect handshaking causes subtle bugs. Implement proper ready/valid handshaking for AXI, ensure single-cycle HREADY response for AHB, and handle wait states correctly on APB. Use protocol checkers during simulation to catch violations early.",
+        content:
+          "Follow ARM AMBA specifications precisely — incorrect handshaking causes subtle bugs. Implement proper ready/valid handshaking for AXI, ensure single-cycle HREADY response for AHB, and handle wait states correctly on APB. Use protocol checkers during simulation to catch violations early.",
       },
       {
         id: "parameterisation",
         title: "Parameterisation & Reuse",
         summary: "Write configurable, reusable RTL modules.",
-        content: "Use SystemVerilog parameters and generate statements to create configurable modules. Parameterise data widths, FIFO depths, and feature enables. Write self-contained modules with clean interfaces that can be reused across projects. Document all parameters with their valid ranges.",
+        content:
+          "Use SystemVerilog parameters and generate statements to create configurable modules. Parameterise data widths, FIFO depths, and feature enables. Write self-contained modules with clean interfaces that can be reused across projects. Document all parameters with their valid ranges.",
       },
       {
         id: "dft-insertion",
         title: "Design for Testability (DFT)",
         summary: "Prepare your RTL for manufacturing test.",
-        content: "Add scan chain insertion points, BIST (Built-In Self-Test) for memories, and JTAG test access ports. Structure your RTL to be scan-friendly by avoiding internally generated clocks and asynchronous resets where possible. DFT is critical for ASIC flows — plan it from the start.",
+        content:
+          "Add scan chain insertion points, BIST (Built-In Self-Test) for memories, and JTAG test access ports. Structure your RTL to be scan-friendly by avoiding internally generated clocks and asynchronous resets where possible. DFT is critical for ASIC flows — plan it from the start.",
       },
     ],
   },
@@ -415,31 +439,36 @@ export const learningPhases: LearningPhase[] = [
         id: "testbench-architecture",
         title: "Testbench Architecture",
         summary: "Build a structured verification environment using UVM or cocotb.",
-        content: "A well-structured testbench separates stimulus generation, checking, and coverage collection. UVM provides a proven methodology with drivers, monitors, scoreboards, and sequences. For simpler projects or Python-familiar teams, cocotb offers a lightweight alternative with coroutine-based test flows.",
+        content:
+          "A well-structured testbench separates stimulus generation, checking, and coverage collection. UVM provides a proven methodology with drivers, monitors, scoreboards, and sequences. For simpler projects or Python-familiar teams, cocotb offers a lightweight alternative with coroutine-based test flows.",
       },
       {
         id: "constrained-random",
         title: "Constrained-Random Verification",
         summary: "Use randomised testing to find corner-case bugs.",
-        content: "Define constraint classes that generate legal but diverse stimulus. Constrained-random testing finds bugs that directed tests miss by exploring unexpected state combinations. Combine with functional coverage to measure progress and identify gaps in your test space.",
+        content:
+          "Define constraint classes that generate legal but diverse stimulus. Constrained-random testing finds bugs that directed tests miss by exploring unexpected state combinations. Combine with functional coverage to measure progress and identify gaps in your test space.",
       },
       {
         id: "functional-coverage",
         title: "Functional Coverage",
         summary: "Measure and track what your tests actually exercise.",
-        content: "Define covergroups for critical functionality: protocol transactions, FSM state transitions, boundary conditions, and error scenarios. Use cross-coverage to find untested combinations. Aim for meaningful coverage metrics rather than just high numbers — focus on functional intent, not line coverage alone.",
+        content:
+          "Define covergroups for critical functionality: protocol transactions, FSM state transitions, boundary conditions, and error scenarios. Use cross-coverage to find untested combinations. Aim for meaningful coverage metrics rather than just high numbers — focus on functional intent, not line coverage alone.",
       },
       {
         id: "formal-verification",
         title: "Formal Verification",
         summary: "Use mathematical proofs to verify protocol and interface correctness.",
-        content: "Write SystemVerilog Assertions (SVA) to specify protocol rules and invariants. Formal tools exhaustively prove these properties hold for all possible inputs — no stimulus needed. Ideal for verifying bus protocols, arbitration logic, FIFO full/empty conditions, and CDC paths.",
+        content:
+          "Write SystemVerilog Assertions (SVA) to specify protocol rules and invariants. Formal tools exhaustively prove these properties hold for all possible inputs — no stimulus needed. Ideal for verifying bus protocols, arbitration logic, FIFO full/empty conditions, and CDC paths.",
       },
       {
         id: "regression-ci",
         title: "Regression & CI/CD",
         summary: "Automate test runs and track results across design changes.",
-        content: "Set up nightly regression suites that run your full test suite. Use CI/CD pipelines (GitHub Actions, GitLab CI) to run smoke tests on every commit. Track pass/fail trends, coverage progression, and simulation performance. Automate seed management for reproducible random tests.",
+        content:
+          "Set up nightly regression suites that run your full test suite. Use CI/CD pipelines (GitHub Actions, GitLab CI) to run smoke tests on every commit. Track pass/fail trends, coverage progression, and simulation performance. Automate seed management for reproducible random tests.",
       },
     ],
   },
@@ -447,32 +476,37 @@ export const learningPhases: LearningPhase[] = [
     id: "synthesis",
     title: "Synthesis",
     shortTitle: "Synth",
-    description: "Transform your RTL into optimised gate-level netlists targeting your chosen technology — FPGA or ASIC standard cells.",
+    description:
+      "Transform your RTL into optimised gate-level netlists targeting your chosen technology — FPGA or ASIC standard cells.",
     icon: "Cpu",
     topics: [
       {
         id: "constraints",
         title: "Timing Constraints (SDC)",
         summary: "Write Synopsys Design Constraints to guide synthesis optimisation.",
-        content: "Define clock definitions, input/output delays, and false/multi-cycle paths. Accurate constraints are essential — over-constraining wastes area and power, under-constraining leads to timing failures. Use create_clock, set_input_delay, set_output_delay, and set_false_path judiciously.",
+        content:
+          "Define clock definitions, input/output delays, and false/multi-cycle paths. Accurate constraints are essential — over-constraining wastes area and power, under-constraining leads to timing failures. Use create_clock, set_input_delay, set_output_delay, and set_false_path judiciously.",
       },
       {
         id: "synthesis-strategies",
         title: "Synthesis Strategies",
         summary: "Choose optimisation targets: area, speed, or power.",
-        content: "Balance area, timing, and power goals through synthesis directives. Use compile_ultra for aggressive optimisation, apply clock gating for power reduction, and flatten hierarchies where timing is critical. Iteratively refine based on synthesis reports — each run teaches you about your design's bottlenecks.",
+        content:
+          "Balance area, timing, and power goals through synthesis directives. Use compile_ultra for aggressive optimisation, apply clock gating for power reduction, and flatten hierarchies where timing is critical. Iteratively refine based on synthesis reports — each run teaches you about your design's bottlenecks.",
       },
       {
         id: "timing-closure",
         title: "Timing Closure",
         summary: "Analyse and fix timing violations in the synthesised netlist.",
-        content: "Read timing reports to identify critical paths, setup/hold violations, and clock skew issues. Fix violations through RTL restructuring (pipeline stages, logic re-partitioning), constraint adjustments, or synthesis directives. Timing closure is iterative — expect multiple passes between synthesis and RTL changes.",
+        content:
+          "Read timing reports to identify critical paths, setup/hold violations, and clock skew issues. Fix violations through RTL restructuring (pipeline stages, logic re-partitioning), constraint adjustments, or synthesis directives. Timing closure is iterative — expect multiple passes between synthesis and RTL changes.",
       },
       {
         id: "lint-cdc-checks",
         title: "Lint & CDC Checks",
         summary: "Run structural checks to catch common design errors.",
-        content: "Use RTL lint tools (Spyglass, Ascent Lint) to catch coding issues that could cause simulation/synthesis mismatches. Run CDC analysis to verify all clock domain crossings are properly synchronised. Fix all lint warnings before proceeding — they often indicate real bugs.",
+        content:
+          "Use RTL lint tools (Spyglass, Ascent Lint) to catch coding issues that could cause simulation/synthesis mismatches. Run CDC analysis to verify all clock domain crossings are properly synchronised. Fix all lint warnings before proceeding — they often indicate real bugs.",
       },
     ],
   },
@@ -480,38 +514,44 @@ export const learningPhases: LearningPhase[] = [
     id: "physical-design",
     title: "Physical Design",
     shortTitle: "PD",
-    description: "Transform your gate-level netlist into a physical layout ready for fabrication — floorplanning, placement, routing, and sign-off.",
+    description:
+      "Transform your gate-level netlist into a physical layout ready for fabrication — floorplanning, placement, routing, and sign-off.",
     icon: "CircuitBoard",
     topics: [
       {
         id: "floorplanning",
         title: "Floorplanning",
         summary: "Plan the physical arrangement of blocks and I/O pads on the die.",
-        content: "Define die size, place hard macros (memories, PLLs), and plan power grid topology. Good floorplanning prevents congestion and timing issues downstream. Place related blocks close together, keep critical paths short, and ensure adequate routing channels between dense blocks.",
+        content:
+          "Define die size, place hard macros (memories, PLLs), and plan power grid topology. Good floorplanning prevents congestion and timing issues downstream. Place related blocks close together, keep critical paths short, and ensure adequate routing channels between dense blocks.",
       },
       {
         id: "placement",
         title: "Placement & Optimisation",
         summary: "Place standard cells and optimise for timing and congestion.",
-        content: "The placer assigns physical locations to each standard cell. Guide it with placement blockages, regions, and density targets. Run incremental optimisation after placement to fix timing and reduce congestion. Check placement quality through timing, congestion, and utilisation reports.",
+        content:
+          "The placer assigns physical locations to each standard cell. Guide it with placement blockages, regions, and density targets. Run incremental optimisation after placement to fix timing and reduce congestion. Check placement quality through timing, congestion, and utilisation reports.",
       },
       {
         id: "clock-tree",
         title: "Clock Tree Synthesis (CTS)",
         summary: "Build balanced clock distribution networks.",
-        content: "CTS inserts buffers and inverters to distribute clocks with minimal skew across all flip-flops. Define target skew, insertion delay, and transition time. Check clock tree quality — excessive skew wastes timing margin, excessive buffers consume area and power. Handle multi-clock designs carefully.",
+        content:
+          "CTS inserts buffers and inverters to distribute clocks with minimal skew across all flip-flops. Define target skew, insertion delay, and transition time. Check clock tree quality — excessive skew wastes timing margin, excessive buffers consume area and power. Handle multi-clock designs carefully.",
       },
       {
         id: "routing",
         title: "Routing & DRC Clean-up",
         summary: "Connect all cells with metal wires following design rules.",
-        content: "Global routing plans wire paths, detailed routing implements them on metal layers. Fix DRC violations (spacing, width, via rules) iteratively. Handle antenna effects, electromigration, and IR drop checks. A clean route with zero DRC violations is required for tapeout.",
+        content:
+          "Global routing plans wire paths, detailed routing implements them on metal layers. Fix DRC violations (spacing, width, via rules) iteratively. Handle antenna effects, electromigration, and IR drop checks. A clean route with zero DRC violations is required for tapeout.",
       },
       {
         id: "power-analysis",
         title: "Power Grid & IR Drop Analysis",
         summary: "Ensure robust power delivery across the die.",
-        content: "Design power rings and stripes to deliver VDD/VSS with minimal IR drop. Analyse static and dynamic IR drop to ensure all cells receive adequate voltage. Hot spots with excessive current density can cause electromigration failures — fix with wider stripes or additional vias.",
+        content:
+          "Design power rings and stripes to deliver VDD/VSS with minimal IR drop. Analyse static and dynamic IR drop to ensure all cells receive adequate voltage. Hot spots with excessive current density can cause electromigration failures — fix with wider stripes or additional vias.",
       },
     ],
   },
@@ -526,25 +566,29 @@ export const learningPhases: LearningPhase[] = [
         id: "signoff-checks",
         title: "Sign-off Checks (DRC/LVS/ERC)",
         summary: "Run final verification checks required by the foundry.",
-        content: "Design Rule Check (DRC) ensures your layout follows foundry manufacturing rules. Layout vs Schematic (LVS) confirms the layout matches your netlist. Electrical Rule Check (ERC) catches issues like floating gates and missing connections. All must pass with zero errors before submission.",
+        content:
+          "Design Rule Check (DRC) ensures your layout follows foundry manufacturing rules. Layout vs Schematic (LVS) confirms the layout matches your netlist. Electrical Rule Check (ERC) catches issues like floating gates and missing connections. All must pass with zero errors before submission.",
       },
       {
         id: "timing-signoff",
         title: "Timing Sign-off (STA)",
         summary: "Verify timing across all process/voltage/temperature corners.",
-        content: "Run Static Timing Analysis across worst-case and best-case PVT corners. Check setup timing at slow corners and hold timing at fast corners. Include on-chip variation (OCV) derating. All paths must meet timing with margin — there are no second chances after tapeout.",
+        content:
+          "Run Static Timing Analysis across worst-case and best-case PVT corners. Check setup timing at slow corners and hold timing at fast corners. Include on-chip variation (OCV) derating. All paths must meet timing with margin — there are no second chances after tapeout.",
       },
       {
         id: "shuttle-submission",
         title: "Shuttle Service Submission",
         summary: "Submit to multi-project wafer services like Europractice or OpenMPW.",
-        content: "Shuttle services share wafer costs across multiple designs. Prepare your GDSII according to shuttle-specific requirements: die size, pad frame, seal ring, and fill rules. Submit before the deadline with all required documentation. Turnaround is typically 3-6 months.",
+        content:
+          "Shuttle services share wafer costs across multiple designs. Prepare your GDSII according to shuttle-specific requirements: die size, pad frame, seal ring, and fill rules. Submit before the deadline with all required documentation. Turnaround is typically 3-6 months.",
       },
       {
         id: "packaging",
         title: "Packaging & Test Planning",
         summary: "Choose packaging and plan production test methodology.",
-        content: "Select a package type (QFP, BGA, chip-on-board) based on pin count, thermal needs, and cost. Define the bond pad to package pin mapping. Plan production tests using scan chains, BIST, and functional tests. Create test programs for ATE (Automatic Test Equipment) if needed.",
+        content:
+          "Select a package type (QFP, BGA, chip-on-board) based on pin count, thermal needs, and cost. Define the bond pad to package pin mapping. Plan production tests using scan chains, BIST, and functional tests. Create test programs for ATE (Automatic Test Equipment) if needed.",
       },
     ],
   },
@@ -559,31 +603,36 @@ export const learningPhases: LearningPhase[] = [
         id: "bring-up",
         title: "Silicon Bring-up",
         summary: "Power on your chip for the first time and establish basic communication.",
-        content: "Start with power supply sequencing and checking current draw. Establish JTAG connectivity, read device ID registers, and verify clock generation. Bring-up is methodical — check one subsystem at a time, starting with the simplest peripherals. Keep a detailed lab notebook of all measurements.",
+        content:
+          "Start with power supply sequencing and checking current draw. Establish JTAG connectivity, read device ID registers, and verify clock generation. Bring-up is methodical — check one subsystem at a time, starting with the simplest peripherals. Keep a detailed lab notebook of all measurements.",
       },
       {
         id: "functional-test",
         title: "Functional Testing",
         summary: "Verify all chip functions match the original specification.",
-        content: "Run the same test vectors used in simulation on real silicon. Compare results systematically. Test all interfaces, peripheral modes, and interrupt paths. Watch for issues that simulation might miss: noise sensitivity, supply droop under load, and temperature-dependent behaviour.",
+        content:
+          "Run the same test vectors used in simulation on real silicon. Compare results systematically. Test all interfaces, peripheral modes, and interrupt paths. Watch for issues that simulation might miss: noise sensitivity, supply droop under load, and temperature-dependent behaviour.",
       },
       {
         id: "characterisation",
         title: "Performance Characterisation",
         summary: "Measure speed, power, and analogue performance across conditions.",
-        content: "Measure maximum clock frequency by sweeping speed until failure. Profile power consumption in active and sleep modes. Characterise across voltage (±10%) and temperature (-40°C to 85°C for industrial). Compare silicon measurements against pre-silicon estimates and identify discrepancies.",
+        content:
+          "Measure maximum clock frequency by sweeping speed until failure. Profile power consumption in active and sleep modes. Characterise across voltage (±10%) and temperature (-40°C to 85°C for industrial). Compare silicon measurements against pre-silicon estimates and identify discrepancies.",
       },
       {
         id: "debug-techniques",
         title: "Debug Techniques",
         summary: "Diagnose and work around silicon bugs.",
-        content: "Use JTAG debug, trace ports, and on-chip instrumentation to isolate bugs. Compare silicon behaviour against RTL simulation using the same stimulus. Common issues include hold-time violations, CDC glitches, and analogue/digital boundary problems. Document all errata for future design spins.",
+        content:
+          "Use JTAG debug, trace ports, and on-chip instrumentation to isolate bugs. Compare silicon behaviour against RTL simulation using the same stimulus. Common issues include hold-time violations, CDC glitches, and analogue/digital boundary problems. Document all errata for future design spins.",
       },
       {
         id: "documentation",
         title: "Documentation & Errata",
         summary: "Document results, known issues, and lessons learned.",
-        content: "Write a silicon validation report covering all test results, characterisation data, and known errata. Document workarounds for any bugs found. Feed lessons back into the design process for the next tape-out. Share findings with the community to help others avoid the same pitfalls.",
+        content:
+          "Write a silicon validation report covering all test results, characterisation data, and known errata. Document workarounds for any bugs found. Feed lessons back into the design process for the next tape-out. Share findings with the community to help others avoid the same pitfalls.",
       },
     ],
   },
@@ -594,30 +643,60 @@ export const technologies = [
     id: "arm-cortex-m0",
     name: "ARM Cortex-M0",
     category: "Processor IP",
-    description: "Ultra-low-power 32-bit processor ideal for education and small designs. Available through the ARM DesignStart programme.",
-    longDescription: "The ARM Cortex-M0 is the smallest and most energy-efficient ARM processor, featuring a 3-stage pipeline and Thumb instruction set. Its minimal gate count makes it ideal for FPGA prototyping and educational SoC designs. Available royalty-free through the ARM DesignStart programme.",
-    features: ["32-bit ARMv6-M architecture", "3-stage pipeline", "Thumb instruction set", "Minimal gate count (~12K gates)", "AMBA AHB-Lite interface", "Available via DesignStart"],
+    description:
+      "Ultra-low-power 32-bit processor ideal for education and small designs. Available through the ARM DesignStart programme.",
+    longDescription:
+      "The ARM Cortex-M0 is the smallest and most energy-efficient ARM processor, featuring a 3-stage pipeline and Thumb instruction set. Its minimal gate count makes it ideal for FPGA prototyping and educational SoC designs. Available royalty-free through the ARM DesignStart programme.",
+    features: [
+      "32-bit ARMv6-M architecture",
+      "3-stage pipeline",
+      "Thumb instruction set",
+      "Minimal gate count (~12K gates)",
+      "AMBA AHB-Lite interface",
+      "Available via DesignStart",
+    ],
     links: [{ label: "ARM DesignStart", url: "https://www.arm.com/resources/designstart" }],
   },
   {
     id: "arm-cortex-m3",
     name: "ARM Cortex-M3",
     category: "Processor IP",
-    description: "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production designs.",
-    longDescription: "The ARM Cortex-M3 brings a richer feature set including hardware multiply/divide, bit-banding, and a Nested Vectored Interrupt Controller (NVIC). Its 3-stage pipeline and Thumb-2 instruction set deliver high code density and performance suitable for production ASIC tapeouts.",
-    features: ["32-bit ARMv7-M architecture", "3-stage pipeline with branch speculation", "Thumb-2 instruction set", "Hardware multiply and divide", "NVIC with up to 240 interrupts", "Memory Protection Unit (MPU)"],
+    description:
+      "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production designs.",
+    longDescription:
+      "The ARM Cortex-M3 brings a richer feature set including hardware multiply/divide, bit-banding, and a Nested Vectored Interrupt Controller (NVIC). Its 3-stage pipeline and Thumb-2 instruction set deliver high code density and performance suitable for production ASIC tapeouts.",
+    features: [
+      "32-bit ARMv7-M architecture",
+      "3-stage pipeline with branch speculation",
+      "Thumb-2 instruction set",
+      "Hardware multiply and divide",
+      "NVIC with up to 240 interrupts",
+      "Memory Protection Unit (MPU)",
+    ],
     links: [{ label: "ARM Cortex-M3 Documentation", url: "https://developer.arm.com/Processors/Cortex-M3" }],
   },
   {
     id: "vivado-quartus",
     name: "Vivado / Quartus",
     category: "FPGA Tools",
-    description: "Industry-standard FPGA development suites from AMD/Xilinx and Intel/Altera for synthesis, simulation, and programming.",
-    longDescription: "Vivado (AMD/Xilinx) and Quartus Prime (Intel/Altera) are the primary FPGA development environments. They provide integrated synthesis, place & route, timing analysis, and on-chip debugging. Both offer free editions suitable for academic use with most common FPGA families.",
-    features: ["RTL synthesis and optimisation", "Place and route", "Static timing analysis", "Integrated logic analyser (ILA/SignalTap)", "IP integrator and block design", "Free academic licences available"],
+    description:
+      "Industry-standard FPGA development suites from AMD/Xilinx and Intel/Altera for synthesis, simulation, and programming.",
+    longDescription:
+      "Vivado (AMD/Xilinx) and Quartus Prime (Intel/Altera) are the primary FPGA development environments. They provide integrated synthesis, place & route, timing analysis, and on-chip debugging. Both offer free editions suitable for academic use with most common FPGA families.",
+    features: [
+      "RTL synthesis and optimisation",
+      "Place and route",
+      "Static timing analysis",
+      "Integrated logic analyser (ILA/SignalTap)",
+      "IP integrator and block design",
+      "Free academic licences available",
+    ],
     links: [
       { label: "AMD Vivado", url: "https://www.xilinx.com/products/design-tools/vivado.html" },
-      { label: "Intel Quartus", url: "https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html" },
+      {
+        label: "Intel Quartus",
+        url: "https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html",
+      },
     ],
   },
   {
@@ -625,8 +704,16 @@ export const technologies = [
     name: "Yosys + OpenROAD",
     category: "Open Source EDA",
     description: "Open-source synthesis and place & route toolchain. Enables fully open ASIC and FPGA flows.",
-    longDescription: "Yosys is an open-source synthesis framework supporting Verilog and SystemVerilog. Combined with OpenROAD for place & route, it enables a fully open-source ASIC flow from RTL to GDSII. Also supports open FPGA flows targeting Lattice iCE40 and ECP5 devices via nextpnr.",
-    features: ["Open-source Verilog synthesis", "ASIC flow via OpenROAD", "FPGA flow via nextpnr", "Technology mapping", "Formal verification via sby", "Active community and development"],
+    longDescription:
+      "Yosys is an open-source synthesis framework supporting Verilog and SystemVerilog. Combined with OpenROAD for place & route, it enables a fully open-source ASIC flow from RTL to GDSII. Also supports open FPGA flows targeting Lattice iCE40 and ECP5 devices via nextpnr.",
+    features: [
+      "Open-source Verilog synthesis",
+      "ASIC flow via OpenROAD",
+      "FPGA flow via nextpnr",
+      "Technology mapping",
+      "Formal verification via sby",
+      "Active community and development",
+    ],
     links: [
       { label: "Yosys GitHub", url: "https://github.com/YosysHQ/yosys" },
       { label: "OpenROAD", url: "https://openroad.readthedocs.io/" },
@@ -636,9 +723,18 @@ export const technologies = [
     id: "cadence-synopsys",
     name: "Cadence / Synopsys",
     category: "ASIC Tools",
-    description: "Commercial EDA tools for synthesis, physical design, and sign-off. Available through academic licensing programmes.",
-    longDescription: "Cadence and Synopsys provide the industry-standard toolchains for ASIC design. From logic synthesis (Genus/Design Compiler) through physical design (Innovus/ICC2) to sign-off (Tempus/PrimeTime), these tools enable production-quality tapeouts. Academic licences are available through university programmes.",
-    features: ["Logic synthesis (Genus / Design Compiler)", "Physical design (Innovus / ICC2)", "Timing sign-off (Tempus / PrimeTime)", "DRC/LVS (Calibre / IC Validator)", "Power analysis (Voltus / PrimePower)", "Academic licensing available"],
+    description:
+      "Commercial EDA tools for synthesis, physical design, and sign-off. Available through academic licensing programmes.",
+    longDescription:
+      "Cadence and Synopsys provide the industry-standard toolchains for ASIC design. From logic synthesis (Genus/Design Compiler) through physical design (Innovus/ICC2) to sign-off (Tempus/PrimeTime), these tools enable production-quality tapeouts. Academic licences are available through university programmes.",
+    features: [
+      "Logic synthesis (Genus / Design Compiler)",
+      "Physical design (Innovus / ICC2)",
+      "Timing sign-off (Tempus / PrimeTime)",
+      "DRC/LVS (Calibre / IC Validator)",
+      "Power analysis (Voltus / PrimePower)",
+      "Academic licensing available",
+    ],
     links: [
       { label: "Cadence Academic", url: "https://www.cadence.com/en_US/home/company/cadence-academic-network.html" },
       { label: "Synopsys University", url: "https://www.synopsys.com/university.html" },
@@ -648,9 +744,18 @@ export const technologies = [
     id: "uvm-cocotb",
     name: "UVM / cocotb",
     category: "Verification",
-    description: "Universal Verification Methodology (SystemVerilog) and cocotb (Python) for comprehensive design verification.",
-    longDescription: "UVM is the industry-standard verification methodology built on SystemVerilog, providing a structured framework for creating reusable testbenches. cocotb offers a Python-based alternative that lowers the barrier to entry while still supporting complex verification scenarios with coroutine-driven test flows.",
-    features: ["UVM: structured verification methodology", "Constrained-random stimulus generation", "Functional coverage collection", "cocotb: Python-based testbenches", "Coroutine-driven test flows", "Works with major simulators"],
+    description:
+      "Universal Verification Methodology (SystemVerilog) and cocotb (Python) for comprehensive design verification.",
+    longDescription:
+      "UVM is the industry-standard verification methodology built on SystemVerilog, providing a structured framework for creating reusable testbenches. cocotb offers a Python-based alternative that lowers the barrier to entry while still supporting complex verification scenarios with coroutine-driven test flows.",
+    features: [
+      "UVM: structured verification methodology",
+      "Constrained-random stimulus generation",
+      "Functional coverage collection",
+      "cocotb: Python-based testbenches",
+      "Coroutine-driven test flows",
+      "Works with major simulators",
+    ],
     links: [
       { label: "UVM Reference", url: "https://www.accellera.org/activities/working-groups/uvm" },
       { label: "cocotb GitHub", url: "https://github.com/cocotb/cocotb" },
@@ -665,19 +770,23 @@ export const partners = [
     name: "ARM",
     type: "industry" as const,
     country: "United Kingdom",
-    description: "Provider of processor IP through the DesignStart programme, enabling academic access to Cortex-M processors.",
-    longDescription: "ARM provides the processor IP at the heart of SoC Labs reference designs. Through the DesignStart programme, academic institutions get royalty-free access to Cortex-M0 and Cortex-M3 cores, complete with documentation, example systems, and development tools.",
+    description:
+      "Provider of processor IP through the DesignStart programme, enabling academic access to Cortex-M processors.",
+    longDescription:
+      "ARM provides the processor IP at the heart of SoC Labs reference designs. Through the DesignStart programme, academic institutions get royalty-free access to Cortex-M0 and Cortex-M3 cores, complete with documentation, example systems, and development tools.",
     url: "https://www.arm.com",
     logo: "/placeholder.svg",
-    coordinates: [-1.2578, 51.7520] as [number, number],
+    coordinates: [-1.2578, 51.752] as [number, number],
   },
   {
     id: "europractice",
     name: "Europractice",
     type: "industry" as const,
     country: "Belgium",
-    description: "ASIC fabrication service providing multi-project wafer (MPW) shuttle access for academic and research institutions.",
-    longDescription: "Europractice provides affordable access to ASIC fabrication for academic institutions across Europe. Their multi-project wafer (MPW) shuttle services allow university research groups to tape out designs in advanced process nodes at a fraction of the cost of a full wafer run.",
+    description:
+      "ASIC fabrication service providing multi-project wafer (MPW) shuttle access for academic and research institutions.",
+    longDescription:
+      "Europractice provides affordable access to ASIC fabrication for academic institutions across Europe. Their multi-project wafer (MPW) shuttle services allow university research groups to tape out designs in advanced process nodes at a fraction of the cost of a full wafer run.",
     url: "https://europractice-ic.com",
     logo: "/placeholder.svg",
     coordinates: [4.7005, 50.8798] as [number, number],
@@ -687,8 +796,10 @@ export const partners = [
     name: "UKRI",
     type: "industry" as const,
     country: "United Kingdom",
-    description: "UK Research and Innovation — funding body supporting research infrastructure and collaborative projects.",
-    longDescription: "UKRI funds research infrastructure and collaborative projects across UK universities. Their support enables SoC Labs to provide shared design resources, training programmes, and access to fabrication services for the UK academic community.",
+    description:
+      "UK Research and Innovation — funding body supporting research infrastructure and collaborative projects.",
+    longDescription:
+      "UKRI funds research infrastructure and collaborative projects across UK universities. Their support enables SoC Labs to provide shared design resources, training programmes, and access to fabrication services for the UK academic community.",
     url: "https://www.ukri.org",
     logo: "/placeholder.svg",
     coordinates: [-0.9628, 51.4543] as [number, number],
@@ -698,8 +809,10 @@ export const partners = [
     name: "IEEE",
     type: "industry" as const,
     country: "United States of America",
-    description: "Professional association supporting standards development and knowledge sharing in electronics and computing.",
-    longDescription: "IEEE supports the SoC Labs community through standards development, conferences, and publication venues. Community members regularly publish in IEEE journals and present at IEEE conferences on topics ranging from processor design to verification methodology.",
+    description:
+      "Professional association supporting standards development and knowledge sharing in electronics and computing.",
+    longDescription:
+      "IEEE supports the SoC Labs community through standards development, conferences, and publication venues. Community members regularly publish in IEEE journals and present at IEEE conferences on topics ranging from processor design to verification methodology.",
     url: "https://www.ieee.org",
     logo: "/placeholder.svg",
     coordinates: [-74.1724, 40.7357] as [number, number],
@@ -709,11 +822,13 @@ export const partners = [
     name: "Google",
     type: "industry" as const,
     country: "United States of America",
-    description: "Supporting open-source silicon initiatives and providing shuttle access through the Google-sponsored OpenMPW programme.",
-    longDescription: "Google sponsors the OpenMPW programme through efabless, providing free ASIC fabrication for open-source designs on the SkyWater 130nm process. This initiative has enabled dozens of academic and hobbyist designs to reach silicon.",
+    description:
+      "Supporting open-source silicon initiatives and providing shuttle access through the Google-sponsored OpenMPW programme.",
+    longDescription:
+      "Google sponsors the OpenMPW programme through efabless, providing free ASIC fabrication for open-source designs on the SkyWater 130nm process. This initiative has enabled dozens of academic and hobbyist designs to reach silicon.",
     url: "https://developers.google.com",
     logo: "/placeholder.svg",
-    coordinates: [-122.0842, 37.4220] as [number, number],
+    coordinates: [-122.0842, 37.422] as [number, number],
   },
   {
     id: "efabless",
@@ -721,7 +836,8 @@ export const partners = [
     type: "industry" as const,
     country: "United States of America",
     description: "Platform for open-source chip design and fabrication, providing access to shuttle programmes.",
-    longDescription: "efabless provides a cloud-based platform for chip design and manages the OpenMPW and chipIgnite shuttle programmes. Their platform streamlines the tapeout process, making ASIC fabrication accessible to individual designers and small research groups.",
+    longDescription:
+      "efabless provides a cloud-based platform for chip design and manages the OpenMPW and chipIgnite shuttle programmes. Their platform streamlines the tapeout process, making ASIC fabrication accessible to individual designers and small research groups.",
     url: "https://efabless.com",
     logo: "/placeholder.svg",
     coordinates: [-97.7431, 30.2672] as [number, number],
@@ -733,7 +849,8 @@ export const partners = [
     type: "academic" as const,
     country: "United Kingdom",
     description: "Leading research in embedded intelligence and hardware-software co-design for edge AI applications.",
-    longDescription: "Imperial College London's Department of Electrical and Electronic Engineering is a world leader in embedded systems and AI hardware research. Their Embedded Intelligence Lab focuses on deploying neural network models onto resource-constrained hardware, contributing key accelerator IP to the SoC Labs ecosystem.",
+    longDescription:
+      "Imperial College London's Department of Electrical and Electronic Engineering is a world leader in embedded systems and AI hardware research. Their Embedded Intelligence Lab focuses on deploying neural network models onto resource-constrained hardware, contributing key accelerator IP to the SoC Labs ecosystem.",
     url: "https://www.imperial.ac.uk",
     logo: "/placeholder.svg",
     coordinates: [-0.1749, 51.4988] as [number, number],
@@ -743,8 +860,10 @@ export const partners = [
     name: "University of Cape Town",
     type: "academic" as const,
     country: "South Africa",
-    description: "Pioneering hardware security research with a focus on lightweight cryptographic implementations for IoT.",
-    longDescription: "The University of Cape Town's hardware security group specialises in lightweight cryptographic implementations for resource-constrained IoT devices. They have successfully taped out multiple ASIC designs through Europractice shuttle services and actively mentor students across Southern Africa.",
+    description:
+      "Pioneering hardware security research with a focus on lightweight cryptographic implementations for IoT.",
+    longDescription:
+      "The University of Cape Town's hardware security group specialises in lightweight cryptographic implementations for resource-constrained IoT devices. They have successfully taped out multiple ASIC designs through Europractice shuttle services and actively mentor students across Southern Africa.",
     url: "https://www.uct.ac.za",
     logo: "/placeholder.svg",
     coordinates: [18.4601, -33.9577] as [number, number],
@@ -755,7 +874,8 @@ export const partners = [
     type: "academic" as const,
     country: "Switzerland",
     description: "World-class research in reconfigurable computing and digital signal processing architectures.",
-    longDescription: "ETH Zürich's Integrated Systems Laboratory conducts cutting-edge research in reconfigurable computing, digital signal processing, and energy-efficient computing. Their work on configurable DSP architectures demonstrates how custom hardware can dramatically improve throughput and energy efficiency.",
+    longDescription:
+      "ETH Zürich's Integrated Systems Laboratory conducts cutting-edge research in reconfigurable computing, digital signal processing, and energy-efficient computing. Their work on configurable DSP architectures demonstrates how custom hardware can dramatically improve throughput and energy efficiency.",
     url: "https://ethz.ch",
     logo: "/placeholder.svg",
     coordinates: [8.5482, 47.3769] as [number, number],
@@ -766,7 +886,8 @@ export const partners = [
     type: "academic" as const,
     country: "Japan",
     description: "Research in heterogeneous multi-ISA architectures and advanced processor design methodologies.",
-    longDescription: "The University of Tokyo's VLSI Design and Education Centre explores heterogeneous multi-ISA computing and advanced processor design. Their research into integrating RISC-V cores alongside ARM processors in SoC Labs platforms opens new paradigms for workload partitioning.",
+    longDescription:
+      "The University of Tokyo's VLSI Design and Education Centre explores heterogeneous multi-ISA computing and advanced processor design. Their research into integrating RISC-V cores alongside ARM processors in SoC Labs platforms opens new paradigms for workload partitioning.",
     url: "https://www.u-tokyo.ac.jp/en/",
     logo: "/placeholder.svg",
     coordinates: [139.7671, 35.6812] as [number, number],
@@ -776,8 +897,10 @@ export const partners = [
     name: "MIT",
     type: "academic" as const,
     country: "United States of America",
-    description: "Energy-efficient circuits research spanning digital and mixed-signal power management for IoT devices.",
-    longDescription: "MIT's Energy-Efficient Circuits group develops adaptive power management techniques for always-on IoT devices. Their work on dynamic voltage and frequency scaling (DVFS) controllers for the EcoSoC platform targets 40-60% energy reduction for typical IoT workloads.",
+    description:
+      "Energy-efficient circuits research spanning digital and mixed-signal power management for IoT devices.",
+    longDescription:
+      "MIT's Energy-Efficient Circuits group develops adaptive power management techniques for always-on IoT devices. Their work on dynamic voltage and frequency scaling (DVFS) controllers for the EcoSoC platform targets 40-60% energy reduction for typical IoT workloads.",
     url: "https://www.mit.edu",
     logo: "/placeholder.svg",
     coordinates: [-71.0942, 42.3601] as [number, number],
@@ -788,7 +911,8 @@ export const partners = [
     type: "academic" as const,
     country: "India",
     description: "Expert research in on-chip communication architectures and SoC integration methodologies.",
-    longDescription: "IIT Bombay's VLSI group focuses on on-chip communication architectures and SoC integration. Their research on high-performance bus interconnects and communication interfaces contributes critical infrastructure IP to the EcoSoC platform.",
+    longDescription:
+      "IIT Bombay's VLSI group focuses on on-chip communication architectures and SoC integration. Their research on high-performance bus interconnects and communication interfaces contributes critical infrastructure IP to the EcoSoC platform.",
     url: "https://www.iitb.ac.in",
     logo: "/placeholder.svg",
     coordinates: [72.8544, 19.0222] as [number, number],
@@ -799,10 +923,11 @@ export const partners = [
     type: "academic" as const,
     country: "Germany",
     description: "Safety-critical hardware design research targeting automotive ISO 26262 compliance.",
-    longDescription: "TU Munich's Chair of Integrated Systems focuses on safety-critical hardware design for automotive applications. Their work on certified safety controllers based on the EcoSoC targets ISO 26262 compliance for autonomous vehicle subsystems.",
+    longDescription:
+      "TU Munich's Chair of Integrated Systems focuses on safety-critical hardware design for automotive applications. Their work on certified safety controllers based on the EcoSoC targets ISO 26262 compliance for autonomous vehicle subsystems.",
     url: "https://www.tum.de/en/",
     logo: "/placeholder.svg",
-    coordinates: [11.5820, 48.1351] as [number, number],
+    coordinates: [11.582, 48.1351] as [number, number],
   },
 ];
 
@@ -891,7 +1016,7 @@ export const communityMembers = [
     institution: "TU Munich",
     organisations: ["tu-munich", "europractice"],
     location: "Munich, Germany",
-    coordinates: [11.5820, 48.1351] as [number, number],
+    coordinates: [11.582, 48.1351] as [number, number],
     projects: ["Safety-Critical Controller"],
     expertise: ["Functional Safety", "Automotive"],
     bio: "Dr. Müller's research at TU Munich focuses on safety-critical hardware design for automotive applications. She is developing a certified safety controller based on the EcoSoC, targeting ISO 26262 compliance for autonomous vehicle subsystems.",
