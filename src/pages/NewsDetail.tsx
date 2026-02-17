@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Layout from "@/components/Layout";
 import { newsArticles } from "@/data/newsData";
-import { communityMembers } from "@/data/mockData";
+import { communityMembers, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 
@@ -47,6 +47,9 @@ const NewsDetail = () => {
   }
 
   const author = communityMembers.find((m) => m.id === article.authorId);
+  const authorOrgs = author?.organisations || [];
+  const institutionOrg = partners.find((p) => authorOrgs.includes(p.id) && p.name === article.institution)
+    || partners.find((p) => authorOrgs.includes(p.id));
 
   return (
     <Layout>
@@ -84,9 +87,18 @@ const NewsDetail = () => {
                   >
                     <User className="h-4 w-4" /> {article.author}
                   </Link>
-                  <span className="flex items-center gap-1.5">
-                    <Building2 className="h-4 w-4" /> {article.institution}
-                  </span>
+                  {institutionOrg ? (
+                    <Link
+                      to={`/partners/${institutionOrg.id}`}
+                      className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                    >
+                      <Building2 className="h-4 w-4" /> {article.institution}
+                    </Link>
+                  ) : (
+                    <span className="flex items-center gap-1.5">
+                      <Building2 className="h-4 w-4" /> {article.institution}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4" />{" "}
                     {new Date(article.date).toLocaleDateString("en-GB", {

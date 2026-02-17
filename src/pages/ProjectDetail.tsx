@@ -149,7 +149,16 @@ const ProjectDetail = () => {
                   ) : (
                     <span className="font-medium text-foreground">{project.author}</span>
                   )}
-                  <span>{project.institution}</span>
+                  {organisations.length > 0 ? (
+                    <Link
+                      to={`/partners/${organisations[0].id}`}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {project.institution}
+                    </Link>
+                  ) : (
+                    <span>{project.institution}</span>
+                  )}
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3.5 w-3.5" />
                     {new Date(project.date).toLocaleDateString("en-GB", {
