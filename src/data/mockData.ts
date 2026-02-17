@@ -88,6 +88,7 @@ export const referenceDesigns = [
       { type: "ASIC", details: "TSMC 65nm (via Europractice)" },
     ],
   },
+  {
     id: "megasoc",
     name: "megaSoC",
     tagline: "Production-ready Cortex-A53 SoC for OS applications",
