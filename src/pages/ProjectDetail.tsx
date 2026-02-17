@@ -8,6 +8,7 @@ import Layout from "@/components/Layout";
 import { communityProjects, communityMembers, referenceDesigns, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
+import MilestoneTracker from "@/components/MilestoneTracker";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -133,6 +134,11 @@ const ProjectDetail = () => {
                   </a>
                 </Button>
               </motion.header>
+
+              {/* Milestone tracker */}
+              {project.phaseProgress && (
+                <MilestoneTracker phaseProgress={project.phaseProgress} />
+              )}
 
               {/* Project image */}
               <motion.div
