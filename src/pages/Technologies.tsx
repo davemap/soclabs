@@ -151,8 +151,11 @@ const Technologies = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Technologies & <span className="text-gradient">Tools</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-4">
               Explore the components, EDA tooling, and infrastructure available to design, verify, and fabricate your SoC.
+            </p>
+            <p className="text-sm text-muted-foreground/80 leading-relaxed max-w-xl mx-auto">
+              Click on any section below to expand it and browse available technologies. Use the <Check className="inline h-3.5 w-3.5 text-primary -mt-0.5" /> button on each card to register your interest — this helps us understand what the community wants to work with.
             </p>
           </motion.div>
 
@@ -424,50 +427,6 @@ const Technologies = () => {
             );
           })}
 
-          {/* FPGA & ASIC Processes */}
-          <div className="grid md:grid-cols-2 gap-8 mt-8">
-            <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
-              <h2 className="text-xl font-display font-bold mb-4">FPGA Prototyping Process</h2>
-              <ol className="space-y-3">
-                {[
-                  "Synthesise your RTL for target FPGA (Xilinx/Intel)",
-                  "Run place & route with timing constraints",
-                  "Generate bitstream and program the FPGA",
-                  "Develop software drivers and test firmware",
-                  "Debug with integrated logic analyser (ILA/SignalTap)",
-                  "Benchmark performance on real hardware",
-                ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="text-primary font-display font-bold text-xs mt-0.5">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
-              <h2 className="text-xl font-display font-bold mb-4">ASIC Tapeout Process</h2>
-              <ol className="space-y-3">
-                {[
-                  "Complete RTL verification and freeze design",
-                  "Run logic synthesis targeting standard cell library",
-                  "Physical design: floorplanning, placement, routing",
-                  "Sign-off checks: DRC, LVS, timing closure",
-                  "Submit to shuttle service (Europractice, OpenMPW)",
-                  "Receive packaged chips and run post-silicon validation",
-                ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                    <span className="text-coral font-display font-bold text-xs mt-0.5">
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
             </div>
 
             {/* Sticky sidebar */}
