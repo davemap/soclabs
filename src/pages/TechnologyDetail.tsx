@@ -98,7 +98,10 @@ const TechnologyDetail = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto mb-12"
           >
-            <Badge variant="outline" className="mb-4">{tech.category}</Badge>
+            <div className="flex items-center gap-2 mb-4">
+              <Badge variant="outline">{(tech as any).group}</Badge>
+              <Badge variant="outline" className="text-muted-foreground">{tech.category}</Badge>
+            </div>
             <div className="flex items-start justify-between gap-6 mb-4">
               <h1 className="text-4xl md:text-5xl font-display font-bold">{tech.name}</h1>
               <RegisterInterestBox name={tech.name} />

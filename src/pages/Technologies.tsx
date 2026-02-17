@@ -6,18 +6,59 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { technologies } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const categories = [...new Set(technologies.map((t) => t.category))];
+// Build the tree: group → subcategory → technologies
+const groups = [
+  { key: "Components", label: "Components", icon: Cpu, description: "IP blocks that make up your SoC" },
+  { key: "EDA Tooling", label: "EDA Tooling", icon: Wrench, description: "Tools for each stage of the design flow" },
+  { key: "Infrastructure", label: "Infrastructure", icon: Server, description: "Boards, services, and fabrication" },
+];
 
-const categoryColors: Record<string, string> = {
-  "Processor IP": "bg-primary/10 text-primary",
-  "FPGA Tools": "bg-coral/10 text-coral",
-  "Open Source EDA": "bg-violet/10 text-violet",
-  "ASIC Tools": "bg-amber/10 text-amber",
-  "Verification": "bg-primary/10 text-primary",
+const edaPhaseOrder = [
+  "RTL Design",
+  "Verification",
+  "Synthesis",
+  "Physical Design",
+  "Tapeout",
+  "Silicon Validation",
+];
+
+const subcategoryColors: Record<string, string> = {
+  Processors: "bg-primary/10 text-primary",
+  "System Interconnects": "bg-violet/10 text-violet",
+  Peripherals: "bg-coral/10 text-coral",
+  "Memory Controllers": "bg-amber/10 text-amber",
+  "Hardware Acceleration": "bg-emerald-500/10 text-emerald-500",
+  "RTL Design": "bg-primary/10 text-primary",
+  Verification: "bg-coral/10 text-coral",
+  Synthesis: "bg-violet/10 text-violet",
+  "Physical Design": "bg-amber/10 text-amber",
+  Tapeout: "bg-emerald-500/10 text-emerald-500",
+  "Silicon Validation": "bg-sky-500/10 text-sky-500",
+  "FPGA Boards": "bg-primary/10 text-primary",
+  "Shuttle Services": "bg-coral/10 text-coral",
 };
+
+const groupColors: Record<string, string> = {
+  Components: "border-primary/30",
+  "EDA Tooling": "border-violet/30",
+  Infrastructure: "border-coral/30",
+};
+
+function getSubcategories(groupKey: string) {
+  const techs = technologies.filter((t) => (t as any).group === groupKey);
+  const cats = [...new Set(techs.map((t) => t.category))];
+  if (groupKey === "EDA Tooling") {
+    return cats.sort((a, b) => {
+      const ai = edaPhaseOrder.indexOf(a);
+      const bi = edaPhaseOrder.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+  }
+  return cats;
+}
 
 const Technologies = () => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
@@ -39,60 +80,115 @@ const Technologies = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto text-center mb-16"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">Technologies & <span className="text-gradient">Tools</span></h1>
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
+              Technologies & <span className="text-gradient">Tools</span>
+            </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              An overview of the platforms, tools, and IP available to design, verify, and fabricate your SoC. Select the technologies that interest you.
+              Explore the components, EDA tooling, and infrastructure available to design, verify, and fabricate your SoC.
             </p>
           </motion.div>
 
-          {categories.map((cat, ci) => (
-            <ScrollReveal key={cat} delay={ci * 0.08} className="max-w-4xl mx-auto mb-12">
-              <div className="flex items-center gap-2 mb-4">
-                <span className={`text-xs px-3 py-1 rounded-full font-semibold ${categoryColors[cat] || "bg-muted text-muted-foreground"}`}>{cat}</span>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                {technologies
-                  .filter((t) => t.category === cat)
-                  .map((tech, i) => {
-                    const isSelected = selectedTechs.includes(tech.name);
-                    return (
-                      <ScrollReveal key={tech.name} delay={i * 0.06}>
-                        <div className="relative">
-                          <Link to={`/technologies/${tech.id}`}>
-                            <Card className={cn(
-                              "hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
-                              isSelected
-                                ? "border-primary/40 shadow-md shadow-primary/10 bg-primary/[0.02]"
-                                : "border-border/60"
-                            )}>
-                              <CardContent className="p-5 pr-14">
-                                <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{tech.description}</p>
-                              </CardContent>
-                            </Card>
-                          </Link>
-                          <button
-                            onClick={() => toggleTech(tech.name)}
-                            className={cn(
-                              "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
-                              isSelected
-                                ? "border-primary bg-primary text-primary-foreground"
-                                : "border-border/60 hover:border-primary/50"
+          {/* Group tabs */}
+          {groups.map((group, gi) => {
+            const Icon = group.icon;
+            const subcats = getSubcategories(group.key);
+
+            return (
+              <ScrollReveal key={group.key} delay={gi * 0.1} className="max-w-5xl mx-auto mb-16">
+                {/* Group header */}
+                <div className={cn("rounded-2xl border bg-card/50 p-6 md:p-8", groupColors[group.key])}>
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-display font-bold">{group.label}</h2>
+                      <p className="text-sm text-muted-foreground">{group.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Subcategories */}
+                  <div className="mt-6 space-y-8">
+                    {subcats.map((subcat, sci) => {
+                      const techsInSubcat = technologies.filter(
+                        (t) => (t as any).group === group.key && t.category === subcat
+                      );
+
+                      return (
+                        <div key={subcat}>
+                          <div className="flex items-center gap-2 mb-3 ml-1">
+                            <div className="w-1 h-5 rounded-full bg-primary/30" />
+                            <span
+                              className={cn(
+                                "text-xs px-3 py-1 rounded-full font-semibold",
+                                subcategoryColors[subcat] || "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              {subcat}
+                            </span>
+                            {group.key === "EDA Tooling" && (
+                              <Link
+                                to={`/learn`}
+                                className="text-[10px] text-muted-foreground hover:text-primary transition-colors ml-1"
+                              >
+                                → Learning Hub
+                              </Link>
                             )}
-                            title={isSelected ? "Interest registered" : `Register interest in ${tech.name}`}
-                          >
-                            {isSelected && <Check className="h-3.5 w-3.5" />}
-                          </button>
+                          </div>
+
+                          <div className="grid md:grid-cols-2 gap-3">
+                            {techsInSubcat.map((tech, i) => {
+                              const isSelected = selectedTechs.includes(tech.name);
+                              return (
+                                <div key={tech.id} className="relative">
+                                  <Link to={`/technologies/${tech.id}`}>
+                                    <Card
+                                      className={cn(
+                                        "hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+                                        isSelected
+                                          ? "border-primary/40 shadow-md shadow-primary/10 bg-primary/[0.02]"
+                                          : "border-border/60"
+                                      )}
+                                    >
+                                      <CardContent className="p-5 pr-14">
+                                        <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
+                                        <p className="text-sm text-muted-foreground leading-relaxed">
+                                          {tech.description}
+                                        </p>
+                                      </CardContent>
+                                    </Card>
+                                  </Link>
+                                  <button
+                                    onClick={() => toggleTech(tech.name)}
+                                    className={cn(
+                                      "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
+                                      isSelected
+                                        ? "border-primary bg-primary text-primary-foreground"
+                                        : "border-border/60 hover:border-primary/50"
+                                    )}
+                                    title={
+                                      isSelected
+                                        ? "Interest registered"
+                                        : `Register interest in ${tech.name}`
+                                    }
+                                  >
+                                    {isSelected && <Check className="h-3.5 w-3.5" />}
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </ScrollReveal>
-                    );
-                  })}
-              </div>
-            </ScrollReveal>
-          ))}
+                      );
+                    })}
+                  </div>
+                </div>
+              </ScrollReveal>
+            );
+          })}
 
           {/* FPGA & ASIC Processes */}
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mt-16">
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mt-8">
             <ScrollReveal direction="left">
               <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
                 <h2 className="text-xl font-display font-bold mb-4">FPGA Prototyping Process</h2>
@@ -106,7 +202,9 @@ const Technologies = () => {
                     "Benchmark performance on real hardware",
                   ].map((step, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="text-primary font-display font-bold text-xs mt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="text-primary font-display font-bold text-xs mt-0.5">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       {step}
                     </li>
                   ))}
@@ -127,7 +225,9 @@ const Technologies = () => {
                     "Receive packaged chips and run post-silicon validation",
                   ].map((step, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="text-coral font-display font-bold text-xs mt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="text-coral font-display font-bold text-xs mt-0.5">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
                       {step}
                     </li>
                   ))}
@@ -138,7 +238,7 @@ const Technologies = () => {
         </div>
       </section>
 
-      {/* Floating CTA for selected technologies */}
+      {/* Floating CTA */}
       <AnimatePresence>
         {selectedCount > 0 && (
           <motion.div
