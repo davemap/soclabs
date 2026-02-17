@@ -171,6 +171,15 @@ export const communityProjects = [
     phaseProgress: { architecture: 100, rtl: 100, verification: 100, synthesis: 100, fpga: 80, asic: 0, "silicon-validation": 0 },
     phaseEffort: { architecture: 3, rtl: 4, verification: 4, synthesis: 3, fpga: 3, asic: 5, "silicon-validation": 4 },
     phaseUncertainty: { architecture: 2, rtl: 3, verification: 3, synthesis: 2, fpga: 3, asic: 4, "silicon-validation": 5 },
+    phaseDates: {
+      architecture: { startDate: "2025-03-01", projectedEndDate: "2025-04-20", completedDate: "2025-04-25" },
+      rtl: { startDate: "2025-04-25", projectedEndDate: "2025-07-20", completedDate: "2025-07-18" },
+      verification: { startDate: "2025-07-01", projectedEndDate: "2025-09-15", completedDate: "2025-09-12" },
+      synthesis: { startDate: "2025-09-15", projectedEndDate: "2025-10-30", completedDate: "2025-10-28" },
+      fpga: { startDate: "2025-10-28", projectedEndDate: "2025-12-15" },
+      asic: { startDate: "2026-01-15", projectedEndDate: "2026-06-01" },
+      "silicon-validation": { startDate: "2026-06-01", projectedEndDate: "2026-09-01" },
+    },
     milestones: [
       { phase: "architecture", task: "Define system partitioning", done: true, effort: 3, uncertainty: 2, startDate: "2025-03-01", projectedEndDate: "2025-03-20", completedDate: "2025-03-18", assigneeId: "sarah-chen", blurb: "Break the system into processor, accelerator, and peripheral subsystems. Define interfaces and data flow between partitions." },
       { phase: "architecture", task: "Select bus architecture (AHB-Lite)", done: true, effort: 2, uncertainty: 1, startDate: "2025-03-10", projectedEndDate: "2025-03-25", completedDate: "2025-03-22", assigneeId: "sarah-chen", blurb: "Evaluate AHB-Lite vs AXI for the extension port. AHB-Lite chosen for simplicity given single-master topology." },
@@ -216,6 +225,15 @@ export const communityProjects = [
     phaseProgress: { architecture: 100, rtl: 100, verification: 100, synthesis: 100, fpga: 100, asic: 75, "silicon-validation": 0 },
     phaseEffort: { architecture: 4, rtl: 5, verification: 3, synthesis: 4, fpga: 3, asic: 5, "silicon-validation": 4 },
     phaseUncertainty: { architecture: 2, rtl: 2, verification: 1, synthesis: 3, fpga: 2, asic: 3, "silicon-validation": 5 },
+    phaseDates: {
+      architecture: { startDate: "2025-01-10", projectedEndDate: "2025-02-20", completedDate: "2025-02-18" },
+      rtl: { startDate: "2025-02-15", projectedEndDate: "2025-05-10", completedDate: "2025-05-08" },
+      verification: { startDate: "2025-05-05", projectedEndDate: "2025-06-15", completedDate: "2025-06-12" },
+      synthesis: { startDate: "2025-06-10", projectedEndDate: "2025-07-25", completedDate: "2025-07-22" },
+      fpga: { startDate: "2025-07-20", projectedEndDate: "2025-08-15", completedDate: "2025-08-10" },
+      asic: { startDate: "2025-08-10", projectedEndDate: "2025-10-30" },
+      "silicon-validation": { startDate: "2026-03-01", projectedEndDate: "2026-06-01" },
+    },
     milestones: [
       { phase: "architecture", task: "Define crypto engine spec", done: true, effort: 3, uncertainty: 2, startDate: "2025-01-10", projectedEndDate: "2025-02-01", completedDate: "2025-01-28", assigneeId: "james-okonkwo", blurb: "Write detailed specification for AES and SHA-256 engines including key sizes, modes, and throughput targets." },
       { phase: "architecture", task: "Plan shared datapath", done: true, effort: 4, uncertainty: 3, startDate: "2025-01-25", projectedEndDate: "2025-02-20", completedDate: "2025-02-18", assigneeId: "james-okonkwo", blurb: "Design time-division multiplexed datapath shared between AES and SHA-256 to minimise area." },
@@ -258,6 +276,12 @@ export const communityProjects = [
     phaseProgress: { architecture: 100, rtl: 80, verification: 50, synthesis: 0, fpga: 30, asic: 0, "silicon-validation": 0 },
     phaseEffort: { architecture: 3, rtl: 4, verification: 4, synthesis: 3, fpga: 3, asic: 0, "silicon-validation": 0 },
     phaseUncertainty: { architecture: 2, rtl: 2, verification: 3, synthesis: 0, fpga: 3, asic: 0, "silicon-validation": 0 },
+    phaseDates: {
+      architecture: { startDate: "2025-02-01", projectedEndDate: "2025-03-10", completedDate: "2025-03-08" },
+      rtl: { startDate: "2025-03-05", projectedEndDate: "2025-05-25" },
+      verification: { startDate: "2025-04-15", projectedEndDate: "2025-06-20" },
+      fpga: { startDate: "2025-05-01", projectedEndDate: "2025-07-15" },
+    },
     milestones: [
       { phase: "architecture", task: "Define filter bank architecture", done: true, effort: 3, uncertainty: 2, startDate: "2025-02-01", projectedEndDate: "2025-02-25", completedDate: "2025-02-22", assigneeId: "maria-gonzalez", blurb: "Specify filter topology, channel count, and MAC sharing strategy for area-efficient implementation." },
       { phase: "architecture", task: "Specify channel sequencer", done: true, effort: 2, uncertainty: 2, startDate: "2025-02-20", projectedEndDate: "2025-03-10", completedDate: "2025-03-08", assigneeId: "maria-gonzalez", blurb: "Design round-robin scheduling for 8 channels with deterministic latency guarantees." },
@@ -292,6 +316,12 @@ export const communityProjects = [
     phaseProgress: { architecture: 100, rtl: 70, verification: 40, synthesis: 0, fpga: 20, asic: 0, "silicon-validation": 0 },
     phaseEffort: { architecture: 4, rtl: 4, verification: 3, synthesis: 0, fpga: 3, asic: 0, "silicon-validation": 0 },
     phaseUncertainty: { architecture: 4, rtl: 3, verification: 4, synthesis: 0, fpga: 4, asic: 0, "silicon-validation": 0 },
+    phaseDates: {
+      architecture: { startDate: "2025-05-01", projectedEndDate: "2025-06-20", completedDate: "2025-06-18" },
+      rtl: { startDate: "2025-06-15", projectedEndDate: "2025-09-10" },
+      verification: { startDate: "2025-08-01", projectedEndDate: "2025-10-15" },
+      fpga: { startDate: "2025-09-01", projectedEndDate: "2025-11-30" },
+    },
     milestones: [
       { phase: "architecture", task: "Define dual-core architecture", done: true, effort: 4, uncertainty: 4, startDate: "2025-05-01", projectedEndDate: "2025-06-01", completedDate: "2025-05-28", assigneeId: "kenji-tanaka", blurb: "Design heterogeneous dual-core topology with shared memory and independent reset/clock domains." },
       { phase: "architecture", task: "Design bus arbitration scheme", done: true, effort: 3, uncertainty: 3, startDate: "2025-05-25", projectedEndDate: "2025-06-20", completedDate: "2025-06-18", assigneeId: "kenji-tanaka", blurb: "Round-robin arbiter with priority override for the AHB-Lite bus supporting both cores." },
@@ -327,6 +357,12 @@ export const communityProjects = [
     phaseProgress: { architecture: 60, rtl: 0, verification: 0, synthesis: 0, fpga: 0, asic: 0, "silicon-validation": 0 },
     phaseEffort: { architecture: 3, rtl: 4, verification: 3, synthesis: 3, fpga: 0, asic: 4, "silicon-validation": 0 },
     phaseUncertainty: { architecture: 3, rtl: 3, verification: 3, synthesis: 2, fpga: 0, asic: 3, "silicon-validation": 0 },
+    phaseDates: {
+      architecture: { startDate: "2025-11-01", projectedEndDate: "2026-02-10" },
+      rtl: { startDate: "2026-02-15", projectedEndDate: "2026-05-15" },
+      verification: { startDate: "2026-05-01", projectedEndDate: "2026-07-01" },
+      asic: { startDate: "2026-07-01", projectedEndDate: "2026-09-01" },
+    },
     milestones: [
       { phase: "architecture", task: "Write PMU specification", done: true, effort: 3, uncertainty: 3, startDate: "2025-11-01", projectedEndDate: "2025-12-01", completedDate: "2025-11-28", assigneeId: "emily-watson", blurb: "Document DVFS operating points, activity counter interfaces, and power domain structure." },
       { phase: "architecture", task: "Define DVFS operating points", done: false, effort: 3, uncertainty: 4, startDate: "2025-12-01", projectedEndDate: "2026-01-15", assigneeId: "emily-watson", blurb: "Characterise voltage-frequency pairs for EcoSoC and define lookup table entries for the policy engine." },
