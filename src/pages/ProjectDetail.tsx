@@ -111,14 +111,14 @@ const ProjectDetail = () => {
                   </span>
                 </div>
 
+                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+                  {project.description}
+                </p>
+
                 {/* Milestone tracker */}
                 {project.phaseProgress && (
                   <MilestoneTracker phaseProgress={project.phaseProgress} />
                 )}
-
-                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  {project.description}
-                </p>
 
                 <div className="flex flex-wrap gap-1.5 mb-6">
                   {project.tags.map((tag) => (
