@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, Plus, X, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ interface AddMilestoneTaskDialogProps {
   phaseLabel: string;
   collaborators: Collaborator[];
   onSubmit: (data: MilestoneTaskFormData) => void;
+  initialData?: MilestoneTaskFormData | null;
 }
 
 const AddMilestoneTaskDialog = ({
@@ -45,6 +46,7 @@ const AddMilestoneTaskDialog = ({
   phaseLabel,
   collaborators,
   onSubmit,
+  initialData,
 }: AddMilestoneTaskDialogProps) => {
   const [task, setTask] = useState("");
   const [blurb, setBlurb] = useState("");
@@ -52,6 +54,29 @@ const AddMilestoneTaskDialog = ({
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  // Pre-fill when dialog opens
+  const prevOpenRef = useRef(false);
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      if (initialData) {
+        setTask(initialData.task || "");
+        setBlurb(initialData.blurb || "");
+        setAssigneeId(initialData.assignee_id || "");
+        setStartDate(initialData.start_date ? new Date(initialData.start_date) : undefined);
+        setEndDate(initialData.projected_end_date ? new Date(initialData.projected_end_date) : undefined);
+        setSelectedTopics(initialData.learning_topic_ids || []);
+      } else {
+        setTask("");
+        setBlurb("");
+        setAssigneeId("");
+        setStartDate(undefined);
+        setEndDate(undefined);
+        setSelectedTopics([]);
+      }
+    }
+    prevOpenRef.current = open;
+  }, [open, initialData]);
 
   const resetForm = () => {
     setTask("");

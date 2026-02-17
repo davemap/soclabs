@@ -252,6 +252,7 @@ const ProjectDetail = () => {
   const [editMilestones, setEditMilestones] = useState<{ id?: string; phase: string; task: string; done: boolean; sort_order: number; blurb?: string; assignee_id?: string | null; start_date?: string | null; projected_end_date?: string | null; learning_topic_ids?: string[] }[]>([]);
   const [savingMilestones, setSavingMilestones] = useState(false);
   const [addTaskDialogPhase, setAddTaskDialogPhase] = useState<string | null>(null);
+  const [editTaskIndex, setEditTaskIndex] = useState<number | null>(null);
   const [projectCollaborators, setProjectCollaborators] = useState<{ user_id: string; full_name: string | null; username: string | null }[]>([]);
 
   // Complete task/phase dialog state
@@ -348,23 +349,46 @@ const ProjectDetail = () => {
   }, [editMode, dbMilestones]);
 
   const handleEditMilestoneAdd = (phase: string) => {
+    setEditTaskIndex(null);
     setAddTaskDialogPhase(phase);
+  };
+
+  const handleEditExistingTask = (index: number) => {
+    const m = editMilestones[index];
+    if (!m) return;
+    setEditTaskIndex(index);
+    setAddTaskDialogPhase(m.phase);
   };
 
   const handleDialogSubmit = (data: any) => {
     if (!addTaskDialogPhase) return;
-    setEditMilestones(prev => [...prev, {
-      phase: addTaskDialogPhase,
-      task: data.task,
-      done: false,
-      sort_order: prev.length,
-      blurb: data.blurb,
-      assignee_id: data.assignee_id === "unassigned" ? null : data.assignee_id,
-      start_date: data.start_date,
-      projected_end_date: data.projected_end_date,
-      learning_topic_ids: data.learning_topic_ids,
-    }]);
+    if (editTaskIndex !== null) {
+      // Update existing task
+      setEditMilestones(prev => prev.map((m, i) => i === editTaskIndex ? {
+        ...m,
+        task: data.task,
+        blurb: data.blurb,
+        assignee_id: data.assignee_id === "unassigned" ? null : data.assignee_id,
+        start_date: data.start_date,
+        projected_end_date: data.projected_end_date,
+        learning_topic_ids: data.learning_topic_ids,
+      } : m));
+    } else {
+      // Add new task
+      setEditMilestones(prev => [...prev, {
+        phase: addTaskDialogPhase,
+        task: data.task,
+        done: false,
+        sort_order: prev.length,
+        blurb: data.blurb,
+        assignee_id: data.assignee_id === "unassigned" ? null : data.assignee_id,
+        start_date: data.start_date,
+        projected_end_date: data.projected_end_date,
+        learning_topic_ids: data.learning_topic_ids,
+      }]);
+    }
     setAddTaskDialogPhase(null);
+    setEditTaskIndex(null);
   };
 
   const handleEditMilestoneRemove = async (index: number) => {
@@ -865,11 +889,12 @@ const ProjectDetail = () => {
                 isOwner={isOwner}
                 onCompleteTask={handleCompleteTask}
                 onCompletePhase={handleCompletePhase}
+                onEditTask={handleEditExistingTask}
               />
               {addTaskDialogPhase && (
                 <AddMilestoneTaskDialog
                   open={!!addTaskDialogPhase}
-                  onOpenChange={(v) => { if (!v) setAddTaskDialogPhase(null); }}
+                  onOpenChange={(v) => { if (!v) { setAddTaskDialogPhase(null); setEditTaskIndex(null); } }}
                   phase={addTaskDialogPhase}
                   phaseLabel={{
                     architecture: "Architecture", rtl: "RTL Design", verification: "Verification",
@@ -878,6 +903,14 @@ const ProjectDetail = () => {
                   }[addTaskDialogPhase] || addTaskDialogPhase}
                   collaborators={projectCollaborators}
                   onSubmit={handleDialogSubmit}
+                  initialData={editTaskIndex !== null ? {
+                    task: editMilestones[editTaskIndex]?.task || "",
+                    blurb: editMilestones[editTaskIndex]?.blurb || "",
+                    assignee_id: editMilestones[editTaskIndex]?.assignee_id || null,
+                    start_date: editMilestones[editTaskIndex]?.start_date || null,
+                    projected_end_date: editMilestones[editTaskIndex]?.projected_end_date || null,
+                    learning_topic_ids: editMilestones[editTaskIndex]?.learning_topic_ids || [],
+                  } : null}
                 />
               )}
               <CompleteTaskDialog
