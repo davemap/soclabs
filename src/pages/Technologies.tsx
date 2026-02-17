@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import { technologies } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 // Build the tree: group → subcategory → technologies
 const groups = [
@@ -63,6 +65,10 @@ const Technologies = () => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
+  const [proposalOpen, setProposalOpen] = useState(false);
+  const [proposalName, setProposalName] = useState("");
+  const [proposalGroup, setProposalGroup] = useState("Components");
+  const [proposalDescription, setProposalDescription] = useState("");
 
   const toggleTech = (name: string) => {
     setSelectedTechs((prev) =>
@@ -86,6 +92,14 @@ const Technologies = () => {
     });
   };
 
+  const handlePropose = () => {
+    if (!proposalName.trim()) return;
+    toast.success("Technology proposed!", { description: `"${proposalName}" has been submitted for review.` });
+    setProposalName("");
+    setProposalDescription("");
+    setProposalOpen(false);
+  };
+
   const selectedCount = selectedTechs.length;
 
   return (
@@ -105,6 +119,9 @@ const Technologies = () => {
             </p>
           </motion.div>
 
+          <div className="max-w-6xl mx-auto flex gap-8">
+            {/* Main content */}
+            <div className="flex-1 min-w-0">
           {/* Groups */}
           {groups.map((group, gi) => {
             const Icon = group.icon;
@@ -118,7 +135,7 @@ const Technologies = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: gi * 0.1 }}
-                className="max-w-5xl mx-auto mb-8"
+                className="mb-8"
               >
                 <div className={cn("rounded-2xl border bg-card/50 overflow-hidden", groupColors[group.key])}>
                   {/* Group header — clickable */}
@@ -266,7 +283,7 @@ const Technologies = () => {
           })}
 
           {/* FPGA & ASIC Processes */}
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mt-8">
+          <div className="grid md:grid-cols-2 gap-8 mt-8">
             <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
               <h2 className="text-xl font-display font-bold mb-4">FPGA Prototyping Process</h2>
               <ol className="space-y-3">
@@ -308,6 +325,114 @@ const Technologies = () => {
                 ))}
               </ol>
             </div>
+          </div>
+            </div>
+
+            {/* Sticky sidebar */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-24 space-y-4">
+                {/* Propose new technology card */}
+                <div className="rounded-xl border border-border/60 bg-card p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Lightbulb className="h-4 w-4 text-primary" />
+                    </div>
+                    <h3 className="font-display font-bold text-sm">Propose a Technology</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Can't find a tool or IP block? Suggest it for the community catalogue.
+                  </p>
+
+                  <AnimatePresence>
+                    {proposalOpen ? (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden space-y-3"
+                      >
+                        <Input
+                          placeholder="Technology name"
+                          value={proposalName}
+                          onChange={(e) => setProposalName(e.target.value)}
+                          className="text-sm h-9"
+                        />
+                        <div className="flex gap-1.5 flex-wrap">
+                          {["Components", "EDA Tooling", "Infrastructure"].map((g) => (
+                            <button
+                              key={g}
+                              onClick={() => setProposalGroup(g)}
+                              className={cn(
+                                "text-[10px] px-2.5 py-1 rounded-full border font-medium transition-all",
+                                proposalGroup === g
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+                              )}
+                            >
+                              {g}
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          placeholder="Brief description (optional)"
+                          value={proposalDescription}
+                          onChange={(e) => setProposalDescription(e.target.value)}
+                          className="w-full text-sm rounded-lg border border-border/60 bg-background p-2.5 h-20 resize-none placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="flex-1 rounded-full text-xs" onClick={handlePropose} disabled={!proposalName.trim()}>
+                            <Send className="h-3 w-3 mr-1.5" /> Submit
+                          </Button>
+                          <Button size="sm" variant="ghost" className="rounded-full text-xs" onClick={() => setProposalOpen(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full rounded-full text-xs"
+                        onClick={() => setProposalOpen(true)}
+                      >
+                        <Plus className="h-3.5 w-3.5 mr-1.5" /> Propose New Technology
+                      </Button>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Selected technologies summary */}
+                {selectedCount > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border border-primary/20 bg-primary/5 p-5"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-display font-bold text-sm">Your Technologies</h3>
+                      <span className="text-xs text-primary font-semibold">{selectedCount}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {selectedTechs.map((name) => (
+                        <button
+                          key={name}
+                          onClick={() => toggleTech(name)}
+                          className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                        >
+                          {name}
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      ))}
+                    </div>
+                    <Button asChild size="sm" className="w-full rounded-full text-xs">
+                      <Link to="/about#join">
+                        Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </motion.div>
+                )}
+              </div>
+            </aside>
           </div>
         </div>
       </section>
