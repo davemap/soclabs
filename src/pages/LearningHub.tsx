@@ -1,75 +1,32 @@
-import { useState, useRef, useCallback } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, ChevronDown, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import { learningPhases, LearningPhase, LearningTopic } from "@/data/mockData";
+import { learningPhases, LearningPhase } from "@/data/mockData";
 
 const iconMap: Record<string, React.ElementType> = {
   FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
 };
 
-const TopicCard = ({ topic, isActive, onClick }: { topic: LearningTopic; isActive: boolean; onClick: () => void }) => (
-  <div id={topic.id} className="scroll-mt-24">
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full text-left rounded-xl border transition-all duration-300 p-4 group",
-        isActive
-          ? "border-primary/40 bg-primary/5 shadow-sm"
-          : "border-border/40 bg-card/50 hover:border-border hover:bg-card"
-      )}
-    >
-      <div className="flex items-start gap-3">
-        <div className={cn(
-          "mt-0.5 transition-transform duration-200",
-          isActive && "rotate-90"
-        )}>
-          <ChevronRight className="h-4 w-4 text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h4 className="font-display font-semibold text-sm mb-1">{topic.title}</h4>
-          <p className="text-xs text-muted-foreground leading-relaxed">{topic.summary}</p>
-        </div>
-      </div>
-    </button>
-    <AnimatePresence>
-      {isActive && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="overflow-hidden"
-        >
-          <div className="pl-11 pr-4 py-4 text-sm text-muted-foreground leading-relaxed">
-            {topic.content}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
-);
-
 const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
-  const [activeTopic, setActiveTopic] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(true);
   const Icon = iconMap[phase.icon] || Cpu;
-
-  const toggleTopic = useCallback((topicId: string) => {
-    setActiveTopic((prev) => (prev === topicId ? null : topicId));
-  }, []);
 
   return (
     <motion.div
-      key={phase.id}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       <div className="rounded-2xl border border-primary/30 bg-card shadow-md">
         {/* Phase header */}
-        <div className="p-6 md:p-7 flex items-center gap-4">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full p-6 md:p-7 flex items-center gap-4 text-left"
+        >
           <div className="p-3 rounded-xl bg-primary/15">
             <Icon className="h-5 w-5 text-primary" />
           </div>
@@ -80,45 +37,50 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
             </div>
             <h2 className="text-xl font-display font-bold">{phase.title}</h2>
           </div>
-        </div>
+          <ChevronDown className={cn("h-5 w-5 text-muted-foreground transition-transform duration-200", expanded && "rotate-180")} />
+        </button>
 
-        {/* Phase content */}
-        <div className="px-6 md:px-7 pb-6 md:pb-7">
-          <p className="text-sm text-muted-foreground leading-relaxed mb-6">{phase.description}</p>
+        {/* Phase content - topic tree */}
+        <AnimatePresence>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="px-6 md:px-7 pb-6 md:pb-7">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5">{phase.description}</p>
 
-          {/* Quick nav */}
-          <div className="flex flex-wrap gap-2 mb-6">
-            {phase.topics.map((topic) => (
-              <button
-                key={topic.id}
-                onClick={() => {
-                  setActiveTopic(topic.id);
-                  document.getElementById(topic.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
-                }}
-                className={cn(
-                  "text-xs px-3 py-1.5 rounded-full border transition-all",
-                  activeTopic === topic.id
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border"
-                )}
-              >
-                {topic.title}
-              </button>
-            ))}
-          </div>
+                {/* Topic tree */}
+                <div className="relative pl-4 border-l-2 border-primary/20 space-y-1">
+                  {phase.topics.map((topic, i) => (
+                    <Link
+                      key={topic.id}
+                      to={`/learn/${phase.id}/${topic.id}`}
+                      className="group flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-all relative"
+                    >
+                      {/* Branch connector */}
+                      <div className="absolute -left-[calc(1rem+1px)] top-1/2 w-4 h-px bg-primary/20" />
+                      <div className="absolute -left-[calc(1rem+3px)] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-primary/40 bg-background group-hover:border-primary group-hover:bg-primary/20 transition-colors" />
 
-          {/* Topic cards */}
-          <div className="space-y-3">
-            {phase.topics.map((topic) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                isActive={activeTopic === topic.id}
-                onClick={() => toggleTopic(topic.id)}
-              />
-            ))}
-          </div>
-        </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors">
+                          {topic.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+                          {topic.summary}
+                        </div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary mt-0.5 shrink-0 transition-colors" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -148,7 +110,7 @@ const LearningHub = () => {
             </p>
           </motion.div>
 
-          {/* Progress stepper with left/right arrows */}
+          {/* Progress stepper */}
           <ScrollReveal className="max-w-4xl mx-auto mb-12">
             <div className="flex items-center gap-2">
               <button
@@ -166,9 +128,7 @@ const LearningHub = () => {
 
               <div className="flex-1 relative">
                 <div className="flex items-center justify-between relative">
-                  {/* Track background */}
                   <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
-                  {/* Active track */}
                   <div
                     className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
                     style={{ width: `${(activePhase / (learningPhases.length - 1)) * 100}%` }}
@@ -218,7 +178,7 @@ const LearningHub = () => {
             </div>
           </ScrollReveal>
 
-          {/* Active phase */}
+          {/* Active phase with topic tree */}
           <div className="max-w-3xl mx-auto">
             <PhaseSection phase={learningPhases[activePhase]} index={activePhase} />
           </div>
