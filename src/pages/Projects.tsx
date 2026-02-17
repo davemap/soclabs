@@ -156,20 +156,9 @@ const Projects = () => {
                                   const total = phaseMilestones.length;
                                   const doneCount = phaseMilestones.filter((m) => m.done).length;
                                   const inProgressCount = total - doneCount;
-                                  const p = project.phaseProgress?.[key] || 0;
-
-                                  // Determine phase state: not started, in progress, or completed
-                                  const isCompleted = p === 100;
-                                  const isNotStarted = p === 0 || total === 0;
-                                  const isInProgress = !isCompleted && !isNotStarted;
-
-                                  let bgClass = "bg-muted/40"; // grey: not started
-                                  if (isCompleted) bgClass = "bg-muted-foreground/30"; // grey: completed
-                                  else if (isInProgress) bgClass = "bg-amber-500"; // orange: in progress
-
-                                  // For phases with milestones, show per-task breakdown
                                   const donePct = total > 0 ? (doneCount / total) * 100 : 0;
                                   const inProgressPct = total > 0 ? (inProgressCount / total) * 100 : 0;
+                                  const p = project.phaseProgress?.[key] || 0;
 
                                   return (
                                     <Tooltip key={key}>
@@ -179,10 +168,10 @@ const Projects = () => {
                                           className="flex-1 rounded-full overflow-hidden bg-muted/20 cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
                                           onClick={(e) => e.stopPropagation()}
                                         >
-                                          {total > 0 && isInProgress ? (
+                                          {total > 0 ? (
                                             <div className="flex h-full">
                                               <div
-                                                className="h-full bg-muted-foreground/30 transition-all"
+                                                className="h-full bg-emerald-500 transition-all"
                                                 style={{ width: `${donePct}%` }}
                                               />
                                               <div
@@ -192,7 +181,8 @@ const Projects = () => {
                                             </div>
                                           ) : (
                                             <div
-                                              className={`h-full w-full transition-all ${bgClass}`}
+                                              className={`h-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
+                                              style={{ width: `${p}%` }}
                                             />
                                           )}
                                         </Link>
