@@ -92,6 +92,10 @@ const ProjectDetail = () => {
     );
   }
 
+  const isFpga = project.technology === "FPGA";
+  const techBorder = isFpga ? "border-sky-500/40" : "border-violet-500/40";
+  const techBorderHover = isFpga ? "hover:border-sky-500/70" : "hover:border-violet-500/70";
+
   const initials = project.author
     .split(" ")
     .filter((w) => /^[A-Z]/.test(w))
@@ -193,7 +197,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 }}
-                className="mb-10 rounded-xl border border-border/60 overflow-hidden bg-muted/20"
+                className={`mb-10 rounded-xl border overflow-hidden bg-muted/20 ${techBorder}`}
               >
                 <img
                   src="/placeholder.svg"
@@ -207,7 +211,7 @@ const ProjectDetail = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="rounded-xl border border-border/60 bg-muted/30 p-5 mb-10"
+                className={`rounded-xl border bg-muted/30 p-5 mb-10 ${techBorder}`}
               >
                 <h3 className="text-sm font-display font-bold mb-2">Architecture Overview</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
@@ -251,7 +255,7 @@ const ProjectDetail = () => {
                       const initials = member.name.split(" ").filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).join("").slice(0, 2);
                       return (
                         <Link key={member.id} to={`/community/${member.id}`} className="group">
-                          <div className="rounded-xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                          <div className={`rounded-xl border bg-card p-4 ${techBorder} ${techBorderHover} hover:shadow-md transition-all duration-300 flex items-center gap-3`}>
                             <Avatar className="h-10 w-10 shrink-0">
                               <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">{initials}</AvatarFallback>
                             </Avatar>
@@ -281,7 +285,7 @@ const ProjectDetail = () => {
                   <div className="grid sm:grid-cols-2 gap-3">
                     {organisations.map((org) => (
                       <Link key={org.id} to={`/partners/${org.id}`} className="group">
-                        <div className="rounded-xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                        <div className={`rounded-xl border bg-card p-4 ${techBorder} ${techBorderHover} hover:shadow-md transition-all duration-300 flex items-center gap-3`}>
                           <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
                             <Building2 className="h-5 w-5 text-primary" />
                           </div>
@@ -306,7 +310,7 @@ const ProjectDetail = () => {
                 >
                   <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
                   <Link to={`/designs/${referenceSoc.id}`} className="block group">
-                    <div className="rounded-xl border border-border/60 bg-card p-5 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
+                    <div className={`rounded-xl border bg-card p-5 ${techBorder} ${techBorderHover} hover:shadow-lg transition-all duration-300`}>
                       <div className="flex items-center gap-4">
                         <div className="p-3 rounded-xl bg-primary/10 shrink-0">
                           <Cpu className="h-6 w-6 text-primary" />
@@ -360,7 +364,7 @@ const ProjectDetail = () => {
             {/* Sticky author sidebar */}
             <aside className="hidden lg:block w-56 shrink-0">
               <div className="sticky top-24 space-y-3">
-                <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <div className={`rounded-xl border bg-card p-4 shadow-sm ${techBorder}`}>
                   <div className="flex flex-col items-center text-center">
                     <Avatar className="h-16 w-16 mb-3">
                       <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
@@ -405,7 +409,7 @@ const ProjectDetail = () => {
                 </div>
 
                 {/* Links card */}
-                <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+                <div className={`rounded-xl border bg-card p-4 shadow-sm ${techBorder}`}>
                   <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
                   <div className="flex flex-col gap-2">
                     <Button asChild size="sm" className="w-full rounded-lg">
