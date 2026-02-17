@@ -23,6 +23,8 @@ export interface Milestone {
 interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
+  phaseEffort?: Record<string, number>;
+  phaseUncertainty?: Record<string, number>;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -95,7 +97,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {} }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -168,11 +170,9 @@ const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) 
           const allDone = done === tasks.length;
           const hasOverrun = tasks.some((t) => isOverrunning(t));
 
-          // Phase-level average effort/uncertainty
-          const effortVals = tasks.filter((t) => t.effort).map((t) => t.effort!);
-          const uncVals = tasks.filter((t) => t.uncertainty).map((t) => t.uncertainty!);
-          const avgEffort = effortVals.length > 0 ? effortVals.reduce((a, b) => a + b, 0) / effortVals.length : 0;
-          const avgUnc = uncVals.length > 0 ? uncVals.reduce((a, b) => a + b, 0) / uncVals.length : 0;
+          // Phase-level effort/uncertainty set by author
+          const phaseEff = phaseEffort[phase] || 0;
+          const phaseUnc = phaseUncertainty[phase] || 0;
 
           return (
             <div key={phase} id={phaseId}>
@@ -198,10 +198,10 @@ const ProjectMilestones = ({ milestones, expandPhase }: ProjectMilestonesProps) 
                 )}
 
                 {/* Phase-level ratings */}
-                {avgEffort > 0 && (
+                {phaseEff > 0 && (
                   <div className="hidden sm:flex items-center gap-2 shrink-0">
-                    <RatingBar value={avgEffort} colors={effortColors} label="Effort" />
-                    <RatingBar value={avgUnc} colors={uncertaintyColors} label="Uncertainty" />
+                    <RatingBar value={phaseEff} colors={effortColors} label="Effort" />
+                    <RatingBar value={phaseUnc} colors={uncertaintyColors} label="Uncertainty" />
                   </div>
                 )}
 
