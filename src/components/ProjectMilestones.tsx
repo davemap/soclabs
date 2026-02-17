@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp } from "lucide-react";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { communityMembers } from "@/data/mockData";
+import { communityMembers, learningPhases } from "@/data/mockData";
 
 export interface Milestone {
   phase: string;
@@ -194,25 +194,27 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
           // Phase-level effort/uncertainty set by author
           const phaseEff = phaseEffort[phase] || 0;
           const phaseUnc = phaseUncertainty[phase] || 0;
+          const learningPhase = learningPhases.find((p) => p.id === phase);
 
           return (
             <div key={phase} id={phaseId}>
-              <button
-                onClick={() => togglePhase(phase)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"
-              >
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform shrink-0",
-                    isExpanded && "rotate-180"
-                  )}
-                />
-                <span className={cn(
-                  "text-sm font-display font-semibold flex-1 min-w-0",
-                  allDone && "text-emerald-600"
-                )}>
-                  {label}
-                </span>
+              <div className="flex items-center gap-0">
+                <button
+                  onClick={() => togglePhase(phase)}
+                  className="flex-1 flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/30 transition-colors"
+                >
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 text-muted-foreground transition-transform shrink-0",
+                      isExpanded && "rotate-180"
+                    )}
+                  />
+                  <span className={cn(
+                    "text-sm font-display font-semibold flex-1 min-w-0",
+                    allDone && "text-emerald-600"
+                  )}>
+                    {label}
+                  </span>
 
                 {(hasOverrun || phaseOverrun) && (
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
@@ -237,6 +239,16 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                   {done}/{tasks.length}
                 </span>
               </button>
+                {learningPhase && (
+                  <Link
+                    to={`/learn/${learningPhase.id}/${learningPhase.topics[0].id}`}
+                    className="shrink-0 p-3 hover:bg-muted/30 transition-colors"
+                    title={`Learn about ${label}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-muted-foreground hover:text-primary transition-colors" />
+                  </Link>
+                )}
+              </div>
 
               <AnimatePresence>
                 {isExpanded && (

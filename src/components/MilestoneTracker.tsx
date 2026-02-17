@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical, CheckCircle2, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -110,6 +111,7 @@ const PhaseNode = ({
   const Icon = iconMap[phase.icon] || Cpu;
   const color = progressColor(progress);
   const phaseTasks = milestones.filter((m) => m.phase === phaseKey);
+  const learningPhase = learningPhases.find((p) => p.id === phaseKey);
 
   const show = useCallback(() => {
     clearTimeout(timeout.current);
@@ -165,8 +167,17 @@ const PhaseNode = ({
         >
           <div className="pt-1">
             <div className="rounded-xl border border-border/60 bg-card shadow-xl p-3 space-y-1">
-              <div className="text-xs font-display font-bold text-foreground mb-2 px-1">
-                {phaseLabels[phaseKey] || phaseKey}
+              <div className="text-xs font-display font-bold text-foreground mb-2 px-1 flex items-center justify-between">
+                <span>{phaseLabels[phaseKey] || phaseKey}</span>
+                {learningPhase && (
+                  <Link
+                    to={`/learn/${learningPhase.id}/${learningPhase.topics[0].id}`}
+                    className="text-[10px] font-medium text-primary hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Learn →
+                  </Link>
+                )}
               </div>
               {phaseTasks.map((task, i) => (
                 <button
@@ -200,13 +211,14 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick }: Mile
     return (phaseProgress[key] || 0) > 0 ? i : max;
   }, 0);
 
-  return (
+   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="rounded-xl border border-border/60 bg-card px-4 py-3 mb-10"
+      className="sticky top-20 z-30 rounded-xl border border-border/60 bg-card/95 backdrop-blur-md px-4 py-3 mb-10 shadow-sm"
     >
+      <div className="text-xs font-display font-semibold text-muted-foreground mb-2">Project Progress</div>
       <div className="relative flex items-start justify-between">
         <div className="absolute top-[25px] left-[25px] right-[25px] h-[3px] rounded-full bg-primary/20" />
         <div
