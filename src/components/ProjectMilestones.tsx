@@ -224,7 +224,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
 
       {trackerSlot}
 
-      <div className={cn("rounded-xl border bg-card overflow-hidden divide-y divide-border/40", technology === "FPGA" ? "border-sky-500/40" : "border-violet-500/40")}>
+      <div className={cn("rounded-xl border bg-card overflow-hidden divide-y divide-border/40", trackerSlot && "rounded-t-none border-t-0", technology === "FPGA" ? "border-sky-500/40" : "border-violet-500/40")}>
         {grouped.map(({ phase, label, tasks, greyedOut }) => {
           if (greyedOut) {
             return (
