@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
@@ -26,6 +27,18 @@ const statusColor = (status: string) => {
 
 const ProjectDetail = () => {
   const navigate = useNavigate();
+  const [expandPhase, setExpandPhase] = useState<string | null>(null);
+
+  const handlePhaseClick = useCallback((phase: string) => {
+    setExpandPhase(phase);
+    // Scroll to the phase in the milestones section
+    setTimeout(() => {
+      const el = document.getElementById(`milestone-phase-${phase}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
+  }, []);
   const { id } = useParams<{ id: string }>();
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
@@ -130,7 +143,11 @@ const ProjectDetail = () => {
 
                 {/* Milestone tracker */}
                 {project.phaseProgress && (
-                  <MilestoneTracker phaseProgress={project.phaseProgress} />
+                  <MilestoneTracker
+                    phaseProgress={project.phaseProgress}
+                    milestones={project.milestones}
+                    onPhaseClick={handlePhaseClick}
+                  />
                 )}
               </motion.header>
 
@@ -274,7 +291,7 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <ProjectMilestones milestones={project.milestones} />
+                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} />
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />
