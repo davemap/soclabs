@@ -124,21 +124,12 @@ const ProjectDetail = () => {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button asChild size="sm" variant="outline">
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Github className="h-4 w-4 mr-2" /> View Repository
-                      <ExternalLink className="h-3 w-3 ml-1" />
-                    </a>
-                  </Button>
-                  {referenceSoc && (
-                    <Button asChild size="sm" variant="outline">
-                      <Link to={`/designs/${referenceSoc.id}`}>
-                        <Cpu className="h-4 w-4 mr-2" /> {referenceSoc.name} Reference SoC
-                      </Link>
-                    </Button>
-                  )}
-                </div>
+                <Button asChild size="sm" variant="outline">
+                  <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4 mr-2" /> View Repository
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </a>
+                </Button>
               </motion.header>
 
               {/* Project image */}
@@ -187,6 +178,36 @@ const ProjectDetail = () => {
               >
                 <ReactMarkdown>{project.content}</ReactMarkdown>
               </motion.div>
+
+              {/* Reference SoC card */}
+              {referenceSoc && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mt-10"
+                >
+                  <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
+                  <Link to={`/designs/${referenceSoc.id}`} className="block group">
+                    <div className="rounded-xl border border-border/60 bg-card p-5 hover:border-primary/40 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center gap-4">
+                        <div className="p-3 rounded-xl bg-primary/10 shrink-0">
+                          <Cpu className="h-6 w-6 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-display font-bold text-lg group-hover:text-primary transition-colors">{referenceSoc.name}</h3>
+                          <p className="text-sm text-muted-foreground">{referenceSoc.tagline}</p>
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            <Badge variant="secondary" className="text-xs">{referenceSoc.processor}</Badge>
+                            <Badge variant="outline" className="text-xs">{referenceSoc.busArchitecture}</Badge>
+                          </div>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              )}
 
               <CommentsThreads pageId={`project-${project.id}`} />
             </div>
