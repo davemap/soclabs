@@ -130,6 +130,7 @@ export type Database = {
           completed_date: string | null
           created_at: string
           done: boolean
+          effort_rating: number | null
           id: string
           learning_topic_ids: string[] | null
           phase: string
@@ -138,6 +139,7 @@ export type Database = {
           sort_order: number
           start_date: string | null
           task: string
+          uncertainty_rating: number | null
           updated_at: string
         }
         Insert: {
@@ -146,6 +148,7 @@ export type Database = {
           completed_date?: string | null
           created_at?: string
           done?: boolean
+          effort_rating?: number | null
           id?: string
           learning_topic_ids?: string[] | null
           phase: string
@@ -154,6 +157,7 @@ export type Database = {
           sort_order?: number
           start_date?: string | null
           task: string
+          uncertainty_rating?: number | null
           updated_at?: string
         }
         Update: {
@@ -162,6 +166,7 @@ export type Database = {
           completed_date?: string | null
           created_at?: string
           done?: boolean
+          effort_rating?: number | null
           id?: string
           learning_topic_ids?: string[] | null
           phase?: string
@@ -170,6 +175,7 @@ export type Database = {
           sort_order?: number
           start_date?: string | null
           task?: string
+          uncertainty_rating?: number | null
           updated_at?: string
         }
         Relationships: [
