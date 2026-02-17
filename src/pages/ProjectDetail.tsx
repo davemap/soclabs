@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -318,14 +318,26 @@ const ProjectDetail = () => {
                     </div>
                   </>
                 )}
+              </div>
 
-                <div className="border-t border-border/60 mt-3 pt-3">
+              {/* Links card */}
+              <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm mt-3">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
+                <div className="flex flex-col gap-2">
                   <Button asChild size="sm" className="w-full rounded-lg">
                     <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                      <Github className="h-4 w-4 mr-2" /> View Repository
+                      <Github className="h-4 w-4 mr-2" /> Repository
                       <ExternalLink className="h-3 w-3 ml-1" />
                     </a>
                   </Button>
+                  {project.docsUrl && (
+                    <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
+                      <a href={project.docsUrl} target="_blank" rel="noopener noreferrer">
+                        <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
             </aside>
