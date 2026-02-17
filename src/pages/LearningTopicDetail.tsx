@@ -1,11 +1,37 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle } from "lucide-react";
 import { learningPhases } from "@/data/mockData";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
+
+const effortColors = [
+  "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
+];
+const uncertaintyColors = [
+  "bg-sky-400", "bg-blue-400", "bg-violet-500", "bg-purple-500", "bg-fuchsia-500",
+];
+
+const RatingDots = ({ value, colors, label, icon: IconComp }: { value: number; colors: string[]; label: string; icon: React.ElementType }) => (
+  <div className="flex items-center gap-2.5">
+    <IconComp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+    <span className="text-xs text-muted-foreground w-20 shrink-0">{label}</span>
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div
+          key={i}
+          className={cn(
+            "w-5 h-2 rounded-full transition-all",
+            i <= value ? colors[value - 1] : "bg-muted/30"
+          )}
+        />
+      ))}
+    </div>
+    <span className="text-xs text-muted-foreground ml-1">{value}/5</span>
+  </div>
+);
 
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
@@ -147,6 +173,19 @@ const LearningTopicDetail = () => {
               >
                 {topic.summary}
               </motion.p>
+
+              {/* Effort & Uncertainty ratings — non-overview topics only */}
+              {!topic.id.endsWith("-overview") && topic.effort && topic.uncertainty && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-8 mb-8 px-4 py-3 rounded-xl border border-border/40 bg-card/30"
+                >
+                  <RatingDots value={topic.effort} colors={effortColors} label="Effort" icon={Flame} />
+                  <RatingDots value={topic.uncertainty} colors={uncertaintyColors} label="Uncertainty" icon={HelpCircle} />
+                </motion.div>
+              )}
 
               {/* Content */}
               <motion.div
