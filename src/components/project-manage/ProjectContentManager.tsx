@@ -14,7 +14,7 @@ interface ContentSection {
   sort_order: number;
 }
 
-export default function ProjectContentManager({ projectId }: { projectId: string }) {
+export default function ProjectContentManager({ projectId, onSave }: { projectId: string; onSave?: () => void }) {
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -73,6 +73,7 @@ export default function ProjectContentManager({ projectId }: { projectId: string
       }
       setSections([...sections]);
       toast.success("Content saved");
+      onSave?.();
     } catch {
       toast.error("Failed to save content");
     }

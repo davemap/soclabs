@@ -135,20 +135,30 @@ const ProjectDetail = () => {
     }
   }, [dbProject, user]);
 
+  const refreshContent = async () => {
+    if (!dbProject) return;
+    const { data } = await supabase
+      .from("project_content")
+      .select("*")
+      .eq("project_id", dbProject.id)
+      .order("sort_order");
+    setDbContent(data || []);
+  };
+
+  const refreshMilestones = async () => {
+    if (!dbProject) return;
+    const { data } = await supabase
+      .from("project_milestones")
+      .select("*")
+      .eq("project_id", dbProject.id)
+      .order("sort_order");
+    setDbMilestones(data || []);
+  };
+
   useEffect(() => {
     if (dbProject) {
-      supabase
-        .from("project_content")
-        .select("*")
-        .eq("project_id", dbProject.id)
-        .order("sort_order")
-        .then(({ data }) => setDbContent(data || []));
-      supabase
-        .from("project_milestones")
-        .select("*")
-        .eq("project_id", dbProject.id)
-        .order("sort_order")
-        .then(({ data }) => setDbMilestones(data || []));
+      refreshContent();
+      refreshMilestones();
     }
   }, [dbProject]);
 
@@ -393,10 +403,10 @@ const ProjectDetail = () => {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="content" className="mt-4">
-                    <ProjectContentManager projectId={dbProject.id} />
+                    <ProjectContentManager projectId={dbProject.id} onSave={refreshContent} />
                   </TabsContent>
                   <TabsContent value="milestones" className="mt-4">
-                    <ProjectMilestonesManager projectId={dbProject.id} />
+                    <ProjectMilestonesManager projectId={dbProject.id} onSave={refreshMilestones} />
                   </TabsContent>
                   <TabsContent value="requests" className="mt-4">
                     <ProjectJoinRequestsManager projectId={dbProject.id} />
