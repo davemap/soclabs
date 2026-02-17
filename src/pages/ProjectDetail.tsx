@@ -1,7 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -73,6 +74,35 @@ const ProjectDetail = () => {
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
   const referenceSoc = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
+  const headerRef = useRef<HTMLDivElement>(null);
+  const trackerSentinelRef = useRef<HTMLDivElement>(null);
+  const milestonesRef = useRef<HTMLDivElement>(null);
+  const [isFloating, setIsFloating] = useState(false);
+  const [isPastMilestones, setIsPastMilestones] = useState(false);
+
+  // Detect when tracker sentinel scrolls out of view (tracker starts floating)
+  useEffect(() => {
+    const sentinel = trackerSentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsFloating(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "-96px 0px 0px 0px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  // Detect when milestones section reaches the sticky position
+  useEffect(() => {
+    const el = milestonesRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsPastMilestones(entry.isIntersecting),
+      { threshold: 0, rootMargin: "-96px 0px 0px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
   const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
   const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
 
@@ -115,63 +145,69 @@ const ProjectDetail = () => {
           <div className="flex gap-8">
             {/* Main content */}
             <div className="flex-1 min-w-0 max-w-4xl">
-              {/* Header */}
-              <motion.header
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-10"
-              >
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <Badge variant="outline" className={statusColor(project.status)}>
-                    {project.status}
-                  </Badge>
-                  <Badge variant="outline">{project.referenceSoc}</Badge>
-                  <Badge variant="outline">{project.technology}</Badge>
-                </div>
+              {/* Header - collapses when tracker is floating */}
+              <div ref={headerRef} className={cn(
+                "transition-all duration-300 overflow-hidden",
+                isFloating && !isPastMilestones ? "max-h-0 opacity-0 mb-0" : "max-h-[1000px] opacity-100 mb-10"
+              )}>
+                <motion.header
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <Badge variant="outline" className={statusColor(project.status)}>
+                      {project.status}
+                    </Badge>
+                    <Badge variant="outline">{project.referenceSoc}</Badge>
+                    <Badge variant="outline">{project.technology}</Badge>
+                  </div>
 
-                <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">
-                  {project.title}
-                </h1>
+                  <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">
+                    {project.title}
+                  </h1>
 
-                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-                  {author ? (
-                    <Link
-                      to={`/community/${author.id}`}
-                      className="font-medium text-primary hover:underline transition-colors"
-                    >
-                      {project.author}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground">{project.author}</span>
-                  )}
-                  <span>{project.institution}</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {new Date(project.date).toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium"
-                    >
-                      <Tag className="h-2.5 w-2.5" />
-                      {tag}
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+                    {author ? (
+                      <Link
+                        to={`/community/${author.id}`}
+                        className="font-medium text-primary hover:underline transition-colors"
+                      >
+                        {project.author}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground">{project.author}</span>
+                    )}
+                    <span>{project.institution}</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {new Date(project.date).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
                     </span>
-                  ))}
-                </div>
+                  </div>
 
-                <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  {project.description}
-                </p>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium"
+                      >
+                        <Tag className="h-2.5 w-2.5" />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
-              </motion.header>
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-4">
+                    {project.description}
+                  </p>
+                </motion.header>
+              </div>
+
+              {/* Sentinel to detect when tracker starts floating */}
+              <div ref={trackerSentinelRef} className="h-0" />
 
               {/* Floating milestone tracker */}
               {project.phaseProgress && (
@@ -180,6 +216,7 @@ const ProjectDetail = () => {
                   milestones={project.milestones}
                   onPhaseClick={handlePhaseClick}
                   technology={project.technology}
+                  isFloating={isFloating && !isPastMilestones}
                 />
               )}
 
@@ -323,7 +360,7 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <div id="project-milestones">
+                <div id="project-milestones" ref={milestonesRef}>
                   <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} expandTopicId={expandTopicId} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
                 </div>
               )}
