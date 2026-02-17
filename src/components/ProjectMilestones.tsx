@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck, Pencil } from "lucide-react";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck, Pencil, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -61,6 +61,8 @@ interface ProjectMilestonesProps {
   isOwner?: boolean;
   onCompleteTask?: (milestoneIndex: number) => void;
   onCompletePhase?: (phase: string) => void;
+  onUncompleteTask?: (milestoneIndex: number) => void;
+  onUncompletePhase?: (phase: string) => void;
   onEditTask?: (index: number) => void;
 }
 
@@ -134,7 +136,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase, onEditTask }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase, onUncompleteTask, onUncompletePhase, onEditTask }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -363,7 +365,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     <span className="hidden sm:inline">Learn</span>
                   </Link>
                 )}
-                {editMode && isOwner && onCompletePhase && (
+                {editMode && isOwner && onCompletePhase && !allDone && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -373,6 +375,17 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Complete Phase</span>
+                  </Button>
+                )}
+                {editMode && isOwner && onUncompletePhase && allDone && tasks.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 rounded-full h-7 text-[11px] gap-1 text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
+                    onClick={(e) => { e.stopPropagation(); onUncompletePhase(phase); }}
+                  >
+                    <Undo2 className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Uncomplete Phase</span>
                   </Button>
                 )}
                 {editMode && onEditAdd && (
@@ -450,6 +463,16 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                   >
                                     <CheckCheck className="h-3.5 w-3.5" />
                                     <span className="hidden sm:inline">Complete</span>
+                                  </button>
+                                )}
+                                {task.done && isOwner && onUncompleteTask && (
+                                  <button
+                                    type="button"
+                                    onClick={() => onUncompleteTask(task.globalIndex)}
+                                    className="shrink-0 flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium text-amber-600 hover:bg-amber-500/10 rounded-md transition-colors"
+                                  >
+                                    <Undo2 className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">Uncomplete</span>
                                   </button>
                                 )}
                                 {onEditTask && (

@@ -318,6 +318,28 @@ const ProjectDetail = () => {
     setCompleteTarget(null);
   };
 
+  const handleUncompleteTask = async (milestoneIndex: number) => {
+    const m = dbMilestones[milestoneIndex];
+    if (!m || !dbProject) return;
+    await supabase.from("project_milestones").update({
+      done: false, completed_date: null, effort_rating: null, uncertainty_rating: null,
+    }).eq("id", m.id);
+    toast.success("Task marked as incomplete");
+    refreshMilestones();
+  };
+
+  const handleUncompletePhase = async (phase: string) => {
+    if (!dbProject) return;
+    const phaseMilestones = dbMilestones.filter((m: any) => m.phase === phase);
+    for (const m of phaseMilestones) {
+      await supabase.from("project_milestones").update({
+        done: false, completed_date: null, effort_rating: null, uncertainty_rating: null,
+      }).eq("id", m.id);
+    }
+    toast.success("Phase marked as incomplete");
+    refreshMilestones();
+  };
+
   useEffect(() => {
     if (!dbProject) return;
     const fetchCollabs = async () => {
@@ -889,6 +911,8 @@ const ProjectDetail = () => {
                 isOwner={isOwner}
                 onCompleteTask={handleCompleteTask}
                 onCompletePhase={handleCompletePhase}
+                onUncompleteTask={handleUncompleteTask}
+                onUncompletePhase={handleUncompletePhase}
                 onEditTask={handleEditExistingTask}
               />
               {addTaskDialogPhase && (
