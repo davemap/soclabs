@@ -1374,7 +1374,7 @@ export const partners = [
     longDescription:
       "Imperial College London's Department of Electrical and Electronic Engineering is a world leader in embedded systems and AI hardware research. Their Embedded Intelligence Lab focuses on deploying neural network models onto resource-constrained hardware, contributing key accelerator IP to the SoC Labs ecosystem.",
     url: "https://www.imperial.ac.uk",
-    logo: "/placeholder.svg",
+    logo: "imperial-college-london",
     coordinates: [-0.1749, 51.4988] as [number, number],
   },
   {
@@ -1387,7 +1387,7 @@ export const partners = [
     longDescription:
       "The University of Cape Town's hardware security group specialises in lightweight cryptographic implementations for resource-constrained IoT devices. They have successfully taped out multiple ASIC designs through Europractice shuttle services and actively mentor students across Southern Africa.",
     url: "https://www.uct.ac.za",
-    logo: "/placeholder.svg",
+    logo: "university-of-cape-town",
     coordinates: [18.4601, -33.9577] as [number, number],
   },
   {
@@ -1399,7 +1399,7 @@ export const partners = [
     longDescription:
       "ETH Zürich's Integrated Systems Laboratory conducts cutting-edge research in reconfigurable computing, digital signal processing, and energy-efficient computing. Their work on configurable DSP architectures demonstrates how custom hardware can dramatically improve throughput and energy efficiency.",
     url: "https://ethz.ch",
-    logo: "/placeholder.svg",
+    logo: "eth-zurich",
     coordinates: [8.5482, 47.3769] as [number, number],
   },
   {
@@ -1411,7 +1411,7 @@ export const partners = [
     longDescription:
       "The University of Tokyo's VLSI Design and Education Centre explores heterogeneous multi-ISA computing and advanced processor design. Their research into integrating RISC-V cores alongside ARM processors in SoC Labs platforms opens new paradigms for workload partitioning.",
     url: "https://www.u-tokyo.ac.jp/en/",
-    logo: "/placeholder.svg",
+    logo: "university-of-tokyo",
     coordinates: [139.7671, 35.6812] as [number, number],
   },
   {
@@ -1424,7 +1424,7 @@ export const partners = [
     longDescription:
       "MIT's Energy-Efficient Circuits group develops adaptive power management techniques for always-on IoT devices. Their work on dynamic voltage and frequency scaling (DVFS) controllers for the EcoSoC platform targets 40-60% energy reduction for typical IoT workloads.",
     url: "https://www.mit.edu",
-    logo: "/placeholder.svg",
+    logo: "mit",
     coordinates: [-71.0942, 42.3601] as [number, number],
   },
   {
@@ -1436,7 +1436,7 @@ export const partners = [
     longDescription:
       "IIT Bombay's VLSI group focuses on on-chip communication architectures and SoC integration. Their research on high-performance bus interconnects and communication interfaces contributes critical infrastructure IP to the EcoSoC platform.",
     url: "https://www.iitb.ac.in",
-    logo: "/placeholder.svg",
+    logo: "iit-bombay",
     coordinates: [72.8544, 19.0222] as [number, number],
   },
   {
@@ -1448,7 +1448,7 @@ export const partners = [
     longDescription:
       "TU Munich's Chair of Integrated Systems focuses on safety-critical hardware design for automotive applications. Their work on certified safety controllers based on the EcoSoC targets ISO 26262 compliance for autonomous vehicle subsystems.",
     url: "https://www.tum.de/en/",
-    logo: "/placeholder.svg",
+    logo: "tu-munich",
     coordinates: [11.582, 48.1351] as [number, number],
   },
 ];
