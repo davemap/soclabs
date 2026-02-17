@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import { useParams, Link, useNavigate, useSearchParams, useBlocker } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -244,18 +244,6 @@ const ProjectDetail = () => {
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsavedChanges]);
-
-  // Block react-router navigation
-  const blocker = useBlocker(hasUnsavedChanges);
-  useEffect(() => {
-    if (blocker.state === "blocked") {
-      if (window.confirm("You have unsaved changes. Are you sure you want to leave?")) {
-        blocker.proceed();
-      } else {
-        blocker.reset();
-      }
-    }
-  }, [blocker]);
 
   // Wrap "Done Editing" toggle with unsaved check
   const handleToggleEditMode = useCallback(() => {
