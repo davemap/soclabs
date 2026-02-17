@@ -120,6 +120,7 @@ const ProjectDetail = () => {
   const [existingRequest, setExistingRequest] = useState<any>(null);
   const [dbContent, setDbContent] = useState<any[]>([]);
   const [dbMilestones, setDbMilestones] = useState<any[]>([]);
+  const [editMode, setEditMode] = useState(false);
 
   // Fetch join request status and content for DB projects
   useEffect(() => {
@@ -196,13 +197,24 @@ const ProjectDetail = () => {
       <Layout>
         <article className="py-24">
           <div className="container mx-auto px-4 max-w-4xl">
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center justify-between mb-8">
               <button
                 onClick={() => navigate(-1)}
-                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
+              {isOwner && (
+                <Button
+                  variant={editMode ? "default" : "outline"}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => setEditMode(!editMode)}
+                >
+                  <Settings className="h-4 w-4 mr-1.5" />
+                  {editMode ? "Done Editing" : "Edit This Page"}
+                </Button>
+              )}
             </motion.div>
 
             <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
@@ -360,8 +372,8 @@ const ProjectDetail = () => {
             )}
 
             {/* Owner Management Tabs */}
-            {isOwner && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-10">
+            {isOwner && editMode && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                   <Settings className="h-5 w-5 text-primary" /> Manage Project
                 </h2>
