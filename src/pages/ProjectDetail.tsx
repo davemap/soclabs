@@ -323,11 +323,27 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
+            {/* Non-sticky milestone tracker (same as mock projects) */}
+            {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
+              <div className="mb-10">
+                <MilestoneTracker
+                  phaseProgress={milestonePhaseProgress}
+                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                  onPhaseClick={handlePhaseClick}
+                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                  isFloating={false}
+                  isSticky={false}
+                />
+              </div>
+            )}
+
             {/* DB Milestones display (for everyone) */}
             {dbMilestones.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }} className="mb-10">
+              <div id="project-milestones">
                 <ProjectMilestones
                   milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                  expandPhase={expandPhase}
+                  expandTaskIndex={expandTaskIndex}
                   technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
                   trackerSlot={
                     Object.keys(milestonePhaseProgress).length > 0
@@ -345,7 +361,7 @@ const ProjectDetail = () => {
                       : undefined
                   }
                 />
-              </motion.div>
+              </div>
             )}
 
             {/* DB Content sections display (for everyone) */}

@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Save } from "lucide-react";
+import { Save, Search, X } from "lucide-react";
 import { toast } from "sonner";
+import { interests } from "@/data/interests";
+import { technologies } from "@/data/mockData";
 
 const fpgaFamilies = [
   "Xilinx Artix-7", "Xilinx Kintex-7", "Xilinx Zynq-7000", "Xilinx UltraScale+",
@@ -42,6 +45,8 @@ interface ProjectData {
   fpga_family: string | null;
   asic_process: string | null;
   timeframe: string | null;
+  interests: string[] | null;
+  technologies: string[] | null;
 }
 
 const timeframeLabelToIndex = (label: string | null): number => {
@@ -62,9 +67,34 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
     asic_process: project.asic_process || "",
   });
   const [timeframeIndex, setTimeframeIndex] = useState<number[]>([timeframeLabelToIndex(project.timeframe)]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(project.interests || []);
+  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(project.technologies || []);
+  const [interestSearch, setInterestSearch] = useState("");
+  const [techSearch, setTechSearch] = useState("");
   const [saving, setSaving] = useState(false);
 
   const currentTimeframeLabel = timeframeSteps[timeframeIndex[0]]?.label ?? "1 Year";
+
+  const filteredInterests = useMemo(() => {
+    if (!interestSearch.trim()) return interests;
+    const q = interestSearch.toLowerCase();
+    return interests.filter(
+      (i) => i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q)
+    );
+  }, [interestSearch]);
+
+  const filteredTechnologies = useMemo(() => {
+    if (!techSearch.trim()) return technologies;
+    const q = techSearch.toLowerCase();
+    return technologies.filter(
+      (t) => t.name.toLowerCase().includes(q) || t.category.toLowerCase().includes(q)
+    );
+  }, [techSearch]);
+
+  const toggleInterest = (slug: string) =>
+    setSelectedInterests((prev) => prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]);
+  const toggleTechnology = (name: string) =>
+    setSelectedTechnologies((prev) => prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]);
 
   const save = async () => {
     setSaving(true);
@@ -80,6 +110,8 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         fpga_family: form.target_technology === "FPGA" ? form.fpga_family : "",
         asic_process: form.target_technology === "ASIC" ? form.asic_process : "",
         timeframe: currentTimeframeLabel,
+        interests: selectedInterests,
+        technologies: selectedTechnologies,
       })
       .eq("id", project.id);
 
@@ -130,7 +162,7 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         </Select>
       </div>
 
-      {/* Target Technology — matching StartProject wizard UI */}
+      {/* Target Technology */}
       <div className="space-y-4">
         <Label>Target Technology</Label>
         <div className="flex gap-2">
@@ -168,7 +200,7 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         )}
       </div>
 
-      {/* Timeline — matching StartProject wizard slider UI */}
+      {/* Timeline */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label>Project Duration</Label>
@@ -177,6 +209,71 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         <Slider value={timeframeIndex} onValueChange={setTimeframeIndex} min={0} max={6} step={1} className="w-full" />
         <div className="flex justify-between text-[10px] text-muted-foreground px-1">
           {timeframeSteps.map((s) => (<span key={s.value}>{s.label}</span>))}
+        </div>
+      </div>
+
+      {/* Interests */}
+      <div className="space-y-3">
+        <Label>Interests</Label>
+        {selectedInterests.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {selectedInterests.map((slug) => {
+              const interest = interests.find((i) => i.slug === slug);
+              return (
+                <Badge key={slug} variant="secondary" className="gap-1">
+                  {interest?.name ?? slug}
+                  <button type="button" onClick={() => toggleInterest(slug)}><X className="h-3 w-3" /></button>
+                </Badge>
+              );
+            })}
+          </div>
+        )}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search interests..." value={interestSearch} onChange={(e) => setInterestSearch(e.target.value)} className="pl-9" />
+        </div>
+        <div className="max-h-48 overflow-y-auto space-y-1 rounded-lg border border-border p-2">
+          {filteredInterests.map((i) => (
+            <button key={i.slug} type="button" onClick={() => toggleInterest(i.slug)}
+              className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition-colors ${
+                selectedInterests.includes(i.slug) ? "bg-primary/10 text-primary" : "hover:bg-muted"
+              }`}>
+              <span>{i.name}</span>
+              <span className="text-xs text-muted-foreground">{i.category}</span>
+            </button>
+          ))}
+          {filteredInterests.length === 0 && (
+            <p className="text-xs text-muted-foreground text-center py-3">No interests found.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Technologies & Tools */}
+      <div className="space-y-3">
+        <Label>Technologies & Tools</Label>
+        {selectedTechnologies.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {selectedTechnologies.map((name) => (
+              <Badge key={name} variant="secondary" className="gap-1">
+                {name}
+                <button type="button" onClick={() => toggleTechnology(name)}><X className="h-3 w-3" /></button>
+              </Badge>
+            ))}
+          </div>
+        )}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search technologies..." value={techSearch} onChange={(e) => setTechSearch(e.target.value)} className="pl-9" />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {filteredTechnologies.map((t) => (
+            <button key={t.name} type="button" onClick={() => toggleTechnology(t.name)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                selectedTechnologies.includes(t.name) ? "bg-primary text-primary-foreground border-primary" : "bg-muted text-muted-foreground border-border hover:border-primary/40"
+              }`}>
+              {t.name}
+            </button>
+          ))}
         </div>
       </div>
 
