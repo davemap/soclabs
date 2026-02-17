@@ -6,9 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { communityProjects } from "@/data/mockData";
+
+const phaseLabels: Record<string, string> = {
+  architecture: "Architecture",
+  rtl: "RTL Design",
+  verification: "Verification",
+  synthesis: "Synthesis",
+  "physical-design": "Physical Design",
+  tapeout: "Tapeout",
+  "silicon-validation": "Silicon Validation",
+};
 
 const referenceSocs = ["All", "NanoSoC", "EcoSoC"];
 const technologyTypes = ["All", "FPGA", "ASIC"];
@@ -138,22 +149,33 @@ const Projects = () => {
                               <span className="text-[10px] font-medium text-muted-foreground">Progress</span>
                               <span className="text-[10px] font-bold tabular-nums text-muted-foreground">{avgProgress}%</span>
                             </div>
-                            <div className="flex gap-0.5 h-1.5 rounded-full overflow-hidden bg-muted/30">
-                              {phaseKeys.map((key) => {
-                                const p = project.phaseProgress?.[key] || 0;
-                                return (
-                                  <div
-                                    key={key}
-                                    className="flex-1 rounded-full overflow-hidden bg-muted/20"
-                                  >
-                                    <div
-                                      className={`h-full rounded-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
-                                      style={{ width: `${p}%` }}
-                                    />
-                                  </div>
-                                );
-                              })}
-                            </div>
+                            <TooltipProvider delayDuration={100}>
+                              <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-muted/30">
+                                {phaseKeys.map((key) => {
+                                  const p = project.phaseProgress?.[key] || 0;
+                                  return (
+                                    <Tooltip key={key}>
+                                      <TooltipTrigger asChild>
+                                        <Link
+                                          to={`/projects/${project.id}?phase=${key}`}
+                                          className="flex-1 rounded-full overflow-hidden bg-muted/20 cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <div
+                                            className={`h-full rounded-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
+                                            style={{ width: `${p}%` }}
+                                          />
+                                        </Link>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top" className="text-xs px-3 py-1.5">
+                                        <span className="font-semibold">{phaseLabels[key] || key}</span>
+                                        <span className="ml-1.5 tabular-nums opacity-80">{p}%</span>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  );
+                                })}
+                              </div>
+                            </TooltipProvider>
                           </div>
                         )}
 
