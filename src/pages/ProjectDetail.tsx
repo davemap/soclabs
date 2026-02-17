@@ -351,14 +351,13 @@ const ProjectDetail = () => {
                   </Link>
                 </motion.div>
               )}
-              </div>{/* End sticky container */}
-
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
                 <div id="project-milestones">
                   <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} expandTopicId={expandTopicId} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
                 </div>
               )}
+              </div>{/* End sticky container */}
 
               <CommentsThreads pageId={`project-${project.id}`} />
             </div>
