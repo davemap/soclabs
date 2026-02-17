@@ -187,11 +187,6 @@ const PhaseNode = ({
                   </span>
                 </button>
               ))}
-              <div className="border-t border-border/40 mt-1 pt-1.5 px-1">
-                <span className="text-[10px] text-muted-foreground">
-                  Click to view details ↓
-                </span>
-              </div>
             </div>
           </div>
         </div>
