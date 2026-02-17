@@ -9,10 +9,27 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical } from "lucide-react";
+import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
 
 const phaseIconMap: Record<string, React.ElementType> = {
   FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical,
+};
+
+// Icons for Component subcategories
+const subcategoryIconMap: Record<string, React.ElementType> = {
+  Processors: Microchip,
+  "System Interconnects": Cable,
+  Peripherals: Radio,
+  "Memory Controllers": MemoryStick,
+  "Hardware Acceleration": Gauge,
+  "RTL Design": Code,
+  Verification: CheckCircle,
+  Synthesis: CircuitBoard,
+  "Physical Design": Cpu,
+  Tapeout: Zap,
+  "Silicon Validation": FlaskConical,
+  "FPGA Boards": HardDrive,
+  "Shuttle Services": Rocket,
 };
 
 // Map EDA category names to learning phase IDs
@@ -84,7 +101,7 @@ const Technologies = () => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map(g => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
-  const [activeEdaPhase, setActiveEdaPhase] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<Record<string, string | null>>({});
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalName, setProposalName] = useState("");
   const [proposalGroup, setProposalGroup] = useState("Components");
@@ -192,61 +209,101 @@ const Technologies = () => {
                         className="overflow-hidden"
                       >
                         <div className="px-6 md:px-8 pb-6 md:pb-8 space-y-6">
-                        {/* EDA Phase progress bar */}
-                        {group.key === "EDA Tooling" && (
-                          <div className="mb-2">
-                            <div className="relative flex items-center justify-between rounded-2xl border-2 border-violet/30 bg-gradient-to-r from-violet/5 via-card to-violet/5 px-6 py-4 shadow-sm shadow-violet/5">
-                              {edaPhaseOrder.map((phaseName) => {
-                                const phaseId = edaCategoryToPhaseId[phaseName];
-                                const phase = learningPhases.find((p) => p.id === phaseId);
-                                if (!phase) return null;
-                                const PhaseIcon = phaseIconMap[phase.icon] || Cpu;
-                                const isActive = activeEdaPhase === phaseName;
+                        {/* Subcategory filter bar */}
+                        {subcats.length > 1 && (() => {
+                          const colorStyles: Record<string, { bar: string; active: string; inactive: string; label: string; filterLabel: string }> = {
+                            Components: {
+                              bar: "border-primary/30 bg-gradient-to-r from-primary/5 via-card to-primary/5 shadow-primary/5",
+                              active: "bg-primary/20 border-primary text-primary scale-110 shadow-lg shadow-primary/25",
+                              inactive: "bg-card border-border/50 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5",
+                              label: "text-primary",
+                              filterLabel: "text-primary",
+                            },
+                            "EDA Tooling": {
+                              bar: "border-violet/30 bg-gradient-to-r from-violet/5 via-card to-violet/5 shadow-violet/5",
+                              active: "bg-violet/20 border-violet text-violet scale-110 shadow-lg shadow-violet/25",
+                              inactive: "bg-card border-border/50 text-muted-foreground hover:border-violet/50 hover:text-violet hover:bg-violet/5",
+                              label: "text-violet",
+                              filterLabel: "text-violet",
+                            },
+                            Infrastructure: {
+                              bar: "border-coral/30 bg-gradient-to-r from-coral/5 via-card to-coral/5 shadow-coral/5",
+                              active: "bg-coral/20 border-coral text-coral scale-110 shadow-lg shadow-coral/25",
+                              inactive: "bg-card border-border/50 text-muted-foreground hover:border-coral/50 hover:text-coral hover:bg-coral/5",
+                              label: "text-coral",
+                              filterLabel: "text-coral",
+                            },
+                          };
+                          const colors = colorStyles[group.key] || colorStyles.Components;
+                          const activeSubcat = activeFilter[group.key] || null;
+                          const abbreviations: Record<string, string> = {
+                            "Processors": "CPU",
+                            "System Interconnects": "Bus",
+                            "Peripherals": "Periph",
+                            "Memory Controllers": "Mem",
+                            "Hardware Acceleration": "Accel",
+                            "FPGA Boards": "FPGA",
+                            "Shuttle Services": "Shuttle",
+                          };
 
-                                return (
-                                  <button
-                                    key={phaseName}
-                                    onClick={() => setActiveEdaPhase(isActive ? null : phaseName)}
-                                    className="relative z-10 flex flex-col items-center gap-1.5 group/phase"
-                                    title={phaseName}
-                                  >
-                                    <div
-                                      className={cn(
-                                        "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 border-2",
-                                        isActive
-                                          ? "bg-violet/20 border-violet text-violet scale-110 shadow-lg shadow-violet/25"
-                                          : "bg-card border-border/50 text-muted-foreground hover:border-violet/50 hover:text-violet hover:bg-violet/5"
-                                      )}
+                          return (
+                            <div className="mb-2">
+                              <div className={cn("relative flex items-center justify-between rounded-2xl border-2 px-6 py-4 shadow-sm", colors.bar)}>
+                                {subcats.map((subcatName) => {
+                                  const SubIcon = subcategoryIconMap[subcatName] || Cpu;
+                                  const isActive = activeSubcat === subcatName;
+                                  let shortLabel = subcatName;
+                                  if (group.key === "EDA Tooling") {
+                                    const phaseId = edaCategoryToPhaseId[subcatName];
+                                    const phase = learningPhases.find((p) => p.id === phaseId);
+                                    if (phase) shortLabel = phase.shortTitle;
+                                  } else {
+                                    shortLabel = abbreviations[subcatName] || subcatName;
+                                  }
+
+                                  return (
+                                    <button
+                                      key={subcatName}
+                                      onClick={() => setActiveFilter(prev => ({
+                                        ...prev,
+                                        [group.key]: isActive ? null : subcatName
+                                      }))}
+                                      className="relative z-10 flex flex-col items-center gap-1.5 group/phase"
+                                      title={subcatName}
                                     >
-                                      <PhaseIcon className="h-4 w-4" />
-                                    </div>
-                                    <span className={cn(
-                                      "text-[10px] font-display font-semibold transition-colors hidden sm:block",
-                                      isActive ? "text-violet" : "text-muted-foreground/70"
-                                    )}>
-                                      {phase.shortTitle}
-                                    </span>
-                                  </button>
-                                );
-                              })}
-                            </div>
-                            {activeEdaPhase && (
-                              <div className="flex items-center gap-2 mt-2 ml-1">
-                                <span className="text-xs text-violet font-medium">Filtering: {activeEdaPhase}</span>
-                                <button
-                                  onClick={() => setActiveEdaPhase(null)}
-                                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                  (clear)
-                                </button>
+                                      <div className={cn(
+                                        "w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-200 border-2",
+                                        isActive ? colors.active : colors.inactive
+                                      )}>
+                                        <SubIcon className="h-4 w-4" />
+                                      </div>
+                                      <span className={cn(
+                                        "text-[10px] font-display font-semibold transition-colors hidden sm:block",
+                                        isActive ? colors.label : "text-muted-foreground/70"
+                                      )}>
+                                        {shortLabel}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
                               </div>
-                            )}
-                          </div>
-                        )}
+                              {activeSubcat && (
+                                <div className="flex items-center gap-2 mt-2 ml-1">
+                                  <span className={cn("text-xs font-medium", colors.filterLabel)}>Filtering: {activeSubcat}</span>
+                                  <button
+                                    onClick={() => setActiveFilter(prev => ({ ...prev, [group.key]: null }))}
+                                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                                  >
+                                    (clear)
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                         {subcats.filter((subcat) => {
-                          if (group.key === "EDA Tooling" && activeEdaPhase) {
-                            return subcat === activeEdaPhase;
-                          }
+                          const active = activeFilter[group.key];
+                          if (active) return subcat === active;
                           return true;
                         }).map((subcat) => {
                             const subcatKey = `${group.key}::${subcat}`;
