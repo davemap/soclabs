@@ -63,13 +63,13 @@ const Designs = () => {
                     <button
                       onClick={() => toggleCompare(design.id)}
                       className={cn(
-                        "absolute top-4 right-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all",
+                        "absolute top-5 right-5 z-10 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold border transition-all",
                         isSelected
                           ? "bg-primary text-primary-foreground border-primary shadow-md"
                           : "bg-card/80 backdrop-blur-sm border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40"
                       )}
                     >
-                      <GitCompare className="h-3 w-3" />
+                      <GitCompare className="h-4 w-4" />
                       {isSelected ? "Comparing" : "Compare"}
                     </button>
 
