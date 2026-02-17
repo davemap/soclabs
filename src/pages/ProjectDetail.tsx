@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ProjectContentManager from "@/components/project-manage/ProjectContentManager";
 import ProjectMilestonesManager from "@/components/project-manage/ProjectMilestonesManager";
+import InlineMilestonesEditor from "@/components/project-manage/InlineMilestonesEditor";
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
 import { Textarea } from "@/components/ui/textarea";
@@ -661,28 +662,38 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {/* DB Milestones display (always visible) */}
-            <div id="project-milestones">
-              <ProjectMilestones
-                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                expandPhase={expandPhase}
-                expandTaskIndex={expandTaskIndex}
-                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                trackerSlot={
-                  (togglePhase: (phase: string) => void) => (
-                    <MilestoneTracker
-                      phaseProgress={milestonePhaseProgress}
-                      milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                      onPhaseClick={(phase) => togglePhase(phase)}
-                      technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                      isFloating={false}
-                      isSticky={false}
-                      compact
-                    />
-                  )
-                }
-              />
-            </div>
+            {/* DB Milestones display / inline edit */}
+            {editMode && isOwner ? (
+              <div id="project-milestones" className="mb-10">
+                <InlineMilestonesEditor
+                  projectId={dbProject.id}
+                  technology={dbProject.target_technology}
+                  onSave={refreshMilestones}
+                />
+              </div>
+            ) : (
+              <div id="project-milestones">
+                <ProjectMilestones
+                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                  expandPhase={expandPhase}
+                  expandTaskIndex={expandTaskIndex}
+                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                  trackerSlot={
+                    (togglePhase: (phase: string) => void) => (
+                      <MilestoneTracker
+                        phaseProgress={milestonePhaseProgress}
+                        milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                        onPhaseClick={(phase) => togglePhase(phase)}
+                        technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                        isFloating={false}
+                        isSticky={false}
+                        compact
+                      />
+                    )
+                  }
+                />
+              </div>
+            )}
 
             {/* Join Request Form for non-owners */}
             {user && !isOwner && !existingRequest && (
@@ -709,11 +720,8 @@ const ProjectDetail = () => {
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                   <Settings className="h-5 w-5 text-primary" /> Manage Project
                 </h2>
-                <Tabs defaultValue="milestones" className="w-full">
+                <Tabs defaultValue="requests" className="w-full">
                   <TabsList className="w-full justify-start">
-                    <TabsTrigger value="milestones" className="gap-1.5">
-                      <ListChecks className="h-3.5 w-3.5" /> Milestones
-                    </TabsTrigger>
                     <TabsTrigger value="requests" className="gap-1.5">
                       <Users className="h-3.5 w-3.5" /> Requests
                     </TabsTrigger>
@@ -721,9 +729,6 @@ const ProjectDetail = () => {
                       <Settings className="h-3.5 w-3.5" /> Settings
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="milestones" className="mt-4">
-                    <ProjectMilestonesManager projectId={dbProject.id} onSave={refreshMilestones} />
-                  </TabsContent>
                   <TabsContent value="requests" className="mt-4">
                     <ProjectJoinRequestsManager projectId={dbProject.id} />
                   </TabsContent>
