@@ -111,6 +111,11 @@ const ProjectDetail = () => {
                   </span>
                 </div>
 
+                {/* Milestone tracker */}
+                {project.phaseProgress && (
+                  <MilestoneTracker phaseProgress={project.phaseProgress} />
+                )}
+
                 <p className="text-lg text-muted-foreground leading-relaxed mb-4">
                   {project.description}
                 </p>
@@ -134,11 +139,6 @@ const ProjectDetail = () => {
                   </a>
                 </Button>
               </motion.header>
-
-              {/* Milestone tracker */}
-              {project.phaseProgress && (
-                <MilestoneTracker phaseProgress={project.phaseProgress} />
-              )}
 
               {/* Project image */}
               <motion.div
