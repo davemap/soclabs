@@ -220,12 +220,14 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
   }, 0);
 
    return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.05 }}
-      className="sticky top-20 z-30 rounded-xl border border-border/60 bg-card/95 backdrop-blur-md px-4 py-3 mb-10 shadow-sm"
-    >
+    <div className="sticky top-24 z-30 mb-10">
+      <div className="absolute -inset-3 bg-background/80 backdrop-blur-md rounded-2xl" />
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="relative rounded-xl border border-border/60 bg-card/95 backdrop-blur-md px-4 py-3 shadow-sm"
+      >
       <div className="text-xs font-display font-semibold text-muted-foreground mb-2">Project Progress</div>
       <div className="relative flex items-start justify-between">
         <div className="absolute top-[25px] left-[25px] right-[25px] h-[3px] rounded-full bg-primary/20" />
@@ -253,7 +255,8 @@ const MilestoneTracker = ({ phaseProgress, milestones = [], onPhaseClick, techno
           );
         })}
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
