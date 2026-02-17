@@ -106,11 +106,8 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="rounded-xl border border-border/60 bg-card p-5 mb-10"
+      className="rounded-xl border border-border/60 bg-card px-4 py-3 mb-10"
     >
-      <h3 className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider mb-5">
-        Project Progress
-      </h3>
       <div className="relative flex items-start justify-between">
         {/* Track line */}
         <div className="absolute top-[25px] left-[25px] right-[25px] h-[3px] rounded-full bg-primary/20" />
