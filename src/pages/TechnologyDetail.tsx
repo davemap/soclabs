@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, ArrowRight } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { technologies, referenceDesigns, communityProjects } from "@/data/mockData";
 
 const TechnologyDetail = () => {
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const tech = technologies.find((t) => t.id === id);
 
@@ -17,7 +18,7 @@ const TechnologyDetail = () => {
       <Layout>
         <div className="py-24 text-center">
           <h1 className="text-2xl font-display font-bold mb-4">Technology not found</h1>
-          <Link to="/technologies" className="text-primary hover:underline">← Back to Technologies</Link>
+          <button onClick={() => navigate(-1)} className="text-primary hover:underline">← Go Back</button>
         </div>
       </Layout>
     );
@@ -52,12 +53,12 @@ const TechnologyDetail = () => {
       <section className="py-24">
         <div className="container mx-auto px-4">
           {/* Back link */}
-          <Link
-            to="/technologies"
+          <button
+            onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to Technologies
-          </Link>
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
 
           {/* Header */}
           <motion.div

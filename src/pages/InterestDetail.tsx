@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, FolderOpen, Github, Tag, ExternalLink, Wrench, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,7 @@ const RegisterInterestBox = ({ interestName }: { interestName: string }) => {
 };
 
 const InterestDetail = () => {
+  const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const interest = interests.find((i) => i.slug === slug);
 
@@ -52,8 +53,8 @@ const InterestDetail = () => {
       <Layout>
         <div className="container mx-auto px-4 py-24 text-center">
           <h1 className="text-2xl font-display font-bold mb-4">Interest not found</h1>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link to="/interests">← Back to Interests</Link>
+          <Button variant="outline" className="rounded-full" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-2" /> Go Back
           </Button>
         </div>
       </Layout>
@@ -82,12 +83,12 @@ const InterestDetail = () => {
             animate={{ opacity: 1, y: 0 }}
             className="max-w-3xl mx-auto mb-16"
           >
-            <Link
-              to="/interests"
+            <button
+              onClick={() => navigate(-1)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Interests
-            </Link>
+              <ArrowLeft className="h-3.5 w-3.5" /> Back
+            </button>
 
             <div className="flex items-start gap-3 mb-4">
               <span className={`text-xs px-3 py-1 rounded-full font-semibold ${categoryColor[interest.category]}`}>
