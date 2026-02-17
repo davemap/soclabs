@@ -121,7 +121,7 @@ const InterestDetail = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="font-display font-bold text-lg mb-1">{linkedTechnology.name}</h3>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{linkedTechnology.category}</span>
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{(linkedTechnology as any).group} · {linkedTechnology.category}</span>
                       <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{linkedTechnology.description}</p>
                     </div>
                   </div>

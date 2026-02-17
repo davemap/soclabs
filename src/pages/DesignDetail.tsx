@@ -161,7 +161,7 @@ const DesignDetail = () => {
                           <CardContent className="p-5">
                             <div className="flex items-center justify-between mb-1">
                               <h3 className="font-display font-semibold">{tech.name}</h3>
-                              <Badge variant="outline" className="text-xs">{tech.category}</Badge>
+                              <Badge variant="outline" className="text-xs">{(tech as any).group} · {tech.category}</Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">{tech.description}</p>
                           </CardContent>

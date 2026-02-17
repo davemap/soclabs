@@ -38,7 +38,7 @@ export const referenceDesigns = [
       { name: "Watchdog", type: "peripheral" },
       { name: "Extension Port", type: "interface" },
     ],
-    relatedTechnologies: ["ARM Cortex-M0", "Vivado / Quartus", "Yosys + OpenROAD", "UVM / cocotb"],
+    relatedTechnologies: ["ARM Cortex-M0", "Vivado / Quartus", "Yosys", "UVM / cocotb"],
     developmentProjectId: "nanosoc-dev",
     provenIn: [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)" },
@@ -88,7 +88,7 @@ export const referenceDesigns = [
       { name: "RTC", type: "peripheral" },
       { name: "Accelerator Slot", type: "interface" },
     ],
-    relatedTechnologies: ["ARM Cortex-M3", "Cadence / Synopsys", "Vivado / Quartus", "UVM / cocotb"],
+    relatedTechnologies: ["ARM Cortex-M3", "Design Compiler / Genus", "Vivado / Quartus", "UVM / cocotb"],
     developmentProjectId: "ecosoc-dev",
     provenIn: [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
@@ -138,7 +138,7 @@ export const referenceDesigns = [
       { name: "RTC", type: "peripheral" },
       { name: "Accelerator Slot", type: "interface" },
     ],
-    relatedTechnologies: ["ARM Cortex-A53", "Cadence / Synopsys", "Vivado / Quartus", "UVM / cocotb"],
+    relatedTechnologies: ["ARM Cortex-A53", "Design Compiler / Genus", "Vivado / Quartus", "UVM / cocotb"],
     developmentProjectId: "megasoc-dev",
     provenIn: [
       { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
@@ -897,10 +897,12 @@ export const learningPhases: LearningPhase[] = [
 ];
 
 export const technologies = [
+  // ── Components > Processors ──
   {
     id: "arm-cortex-m0",
     name: "ARM Cortex-M0",
-    category: "Processor IP",
+    group: "Components",
+    category: "Processors",
     description:
       "Ultra-low-power 32-bit processor ideal for education and small designs. Available through the ARM DesignStart programme.",
     longDescription:
@@ -918,7 +920,8 @@ export const technologies = [
   {
     id: "arm-cortex-m3",
     name: "ARM Cortex-M3",
-    category: "Processor IP",
+    group: "Components",
+    category: "Processors",
     description:
       "Feature-rich 32-bit processor with hardware multiply, divide, and extensive debug support. Suitable for production designs.",
     longDescription:
@@ -933,74 +936,125 @@ export const technologies = [
     ],
     links: [{ label: "ARM Cortex-M3 Documentation", url: "https://developer.arm.com/Processors/Cortex-M3" }],
   },
+
+  // ── Components > System Interconnects ──
   {
-    id: "vivado-quartus",
-    name: "Vivado / Quartus",
-    category: "FPGA Tools",
+    id: "amba-interconnect",
+    name: "AMBA Interconnect (AHB / AXI / APB)",
+    group: "Components",
+    category: "System Interconnects",
     description:
-      "Industry-standard FPGA development suites from AMD/Xilinx and Intel/Altera for synthesis, simulation, and programming.",
+      "ARM's Advanced Microcontroller Bus Architecture protocols for on-chip communication between processors, peripherals, and memory.",
     longDescription:
-      "Vivado (AMD/Xilinx) and Quartus Prime (Intel/Altera) are the primary FPGA development environments. They provide integrated synthesis, place & route, timing analysis, and on-chip debugging. Both offer free editions suitable for academic use with most common FPGA families.",
+      "AMBA (Advanced Microcontroller Bus Architecture) is the de-facto standard for on-chip interconnects in ARM-based SoCs. AHB-Lite provides a simple single-master bus, AXI enables high-performance multi-master access with out-of-order transactions, and APB offers a low-power interface for slow peripherals.",
     features: [
-      "RTL synthesis and optimisation",
-      "Place and route",
-      "Static timing analysis",
-      "Integrated logic analyser (ILA/SignalTap)",
-      "IP integrator and block design",
-      "Free academic licences available",
+      "AHB-Lite: simple single-master bus",
+      "AXI: high-performance, out-of-order, multi-master",
+      "APB: low-power peripheral bus",
+      "Bus matrix for concurrent access",
+      "Well-documented open specification",
+      "Widely supported by IP vendors",
     ],
     links: [
-      { label: "AMD Vivado", url: "https://www.xilinx.com/products/design-tools/vivado.html" },
-      {
-        label: "Intel Quartus",
-        url: "https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html",
-      },
+      { label: "AMBA Specification", url: "https://developer.arm.com/architectures/system-architectures/amba" },
     ],
   },
+
+  // ── Components > Peripherals ──
   {
-    id: "yosys-openroad",
-    name: "Yosys + OpenROAD",
-    category: "Open Source EDA",
-    description: "Open-source synthesis and place & route toolchain. Enables fully open ASIC and FPGA flows.",
-    longDescription:
-      "Yosys is an open-source synthesis framework supporting Verilog and SystemVerilog. Combined with OpenROAD for place & route, it enables a fully open-source ASIC flow from RTL to GDSII. Also supports open FPGA flows targeting Lattice iCE40 and ECP5 devices via nextpnr.",
-    features: [
-      "Open-source Verilog synthesis",
-      "ASIC flow via OpenROAD",
-      "FPGA flow via nextpnr",
-      "Technology mapping",
-      "Formal verification via sby",
-      "Active community and development",
-    ],
-    links: [
-      { label: "Yosys GitHub", url: "https://github.com/YosysHQ/yosys" },
-      { label: "OpenROAD", url: "https://openroad.readthedocs.io/" },
-    ],
-  },
-  {
-    id: "cadence-synopsys",
-    name: "Cadence / Synopsys",
-    category: "ASIC Tools",
+    id: "standard-peripherals",
+    name: "Standard Peripheral IP",
+    group: "Components",
+    category: "Peripherals",
     description:
-      "Commercial EDA tools for synthesis, physical design, and sign-off. Available through academic licensing programmes.",
+      "Common on-chip peripherals including GPIO, UART, SPI, I2C, timers, and watchdog for embedded SoC designs.",
     longDescription:
-      "Cadence and Synopsys provide the industry-standard toolchains for ASIC design. From logic synthesis (Genus/Design Compiler) through physical design (Innovus/ICC2) to sign-off (Tempus/PrimeTime), these tools enable production-quality tapeouts. Academic licences are available through university programmes.",
+      "Standard peripheral IP blocks provide essential I/O and control functionality for embedded SoCs. These include general-purpose I/O (GPIO), serial communication (UART, SPI, I2C), timers, watchdog, and real-time clocks. Available as open-source or through ARM DesignStart.",
     features: [
-      "Logic synthesis (Genus / Design Compiler)",
-      "Physical design (Innovus / ICC2)",
-      "Timing sign-off (Tempus / PrimeTime)",
-      "DRC/LVS (Calibre / IC Validator)",
-      "Power analysis (Voltus / PrimePower)",
-      "Academic licensing available",
+      "GPIO with programmable direction and interrupts",
+      "UART with configurable baud rate",
+      "SPI master/slave with DMA support",
+      "I2C multi-master capable",
+      "32-bit timers with capture/compare",
+      "Watchdog with system reset",
     ],
     links: [
-      { label: "Cadence Academic", url: "https://www.cadence.com/en_US/home/company/cadence-academic-network.html" },
-      { label: "Synopsys University", url: "https://www.synopsys.com/university.html" },
+      { label: "ARM CMSDK Peripherals", url: "https://developer.arm.com/Tools%20and%20Software/Corstone-101" },
     ],
   },
+
+  // ── Components > Memory Controllers ──
+  {
+    id: "memory-controllers",
+    name: "SRAM & Memory Controllers",
+    group: "Components",
+    category: "Memory Controllers",
+    description:
+      "On-chip SRAM blocks and memory controller IP for interfacing with external memories in SoC designs.",
+    longDescription:
+      "Memory subsystems are critical to SoC performance. On-chip SRAM provides fast, low-latency storage for code and data, while memory controllers manage access to external DRAM or Flash. Designs must consider bandwidth, latency, power, and area trade-offs.",
+    features: [
+      "Single-port and dual-port SRAM blocks",
+      "Configurable memory sizes",
+      "AHB/AXI memory interface wrappers",
+      "Optional ECC for reliability",
+      "Low-power retention modes",
+      "BIST (Built-In Self Test) support",
+    ],
+    links: [],
+  },
+
+  // ── Components > Hardware Acceleration ──
+  {
+    id: "hw-acceleration",
+    name: "Custom Accelerator Interfaces",
+    group: "Components",
+    category: "Hardware Acceleration",
+    description:
+      "Standardised interfaces and templates for integrating custom hardware accelerators into ARM-based SoCs.",
+    longDescription:
+      "Custom accelerators are key to achieving high performance and energy efficiency for domain-specific workloads. SoC Labs provides standardised accelerator interface templates compatible with AMBA bus protocols, enabling rapid integration of custom compute engines for ML, DSP, cryptography, and more.",
+    features: [
+      "AHB-Lite slave accelerator template",
+      "AXI4 streaming interface support",
+      "DMA request and interrupt lines",
+      "Memory-mapped register interface",
+      "Configurable data width and buffering",
+      "Example accelerator designs available",
+    ],
+    links: [
+      { label: "SoC Labs Accelerator Guide", url: "https://git.soton.ac.uk/soclabs/accelerator-project" },
+    ],
+  },
+
+  // ── EDA Tooling > RTL Design ──
+  {
+    id: "verilator-linting",
+    name: "Verilator / Linting Tools",
+    group: "EDA Tooling",
+    category: "RTL Design",
+    description:
+      "Open-source RTL simulation and linting tools for catching design errors early in the development cycle.",
+    longDescription:
+      "Verilator compiles synthesisable Verilog and SystemVerilog into fast C++ or SystemC models. It also provides powerful linting capabilities that catch common RTL coding errors. Combined with tools like Spyglass, these form the first line of defence for design quality.",
+    features: [
+      "Fast cycle-accurate simulation",
+      "Comprehensive linting rules",
+      "SystemVerilog support",
+      "C++/SystemC testbench integration",
+      "Coverage collection",
+      "Open-source and free",
+    ],
+    links: [
+      { label: "Verilator", url: "https://www.veripool.org/verilator/" },
+    ],
+  },
+
+  // ── EDA Tooling > Verification ──
   {
     id: "uvm-cocotb",
     name: "UVM / cocotb",
+    group: "EDA Tooling",
     category: "Verification",
     description:
       "Universal Verification Methodology (SystemVerilog) and cocotb (Python) for comprehensive design verification.",
@@ -1017,6 +1071,210 @@ export const technologies = [
     links: [
       { label: "UVM Reference", url: "https://www.accellera.org/activities/working-groups/uvm" },
       { label: "cocotb GitHub", url: "https://github.com/cocotb/cocotb" },
+    ],
+  },
+
+  // ── EDA Tooling > Synthesis ──
+  {
+    id: "vivado-quartus",
+    name: "Vivado / Quartus",
+    group: "EDA Tooling",
+    category: "Synthesis",
+    description:
+      "Industry-standard FPGA development suites from AMD/Xilinx and Intel/Altera for synthesis, place & route, and programming.",
+    longDescription:
+      "Vivado (AMD/Xilinx) and Quartus Prime (Intel/Altera) are the primary FPGA development environments. They provide integrated synthesis, place & route, timing analysis, and on-chip debugging. Both offer free editions suitable for academic use with most common FPGA families.",
+    features: [
+      "RTL synthesis and optimisation",
+      "Place and route",
+      "Static timing analysis",
+      "Integrated logic analyser (ILA/SignalTap)",
+      "IP integrator and block design",
+      "Free academic licences available",
+    ],
+    links: [
+      { label: "AMD Vivado", url: "https://www.xilinx.com/products/design-tools/vivado.html" },
+      { label: "Intel Quartus", url: "https://www.intel.com/content/www/us/en/products/details/fpga/development-tools/quartus-prime.html" },
+    ],
+  },
+  {
+    id: "yosys",
+    name: "Yosys",
+    group: "EDA Tooling",
+    category: "Synthesis",
+    description: "Open-source synthesis framework supporting Verilog and SystemVerilog for both FPGA and ASIC flows.",
+    longDescription:
+      "Yosys is an open-source synthesis framework that converts RTL into optimised gate-level netlists. It supports technology mapping to FPGA architectures (via nextpnr) and standard cell libraries for ASIC flows. Its modular architecture enables custom synthesis passes and formal verification via sby.",
+    features: [
+      "Open-source Verilog synthesis",
+      "Technology mapping to FPGAs and ASICs",
+      "Formal verification via sby",
+      "Modular pass-based architecture",
+      "Lattice iCE40 / ECP5 support",
+      "Active community and development",
+    ],
+    links: [
+      { label: "Yosys GitHub", url: "https://github.com/YosysHQ/yosys" },
+    ],
+  },
+  {
+    id: "design-compiler-genus",
+    name: "Design Compiler / Genus",
+    group: "EDA Tooling",
+    category: "Synthesis",
+    description:
+      "Industry-standard ASIC logic synthesis tools from Synopsys and Cadence for production-quality gate-level netlists.",
+    longDescription:
+      "Design Compiler (Synopsys) and Genus (Cadence) are the leading commercial logic synthesis tools for ASIC design. They translate RTL into optimised gate-level netlists mapped to standard cell libraries, with advanced timing optimisation, power analysis, and design-for-test insertion capabilities.",
+    features: [
+      "Advanced timing-driven synthesis",
+      "Multi-corner multi-mode optimisation",
+      "Power-aware synthesis (UPF/CPF)",
+      "DFT insertion (scan chains)",
+      "Standard cell library mapping",
+      "Academic licensing available",
+    ],
+    links: [
+      { label: "Synopsys University", url: "https://www.synopsys.com/university.html" },
+      { label: "Cadence Academic", url: "https://www.cadence.com/en_US/home/company/cadence-academic-network.html" },
+    ],
+  },
+
+  // ── EDA Tooling > Physical Design ──
+  {
+    id: "openroad",
+    name: "OpenROAD",
+    group: "EDA Tooling",
+    category: "Physical Design",
+    description: "Open-source physical design platform providing automated floorplanning, placement, CTS, and routing.",
+    longDescription:
+      "OpenROAD is an open-source RTL-to-GDSII flow that automates floorplanning, placement, clock tree synthesis, and routing. It enables fully transparent ASIC physical design without commercial tool licences, making tapeout accessible for academic and research groups.",
+    features: [
+      "Automated floorplanning",
+      "Global and detailed placement",
+      "Clock tree synthesis (CTS)",
+      "Global and detailed routing",
+      "Timing-driven optimisation",
+      "Open PDK support (SkyWater 130nm)",
+    ],
+    links: [
+      { label: "OpenROAD", url: "https://openroad.readthedocs.io/" },
+    ],
+  },
+  {
+    id: "innovus-icc2",
+    name: "Innovus / ICC2",
+    group: "EDA Tooling",
+    category: "Physical Design",
+    description:
+      "Commercial physical design tools from Cadence and Synopsys for production-quality ASIC place & route.",
+    longDescription:
+      "Innovus (Cadence) and IC Compiler II (Synopsys) are the industry-standard tools for ASIC physical design. They provide advanced placement, clock tree synthesis, routing, and optimisation engines that achieve production-quality results across advanced technology nodes.",
+    features: [
+      "Advanced multi-objective placement",
+      "Clock tree synthesis and optimisation",
+      "Detail routing with DRC fix",
+      "IR drop and EM analysis",
+      "Multi-corner multi-mode optimisation",
+      "Academic licensing available",
+    ],
+    links: [
+      { label: "Cadence Innovus", url: "https://www.cadence.com/en_US/home/tools/digital-design-and-signoff/soc-implementation-and-floorplanning/innovus-implementation-system.html" },
+    ],
+  },
+
+  // ── EDA Tooling > Tapeout ──
+  {
+    id: "signoff-tools",
+    name: "Sign-off Tools (DRC / LVS / STA)",
+    group: "EDA Tooling",
+    category: "Tapeout",
+    description:
+      "Design rule checking, layout vs schematic verification, and static timing analysis tools for tapeout sign-off.",
+    longDescription:
+      "Before submitting a design for fabrication, it must pass sign-off checks: DRC verifies manufacturing rules, LVS confirms the layout matches the schematic, and STA ensures timing is met across all operating corners. Tools include Calibre (Siemens), IC Validator (Synopsys), and PrimeTime.",
+    features: [
+      "DRC: design rule checking",
+      "LVS: layout vs schematic verification",
+      "STA: static timing analysis",
+      "Power integrity analysis",
+      "Signal integrity checks",
+      "GDSII generation and validation",
+    ],
+    links: [
+      { label: "Siemens Calibre", url: "https://eda.sw.siemens.com/en-US/ic/calibre/" },
+    ],
+  },
+
+  // ── EDA Tooling > Silicon Validation ──
+  {
+    id: "debug-test-tools",
+    name: "Debug & Test Equipment",
+    group: "EDA Tooling",
+    category: "Silicon Validation",
+    description:
+      "JTAG debuggers, logic analysers, and automated test equipment for post-silicon bring-up and validation.",
+    longDescription:
+      "After fabrication, silicon must be validated against its specification. This requires JTAG debug probes (e.g., ARM DSTREAM), logic analysers, oscilloscopes, and automated test equipment (ATE). Software tools like ARM DS-5 and OpenOCD provide debug access to the running chip.",
+    features: [
+      "JTAG / SWD debug access",
+      "ARM DSTREAM / ULINKpro probes",
+      "OpenOCD open-source debugger",
+      "Logic analyser integration",
+      "Power measurement and profiling",
+      "Automated test pattern generation",
+    ],
+    links: [
+      { label: "OpenOCD", url: "https://openocd.org/" },
+      { label: "ARM Development Studio", url: "https://developer.arm.com/Tools%20and%20Software/Arm%20Development%20Studio" },
+    ],
+  },
+
+  // ── Infrastructure > FPGA Boards ──
+  {
+    id: "fpga-boards",
+    name: "FPGA Development Boards",
+    group: "Infrastructure",
+    category: "FPGA Boards",
+    description:
+      "Prototyping boards from Xilinx/AMD and Intel/Altera used for SoC validation before ASIC fabrication.",
+    longDescription:
+      "FPGA development boards provide real hardware for prototyping SoC designs. Popular boards include Digilent Arty A7 (Xilinx Artix-7), Terasic DE10 (Intel Cyclone V), and higher-end platforms for larger designs. FPGA prototyping is a critical step before committing to silicon.",
+    features: [
+      "Digilent Arty A7 (Artix-7 35T/100T)",
+      "Terasic DE10 (Cyclone V)",
+      "Nexys A7 for education",
+      "On-board JTAG programming",
+      "Pmod and Arduino-compatible headers",
+      "Academic pricing available",
+    ],
+    links: [
+      { label: "Digilent Arty A7", url: "https://digilent.com/shop/arty-a7/" },
+      { label: "Terasic DE10", url: "https://www.terasic.com.tw/" },
+    ],
+  },
+
+  // ── Infrastructure > Shuttle Services ──
+  {
+    id: "shuttle-services",
+    name: "ASIC Shuttle Services",
+    group: "Infrastructure",
+    category: "Shuttle Services",
+    description:
+      "Multi-project wafer services enabling affordable silicon fabrication for academic and research designs.",
+    longDescription:
+      "ASIC shuttle services share wafer costs across multiple designs, making fabrication affordable for universities and small teams. Europractice provides access to advanced nodes (TSMC, GlobalFoundries), while Google/efabless OpenMPW offers free fabrication on SkyWater 130nm for open-source designs.",
+    features: [
+      "Europractice MPW shuttles",
+      "Google/efabless OpenMPW (free)",
+      "chipIgnite programme",
+      "MOSIS educational shuttles",
+      "Technology nodes from 130nm to 7nm",
+      "Package and test included",
+    ],
+    links: [
+      { label: "Europractice", url: "https://europractice-ic.com/" },
+      { label: "efabless chipIgnite", url: "https://efabless.com/" },
     ],
   },
 ];
