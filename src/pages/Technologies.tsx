@@ -3,10 +3,9 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import ScrollReveal from "@/components/ScrollReveal";
 import { technologies } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Build the tree: group → subcategory → technologies
@@ -62,11 +61,29 @@ function getSubcategories(groupKey: string) {
 
 const Technologies = () => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
 
   const toggleTech = (name: string) => {
     setSelectedTechs((prev) =>
       prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name]
     );
+  };
+
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
+
+  const toggleSubcat = (key: string) => {
+    setCollapsedSubcats((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
   };
 
   const selectedCount = selectedTechs.length;
@@ -88,152 +105,209 @@ const Technologies = () => {
             </p>
           </motion.div>
 
-          {/* Group tabs */}
+          {/* Groups */}
           {groups.map((group, gi) => {
             const Icon = group.icon;
             const subcats = getSubcategories(group.key);
+            const isGroupCollapsed = collapsedGroups.has(group.key);
+            const techCount = technologies.filter((t) => (t as any).group === group.key).length;
 
             return (
-              <ScrollReveal key={group.key} delay={gi * 0.1} className="max-w-5xl mx-auto mb-16">
-                {/* Group header */}
-                <div className={cn("rounded-2xl border bg-card/50 p-6 md:p-8", groupColors[group.key])}>
-                  <div className="flex items-center gap-3 mb-1">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <motion.div
+                key={group.key}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: gi * 0.1 }}
+                className="max-w-5xl mx-auto mb-8"
+              >
+                <div className={cn("rounded-2xl border bg-card/50 overflow-hidden", groupColors[group.key])}>
+                  {/* Group header — clickable */}
+                  <button
+                    onClick={() => toggleGroup(group.key)}
+                    className="w-full flex items-center gap-3 p-6 md:p-8 text-left hover:bg-accent/30 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <h2 className="text-2xl font-display font-bold">{group.label}</h2>
                       <p className="text-sm text-muted-foreground">{group.description}</p>
                     </div>
-                  </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-xs text-muted-foreground font-medium">{techCount}</span>
+                      <ChevronDown
+                        className={cn(
+                          "h-5 w-5 text-muted-foreground transition-transform duration-300",
+                          isGroupCollapsed && "-rotate-90"
+                        )}
+                      />
+                    </div>
+                  </button>
 
-                  {/* Subcategories */}
-                  <div className="mt-6 space-y-8">
-                    {subcats.map((subcat, sci) => {
-                      const techsInSubcat = technologies.filter(
-                        (t) => (t as any).group === group.key && t.category === subcat
-                      );
+                  {/* Group content */}
+                  <AnimatePresence initial={false}>
+                    {!isGroupCollapsed && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 md:px-8 pb-6 md:pb-8 space-y-6">
+                          {subcats.map((subcat) => {
+                            const subcatKey = `${group.key}::${subcat}`;
+                            const isSubcatCollapsed = collapsedSubcats.has(subcatKey);
+                            const techsInSubcat = technologies.filter(
+                              (t) => (t as any).group === group.key && t.category === subcat
+                            );
 
-                      return (
-                        <div key={subcat}>
-                          <div className="flex items-center gap-2 mb-3 ml-1">
-                            <div className="w-1 h-5 rounded-full bg-primary/30" />
-                            <span
-                              className={cn(
-                                "text-xs px-3 py-1 rounded-full font-semibold",
-                                subcategoryColors[subcat] || "bg-muted text-muted-foreground"
-                              )}
-                            >
-                              {subcat}
-                            </span>
-                            {group.key === "EDA Tooling" && (
-                              <Link
-                                to={`/learn`}
-                                className="text-[10px] text-muted-foreground hover:text-primary transition-colors ml-1"
-                              >
-                                → Learning Hub
-                              </Link>
-                            )}
-                          </div>
-
-                          <div className="grid md:grid-cols-2 gap-3">
-                            {techsInSubcat.map((tech, i) => {
-                              const isSelected = selectedTechs.includes(tech.name);
-                              return (
-                                <div key={tech.id} className="relative">
-                                  <Link to={`/technologies/${tech.id}`}>
-                                    <Card
-                                      className={cn(
-                                        "hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
-                                        isSelected
-                                          ? "border-primary/40 shadow-md shadow-primary/10 bg-primary/[0.02]"
-                                          : "border-border/60"
-                                      )}
-                                    >
-                                      <CardContent className="p-5 pr-14">
-                                        <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
-                                        <p className="text-sm text-muted-foreground leading-relaxed">
-                                          {tech.description}
-                                        </p>
-                                      </CardContent>
-                                    </Card>
-                                  </Link>
-                                  <button
-                                    onClick={() => toggleTech(tech.name)}
+                            return (
+                              <div key={subcat}>
+                                {/* Subcategory header — clickable */}
+                                <button
+                                  onClick={() => toggleSubcat(subcatKey)}
+                                  className="flex items-center gap-2 mb-3 ml-1 group/sub w-full text-left"
+                                >
+                                  <div className="w-1 h-5 rounded-full bg-primary/30" />
+                                  <span
                                     className={cn(
-                                      "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
-                                      isSelected
-                                        ? "border-primary bg-primary text-primary-foreground"
-                                        : "border-border/60 hover:border-primary/50"
+                                      "text-xs px-3 py-1 rounded-full font-semibold",
+                                      subcategoryColors[subcat] || "bg-muted text-muted-foreground"
                                     )}
-                                    title={
-                                      isSelected
-                                        ? "Interest registered"
-                                        : `Register interest in ${tech.name}`
-                                    }
                                   >
-                                    {isSelected && <Check className="h-3.5 w-3.5" />}
-                                  </button>
-                                </div>
-                              );
-                            })}
-                          </div>
+                                    {subcat}
+                                  </span>
+                                  <span className="text-[10px] text-muted-foreground ml-0.5">
+                                    {techsInSubcat.length}
+                                  </span>
+                                  {group.key === "EDA Tooling" && (
+                                    <Link
+                                      to="/learn"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="text-[10px] text-muted-foreground hover:text-primary transition-colors ml-1"
+                                    >
+                                      → Learning Hub
+                                    </Link>
+                                  )}
+                                  <ChevronDown
+                                    className={cn(
+                                      "h-3.5 w-3.5 text-muted-foreground/60 transition-transform duration-200 ml-auto",
+                                      isSubcatCollapsed && "-rotate-90"
+                                    )}
+                                  />
+                                </button>
+
+                                {/* Subcategory cards */}
+                                <AnimatePresence initial={false}>
+                                  {!isSubcatCollapsed && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: "auto", opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                                      className="overflow-hidden"
+                                    >
+                                      <div className="grid md:grid-cols-2 gap-3">
+                                        {techsInSubcat.map((tech) => {
+                                          const isSelected = selectedTechs.includes(tech.name);
+                                          return (
+                                            <div key={tech.id} className="relative">
+                                              <Link to={`/technologies/${tech.id}`}>
+                                                <Card
+                                                  className={cn(
+                                                    "hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300",
+                                                    isSelected
+                                                      ? "border-primary/40 shadow-md shadow-primary/10 bg-primary/[0.02]"
+                                                      : "border-border/60"
+                                                  )}
+                                                >
+                                                  <CardContent className="p-5 pr-14">
+                                                    <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
+                                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                                      {tech.description}
+                                                    </p>
+                                                  </CardContent>
+                                                </Card>
+                                              </Link>
+                                              <button
+                                                onClick={() => toggleTech(tech.name)}
+                                                className={cn(
+                                                  "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
+                                                  isSelected
+                                                    ? "border-primary bg-primary text-primary-foreground"
+                                                    : "border-border/60 hover:border-primary/50"
+                                                )}
+                                                title={
+                                                  isSelected
+                                                    ? "Interest registered"
+                                                    : `Register interest in ${tech.name}`
+                                                }
+                                              >
+                                                {isSelected && <Check className="h-3.5 w-3.5" />}
+                                              </button>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </ScrollReveal>
+              </motion.div>
             );
           })}
 
           {/* FPGA & ASIC Processes */}
           <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mt-8">
-            <ScrollReveal direction="left">
-              <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
-                <h2 className="text-xl font-display font-bold mb-4">FPGA Prototyping Process</h2>
-                <ol className="space-y-3">
-                  {[
-                    "Synthesise your RTL for target FPGA (Xilinx/Intel)",
-                    "Run place & route with timing constraints",
-                    "Generate bitstream and program the FPGA",
-                    "Develop software drivers and test firmware",
-                    "Debug with integrated logic analyser (ILA/SignalTap)",
-                    "Benchmark performance on real hardware",
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="text-primary font-display font-bold text-xs mt-0.5">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </ScrollReveal>
+            <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
+              <h2 className="text-xl font-display font-bold mb-4">FPGA Prototyping Process</h2>
+              <ol className="space-y-3">
+                {[
+                  "Synthesise your RTL for target FPGA (Xilinx/Intel)",
+                  "Run place & route with timing constraints",
+                  "Generate bitstream and program the FPGA",
+                  "Develop software drivers and test firmware",
+                  "Debug with integrated logic analyser (ILA/SignalTap)",
+                  "Benchmark performance on real hardware",
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-primary font-display font-bold text-xs mt-0.5">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
 
-            <ScrollReveal direction="right">
-              <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
-                <h2 className="text-xl font-display font-bold mb-4">ASIC Tapeout Process</h2>
-                <ol className="space-y-3">
-                  {[
-                    "Complete RTL verification and freeze design",
-                    "Run logic synthesis targeting standard cell library",
-                    "Physical design: floorplanning, placement, routing",
-                    "Sign-off checks: DRC, LVS, timing closure",
-                    "Submit to shuttle service (Europractice, OpenMPW)",
-                    "Receive packaged chips and run post-silicon validation",
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="text-coral font-display font-bold text-xs mt-0.5">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </ScrollReveal>
+            <div className="rounded-2xl border border-border/60 bg-card p-7 shadow-sm">
+              <h2 className="text-xl font-display font-bold mb-4">ASIC Tapeout Process</h2>
+              <ol className="space-y-3">
+                {[
+                  "Complete RTL verification and freeze design",
+                  "Run logic synthesis targeting standard cell library",
+                  "Physical design: floorplanning, placement, routing",
+                  "Sign-off checks: DRC, LVS, timing closure",
+                  "Submit to shuttle service (Europractice, OpenMPW)",
+                  "Receive packaged chips and run post-silicon validation",
+                ].map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
+                    <span className="text-coral font-display font-bold text-xs mt-0.5">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
         </div>
       </section>
