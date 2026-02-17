@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -60,10 +61,17 @@ const slideVariants = {
 
 const StartProject = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [joinOpen, setJoinOpen] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
+
+  // Skip sign-up step when logged in
+  const effectiveStepLabels = user ? stepLabels.slice(1) : stepLabels;
+  const effectiveTotalSteps = user ? TOTAL_STEPS - 1 : TOTAL_STEPS;
+  // Map internal step to the actual content step (offset by 1 when logged in)
+  const contentStep = user ? step + 1 : step;
 
   // Form state
   const [title, setTitle] = useState("");
@@ -125,18 +133,18 @@ const StartProject = () => {
   const removeEmailInvite = (email: string) => setEmailInvites((prev) => prev.filter((e) => e !== email));
 
   const canProceed = () => {
-    if (step === 0) return isSignedUp;
-    if (step === 1) return title.trim().length > 0;
-    if (step === 2) return referenceSoc.length > 0;
+    if (contentStep === 0) return isSignedUp;
+    if (contentStep === 1) return title.trim().length > 0;
+    if (contentStep === 2) return referenceSoc.length > 0;
     return true;
   };
 
   const goNext = () => {
     if (!canProceed()) {
-      toast({ title: "Please complete this step", description: step === 0 ? "Please sign up first." : step === 1 ? "Project title is required." : "Please select a reference SoC.", variant: "destructive" });
+      toast({ title: "Please complete this step", description: contentStep === 0 ? "Please sign up first." : contentStep === 1 ? "Project title is required." : "Please select a reference SoC.", variant: "destructive" });
       return;
     }
-    if (step < TOTAL_STEPS - 1) { setDirection(1); setStep((s) => s + 1); }
+    if (step < effectiveTotalSteps - 1) { setDirection(1); setStep((s) => s + 1); }
   };
   const goBack = () => { if (step > 0) { setDirection(-1); setStep((s) => s - 1); } };
 
@@ -176,7 +184,7 @@ const StartProject = () => {
           {/* Stepper */}
           <div className="mb-10">
             <div className="flex items-center justify-between mb-3">
-              {stepLabels.map((label, i) => (
+              {effectiveStepLabels.map((label, i) => (
                 <button
                   key={label}
                   type="button"
@@ -202,7 +210,7 @@ const StartProject = () => {
               <motion.div
                 className="h-full bg-primary rounded-full"
                 initial={false}
-                animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
+                animate={{ width: `${((step + 1) / effectiveTotalSteps) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
             </div>
@@ -220,7 +228,7 @@ const StartProject = () => {
                 exit="exit"
                 transition={{ duration: 0.25, ease: "easeInOut" }}
               >
-                {step === 0 && (
+                {contentStep === 0 && (
                   <Card>
                     <CardContent className="p-8 text-center space-y-6">
                       <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center">
@@ -246,7 +254,7 @@ const StartProject = () => {
                   </Card>
                 )}
 
-                {step === 1 && (
+                {contentStep === 1 && (
                   <Card>
                     <CardContent className="p-6 space-y-5">
                       <h2 className="text-lg font-display font-semibold">Project Details</h2>
@@ -262,7 +270,7 @@ const StartProject = () => {
                   </Card>
                 )}
 
-                {step === 2 && (
+                {contentStep === 2 && (
                   <Card>
                     <CardContent className="p-6 space-y-5">
                       <h2 className="text-lg font-display font-semibold">Reference SoC *</h2>
@@ -289,7 +297,7 @@ const StartProject = () => {
                   </Card>
                 )}
 
-                {step === 3 && (
+                {contentStep === 3 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -349,7 +357,7 @@ const StartProject = () => {
                   </div>
                 )}
 
-                {step === 4 && (
+                {contentStep === 4 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -421,7 +429,7 @@ const StartProject = () => {
                   </div>
                 )}
 
-                {step === 5 && (
+                {contentStep === 5 && (
                   <div className="space-y-6">
                     <Card>
                       <CardContent className="p-6 space-y-5">
@@ -516,10 +524,10 @@ const StartProject = () => {
             </Button>
 
             <span className="text-xs text-muted-foreground">
-              Step {step + 1} of {TOTAL_STEPS}
+              Step {step + 1} of {effectiveTotalSteps}
             </span>
 
-            {step < TOTAL_STEPS - 1 ? (
+            {step < effectiveTotalSteps - 1 ? (
               <Button type="button" onClick={goNext} className="rounded-full px-6">
                 Next <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
