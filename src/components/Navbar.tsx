@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Cpu, LogIn, LogOut, User } from "lucide-react";
+import { Menu, X, Cpu, LogIn, LogOut, User, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import JoinCommunityDialog from "@/components/JoinCommunityDialog";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { to: "/designs", label: "Reference Designs" },
@@ -53,35 +59,43 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-2">
           {!loading && (
             user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-primary-foreground/70 max-w-[140px] truncate">
-                  {user.email}
-                </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="rounded-full text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 gap-1.5"
+                  >
+                    <User className="h-4 w-4" />
+                    Profile
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44 bg-card border border-border shadow-lg z-[100]">
+                  <DropdownMenuItem onClick={signOut} className="cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
                 <Button
                   size="sm"
                   variant="ghost"
                   className="rounded-full text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
-                  onClick={signOut}
+                  asChild
                 >
-                  <LogOut className="h-4 w-4 mr-1" /> Sign Out
+                  <Link to="/auth">
+                    <LogIn className="h-4 w-4 mr-1" /> Sign In
+                  </Link>
                 </Button>
-              </div>
-            ) : (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="rounded-full text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
-                asChild
-              >
-                <Link to="/auth">
-                  <LogIn className="h-4 w-4 mr-1" /> Sign In
-                </Link>
-              </Button>
+                <Button size="sm" className="rounded-full px-5" onClick={() => setJoinOpen(true)}>
+                  Join Community
+                </Button>
+              </>
             )
           )}
-          <Button size="sm" className="rounded-full px-5" onClick={() => setJoinOpen(true)}>
-            Join Community
-          </Button>
         </div>
 
         <button className="lg:hidden text-primary-foreground" onClick={() => setOpen(!open)}>
@@ -118,21 +132,23 @@ const Navbar = () => {
                   <LogOut className="h-4 w-4 mr-2" /> Sign Out
                 </Button>
               ) : (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="mt-2 rounded-full justify-start text-primary-foreground/80"
-                  asChild
-                >
-                  <Link to="/auth" onClick={() => setOpen(false)}>
-                    <LogIn className="h-4 w-4 mr-2" /> Sign In
-                  </Link>
-                </Button>
+                <>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="mt-2 rounded-full justify-start text-primary-foreground/80"
+                    asChild
+                  >
+                    <Link to="/auth" onClick={() => setOpen(false)}>
+                      <LogIn className="h-4 w-4 mr-2" /> Sign In
+                    </Link>
+                  </Button>
+                  <Button size="sm" className="mt-1 rounded-full" onClick={() => { setOpen(false); setJoinOpen(true); }}>
+                    Join Community
+                  </Button>
+                </>
               )
             )}
-            <Button size="sm" className="mt-1 rounded-full" onClick={() => { setOpen(false); setJoinOpen(true); }}>
-              Join Community
-            </Button>
           </div>
         </div>
       )}
