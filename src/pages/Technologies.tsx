@@ -317,27 +317,36 @@ const Technologies = () => {
                                                 >
                                                   <CardContent className="p-5 pr-14">
                                                     <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
-                                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                                    <p className="text-sm text-muted-foreground leading-relaxed mb-2">
                                                       {tech.description}
                                                     </p>
+                                                    <span className={cn(
+                                                      "inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full transition-colors",
+                                                      isSelected
+                                                        ? "bg-primary/15 text-primary"
+                                                        : "bg-muted/60 text-muted-foreground"
+                                                    )}>
+                                                      <Check className={cn("h-2.5 w-2.5", isSelected ? "opacity-100" : "opacity-40")} />
+                                                      {isSelected ? "Interested" : "Register interest"}
+                                                    </span>
                                                   </CardContent>
                                                 </Card>
                                               </Link>
                                               <button
                                                 onClick={() => toggleTech(tech.name)}
                                                 className={cn(
-                                                  "absolute top-4 right-4 w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
+                                                  "absolute top-4 right-4 w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200 z-10",
                                                   isSelected
-                                                    ? "border-primary bg-primary text-primary-foreground"
-                                                    : "border-border/60 hover:border-primary/50"
+                                                    ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                                                    : "border-border/60 hover:border-primary/50 hover:bg-primary/5"
                                                 )}
                                                 title={
                                                   isSelected
-                                                    ? "Interest registered"
+                                                    ? "Interest registered ✓"
                                                     : `Register interest in ${tech.name}`
                                                 }
                                               >
-                                                {isSelected && <Check className="h-3.5 w-3.5" />}
+                                                {isSelected ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
                                               </button>
                                             </div>
                                           );
