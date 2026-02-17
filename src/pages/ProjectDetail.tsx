@@ -291,7 +291,7 @@ const ProjectDetail = () => {
 
             {/* Non-sticky milestone tracker (same as mock projects) */}
             {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
-              <div className="mb-4">
+              <div className="mb-2">
                 <MilestoneTracker
                   phaseProgress={milestonePhaseProgress}
                   milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
