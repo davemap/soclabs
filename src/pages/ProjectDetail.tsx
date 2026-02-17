@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import ProjectContentManager from "@/components/project-manage/ProjectContentManager";
 import ProjectMilestonesManager from "@/components/project-manage/ProjectMilestonesManager";
-import InlineMilestonesEditor from "@/components/project-manage/InlineMilestonesEditor";
+
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
 import { Textarea } from "@/components/ui/textarea";
@@ -245,6 +245,58 @@ const ProjectDetail = () => {
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [hasUnsavedChanges]);
+
+  // Inline edit state for milestones
+  const [editMilestones, setEditMilestones] = useState<{ id?: string; phase: string; task: string; done: boolean; sort_order: number }[]>([]);
+  const [savingMilestones, setSavingMilestones] = useState(false);
+
+  useEffect(() => {
+    if (editMode && dbMilestones.length > 0) {
+      setEditMilestones(dbMilestones.map((m: any) => ({ id: m.id, phase: m.phase, task: m.task, done: m.done, sort_order: m.sort_order })));
+    } else if (editMode) {
+      setEditMilestones([]);
+    }
+  }, [editMode, dbMilestones]);
+
+  const handleEditMilestoneAdd = (phase: string) => {
+    setEditMilestones(prev => [...prev, { phase, task: "", done: false, sort_order: prev.length }]);
+  };
+
+  const handleEditMilestoneRemove = async (index: number) => {
+    const m = editMilestones[index];
+    if (m.id) {
+      await supabase.from("project_milestones").delete().eq("id", m.id);
+    }
+    setEditMilestones(prev => prev.filter((_, i) => i !== index));
+    toast.success("Task removed");
+    refreshMilestones();
+  };
+
+  const handleEditMilestoneUpdate = (index: number, field: string, value: any) => {
+    setEditMilestones(prev => prev.map((m, i) => i === index ? { ...m, [field]: value } : m));
+  };
+
+  const handleEditMilestonesSave = async () => {
+    setSavingMilestones(true);
+    try {
+      for (let i = 0; i < editMilestones.length; i++) {
+        const m = editMilestones[i];
+        if (!m.task.trim()) continue;
+        if (m.id) {
+          await supabase.from("project_milestones").update({ phase: m.phase, task: m.task, done: m.done, sort_order: i }).eq("id", m.id);
+        } else {
+          const { data } = await supabase.from("project_milestones").insert({ project_id: dbProject?.id, phase: m.phase, task: m.task, done: m.done, sort_order: i }).select().single();
+          if (data) editMilestones[i] = { ...m, id: data.id, sort_order: i };
+        }
+      }
+      setEditMilestones([...editMilestones]);
+      toast.success("Milestones saved");
+      refreshMilestones();
+    } catch {
+      toast.error("Failed to save milestones");
+    }
+    setSavingMilestones(false);
+  };
 
   // Wrap "Done Editing" toggle with unsaved check
   const handleToggleEditMode = useCallback(() => {
@@ -663,37 +715,36 @@ const ProjectDetail = () => {
             )}
 
             {/* DB Milestones display / inline edit */}
-            {editMode && isOwner ? (
-              <div id="project-milestones" className="mb-10">
-                <InlineMilestonesEditor
-                  projectId={dbProject.id}
-                  technology={dbProject.target_technology}
-                  onSave={refreshMilestones}
-                />
-              </div>
-            ) : (
-              <div id="project-milestones">
-                <ProjectMilestones
-                  milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                  expandPhase={expandPhase}
-                  expandTaskIndex={expandTaskIndex}
-                  technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                  trackerSlot={
-                    (togglePhase: (phase: string) => void) => (
-                      <MilestoneTracker
-                        phaseProgress={milestonePhaseProgress}
-                        milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
-                        onPhaseClick={(phase) => togglePhase(phase)}
-                        technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
-                        isFloating={false}
-                        isSticky={false}
-                        compact
-                      />
-                    )
-                  }
-                />
-              </div>
-            )}
+            <div id="project-milestones">
+              <ProjectMilestones
+                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                expandPhase={expandPhase}
+                expandTaskIndex={expandTaskIndex}
+                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                trackerSlot={
+                  !editMode
+                    ? (togglePhase: (phase: string) => void) => (
+                        <MilestoneTracker
+                          phaseProgress={milestonePhaseProgress}
+                          milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                          onPhaseClick={(phase) => togglePhase(phase)}
+                          technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                          isFloating={false}
+                          isSticky={false}
+                          compact
+                        />
+                      )
+                    : undefined
+                }
+                editMode={editMode && isOwner}
+                editMilestones={editMode && isOwner ? editMilestones : undefined}
+                onEditAdd={handleEditMilestoneAdd}
+                onEditRemove={handleEditMilestoneRemove}
+                onEditUpdate={handleEditMilestoneUpdate}
+                onEditSave={handleEditMilestonesSave}
+                editSaving={savingMilestones}
+              />
+            </div>
 
             {/* Join Request Form for non-owners */}
             {user && !isOwner && !existingRequest && (

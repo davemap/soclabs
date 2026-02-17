@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen } from "lucide-react";
+import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -27,6 +29,14 @@ interface PhaseDateInfo {
   completedDate?: string;
 }
 
+interface EditableMilestone {
+  id?: string;
+  phase: string;
+  task: string;
+  done: boolean;
+  sort_order: number;
+}
+
 interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
@@ -37,6 +47,13 @@ interface ProjectMilestonesProps {
   phaseDates?: Record<string, PhaseDateInfo>;
   technology?: string;
   trackerSlot?: React.ReactNode | ((togglePhase: (phase: string) => void, expandedPhases: Set<string>) => React.ReactNode);
+  editMode?: boolean;
+  editMilestones?: EditableMilestone[];
+  onEditAdd?: (phase: string) => void;
+  onEditRemove?: (index: number) => void;
+  onEditUpdate?: (index: number, field: string, value: any) => void;
+  onEditSave?: () => void;
+  editSaving?: boolean;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -109,7 +126,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -185,17 +202,22 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
 
   const greyedOutPhases = technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
   const phaseOrder = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
+  
+  // In edit mode, use editMilestones for task display; show all non-greyed phases
+  const displayMilestones = editMode && editMilestones ? editMilestones : milestones;
   const grouped = phaseOrder
     .map((phase) => ({
       phase,
       label: phaseLabels[phase] || phase,
-      tasks: milestones.filter((m) => m.phase === phase),
+      tasks: editMode && editMilestones
+        ? editMilestones.map((m, i) => ({ ...m, originalIndex: i })).filter((m) => m.phase === phase)
+        : milestones.filter((m) => m.phase === phase).map((m, i) => ({ ...m, originalIndex: -1 })),
       greyedOut: greyedOutPhases.has(phase),
     }))
-    .filter((g) => g.tasks.length > 0 || g.greyedOut);
+    .filter((g) => g.tasks.length > 0 || g.greyedOut || editMode);
 
-  const totalDone = milestones.filter((m) => m.done).length;
-  const totalTasks = milestones.length;
+  const totalDone = displayMilestones.filter((m) => m.done).length;
+  const totalTasks = displayMilestones.length;
 
   return (
     <motion.div
@@ -211,6 +233,11 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
         <span className="text-sm text-muted-foreground ml-auto">
           {totalDone}/{totalTasks} completed
         </span>
+        {editMode && onEditSave && (
+          <Button size="sm" onClick={onEditSave} disabled={editSaving} className="rounded-full h-8">
+            <Save className="h-3.5 w-3.5 mr-1" /> {editSaving ? "Saving..." : "Save All"}
+          </Button>
+        )}
         {(expandedPhases.size > 0 || expandedTasks.size > 0) && (
           <button
             onClick={() => { setExpandedPhases(new Set()); setExpandedTasks(new Set()); }}
@@ -318,7 +345,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                   {done}/{tasks.length}
                 </span>
               </button>
-                {learningPhase && (
+                {learningPhase && !editMode && (
                   <Link
                     to={`/learn/${learningPhase.id}/${learningPhase.topics[0].id}`}
                     className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary hover:bg-muted/30 rounded-md transition-colors"
@@ -327,6 +354,14 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     <BookOpen className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Learn</span>
                   </Link>
+                )}
+                {editMode && onEditAdd && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEditAdd(phase); if (!isExpanded) togglePhase(phase); }}
+                    className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 text-[11px] font-medium text-primary hover:bg-primary/10 rounded-md transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Add
+                  </button>
                 )}
               </div>
 
@@ -371,7 +406,42 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                       )}
 
                       <div className="space-y-1">
-                      {tasks.map((task, i) => {
+                      {editMode ? (
+                        <>
+                          {tasks.length === 0 && (
+                            <p className="text-xs text-muted-foreground py-2 px-1">No tasks yet. Click "Add" above to get started.</p>
+                          )}
+                          {tasks.map((task) => (
+                            <div key={task.originalIndex} className="flex items-center gap-2 rounded-lg bg-muted/30 px-3 py-2">
+                              <button
+                                type="button"
+                                onClick={() => onEditUpdate?.(task.originalIndex, "done", !task.done)}
+                                className="shrink-0"
+                              >
+                                {task.done ? (
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                ) : (
+                                  <Circle className="h-4 w-4 text-muted-foreground/40" />
+                                )}
+                              </button>
+                              <Input
+                                placeholder="Task description..."
+                                value={task.task}
+                                onChange={(e) => onEditUpdate?.(task.originalIndex, "task", e.target.value)}
+                                className="flex-1 h-8 text-sm border-none bg-transparent shadow-none focus-visible:ring-0 px-1"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => onEditRemove?.(task.originalIndex)}
+                                className="shrink-0 p-1 rounded hover:bg-destructive/10 transition-colors"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                              </button>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                      tasks.map((task, i) => {
                         const taskKey = `${phase}-${i}`;
                         const taskExpanded = expandedTasks.has(taskKey);
                         const overrun = isOverrunning(task);
@@ -433,7 +503,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                   className="overflow-hidden"
                                 >
                                   <div className="px-3 pb-3 pt-1 space-y-2.5 border-t border-border/20">
-                                    {/* Learning topic links */}
                                     {task.learningTopicIds && task.learningTopicIds.length > 0 && (() => {
                                       const resolvedTopics = task.learningTopicIds!.map((topicId) => {
                                         for (const lp of learningPhases) {
@@ -461,7 +530,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                       );
                                     })()}
 
-                                    {/* Blurb */}
                                     {task.blurb && (
                                       <p className="text-xs text-muted-foreground leading-relaxed">
                                         {task.blurb}
@@ -469,7 +537,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                     )}
 
                                     <div className="flex flex-wrap gap-x-6 gap-y-2">
-                                      {/* Effort & Uncertainty */}
                                       {task.effort && (
                                         <RatingBar value={task.effort} colors={effortColors} label="Effort" />
                                       )}
@@ -478,7 +545,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                       )}
                                     </div>
 
-                                    {/* Dates */}
                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
                                       {task.startDate && (
                                         <span className="flex items-center gap-1">
@@ -506,7 +572,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                                       )}
                                     </div>
 
-                                    {/* Assignee */}
                                     {assignee && (
                                       <Link
                                         to={`/community/${assignee.id}`}
@@ -523,7 +588,8 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                             </AnimatePresence>
                           </div>
                         );
-                      })}
+                      })
+                      )}
                       </div>
                     </div>
                   </motion.div>
