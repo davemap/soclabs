@@ -89,7 +89,7 @@ const ProjectDetail = () => {
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
                   {author ? (
                     <Link
-                      to={`/members/${author.id}`}
+                      to={`/community/${author.id}`}
                       className="font-medium text-primary hover:underline transition-colors"
                     >
                       {project.author}
@@ -179,7 +179,7 @@ const ProjectDetail = () => {
                   </Avatar>
                   {author ? (
                     <Link
-                      to={`/members/${author.id}`}
+                      to={`/community/${author.id}`}
                       className="text-sm font-display font-bold hover:text-primary transition-colors"
                     >
                       {project.author}
@@ -205,7 +205,7 @@ const ProjectDetail = () => {
 
                     <div className="border-t border-border/60 mt-3 pt-3">
                       <Button asChild variant="outline" size="sm" className="w-full rounded-lg justify-start">
-                        <Link to={`/members/${author.id}`}>
+                        <Link to={`/community/${author.id}`}>
                           <User className="h-3.5 w-3.5 mr-2" /> View Profile
                         </Link>
                       </Button>
