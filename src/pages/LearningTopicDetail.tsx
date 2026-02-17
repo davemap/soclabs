@@ -91,29 +91,55 @@ const LearningTopicDetail = () => {
                       />
                       {learningPhases.map((p, i) => {
                         const Icon = iconMap[p.icon] || Cpu;
+                        const nonOverviewTopics = p.topics.filter((t) => !t.id.endsWith("-overview"));
                         return (
-                          <Link
-                            key={p.id}
-                            to={`/learn/${p.id}/${p.topics[0].id}`}
-                            className={cn(
-                              "relative z-10 flex flex-col items-center gap-2 group",
-                              i <= phaseIndex ? "text-primary" : "text-muted-foreground"
-                            )}
-                          >
-                            <div
+                          <div key={p.id} className="relative z-10 flex flex-col items-center gap-2 group/phase">
+                            <Link
+                              to={`/learn/${p.id}/${p.topics[0].id}`}
                               className={cn(
-                                "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-                                i === phaseIndex
-                                  ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-                                  : i < phaseIndex
-                                  ? "border-primary bg-primary/10"
-                                  : "border-border bg-background"
+                                "flex flex-col items-center gap-2",
+                                i <= phaseIndex ? "text-primary" : "text-muted-foreground"
                               )}
                             >
-                              <Icon className="h-4 w-4" />
+                              <div
+                                className={cn(
+                                  "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
+                                  i === phaseIndex
+                                    ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+                                    : i < phaseIndex
+                                    ? "border-primary bg-primary/10"
+                                    : "border-border bg-background"
+                                )}
+                              >
+                                <Icon className="h-4 w-4" />
+                              </div>
+                              <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
+                            </Link>
+                            {/* Hover dropdown showing topics */}
+                            <div className="absolute top-full mt-1 hidden group-hover/phase:block w-56 z-50">
+                              <div className="pt-2">
+                                <div className="rounded-xl border border-border/60 bg-card shadow-xl p-3 space-y-0.5">
+                                  <div className="text-xs font-display font-bold text-foreground mb-2 px-1">
+                                    {p.title}
+                                  </div>
+                                  {nonOverviewTopics.map((t) => (
+                                    <Link
+                                      key={t.id}
+                                      to={`/learn/${p.id}/${t.id}`}
+                                      className={cn(
+                                        "block px-2 py-1.5 rounded-lg text-xs transition-all",
+                                        t.id === topicId && p.id === phaseId
+                                          ? "bg-primary/10 text-primary font-medium"
+                                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                      )}
+                                    >
+                                      {t.title}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </div>
                             </div>
-                            <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
-                          </Link>
+                          </div>
                         );
                       })}
                     </div>
