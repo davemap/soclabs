@@ -309,20 +309,6 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {dbProject.target_technology && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-xl border bg-muted/30 p-5 mb-10">
-                <h3 className="text-sm font-display font-bold mb-2">Target Technology</h3>
-                <p className="text-sm text-muted-foreground">
-                  {dbProject.target_technology}
-                  {dbProject.fpga_family && ` — ${dbProject.fpga_family}`}
-                  {dbProject.asic_process && ` — ${dbProject.asic_process}`}
-                </p>
-                {dbProject.timeframe && (
-                  <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
-                )}
-              </motion.div>
-            )}
-
             {/* Non-sticky milestone tracker (same as mock projects) */}
             {dbMilestones.length > 0 && Object.keys(milestonePhaseProgress).length > 0 && (
               <div className="mb-10">
@@ -335,6 +321,20 @@ const ProjectDetail = () => {
                   isSticky={false}
                 />
               </div>
+            )}
+
+            {dbProject.target_technology && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="rounded-xl border bg-muted/30 p-5 mb-10">
+                <h3 className="text-sm font-display font-bold mb-2">Target Technology</h3>
+                <p className="text-sm text-muted-foreground">
+                  {dbProject.target_technology}
+                  {dbProject.fpga_family && ` — ${dbProject.fpga_family}`}
+                  {dbProject.asic_process && ` — ${dbProject.asic_process}`}
+                </p>
+                {dbProject.timeframe && (
+                  <p className="text-sm text-muted-foreground mt-1">Timeline: {dbProject.timeframe}</p>
+                )}
+              </motion.div>
             )}
 
             {/* DB Milestones display (for everyone) */}
