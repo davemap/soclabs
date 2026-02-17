@@ -28,10 +28,11 @@ const statusColor = (status: string) => {
 const ProjectDetail = () => {
   const navigate = useNavigate();
   const [expandPhase, setExpandPhase] = useState<string | null>(null);
+  const [expandTaskIndex, setExpandTaskIndex] = useState<number | undefined>(undefined);
 
-  const handlePhaseClick = useCallback((phase: string) => {
+  const handlePhaseClick = useCallback((phase: string, taskIndex?: number) => {
     setExpandPhase(phase);
-    // Scroll to the phase in the milestones section
+    setExpandTaskIndex(taskIndex);
     setTimeout(() => {
       const el = document.getElementById(`milestone-phase-${phase}`);
       if (el) {
@@ -292,7 +293,7 @@ const ProjectDetail = () => {
 
               {/* Project Milestones */}
               {project.milestones && project.milestones.length > 0 && (
-                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
+                <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />

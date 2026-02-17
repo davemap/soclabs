@@ -30,6 +30,7 @@ interface PhaseDateInfo {
 interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
+  expandTaskIndex?: number;
   phaseEffort?: Record<string, number>;
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
@@ -106,7 +107,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -117,15 +118,25 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
         next.add(expandPhase);
         return next;
       });
-      // Auto-expand all tasks within the clicked phase
-      const phaseTasks = milestones.filter((m) => m.phase === expandPhase);
-      setExpandedTasks((prev) => {
-        const next = new Set(prev);
-        phaseTasks.forEach((_, i) => next.add(`${expandPhase}-${i}`));
-        return next;
-      });
+      if (expandTaskIndex !== undefined) {
+        // Only expand the specific task
+        const taskKey = `${expandPhase}-${expandTaskIndex}`;
+        setExpandedTasks((prev) => {
+          const next = new Set(prev);
+          next.add(taskKey);
+          return next;
+        });
+      } else {
+        // Expand all tasks within the clicked phase
+        const phaseTasks = milestones.filter((m) => m.phase === expandPhase);
+        setExpandedTasks((prev) => {
+          const next = new Set(prev);
+          phaseTasks.forEach((_, i) => next.add(`${expandPhase}-${i}`));
+          return next;
+        });
+      }
     }
-  }, [expandPhase, milestones]);
+  }, [expandPhase, expandTaskIndex, milestones]);
 
   const togglePhase = (phase: string) => {
     setExpandedPhases((prev) => {

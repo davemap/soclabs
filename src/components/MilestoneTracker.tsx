@@ -33,7 +33,7 @@ const phaseLabels: Record<string, string> = {
 interface MilestoneTrackerProps {
   phaseProgress: Record<string, number>;
   milestones?: Milestone[];
-  onPhaseClick?: (phase: string) => void;
+  onPhaseClick?: (phase: string, taskIndex?: number) => void;
   technology?: string;
 }
 
@@ -105,7 +105,7 @@ const PhaseNode = ({
   phaseKey: string;
   progress: number;
   milestones: Milestone[];
-  onPhaseClick?: (phase: string) => void;
+  onPhaseClick?: (phase: string, taskIndex?: number) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const timeout = useRef<ReturnType<typeof setTimeout>>();
@@ -183,7 +183,12 @@ const PhaseNode = ({
               {phaseTasks.map((task, i) => (
                 <button
                   key={i}
-                  onClick={handleClick}
+                  onClick={() => {
+                    if (onPhaseClick) {
+                      const globalIndex = milestones.filter((m) => m.phase === phaseKey).indexOf(task);
+                      onPhaseClick(phaseKey, globalIndex);
+                    }
+                  }}
                   className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all text-left hover:bg-muted/50"
                 >
                   {task.done ? (
