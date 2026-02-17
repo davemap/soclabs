@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
@@ -102,6 +102,7 @@ const Technologies = () => {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map(g => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState<Record<string, string | null>>({});
+  const [search, setSearch] = useState("");
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalName, setProposalName] = useState("");
   const [proposalGroup, setProposalGroup] = useState("Components");
@@ -159,6 +160,25 @@ const Technologies = () => {
             </p>
           </motion.div>
 
+          {/* Search bar */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search technologies..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  // Auto-expand all groups when searching
+                  if (e.target.value) {
+                    setCollapsedGroups(new Set());
+                  }
+                }}
+                className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-card text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+              />
+            </div>
+          </div>
           <div className="max-w-6xl mx-auto flex gap-8">
             {/* Main content */}
             <div className="flex-1 min-w-0">
@@ -312,8 +332,11 @@ const Technologies = () => {
                             const subcatKey = `${group.key}::${subcat}`;
                             const isSubcatCollapsed = collapsedSubcats.has(subcatKey);
                             const techsInSubcat = technologies.filter(
-                              (t) => (t as any).group === group.key && t.category === subcat
+                              (t) => (t as any).group === group.key && t.category === subcat &&
+                                (!search || t.name.toLowerCase().includes(search.toLowerCase()) || t.description.toLowerCase().includes(search.toLowerCase()))
                             );
+
+                            if (search && techsInSubcat.length === 0) return null;
 
                             return (
                               <div key={subcat}>
