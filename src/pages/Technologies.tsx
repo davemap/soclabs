@@ -196,8 +196,6 @@ const Technologies = () => {
                         {group.key === "EDA Tooling" && (
                           <div className="mb-2">
                             <div className="relative flex items-center justify-between rounded-2xl border-2 border-violet/30 bg-gradient-to-r from-violet/5 via-card to-violet/5 px-6 py-4 shadow-sm shadow-violet/5">
-                              {/* Connecting line */}
-                              <div className="absolute top-1/2 left-[40px] right-[40px] h-[3px] rounded-full bg-violet/15 -translate-y-1/2" />
                               {edaPhaseOrder.map((phaseName) => {
                                 const phaseId = edaCategoryToPhaseId[phaseName];
                                 const phase = learningPhases.find((p) => p.id === phaseId);
