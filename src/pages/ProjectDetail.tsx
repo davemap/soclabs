@@ -1,11 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Layout from "@/components/Layout";
-import { communityProjects, communityMembers, referenceDesigns } from "@/data/mockData";
+import { communityProjects, communityMembers, referenceDesigns, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 
@@ -28,6 +28,8 @@ const ProjectDetail = () => {
   const project = communityProjects.find((p) => p.id === id);
   const author = project ? communityMembers.find((m) => m.id === project.authorId) : null;
   const referenceSoc = project ? referenceDesigns.find((d) => d.name.toLowerCase() === project.referenceSoc.toLowerCase()) : null;
+  const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
+  const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
 
   if (!project) {
     return (
@@ -178,6 +180,67 @@ const ProjectDetail = () => {
               >
                 <ReactMarkdown>{project.content}</ReactMarkdown>
               </motion.div>
+
+              {/* Collaborators */}
+              {collaborators.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="mt-10"
+                >
+                  <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" /> Collaborators
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {collaborators.map((member) => {
+                      const initials = member.name.split(" ").filter((w) => /^[A-Z]/.test(w)).map((w) => w[0]).join("").slice(0, 2);
+                      return (
+                        <Link key={member.id} to={`/community/${member.id}`} className="group">
+                          <div className="rounded-xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                            <Avatar className="h-10 w-10 shrink-0">
+                              <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">{initials}</AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="text-sm font-display font-bold truncate group-hover:text-primary transition-colors">{member.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Organisations */}
+              {organisations.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.22 }}
+                  className="mt-10"
+                >
+                  <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-primary" /> Associated Organisations
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {organisations.map((org) => (
+                      <Link key={org.id} to={`/partners/${org.id}`} className="group">
+                        <div className="rounded-xl border border-border/60 bg-card p-4 hover:border-primary/40 hover:shadow-md transition-all duration-300 flex items-center gap-3">
+                          <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
+                            <Building2 className="h-5 w-5 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-display font-bold truncate group-hover:text-primary transition-colors">{org.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{org.description}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Reference SoC card */}
               {referenceSoc && (
