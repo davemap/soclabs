@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -594,8 +594,12 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {/* DB Content sections display (for everyone) */}
-            {dbContent.length > 0 && (
+            {/* DB Content sections display / inline edit */}
+            {editMode && isOwner ? (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
+                <ProjectContentManager projectId={dbProject.id} onSave={refreshContent} />
+              </motion.div>
+            ) : dbContent.length > 0 ? (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
                 <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
                   {dbContent.map((section: any) => (
@@ -606,7 +610,7 @@ const ProjectDetail = () => {
                   ))}
                 </div>
               </motion.div>
-            )}
+            ) : null}
 
             {dbRefSoc && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
@@ -680,11 +684,8 @@ const ProjectDetail = () => {
                 <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
                   <Settings className="h-5 w-5 text-primary" /> Manage Project
                 </h2>
-                <Tabs defaultValue="content" className="w-full">
+                <Tabs defaultValue="milestones" className="w-full">
                   <TabsList className="w-full justify-start">
-                    <TabsTrigger value="content" className="gap-1.5">
-                      <FileText className="h-3.5 w-3.5" /> Content
-                    </TabsTrigger>
                     <TabsTrigger value="milestones" className="gap-1.5">
                       <ListChecks className="h-3.5 w-3.5" /> Milestones
                     </TabsTrigger>
@@ -695,9 +696,6 @@ const ProjectDetail = () => {
                       <Settings className="h-3.5 w-3.5" /> Settings
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="content" className="mt-4">
-                    <ProjectContentManager projectId={dbProject.id} onSave={refreshContent} />
-                  </TabsContent>
                   <TabsContent value="milestones" className="mt-4">
                     <ProjectMilestonesManager projectId={dbProject.id} onSave={refreshMilestones} />
                   </TabsContent>
