@@ -33,6 +33,32 @@ const RatingDots = ({ value, colors, label, icon: IconComp }: { value: number; c
   </div>
 );
 
+/** Weighted average that emphasises high values (quadratic weighting) */
+const weightedAvg = (values: number[]): number => {
+  if (values.length === 0) return 0;
+  const weighted = values.reduce((sum, v) => sum + v * v, 0);
+  const divisor = values.reduce((sum, v) => sum + v, 0);
+  return divisor > 0 ? Math.round((weighted / divisor) * 10) / 10 : 0;
+};
+
+const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
+  if (!effort || !uncertainty) return null;
+  return (
+    <div className="flex items-center gap-1 ml-auto shrink-0">
+      <div className="flex gap-px" title={`Effort: ${effort}/5`}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= effort ? effortColors[effort - 1] : "bg-muted/20")} />
+        ))}
+      </div>
+      <div className="w-px h-3 bg-border/40 mx-0.5" />
+      <div className="flex gap-px" title={`Uncertainty: ${uncertainty}/5`}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uncertainty ? uncertaintyColors[uncertainty - 1] : "bg-muted/20")} />
+        ))}
+      </div>
+    </div>
+  );
+};
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
   const { phaseId, topicId } = useParams();
@@ -200,13 +226,52 @@ const LearningTopicDetail = () => {
               </motion.div>
 
               {/* Phase topics selector — only on overview pages */}
-              {topic.id.endsWith("-overview") && (
+              {topic.id.endsWith("-overview") && (() => {
+                const realTopics = phase.topics.filter((t) => !t.id.endsWith("-overview"));
+                const effortValues = realTopics.map((t) => t.effort ?? 0).filter(Boolean);
+                const uncertaintyValues = realTopics.map((t) => t.uncertainty ?? 0).filter(Boolean);
+                const avgEffort = weightedAvg(effortValues);
+                const avgUncertainty = weightedAvg(uncertaintyValues);
+                return (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                   className="mb-12"
                 >
+                  {/* Phase-level weighted averages */}
+                  <div className="flex flex-col sm:flex-row gap-4 mb-8 p-5 rounded-xl border border-border/40 bg-card/30">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Flame className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-xs font-display font-semibold text-foreground">Phase Effort</span>
+                        <span className="text-xs text-muted-foreground ml-auto">{avgEffort}/5</span>
+                      </div>
+                      <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
+                          style={{ width: `${(avgEffort / 5) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-effort tasks</p>
+                    </div>
+                    <div className="w-px bg-border/40 hidden sm:block" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-xs font-display font-semibold text-foreground">Phase Uncertainty</span>
+                        <span className="text-xs text-muted-foreground ml-auto">{avgUncertainty}/5</span>
+                      </div>
+                      <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
+                        <div
+                          className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
+                          style={{ width: `${(avgUncertainty / 5) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-uncertainty tasks</p>
+                    </div>
+                  </div>
+
                   <h2 className="text-lg font-display font-bold mb-5">Topics in this phase</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {phase.topics
@@ -235,7 +300,8 @@ const LearningTopicDetail = () => {
                       ))}
                   </div>
                 </motion.div>
-              )}
+                );
+              })()}
 
               {/* Prev / Next navigation */}
               <div className="flex items-stretch gap-4">
@@ -302,7 +368,10 @@ const LearningTopicDetail = () => {
                       )} />
                       <div className="absolute -left-3 top-1/2 w-3 h-px bg-primary/20" />
                       <span className="w-4 text-muted-foreground/60 shrink-0">{i + 1}.</span>
-                      <span className="leading-tight">{t.title}</span>
+                      <span className="leading-tight flex-1">{t.title}</span>
+                      {!t.id.endsWith("-overview") && (
+                        <MiniRatingBar effort={t.effort} uncertainty={t.uncertainty} />
+                      )}
                     </Link>
                   ))}
                 </div>
