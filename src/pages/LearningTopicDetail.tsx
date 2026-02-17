@@ -174,6 +174,44 @@ const LearningTopicDetail = () => {
                 </div>
               </motion.div>
 
+              {/* Phase topics selector — only on overview pages */}
+              {topic.id.endsWith("-overview") && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mb-12"
+                >
+                  <h2 className="text-lg font-display font-bold mb-5">Topics in this phase</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {phase.topics
+                      .filter((t) => !t.id.endsWith("-overview"))
+                      .map((t, i) => (
+                        <Link
+                          key={t.id}
+                          to={`/learn/${phase.id}/${t.id}`}
+                          className="group relative rounded-xl border border-border/40 bg-card/50 p-4 hover:border-primary/40 hover:bg-primary/5 transition-all"
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-bold font-display shrink-0">
+                              {i + 1}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-display font-semibold group-hover:text-primary transition-colors mb-1">
+                                {t.title}
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                                {t.summary}
+                              </p>
+                            </div>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
+                          </div>
+                        </Link>
+                      ))}
+                  </div>
+                </motion.div>
+              )}
+
               {/* Prev / Next navigation */}
               <div className="flex items-stretch gap-4">
                 {prev ? (
