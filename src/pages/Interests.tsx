@@ -1,12 +1,15 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ArrowRight, Sparkles, Search, Cpu, FlaskConical, Users } from "lucide-react";
+import { Check, ArrowRight, Sparkles, Search, Cpu, FlaskConical, Users, Plus, Send, X, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { interests, Interest } from "@/data/interests";
+import { toast } from "sonner";
 
 const categories = [
 {
@@ -117,6 +120,10 @@ const Interests = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(15);
+  const [proposalOpen, setProposalOpen] = useState(false);
+  const [proposalName, setProposalName] = useState("");
+  const [proposalCategory, setProposalCategory] = useState<string>("Technologies");
+  const [proposalDescription, setProposalDescription] = useState("");
 
   const toggleInterest = (name: string) => {
     setSelectedInterests((prev) => prev.includes(name) ? prev.filter((i) => i !== name) : [...prev, name]);
@@ -132,6 +139,14 @@ const Interests = () => {
       return matchesCategory && matchesSearch;
     });
   }, [activeCategory, search]);
+
+  const handlePropose = () => {
+    if (!proposalName.trim()) return;
+    toast.success("Interest proposed!", { description: `"${proposalName}" has been submitted for review.` });
+    setProposalName("");
+    setProposalDescription("");
+    setProposalOpen(false);
+  };
 
   const selectedCount = selectedInterests.length;
 
@@ -233,51 +248,158 @@ const Interests = () => {
         </div>
       </section>
 
-      {/* Interest grid */}
+      {/* Interest grid + sidebar */}
       <section className="py-12 pb-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-muted-foreground">
-                Showing <span className="font-semibold text-foreground">{filteredInterests.length}</span> interests
-              </p>
-              {selectedCount > 0 &&
-              <motion.p
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-sm font-medium text-primary">
+          <div className="max-w-6xl mx-auto flex gap-8">
+            {/* Main grid */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-sm text-muted-foreground">
+                  Showing <span className="font-semibold text-foreground">{filteredInterests.length}</span> interests
+                </p>
+                {selectedCount > 0 &&
+                  <motion.p
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-sm font-medium text-primary">
+                    {selectedCount} selected
+                  </motion.p>
+                }
+              </div>
 
-                  {selectedCount} selected
-                </motion.p>
+              <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredInterests.slice(0, visibleCount).map((interest) =>
+                    <InterestCard
+                      key={interest.slug}
+                      interest={interest}
+                      isSelected={selectedInterests.includes(interest.name)}
+                      onToggle={() => toggleInterest(interest.name)} />
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {visibleCount < filteredInterests.length &&
+                <div className="text-center mt-8">
+                  <Button variant="outline" className="rounded-full px-8" onClick={() => setVisibleCount((v) => v + 15)}>
+                    Show more ({filteredInterests.length - visibleCount} remaining)
+                  </Button>
+                </div>
+              }
+
+              {filteredInterests.length === 0 &&
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground">No interests match your search.</p>
+                </div>
               }
             </div>
 
-            <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <AnimatePresence mode="popLayout">
-                {filteredInterests.slice(0, visibleCount).map((interest) =>
-                <InterestCard
-                  key={interest.slug}
-                  interest={interest}
-                  isSelected={selectedInterests.includes(interest.name)}
-                  onToggle={() => toggleInterest(interest.name)} />
+            {/* Sticky sidebar */}
+            <aside className="hidden lg:block w-64 shrink-0">
+              <div className="sticky top-24 space-y-4">
+                {/* Propose new interest card */}
+                <div className="rounded-xl border border-border/60 bg-card p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <Lightbulb className="h-4 w-4 text-primary" />
+                    </div>
+                    <h3 className="font-display font-bold text-sm">Propose an Interest</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Can't find what you're looking for? Suggest a new interest area for the community.
+                  </p>
 
+                  <AnimatePresence>
+                    {proposalOpen ? (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden space-y-3"
+                      >
+                        <Input
+                          placeholder="Interest name"
+                          value={proposalName}
+                          onChange={(e) => setProposalName(e.target.value)}
+                          className="text-sm h-9"
+                        />
+                        <div className="flex gap-1.5 flex-wrap">
+                          {["Technologies", "Research Fields", "Activities"].map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() => setProposalCategory(cat)}
+                              className={cn(
+                                "text-[10px] px-2.5 py-1 rounded-full border font-medium transition-all",
+                                proposalCategory === cat
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "border-border/60 text-muted-foreground hover:border-primary/40"
+                              )}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                        <textarea
+                          placeholder="Brief description (optional)"
+                          value={proposalDescription}
+                          onChange={(e) => setProposalDescription(e.target.value)}
+                          className="w-full text-sm rounded-lg border border-border/60 bg-background p-2.5 h-20 resize-none placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="flex-1 rounded-full text-xs" onClick={handlePropose} disabled={!proposalName.trim()}>
+                            <Send className="h-3 w-3 mr-1.5" /> Submit
+                          </Button>
+                          <Button size="sm" variant="ghost" className="rounded-full text-xs" onClick={() => setProposalOpen(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full rounded-full text-xs"
+                        onClick={() => setProposalOpen(true)}
+                      >
+                        <Plus className="h-3.5 w-3.5 mr-1.5" /> Propose New Interest
+                      </Button>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Selected interests summary */}
+                {selectedCount > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl border border-primary/20 bg-primary/5 p-5"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-display font-bold text-sm">Your Interests</h3>
+                      <span className="text-xs text-primary font-semibold">{selectedCount}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {selectedInterests.map((name) => (
+                        <button
+                          key={name}
+                          onClick={() => toggleInterest(name)}
+                          className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                        >
+                          {name}
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      ))}
+                    </div>
+                    <Button asChild size="sm" className="w-full rounded-full text-xs">
+                      <Link to="/about#join">
+                        Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </motion.div>
                 )}
-              </AnimatePresence>
-            </motion.div>
-
-            {visibleCount < filteredInterests.length &&
-            <div className="text-center mt-8">
-                <Button variant="outline" className="rounded-full px-8" onClick={() => setVisibleCount((v) => v + 15)}>
-                  Show more ({filteredInterests.length - visibleCount} remaining)
-                </Button>
               </div>
-            }
-
-            {filteredInterests.length === 0 &&
-            <div className="text-center py-16">
-                <p className="text-muted-foreground">No interests match your search.</p>
-              </div>
-            }
+            </aside>
           </div>
 
           {/* Floating CTA */}
