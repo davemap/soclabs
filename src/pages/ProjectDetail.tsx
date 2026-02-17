@@ -77,31 +77,46 @@ const ProjectDetail = () => {
   const headerRef = useRef<HTMLDivElement>(null);
   const trackerSentinelRef = useRef<HTMLDivElement>(null);
   const milestonesRef = useRef<HTMLDivElement>(null);
+  const floatThresholdRef = useRef<number | null>(null);
   const [isFloating, setIsFloating] = useState(false);
-  const [isPastMilestones, setIsPastMilestones] = useState(false);
 
-  // Detect when tracker sentinel scrolls out of view (tracker starts floating)
+  // Store the sentinel's initial offset once on mount, then use scroll listener
   useEffect(() => {
     const sentinel = trackerSentinelRef.current;
     if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsFloating(!entry.isIntersecting),
-      { threshold: 0, rootMargin: "-96px 0px 0px 0px" }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, []);
 
-  // Detect when milestones section reaches the sticky position
-  useEffect(() => {
-    const el = milestonesRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsPastMilestones(entry.isIntersecting),
-      { threshold: 0, rootMargin: "-96px 0px 0px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    // Capture the threshold on first layout
+    const captureThreshold = () => {
+      if (floatThresholdRef.current === null) {
+        floatThresholdRef.current = sentinel.getBoundingClientRect().top + window.scrollY - 96;
+      }
+    };
+
+    // Small delay to ensure layout is settled
+    requestAnimationFrame(captureThreshold);
+
+    const handleScroll = () => {
+      if (floatThresholdRef.current === null) return;
+
+      const milestoneEl = milestonesRef.current;
+      const trackerHeight = 120; // approximate tracker height + padding
+      const scrollY = window.scrollY;
+
+      // Check if we've scrolled past the original position
+      const pastThreshold = scrollY > floatThresholdRef.current;
+
+      // Check if milestones section top is close to the sticky position
+      let pastMilestones = false;
+      if (milestoneEl) {
+        const milestoneTop = milestoneEl.getBoundingClientRect().top;
+        pastMilestones = milestoneTop <= 96 + trackerHeight;
+      }
+
+      setIsFloating(pastThreshold && !pastMilestones);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   const collaborators = project ? communityMembers.filter((m) => project.collaboratorIds?.includes(m.id)) : [];
   const organisations = project ? partners.filter((p) => project.organisationIds?.includes(p.id)) : [];
@@ -148,7 +163,7 @@ const ProjectDetail = () => {
               {/* Header - collapses when tracker is floating */}
               <div ref={headerRef} className={cn(
                 "transition-all duration-300 overflow-hidden",
-                isFloating && !isPastMilestones ? "max-h-0 opacity-0 mb-0" : "max-h-[1000px] opacity-100 mb-10"
+                isFloating ? "max-h-0 opacity-0 mb-0" : "max-h-[1000px] opacity-100 mb-10"
               )}>
                 <motion.header
                   initial={{ opacity: 0, y: 20 }}
@@ -216,7 +231,7 @@ const ProjectDetail = () => {
                   milestones={project.milestones}
                   onPhaseClick={handlePhaseClick}
                   technology={project.technology}
-                  isFloating={isFloating && !isPastMilestones}
+                  isFloating={isFloating}
                 />
               )}
 
