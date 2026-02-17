@@ -665,21 +665,6 @@ const ProjectDetail = () => {
               ) : null}
 
               <div className="flex flex-wrap gap-3 mt-6">
-                {dbProject.github_url && (
-                  <Button asChild variant="outline" size="sm" className="rounded-full">
-                    <a href={dbProject.github_url} target="_blank" rel="noreferrer">
-                      <Github className="h-4 w-4 mr-2" /> GitHub
-                    </a>
-                  </Button>
-                )}
-                {dbProject.docs_url && (
-                  <Button asChild variant="outline" size="sm" className="rounded-full">
-                    <a href={dbProject.docs_url} target="_blank" rel="noreferrer">
-                      <BookOpen className="h-4 w-4 mr-2" /> Documentation
-                    </a>
-                  </Button>
-                )}
-                {/* Join Request Button for non-owners */}
                 {user && !isOwner && !existingRequest && (
                   <Button variant="default" size="sm" className="rounded-full" onClick={() => document.getElementById("join-request-section")?.scrollIntoView({ behavior: "smooth" })}>
                     <UserPlus className="h-4 w-4 mr-2" /> Request to Join
