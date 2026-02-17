@@ -81,11 +81,17 @@ const LearningTopicDetail = () => {
 
                   <div className="flex-1 relative">
                     <div className="flex items-center justify-between relative">
-                      <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
-                      <div
-                        className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
-                        style={{ width: `${(phaseIndex / (learningPhases.length - 1)) * 100}%` }}
-                      />
+                      {/* Track between icon edges: inset by half icon width (20px) */}
+                      <div className="absolute top-5 h-0.5 bg-border" style={{ left: 20, right: 20 }} />
+                      {phaseIndex > 0 && (
+                        <div
+                          className="absolute top-5 h-0.5 bg-primary transition-all duration-500"
+                          style={{
+                            left: 20,
+                            width: `calc(${(phaseIndex / (learningPhases.length - 1)) * 100}%)`,
+                          }}
+                        />
+                      )}
                       {learningPhases.map((p, i) => (
                         <PhaseStepperIcon
                           key={p.id}
