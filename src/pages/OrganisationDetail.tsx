@@ -34,7 +34,7 @@ const OrganisationDetail = () => {
   return (
     <Layout>
       <section className="py-24">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 max-w-4xl">
           <button
             onClick={() => navigate(-1)}
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
@@ -46,7 +46,7 @@ const OrganisationDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mb-12"
+            className="mb-12"
           >
             <div className="flex items-center gap-3 mb-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${org.type === "academic" ? "bg-primary/10" : "bg-coral/10"}`}>
@@ -69,7 +69,7 @@ const OrganisationDetail = () => {
           </motion.div>
 
           {/* Members */}
-          <div className="max-w-4xl mb-16">
+          <div className="mb-16">
             <ScrollReveal>
               <div className="flex items-center gap-2 mb-6">
                 <Users className="h-5 w-5 text-primary" />
@@ -125,7 +125,7 @@ const OrganisationDetail = () => {
           </div>
 
           {/* Projects */}
-          <div className="max-w-4xl">
+          <div>
             <ScrollReveal>
               <div className="flex items-center gap-2 mb-6">
                 <FolderOpen className="h-5 w-5 text-coral" />
