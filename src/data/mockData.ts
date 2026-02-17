@@ -1,7 +1,7 @@
 export const referenceDesigns = [
   {
     id: "nanosoc",
-    name: "NanoSoC",
+    name: "nanoSoC",
     tagline: "Minimal ARM Cortex-M0 SoC for learning and prototyping",
     description:
       "A stripped-down System-on-Chip built around the ARM Cortex-M0 processor. Designed as the perfect starting point for students and researchers who want to understand SoC architecture from the ground up. Includes AHB-Lite bus, basic GPIO, UART, and timer peripherals.",
