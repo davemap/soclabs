@@ -31,6 +31,7 @@ interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
   expandTaskIndex?: number;
+  expandTopicId?: string | null;
   phaseEffort?: Record<string, number>;
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
@@ -107,9 +108,36 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+
+  // Handle expanding by topic ID (from Learning Hub links)
+  useEffect(() => {
+    if (expandTopicId) {
+      const newPhases = new Set<string>();
+      const newTasks = new Set<string>();
+      // Group milestones by phase to get correct per-phase index
+      const phaseGroups: Record<string, number[]> = {};
+      milestones.forEach((m, globalIdx) => {
+        if (!phaseGroups[m.phase]) phaseGroups[m.phase] = [];
+        phaseGroups[m.phase].push(globalIdx);
+      });
+      for (const [phase, globalIndices] of Object.entries(phaseGroups)) {
+        globalIndices.forEach((gi, localIdx) => {
+          const m = milestones[gi];
+          if (m.learningTopicIds?.includes(expandTopicId)) {
+            newPhases.add(phase);
+            newTasks.add(`${phase}-${localIdx}`);
+          }
+        });
+      }
+      if (newPhases.size > 0) {
+        setExpandedPhases((prev) => new Set([...prev, ...newPhases]));
+        setExpandedTasks((prev) => new Set([...prev, ...newTasks]));
+      }
+    }
+  }, [expandTopicId, milestones]);
 
   useEffect(() => {
     if (expandPhase) {
@@ -119,7 +147,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, phaseEffo
         return next;
       });
       if (expandTaskIndex !== undefined) {
-        // Only expand the specific task
         const taskKey = `${expandPhase}-${expandTaskIndex}`;
         setExpandedTasks((prev) => {
           const next = new Set(prev);
@@ -127,7 +154,6 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, phaseEffo
           return next;
         });
       } else {
-        // Expand all tasks within the clicked phase
         const phaseTasks = milestones.filter((m) => m.phase === expandPhase);
         setExpandedTasks((prev) => {
           const next = new Set(prev);
