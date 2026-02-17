@@ -4,11 +4,30 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
-import { technologies } from "@/data/mockData";
+import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical } from "lucide-react";
+
+const phaseIconMap: Record<string, React.ElementType> = {
+  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical,
+};
+
+// Map EDA category names to learning phase IDs
+const edaCategoryToPhaseId: Record<string, string> = {
+  "RTL Design": "rtl",
+  "Verification": "verification",
+  "Synthesis": "synthesis",
+  "Physical Design": "physical-design",
+  "Tapeout": "tapeout",
+  "Silicon Validation": "silicon-validation",
+};
+
+const phaseIdToEdaCategory: Record<string, string> = Object.fromEntries(
+  Object.entries(edaCategoryToPhaseId).map(([k, v]) => [v, k])
+);
 
 // Build the tree: group → subcategory → technologies
 const groups = [
@@ -63,8 +82,9 @@ function getSubcategories(groupKey: string) {
 
 const Technologies = () => {
   const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map(g => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
+  const [activeEdaPhase, setActiveEdaPhase] = useState<string | null>(null);
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalName, setProposalName] = useState("");
   const [proposalGroup, setProposalGroup] = useState("Components");
@@ -172,7 +192,74 @@ const Technologies = () => {
                         className="overflow-hidden"
                       >
                         <div className="px-6 md:px-8 pb-6 md:pb-8 space-y-6">
-                          {subcats.map((subcat) => {
+                        {/* EDA Phase progress bar */}
+                        {group.key === "EDA Tooling" && (
+                          <div className="mb-2">
+                            <div className="relative flex items-center justify-between rounded-xl border border-violet/20 bg-card/80 px-4 py-3">
+                              {/* Connecting line */}
+                              <div className="absolute top-1/2 left-[30px] right-[30px] h-[2px] bg-violet/10 -translate-y-1/2" />
+                              {edaPhaseOrder.map((phaseName, pi) => {
+                                const phaseId = edaCategoryToPhaseId[phaseName];
+                                const phase = learningPhases.find((p) => p.id === phaseId);
+                                if (!phase) return null;
+                                const PhaseIcon = phaseIconMap[phase.icon] || Cpu;
+                                const isActive = activeEdaPhase === phaseName;
+                                const toolCount = technologies.filter(
+                                  (t) => (t as any).group === "EDA Tooling" && t.category === phaseName
+                                ).length;
+
+                                return (
+                                  <button
+                                    key={phaseName}
+                                    onClick={() => setActiveEdaPhase(isActive ? null : phaseName)}
+                                    className="relative z-10 flex flex-col items-center gap-1 group/phase"
+                                    title={`${phaseName} (${toolCount} tools)`}
+                                  >
+                                    <div
+                                      className={cn(
+                                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 border-2",
+                                        isActive
+                                          ? "bg-violet/15 border-violet text-violet scale-110 shadow-md shadow-violet/20"
+                                          : "bg-card border-border/40 text-muted-foreground hover:border-violet/40 hover:text-violet"
+                                      )}
+                                    >
+                                      <PhaseIcon className="h-4 w-4" />
+                                    </div>
+                                    <span className={cn(
+                                      "text-[10px] font-display font-medium transition-colors hidden sm:block",
+                                      isActive ? "text-violet" : "text-muted-foreground"
+                                    )}>
+                                      {phase.shortTitle}
+                                    </span>
+                                    <span className={cn(
+                                      "text-[9px] font-semibold",
+                                      isActive ? "text-violet" : "text-muted-foreground/50"
+                                    )}>
+                                      {toolCount}
+                                    </span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            {activeEdaPhase && (
+                              <div className="flex items-center gap-2 mt-2 ml-1">
+                                <span className="text-xs text-violet font-medium">Filtering: {activeEdaPhase}</span>
+                                <button
+                                  onClick={() => setActiveEdaPhase(null)}
+                                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                                >
+                                  (clear)
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {subcats.filter((subcat) => {
+                          if (group.key === "EDA Tooling" && activeEdaPhase) {
+                            return subcat === activeEdaPhase;
+                          }
+                          return true;
+                        }).map((subcat) => {
                             const subcatKey = `${group.key}::${subcat}`;
                             const isSubcatCollapsed = collapsedSubcats.has(subcatKey);
                             const techsInSubcat = technologies.filter(
