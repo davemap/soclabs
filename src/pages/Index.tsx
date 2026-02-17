@@ -76,7 +76,7 @@ const Index = () => {
             </p>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {referenceDesigns.slice(0, 4).map((design, i) => (
               <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                 <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30">
