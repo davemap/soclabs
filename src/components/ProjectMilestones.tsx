@@ -197,8 +197,8 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
                   <AlertTriangle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                 )}
 
-                {/* Phase-level ratings */}
-                {phaseEff > 0 && (
+                {/* Phase-level ratings - only shown when all tasks are done */}
+                {allDone && phaseEff > 0 && (
                   <div className="hidden sm:flex items-center gap-2 shrink-0">
                     <RatingBar value={phaseEff} colors={effortColors} label="Effort" />
                     <RatingBar value={phaseUnc} colors={uncertaintyColors} label="Uncertainty" />
