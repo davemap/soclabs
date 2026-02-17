@@ -62,78 +62,78 @@ const LearningTopicDetail = () => {
             </nav>
           </div>
 
-          {/* Phase stepper + arrows - full width */}
-          <div className="max-w-4xl mx-auto mb-10">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => prevPhase && navigate(`/learn/${prevPhase.id}/${prevPhase.topics[0].id}`)}
-                disabled={!prevPhase}
-                className={cn(
-                  "p-2 rounded-lg border transition-all shrink-0",
-                  !prevPhase
-                    ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
-                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
-                )}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-
-              <div className="flex-1 relative">
-                <div className="flex items-center justify-between relative">
-                  <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
-                  <div
-                    className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
-                    style={{ width: `${(phaseIndex / (learningPhases.length - 1)) * 100}%` }}
-                  />
-                  {learningPhases.map((p, i) => {
-                    const Icon = iconMap[p.icon] || Cpu;
-                    return (
-                      <Link
-                        key={p.id}
-                        to={`/learn?phase=${p.id}`}
-                        className={cn(
-                          "relative z-10 flex flex-col items-center gap-2 group",
-                          i <= phaseIndex ? "text-primary" : "text-muted-foreground"
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
-                            i === phaseIndex
-                              ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
-                              : i < phaseIndex
-                              ? "border-primary bg-primary/10"
-                              : "border-border bg-background"
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <button
-                onClick={() => nextPhase && navigate(`/learn/${nextPhase.id}/${nextPhase.topics[0].id}`)}
-                disabled={!nextPhase}
-                className={cn(
-                  "p-2 rounded-lg border transition-all shrink-0",
-                  !nextPhase
-                    ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
-                    : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
-                )}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
           {/* Main content with floating sidebar */}
           <div className="max-w-6xl mx-auto flex gap-8">
             {/* Main content */}
             <div className="flex-1 min-w-0">
+              {/* Phase stepper + arrows - centred over content column */}
+              <div className="max-w-2xl mx-auto mb-10">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => prevPhase && navigate(`/learn/${prevPhase.id}/${prevPhase.topics[0].id}`)}
+                    disabled={!prevPhase}
+                    className={cn(
+                      "p-2 rounded-lg border transition-all shrink-0",
+                      !prevPhase
+                        ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                        : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
+                    )}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  <div className="flex-1 relative">
+                    <div className="flex items-center justify-between relative">
+                      <div className="absolute top-5 left-0 right-0 h-0.5 bg-border" />
+                      <div
+                        className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-500"
+                        style={{ width: `${(phaseIndex / (learningPhases.length - 1)) * 100}%` }}
+                      />
+                      {learningPhases.map((p, i) => {
+                        const Icon = iconMap[p.icon] || Cpu;
+                        return (
+                          <Link
+                            key={p.id}
+                            to={`/learn?phase=${p.id}`}
+                            className={cn(
+                              "relative z-10 flex flex-col items-center gap-2 group",
+                              i <= phaseIndex ? "text-primary" : "text-muted-foreground"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "w-10 h-10 rounded-xl flex items-center justify-center border-2 transition-all",
+                                i === phaseIndex
+                                  ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+                                  : i < phaseIndex
+                                  ? "border-primary bg-primary/10"
+                                  : "border-border bg-background"
+                              )}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <span className="text-xs font-display font-medium hidden sm:block">{p.shortTitle}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => nextPhase && navigate(`/learn/${nextPhase.id}/${nextPhase.topics[0].id}`)}
+                    disabled={!nextPhase}
+                    className={cn(
+                      "p-2 rounded-lg border transition-all shrink-0",
+                      !nextPhase
+                        ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
+                        : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
+                    )}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
               {/* Phase badge */}
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-xs font-semibold font-display text-primary bg-primary/10 px-3 py-1 rounded-full">
