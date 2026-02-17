@@ -213,19 +213,7 @@ const LearningTopicDetail = () => {
                 </motion.div>
               )}
 
-              {/* Content */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="prose prose-invert max-w-none mb-12"
-              >
-                <div className="rounded-2xl border border-border/60 bg-card/50 p-6 md:p-8 text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {topic.content}
-                </div>
-              </motion.div>
-
-              {/* Phase topics selector — only on overview pages */}
+              {/* Phase averages — only on overview pages, above content */}
               {topic.id.endsWith("-overview") && (() => {
                 const realTopics = phase.topics.filter((t) => !t.id.endsWith("-overview"));
                 const effortValues = realTopics.map((t) => t.effort ?? 0).filter(Boolean);
@@ -302,6 +290,18 @@ const LearningTopicDetail = () => {
                 </motion.div>
                 );
               })()}
+
+              {/* Content */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="prose prose-invert max-w-none mb-12"
+              >
+                <div className="rounded-2xl border border-border/60 bg-card/50 p-6 md:p-8 text-sm md:text-base text-muted-foreground leading-relaxed">
+                  {topic.content}
+                </div>
+              </motion.div>
 
               {/* Prev / Next navigation */}
               <div className="flex items-stretch gap-4">
