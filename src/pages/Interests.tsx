@@ -153,7 +153,7 @@ const Interests = () => {
   return (
     <Layout>
       {/* Hero */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="absolute inset-0 mesh-dots opacity-40" />
         <div className="container mx-auto px-4 relative">
@@ -249,7 +249,7 @@ const Interests = () => {
       </section>
 
       {/* Interest grid + sidebar */}
-      <section className="py-12 pb-24">
+      <section className="py-6 pb-24">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto flex gap-8">
             {/* Main grid */}
