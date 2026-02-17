@@ -165,26 +165,22 @@ const Projects = () => {
                                       <TooltipTrigger asChild>
                                         <Link
                                           to={`/projects/${project.id}?phase=${key}`}
-                                          className="flex-1 rounded-full overflow-hidden bg-muted/20 cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all"
+                                          className={`flex-1 rounded-full overflow-hidden cursor-pointer hover:ring-1 hover:ring-primary/40 transition-all ${
+                                            total > 0
+                                              ? doneCount === total
+                                                ? "bg-emerald-500"
+                                                : doneCount > 0
+                                                  ? "bg-amber-500"
+                                                  : "bg-muted/40"
+                                              : p === 100
+                                                ? "bg-emerald-500"
+                                                : p > 0
+                                                  ? "bg-amber-500"
+                                                  : "bg-muted/40"
+                                          }`}
                                           onClick={(e) => e.stopPropagation()}
                                         >
-                                          {total > 0 ? (
-                                            <div className="flex h-full">
-                                              <div
-                                                className="h-full bg-emerald-500 transition-all"
-                                                style={{ width: `${donePct}%` }}
-                                              />
-                                              <div
-                                                className="h-full bg-amber-500 transition-all"
-                                                style={{ width: `${inProgressPct}%` }}
-                                              />
-                                            </div>
-                                          ) : (
-                                            <div
-                                              className={`h-full transition-all ${isFpga ? "bg-sky-500" : "bg-violet-500"}`}
-                                              style={{ width: `${p}%` }}
-                                            />
-                                          )}
+                                          <div className="h-full" />
                                         </Link>
                                       </TooltipTrigger>
                                       <TooltipContent side="top" className="text-xs px-3 py-1.5">
