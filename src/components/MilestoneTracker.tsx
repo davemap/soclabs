@@ -1,14 +1,23 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap } from "lucide-react";
+import { FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { learningPhases } from "@/data/mockData";
 
 const iconMap: Record<string, React.ElementType> = {
-  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap,
+  FileText, Code, CheckCircle, Cpu, CircuitBoard, Zap, FlaskConical,
 };
 
-const phaseKeys = ["architecture", "rtl", "verification", "synthesis", "fpga", "asic"];
+const phaseKeys = ["architecture", "rtl", "verification", "synthesis", "fpga", "asic", "silicon-validation"];
+
+// Extra phase not in learningPhases
+const siliconValidationPhase = {
+  id: "silicon-validation",
+  title: "Silicon Validation",
+  shortTitle: "SiVal",
+  icon: "FlaskConical",
+  topics: [{ id: "silicon-validation-overview", title: "Overview" }],
+};
 
 interface MilestoneTrackerProps {
   phaseProgress: Record<string, number>;
@@ -118,16 +127,19 @@ const MilestoneTracker = ({ phaseProgress }: MilestoneTrackerProps) => {
           }}
         />
 
-        {learningPhases.map((phase, index) => {
+        {[...learningPhases, siliconValidationPhase].map((phase, index) => {
           const phaseKey = phaseKeys[index];
           if (!phaseKey) return null;
           const progress = phaseProgress[phaseKey] || 0;
           const Icon = iconMap[phase.icon] || Cpu;
           const color = progressColor(progress);
+          const linkTo = phase.id === "silicon-validation"
+            ? "#"
+            : `/learn/${phase.id}/${phase.topics[0].id}`;
 
           return (
             <div key={phase.id} className="relative z-10 flex flex-col items-center gap-1">
-              <Link to={`/learn/${phase.id}/${phase.topics[0].id}`} className="group">
+              <Link to={linkTo} className="group">
                 <RoundedRectProgress progress={progress}>
                   <div
                     className={cn(

@@ -9,6 +9,7 @@ import { communityProjects, communityMembers, referenceDesigns, partners } from 
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 import MilestoneTracker from "@/components/MilestoneTracker";
+import ProjectMilestones from "@/components/ProjectMilestones";
 
 const statusColor = (status: string) => {
   switch (status) {
@@ -269,6 +270,11 @@ const ProjectDetail = () => {
                     </div>
                   </Link>
                 </motion.div>
+              )}
+
+              {/* Project Milestones */}
+              {project.milestones && project.milestones.length > 0 && (
+                <ProjectMilestones milestones={project.milestones} />
               )}
 
               <CommentsThreads pageId={`project-${project.id}`} />
