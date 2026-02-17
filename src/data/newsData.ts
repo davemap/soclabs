@@ -56,6 +56,16 @@ export interface NewsArticle {
   image?: string;
 }
 
+export const newsImages: Record<string, string> = {
+  "nanosoc-fpga-workshop-2026": "/news/fpga-workshop.jpg",
+  "ecosoc-tapeout-tsmc-28nm": "/news/asic-tapeout.jpg",
+  "design-competition-2026": "/news/design-competition.jpg",
+  "risc-v-summit-talk": "/news/riscv-summit.jpg",
+  "ml-accelerator-tinyml-benchmark": "/news/ml-accelerator.jpg",
+  "open-eda-flow-yosys": "/news/open-eda.jpg",
+  "dvfs-controller-results": "/news/dvfs-power.jpg",
+};
+
 export const newsArticles: NewsArticle[] = [
   {
     id: "nanosoc-fpga-workshop-2026",
