@@ -9,6 +9,7 @@ import DesignDetail from "./pages/DesignDetail";
 import SubmitDesign from "./pages/SubmitDesign";
 import Projects from "./pages/Projects";
 import LearningHub from "./pages/LearningHub";
+import LearningTopicDetail from "./pages/LearningTopicDetail";
 import ProjectDetail from "./pages/ProjectDetail";
 import Technologies from "./pages/Technologies";
 import TechnologyDetail from "./pages/TechnologyDetail";
@@ -41,7 +42,8 @@ const App = () => (
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/start" element={<StartProject />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
-          <Route path="/learn" element={<LearningHub />} />
+           <Route path="/learn" element={<LearningHub />} />
+           <Route path="/learn/:phaseId/:topicId" element={<LearningTopicDetail />} />
            <Route path="/technologies" element={<Technologies />} />
            <Route path="/technologies/:id" element={<TechnologyDetail />} />
           <Route path="/partners" element={<Partners />} />
