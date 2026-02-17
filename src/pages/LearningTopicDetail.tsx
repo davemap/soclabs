@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -15,24 +16,73 @@ const uncertaintyColors = [
   "bg-sky-400", "bg-blue-400", "bg-violet-500", "bg-purple-500", "bg-fuchsia-500",
 ];
 
+const effortTooltip = "Effort represents how much work is involved in completing this task or phase.";
+const uncertaintyTooltip = "Uncertainty represents the flexibility in duration. High uncertainty means the task could take much longer or shorter than expected — it's hard to predict upfront. Low uncertainty indicates a straightforward task with few unexpected complications.";
+
 const RatingDots = ({ value, colors, label, icon: IconComp }: { value: number; colors: string[]; label: string; icon: React.ElementType }) => (
-  <div className="flex items-center gap-2.5">
-    <IconComp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-    <span className="text-xs text-muted-foreground w-20 shrink-0">{label}</span>
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div
-          key={i}
-          className={cn(
-            "w-5 h-2 rounded-full transition-all",
-            i <= value ? colors[value - 1] : "bg-muted/30"
-          )}
-        />
-      ))}
-    </div>
-    <span className="text-xs text-muted-foreground ml-1">{value}/5</span>
-  </div>
+  <TooltipProvider delayDuration={200}>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex items-center gap-2.5 cursor-help">
+          <IconComp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <span className="text-xs text-muted-foreground w-20 shrink-0">{label}</span>
+          <div className="flex items-center gap-1">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-5 h-2 rounded-full transition-all",
+                  i <= value ? colors[value - 1] : "bg-muted/30"
+                )}
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground ml-1">{value}/5</span>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs text-xs">
+        <p>{label === "Effort" ? effortTooltip : uncertaintyTooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 );
+
+const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
+  if (!effort || !uncertainty) return null;
+  return (
+    <TooltipProvider delayDuration={200}>
+      <div className="flex items-center gap-1 ml-auto shrink-0">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex gap-px cursor-help">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= effort ? effortColors[effort - 1] : "bg-muted/20")} />
+              ))}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs text-xs">
+            <p className="font-semibold mb-1">Effort: {effort}/5</p>
+            <p>{effortTooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+        <div className="w-px h-3 bg-border/40 mx-0.5" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex gap-px cursor-help">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uncertainty ? uncertaintyColors[uncertainty - 1] : "bg-muted/20")} />
+              ))}
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-xs text-xs">
+            <p className="font-semibold mb-1">Uncertainty: {uncertainty}/5</p>
+            <p>{uncertaintyTooltip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+};
 
 /** Weighted average that emphasises high values (quadratic weighting) */
 const weightedAvg = (values: number[]): number => {
@@ -42,24 +92,6 @@ const weightedAvg = (values: number[]): number => {
   return divisor > 0 ? Math.round((weighted / divisor) * 10) / 10 : 0;
 };
 
-const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?: number }) => {
-  if (!effort || !uncertainty) return null;
-  return (
-    <div className="flex items-center gap-1 ml-auto shrink-0">
-      <div className="flex gap-px" title={`Effort: ${effort}/5`}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`e${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= effort ? effortColors[effort - 1] : "bg-muted/20")} />
-        ))}
-      </div>
-      <div className="w-px h-3 bg-border/40 mx-0.5" />
-      <div className="flex gap-px" title={`Uncertainty: ${uncertainty}/5`}>
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={`u${i}`} className={cn("w-1.5 h-3 rounded-sm", i <= uncertainty ? uncertaintyColors[uncertainty - 1] : "bg-muted/20")} />
-        ))}
-      </div>
-    </div>
-  );
-};
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
   const { phaseId, topicId } = useParams();
@@ -229,35 +261,55 @@ const LearningTopicDetail = () => {
                   className="mb-8"
                 >
                   <div className="flex flex-col sm:flex-row gap-4 p-5 rounded-xl border border-border/40 bg-card/30">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Flame className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs font-display font-semibold text-foreground">Phase Effort</span>
-                        <span className="text-xs text-muted-foreground ml-auto">{avgEffort}/5</span>
+                    <TooltipProvider delayDuration={200}>
+                      <div className="flex-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Flame className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-xs font-display font-semibold text-foreground">Phase Effort</span>
+                                <span className="text-xs text-muted-foreground ml-auto">{avgEffort}/5</span>
+                              </div>
+                              <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
+                                <div
+                                  className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
+                                  style={{ width: `${(avgEffort / 5) * 100}%` }}
+                                />
+                              </div>
+                              <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-effort tasks</p>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p>{effortTooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
-                      <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
-                        <div
-                          className={cn("h-full rounded-full transition-all", effortColors[Math.round(avgEffort) - 1] || "bg-muted")}
-                          style={{ width: `${(avgEffort / 5) * 100}%` }}
-                        />
+                      <div className="w-px bg-border/40 hidden sm:block" />
+                      <div className="flex-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="cursor-help">
+                              <div className="flex items-center gap-2 mb-2">
+                                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-xs font-display font-semibold text-foreground">Phase Uncertainty</span>
+                                <span className="text-xs text-muted-foreground ml-auto">{avgUncertainty}/5</span>
+                              </div>
+                              <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
+                                <div
+                                  className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
+                                  style={{ width: `${(avgUncertainty / 5) * 100}%` }}
+                                />
+                              </div>
+                              <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-uncertainty tasks</p>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            <p>{uncertaintyTooltip}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-effort tasks</p>
-                    </div>
-                    <div className="w-px bg-border/40 hidden sm:block" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <HelpCircle className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs font-display font-semibold text-foreground">Phase Uncertainty</span>
-                        <span className="text-xs text-muted-foreground ml-auto">{avgUncertainty}/5</span>
-                      </div>
-                      <div className="h-2.5 rounded-full bg-muted/20 overflow-hidden">
-                        <div
-                          className={cn("h-full rounded-full transition-all", uncertaintyColors[Math.round(avgUncertainty) - 1] || "bg-muted")}
-                          style={{ width: `${(avgUncertainty / 5) * 100}%` }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-1">Weighted towards high-uncertainty tasks</p>
-                    </div>
+                    </TooltipProvider>
                   </div>
                 </motion.div>
                 );
