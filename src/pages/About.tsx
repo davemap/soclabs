@@ -60,18 +60,18 @@ const About = () => {
               <p className="text-muted-foreground mb-6 leading-relaxed">
                 Explore technologies, research fields, and activities — and connect with people who share your interests.
               </p>
-              <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex items-center justify-center gap-3">
                 <Button asChild className="rounded-full px-6">
                   <Link to="/learn">
                     Learning Hub <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-full px-6">
+                <Button asChild className="rounded-full px-6">
                   <Link to="/technologies">
                     Technologies <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="rounded-full px-6">
+                <Button asChild className="rounded-full px-6">
                   <Link to="/interests">
                     Research Fields <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
