@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,6 +28,9 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
     github_url: project.github_url || "",
     docs_url: project.docs_url || "",
     status: project.status,
+    target_technology: project.target_technology || "",
+    fpga_family: project.fpga_family || "",
+    asic_process: project.asic_process || "",
     timeframe: project.timeframe || "",
   });
   const [saving, setSaving] = useState(false);
@@ -41,6 +45,9 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         github_url: form.github_url,
         docs_url: form.docs_url,
         status: form.status,
+        target_technology: form.target_technology,
+        fpga_family: form.target_technology === "FPGA" ? form.fpga_family : "",
+        asic_process: form.target_technology === "ASIC" ? form.asic_process : "",
         timeframe: form.timeframe,
       })
       .eq("id", project.id);
@@ -81,12 +88,60 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Status</Label>
-          <Input value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} />
+          <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Planning">Planning</SelectItem>
+              <SelectItem value="In Progress">In Progress</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
-          <Label>Timeframe</Label>
-          <Input value={form.timeframe} onChange={(e) => setForm({ ...form, timeframe: e.target.value })} />
+          <Label>Target Technology</Label>
+          <Select value={form.target_technology} onValueChange={(v) => setForm({ ...form, target_technology: v })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select technology" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="FPGA">FPGA</SelectItem>
+              <SelectItem value="ASIC">ASIC</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </div>
+
+      {form.target_technology === "FPGA" && (
+        <div className="space-y-2">
+          <Label>FPGA Family</Label>
+          <Input value={form.fpga_family} onChange={(e) => setForm({ ...form, fpga_family: e.target.value })} placeholder="e.g. Xilinx Artix-7" />
+        </div>
+      )}
+
+      {form.target_technology === "ASIC" && (
+        <div className="space-y-2">
+          <Label>ASIC Process</Label>
+          <Input value={form.asic_process} onChange={(e) => setForm({ ...form, asic_process: e.target.value })} placeholder="e.g. TSMC 28nm" />
+        </div>
+      )}
+
+      <div className="space-y-2">
+        <Label>Timeline</Label>
+        <Select value={form.timeframe} onValueChange={(v) => setForm({ ...form, timeframe: v })}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select timeline" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="3 months">3 months</SelectItem>
+            <SelectItem value="6 months">6 months</SelectItem>
+            <SelectItem value="9 months">9 months</SelectItem>
+            <SelectItem value="12 months">12 months</SelectItem>
+            <SelectItem value="18 months">18 months</SelectItem>
+            <SelectItem value="24 months">24 months</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <Button onClick={save} disabled={saving}>
