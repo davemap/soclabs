@@ -77,6 +77,7 @@ const ProjectDetail = () => {
   const trackerSentinelRef = useRef<HTMLDivElement>(null);
   const floatThresholdRef = useRef<number | null>(null);
   const [isFloating, setIsFloating] = useState(false);
+  const milestonesEndRef = useRef<HTMLDivElement>(null);
 
   // Track scroll position to detect when tracker should float
   useEffect(() => {
@@ -201,18 +202,19 @@ const ProjectDetail = () => {
               {/* Sentinel to detect when tracker starts floating */}
               <div ref={trackerSentinelRef} className="h-0" />
 
-              {/* Sticky container: tracker sticks until this container's bottom (just before milestones) */}
-              <div>
-                {/* Floating milestone tracker */}
-                {project.phaseProgress && (
+              {/* Non-sticky milestone tracker in its original position */}
+              {project.phaseProgress && (
+                <div className="mb-10">
                   <MilestoneTracker
                     phaseProgress={project.phaseProgress}
                     milestones={project.milestones}
                     onPhaseClick={handlePhaseClick}
                     technology={project.technology}
-                    isFloating={isFloating}
+                    isFloating={false}
+                    isSticky={false}
                   />
-                )}
+                </div>
+              )}
 
               {/* Project image */}
               <motion.div
@@ -328,7 +330,7 @@ const ProjectDetail = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="mt-10"
+                  className="mt-10 mb-10"
                 >
                   <h2 className="text-xl font-display font-bold mb-4">Reference SoC Platform</h2>
                   <Link to={`/designs/${referenceSoc.id}`} className="block group">
@@ -351,13 +353,23 @@ const ProjectDetail = () => {
                   </Link>
                 </motion.div>
               )}
-              {/* Project Milestones */}
+
+              {/* Sticky container: tracker + milestones only */}
               {project.milestones && project.milestones.length > 0 && (
                 <div id="project-milestones">
+                  {project.phaseProgress && (
+                    <MilestoneTracker
+                      phaseProgress={project.phaseProgress}
+                      milestones={project.milestones}
+                      onPhaseClick={handlePhaseClick}
+                      technology={project.technology}
+                      isFloating={isFloating}
+                      isSticky={true}
+                    />
+                  )}
                   <ProjectMilestones milestones={project.milestones} expandPhase={expandPhase} expandTaskIndex={expandTaskIndex} expandTopicId={expandTopicId} phaseEffort={project.phaseEffort} phaseUncertainty={project.phaseUncertainty} phaseDates={project.phaseDates} technology={project.technology} />
                 </div>
               )}
-              </div>{/* End sticky container */}
 
               <CommentsThreads pageId={`project-${project.id}`} />
             </div>
