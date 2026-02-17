@@ -188,6 +188,47 @@ export type Database = {
           },
         ]
       }
+      project_phase_completions: {
+        Row: {
+          completed_date: string | null
+          created_at: string
+          effort_rating: number | null
+          id: string
+          phase: string
+          project_id: string
+          uncertainty_rating: number | null
+          updated_at: string
+        }
+        Insert: {
+          completed_date?: string | null
+          created_at?: string
+          effort_rating?: number | null
+          id?: string
+          phase: string
+          project_id: string
+          uncertainty_rating?: number | null
+          updated_at?: string
+        }
+        Update: {
+          completed_date?: string | null
+          created_at?: string
+          effort_rating?: number | null
+          id?: string
+          phase?: string
+          project_id?: string
+          uncertainty_rating?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_phase_completions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           asic_process: string | null

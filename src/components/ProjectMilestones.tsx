@@ -41,6 +41,13 @@ interface EditableMilestone {
   learning_topic_ids?: string[];
 }
 
+interface PhaseCompletion {
+  phase: string;
+  completed_date?: string;
+  effort_rating?: number;
+  uncertainty_rating?: number;
+}
+
 interface ProjectMilestonesProps {
   milestones: Milestone[];
   expandPhase?: string | null;
@@ -49,6 +56,7 @@ interface ProjectMilestonesProps {
   phaseEffort?: Record<string, number>;
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
+  phaseCompletions?: PhaseCompletion[];
   technology?: string;
   trackerSlot?: React.ReactNode | ((togglePhase: (phase: string) => void, expandedPhases: Set<string>) => React.ReactNode);
   editMode?: boolean;
@@ -136,7 +144,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase, onUncompleteTask, onUncompletePhase, onEditTask }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTopicId, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, phaseCompletions = [], technology, trackerSlot, editMode, editMilestones, onEditAdd, onEditRemove, onEditUpdate, onEditSave, editSaving, isOwner, onCompleteTask, onCompletePhase, onUncompleteTask, onUncompletePhase, onEditTask }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -280,15 +288,18 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
           const phaseId = `milestone-phase-${phase}`;
           const done = tasks.filter((t) => t.done).length;
           const isExpanded = expandedPhases.has(phase);
-          const allDone = done === tasks.length;
+          const allTasksDone = tasks.length > 0 && done === tasks.length;
+          const phaseCompletion = phaseCompletions.find((pc) => pc.phase === phase);
+          const phaseIsCompleted = !!phaseCompletion;
+          const allDone = allTasksDone && phaseIsCompleted;
           const hasOverrun = tasks.some((t) => isOverrunning(t));
           const phaseDateInfo = phaseDates[phase];
           const phaseOverrun = phaseDateInfo && !phaseDateInfo.completedDate && phaseDateInfo.projectedEndDate && new Date() > new Date(phaseDateInfo.projectedEndDate);
           const phaseCompletedLate = phaseDateInfo?.completedDate && phaseDateInfo?.projectedEndDate && new Date(phaseDateInfo.completedDate) > new Date(phaseDateInfo.projectedEndDate);
 
-          // Phase-level effort/uncertainty set by author
-          const phaseEff = phaseEffort[phase] || 0;
-          const phaseUnc = phaseUncertainty[phase] || 0;
+          // Phase-level effort/uncertainty from phase completion retrospective
+          const phaseEff = phaseCompletion?.effort_rating || 0;
+          const phaseUnc = phaseCompletion?.uncertainty_rating || 0;
           const learningPhase = learningPhases.find((p) => p.id === phase);
 
           return (
@@ -317,7 +328,7 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
 
                 {/* Phase-level ratings */}
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
-                  {allDone && phaseEff > 0 ? (
+                  {phaseIsCompleted && phaseEff > 0 ? (
                     <>
                       <RatingBar value={phaseEff} colors={effortColors} label="Effort" />
                       <RatingBar value={phaseUnc} colors={uncertaintyColors} label="Uncertainty" />
@@ -365,19 +376,19 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                     <span className="hidden sm:inline">Learn</span>
                   </Link>
                 )}
-                {editMode && isOwner && onCompletePhase && !allDone && (
+                {editMode && isOwner && onCompletePhase && !phaseIsCompleted && (
                   <Button
                     size="sm"
                     variant="outline"
                     className="shrink-0 rounded-full h-7 text-[11px] gap-1"
-                    disabled={tasks.length === 0}
+                    disabled={!allTasksDone}
                     onClick={(e) => { e.stopPropagation(); onCompletePhase(phase); }}
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Complete Phase</span>
                   </Button>
                 )}
-                {editMode && isOwner && onUncompletePhase && allDone && tasks.length > 0 && (
+                {editMode && isOwner && onUncompletePhase && phaseIsCompleted && (
                   <Button
                     size="sm"
                     variant="outline"

@@ -150,6 +150,7 @@ const ProjectDetail = () => {
   const [existingRequest, setExistingRequest] = useState<any>(null);
   const [dbContent, setDbContent] = useState<any[]>([]);
   const [dbMilestones, setDbMilestones] = useState<any[]>([]);
+  const [dbPhaseCompletions, setDbPhaseCompletions] = useState<any[]>([]);
   const [editMode, setEditMode] = useState(false);
 
   // Inline edit state for target technology
@@ -316,18 +317,14 @@ const ProjectDetail = () => {
           }).eq("id", m.id);
         }
       } else {
-        // Complete all tasks in the phase
-        const phaseMilestones = dbMilestones.filter((m: any) => m.phase === completeTarget.phase);
-        for (const m of phaseMilestones) {
-          if (!m.done) {
-            await supabase.from("project_milestones").update({
-              done: true,
-              completed_date: data.completed_date,
-              effort_rating: data.effort_rating,
-              uncertainty_rating: data.uncertainty_rating,
-            }).eq("id", m.id);
-          }
-        }
+        // Phase completion — store in project_phase_completions
+        await supabase.from("project_phase_completions").upsert({
+          project_id: dbProject.id,
+          phase: completeTarget.phase,
+          completed_date: data.completed_date,
+          effort_rating: data.effort_rating,
+          uncertainty_rating: data.uncertainty_rating,
+        }, { onConflict: "project_id,phase" });
       }
       toast.success(completeTarget.type === "task" ? "Task completed!" : "Phase completed!");
       refreshMilestones();
@@ -350,12 +347,10 @@ const ProjectDetail = () => {
 
   const handleUncompletePhase = async (phase: string) => {
     if (!dbProject) return;
-    const phaseMilestones = dbMilestones.filter((m: any) => m.phase === phase);
-    for (const m of phaseMilestones) {
-      await supabase.from("project_milestones").update({
-        done: false, completed_date: null, effort_rating: null, uncertainty_rating: null,
-      }).eq("id", m.id);
-    }
+    await supabase.from("project_phase_completions")
+      .delete()
+      .eq("project_id", dbProject.id)
+      .eq("phase", phase);
     toast.success("Phase marked as incomplete");
     refreshMilestones();
   };
@@ -519,6 +514,12 @@ const ProjectDetail = () => {
       .eq("project_id", dbProject.id)
       .order("sort_order");
     setDbMilestones(data || []);
+    // Also refresh phase completions
+    const { data: pcData } = await supabase
+      .from("project_phase_completions")
+      .select("*")
+      .eq("project_id", dbProject.id);
+    setDbPhaseCompletions(pcData || []);
   };
 
   useEffect(() => {
@@ -860,6 +861,7 @@ const ProjectDetail = () => {
                 milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, effort: m.effort_rating, uncertainty: m.uncertainty_rating, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
                 expandPhase={expandPhase}
                 expandTaskIndex={expandTaskIndex}
+                phaseCompletions={dbPhaseCompletions.map((pc: any) => ({ phase: pc.phase, completed_date: pc.completed_date, effort_rating: pc.effort_rating, uncertainty_rating: pc.uncertainty_rating }))}
                 technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
                 trackerSlot={
                   !editMode
