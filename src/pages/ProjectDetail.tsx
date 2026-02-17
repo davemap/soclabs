@@ -303,9 +303,61 @@ const ProjectDetail = () => {
               </div>
             )}
 
+            {/* Target Technology card */}
+            {dbProject.target_technology && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-10">
+                {(() => {
+                  const isFpga = dbProject.target_technology === "FPGA";
+                  const isAsic = dbProject.target_technology === "ASIC";
+                  const accentClass = isFpga
+                    ? "border-sky-500/30 bg-sky-500/5"
+                    : isAsic
+                      ? "border-violet-500/30 bg-violet-500/5"
+                      : "border-border bg-muted/30";
+                  const iconBgClass = isFpga
+                    ? "bg-sky-500/10 text-sky-600"
+                    : isAsic
+                      ? "bg-violet-500/10 text-violet-600"
+                      : "bg-muted text-muted-foreground";
+                  const badgeClass = isFpga
+                    ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
+                    : isAsic
+                      ? "bg-violet-500/10 text-violet-600 border-violet-500/20"
+                      : "bg-muted text-muted-foreground border-border";
+                  return (
+                    <div className={cn("rounded-xl border p-5", accentClass)}>
+                      <div className="flex items-start gap-4">
+                        <div className={cn("p-3 rounded-xl shrink-0", iconBgClass)}>
+                          <CircuitBoard className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-display font-bold mb-1">Target Technology</h3>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Badge variant="outline" className={badgeClass}>
+                              {dbProject.target_technology}
+                            </Badge>
+                            {dbProject.fpga_family && (
+                              <Badge variant="outline" className="text-xs">
+                                {dbProject.fpga_family}
+                              </Badge>
+                            )}
+                            {dbProject.asic_process && (
+                              <Badge variant="outline" className="text-xs">
+                                {dbProject.asic_process}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </motion.div>
+            )}
+
             {/* Timeframe visual bar */}
             {dbProject.timeframe && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="mb-10">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
                 {(() => {
                   const timeframeSteps = ["1 Month", "3 Months", "6 Months", "9 Months", "12 Months", "18 Months", "Unknown"];
                   const currentIndex = timeframeSteps.indexOf(dbProject.timeframe);
@@ -363,58 +415,6 @@ const ProjectDetail = () => {
                     </div>
                   ))}
                 </div>
-              </motion.div>
-            )}
-
-            {/* Target Technology card */}
-            {dbProject.target_technology && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="mb-10">
-                {(() => {
-                  const isFpga = dbProject.target_technology === "FPGA";
-                  const isAsic = dbProject.target_technology === "ASIC";
-                  const accentClass = isFpga
-                    ? "border-sky-500/30 bg-sky-500/5"
-                    : isAsic
-                      ? "border-violet-500/30 bg-violet-500/5"
-                      : "border-border bg-muted/30";
-                  const iconBgClass = isFpga
-                    ? "bg-sky-500/10 text-sky-600"
-                    : isAsic
-                      ? "bg-violet-500/10 text-violet-600"
-                      : "bg-muted text-muted-foreground";
-                  const badgeClass = isFpga
-                    ? "bg-sky-500/10 text-sky-600 border-sky-500/20"
-                    : isAsic
-                      ? "bg-violet-500/10 text-violet-600 border-violet-500/20"
-                      : "bg-muted text-muted-foreground border-border";
-                  return (
-                    <div className={cn("rounded-xl border p-5", accentClass)}>
-                      <div className="flex items-start gap-4">
-                        <div className={cn("p-3 rounded-xl shrink-0", iconBgClass)}>
-                          <CircuitBoard className="h-6 w-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-display font-bold mb-1">Target Technology</h3>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Badge variant="outline" className={badgeClass}>
-                              {dbProject.target_technology}
-                            </Badge>
-                            {dbProject.fpga_family && (
-                              <Badge variant="outline" className="text-xs">
-                                {dbProject.fpga_family}
-                              </Badge>
-                            )}
-                            {dbProject.asic_process && (
-                              <Badge variant="outline" className="text-xs">
-                                {dbProject.asic_process}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()}
               </motion.div>
             )}
 
