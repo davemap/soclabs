@@ -58,7 +58,7 @@ const About = () => {
             <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
               <h2 className="text-2xl font-display font-bold mb-3">Find Your Focus</h2>
               <p className="text-muted-foreground mb-6 leading-relaxed">
-                Explore technologies, research fields, and activities — and connect with people who share your interests.
+                Explore technologies, discussions, and activities — and connect with people who share your interests.
               </p>
               <div className="flex items-center justify-center gap-3">
                 <Button asChild className="rounded-full px-6">
@@ -72,8 +72,8 @@ const About = () => {
                   </Link>
                 </Button>
                 <Button asChild className="rounded-full px-6">
-                  <Link to="/interests">
-                    Research Fields <ArrowRight className="ml-2 h-4 w-4" />
+                  <Link to="/research">
+                    Discussions <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
