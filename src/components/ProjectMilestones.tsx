@@ -32,6 +32,7 @@ interface ProjectMilestonesProps {
   phaseEffort?: Record<string, number>;
   phaseUncertainty?: Record<string, number>;
   phaseDates?: Record<string, PhaseDateInfo>;
+  technology?: string;
 }
 
 const phaseLabels: Record<string, string> = {
@@ -104,7 +105,7 @@ const isOverrunning = (m: Milestone): boolean => {
   return false;
 };
 
-const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {} }: ProjectMilestonesProps) => {
+const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUncertainty = {}, phaseDates = {}, technology }: ProjectMilestonesProps) => {
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
@@ -143,14 +144,16 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
     });
   };
 
+  const greyedOutPhases = technology === "FPGA" ? new Set(["tapeout"]) : new Set<string>();
   const phaseOrder = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
   const grouped = phaseOrder
     .map((phase) => ({
       phase,
       label: phaseLabels[phase] || phase,
       tasks: milestones.filter((m) => m.phase === phase),
+      greyedOut: greyedOutPhases.has(phase),
     }))
-    .filter((g) => g.tasks.length > 0);
+    .filter((g) => g.tasks.length > 0 || g.greyedOut);
 
   const totalDone = milestones.filter((m) => m.done).length;
   const totalTasks = milestones.length;
@@ -181,7 +184,21 @@ const ProjectMilestones = ({ milestones, expandPhase, phaseEffort = {}, phaseUnc
       </div>
 
       <div className="rounded-xl border border-border/60 bg-card overflow-hidden divide-y divide-border/40">
-        {grouped.map(({ phase, label, tasks }) => {
+        {grouped.map(({ phase, label, tasks, greyedOut }) => {
+          if (greyedOut) {
+            return (
+              <div key={phase} className="opacity-30 pointer-events-none">
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-display font-semibold text-muted-foreground flex-1 min-w-0 italic">
+                    {label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">N/A for FPGA</span>
+                </div>
+              </div>
+            );
+          }
+
           const phaseId = `milestone-phase-${phase}`;
           const done = tasks.filter((t) => t.done).length;
           const isExpanded = expandedPhases.has(phase);
