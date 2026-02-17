@@ -63,7 +63,7 @@ const TechnologyDetail = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mb-12"
+            className="max-w-3xl mx-auto mb-12"
           >
             <Badge variant="outline" className="mb-4">{tech.category}</Badge>
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{tech.name}</h1>
@@ -72,7 +72,7 @@ const TechnologyDetail = () => {
             </p>
           </motion.div>
 
-          <div className="max-w-4xl grid md:grid-cols-3 gap-8 mb-16">
+          <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 mb-16">
             {/* Features */}
             <ScrollReveal className="md:col-span-2">
               <div className="rounded-2xl border border-border/60 bg-card p-7">
@@ -111,7 +111,7 @@ const TechnologyDetail = () => {
           </div>
 
           {/* Reference SoCs */}
-          <ScrollReveal className="max-w-4xl mb-12">
+          <ScrollReveal className="max-w-4xl mx-auto mb-12">
             <h2 className="text-2xl font-display font-bold mb-6">
               Reference SoCs using <span className="text-gradient">{tech.name}</span>
             </h2>
@@ -141,7 +141,7 @@ const TechnologyDetail = () => {
           </ScrollReveal>
 
           {/* Community Projects */}
-          <ScrollReveal className="max-w-4xl">
+          <ScrollReveal className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-display font-bold mb-6">
               Projects using <span className="text-gradient">{tech.name}</span>
             </h2>
