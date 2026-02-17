@@ -79,6 +79,7 @@ const ProjectDetail = () => {
   const milestonesRef = useRef<HTMLDivElement>(null);
   const floatThresholdRef = useRef<number | null>(null);
   const [isFloating, setIsFloating] = useState(false);
+  const [isPastMilestones, setIsPastMilestones] = useState(false);
 
   // Store the sentinel's initial offset once on mount, then use scroll listener
   useEffect(() => {
@@ -113,6 +114,7 @@ const ProjectDetail = () => {
       }
 
       setIsFloating(pastThreshold && !pastMilestones);
+      setIsPastMilestones(pastMilestones);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -232,6 +234,7 @@ const ProjectDetail = () => {
                   onPhaseClick={handlePhaseClick}
                   technology={project.technology}
                   isFloating={isFloating}
+                  isPastMilestones={isPastMilestones}
                 />
               )}
 
