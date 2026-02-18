@@ -321,9 +321,17 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
   const [addingOrg, setAddingOrg] = useState(false);
 
   useEffect(() => {
-    supabase.from("organisations").select("id, name, type, description, logo").order("name").then(({ data }) => {
+    // Only show organisations the current user is personally associated with
+    const fetchUserOrgs = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from("profiles").select("organisations").eq("user_id", user.id).single();
+      const userOrgIds = profile?.organisations || [];
+      if (userOrgIds.length === 0) { setDbOrganisations([]); return; }
+      const { data } = await supabase.from("organisations").select("id, name, type, description, logo").in("id", userOrgIds).order("name");
       if (data) setDbOrganisations(data);
-    });
+    };
+    fetchUserOrgs();
   }, []);
 
   const toggleTechnology = useCallback((name: string) => {
