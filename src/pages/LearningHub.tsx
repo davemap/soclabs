@@ -255,7 +255,7 @@ const LearningHub = () => {
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
-            <DesignFlowToggle />
+            <DesignFlowToggle className="mt-4" />
           </motion.div>
 
           {/* Progress stepper */}
