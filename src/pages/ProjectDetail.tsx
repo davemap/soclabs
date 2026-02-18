@@ -5,7 +5,7 @@ import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, U
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/Layout";
 import { communityProjects, communityMembers, referenceDesigns, partners } from "@/data/mockData";
@@ -131,7 +131,7 @@ const ProjectDetail = () => {
             // Fetch the profile separately since there's no FK relationship
             const { data: profile } = await supabase
               .from("profiles")
-              .select("username, full_name")
+              .select("username, full_name, avatar_url")
               .eq("user_id", data.user_id)
               .maybeSingle();
             setDbProject({ ...data, profile });
@@ -1034,6 +1034,7 @@ const ProjectDetail = () => {
                     <div className="flex flex-col items-center text-center">
                       <Link to={`/community/${dbProject.user_id}`} className="hover:opacity-80 transition-opacity">
                         <Avatar className="h-16 w-16 mb-3">
+                          <AvatarImage src={dbProject.profile?.avatar_url ?? undefined} />
                           <AvatarFallback className="text-lg font-display font-bold bg-primary/10 text-primary">
                             {(dbProject.profile?.full_name || dbProject.profile?.username || "U")
                               .split(" ")
