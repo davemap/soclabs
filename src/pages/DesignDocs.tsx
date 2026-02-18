@@ -12,6 +12,7 @@ import { referenceDesigns } from "@/data/mockData";
 import { nanosocDocs } from "@/data/nanosocDocs";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 
 interface DocSection {
@@ -192,7 +193,7 @@ const DesignDocs = () => {
                         <div className="rounded-2xl border bg-card p-6 md:p-10">
                           <h2 className="text-2xl font-display font-bold mb-6">{section.title}</h2>
                           <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-table:border-collapse prose-th:border prose-th:border-border prose-th:px-3 prose-th:py-2 prose-th:bg-muted/50 prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2 prose-a:text-primary">
-                            <ReactMarkdown>{section.content}</ReactMarkdown>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
                           </div>
                         </div>
                       </TabsContent>
