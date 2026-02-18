@@ -30,14 +30,14 @@ const DesignDocs = () => {
   const [syncing, setSyncing] = useState(false);
 
   // Fetch docs from DB
-  const { data: dbDocs, isLoading, refetch } = useQuery({
+  const {
+    data: dbDocs,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["design-docs", id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("design_docs")
-        .select("*")
-        .eq("design_id", id!)
-        .order("sort_order");
+      const { data, error } = await supabase.from("design_docs").select("*").eq("design_id", id!).order("sort_order");
       if (error) throw error;
       return data as DocSection[];
     },
@@ -49,8 +49,8 @@ const DesignDocs = () => {
   const sections = hasDbDocs
     ? dbDocs.map((d) => ({ id: d.section_id, title: d.title, content: d.content }))
     : id === "nanosoc"
-    ? nanosocDocs
-    : null;
+      ? nanosocDocs
+      : null;
 
   const lastSynced = hasDbDocs ? dbDocs[0]?.last_synced_at : null;
 
@@ -77,7 +77,9 @@ const DesignDocs = () => {
       <Layout>
         <div className="container mx-auto px-4 py-32 text-center">
           <h1 className="text-3xl font-display font-bold mb-4">Design Not Found</h1>
-          <Link to="/designs" className="text-primary hover:underline">Back to Designs</Link>
+          <Link to="/designs" className="text-primary hover:underline">
+            Back to Designs
+          </Link>
         </div>
       </Layout>
     );
@@ -88,7 +90,9 @@ const DesignDocs = () => {
       <Layout>
         <div className="container mx-auto px-4 py-32 text-center">
           <h1 className="text-3xl font-display font-bold mb-4">Documentation not available yet</h1>
-          <Link to={`/designs/${id}`} className="text-primary hover:underline">Back to {design.name}</Link>
+          <Link to={`/designs/${id}`} className="text-primary hover:underline">
+            Back to {design.name}
+          </Link>
         </div>
       </Layout>
     );
@@ -122,13 +126,24 @@ const DesignDocs = () => {
                       <h1 className="text-3xl md:text-4xl font-display font-bold">{design.name} Documentation</h1>
                       <p className="text-muted-foreground text-sm mt-1">
                         Sourced from the{" "}
-                        <a href={design.githubUrl + "/-/tree/main/docs/build/qthelp"} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                        <a
+                          href={design.githubUrl + "/-/blob/main/docs/build/qthelp"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline inline-flex items-center gap-1"
+                        >
                           repository docs <ExternalLink className="h-3 w-3" />
                         </a>
                       </p>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="rounded-full shrink-0" onClick={handleSync} disabled={syncing}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full shrink-0"
+                    onClick={handleSync}
+                    disabled={syncing}
+                  >
                     <RefreshCw className={`h-4 w-4 mr-1.5 ${syncing ? "animate-spin" : ""}`} />
                     {syncing ? "Syncing…" : "Sync Docs"}
                   </Button>
@@ -138,7 +153,14 @@ const DesignDocs = () => {
                   <Badge variant="outline">v{design.version || "latest"}</Badge>
                   {lastSynced && (
                     <span className="text-xs text-muted-foreground ml-2">
-                      Last synced: {new Date(lastSynced).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      Last synced:{" "}
+                      {new Date(lastSynced).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                   )}
                 </div>
@@ -183,7 +205,9 @@ const DesignDocs = () => {
             {/* Sticky sidebar — matches DesignDetail layout */}
             <aside className="hidden lg:block w-56 shrink-0 sticky top-24">
               <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
-                <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
+                <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">
+                  Get Started
+                </h3>
                 {(design.version || design.branch) && (
                   <div className="space-y-2 pb-2 border-b border-border/40">
                     {design.version && (
