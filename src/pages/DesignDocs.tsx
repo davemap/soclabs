@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, ExternalLink, RefreshCw, Cpu, Github } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, RefreshCw, Cpu, Github, ArrowRight, Tag, GitBranch } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -99,9 +99,27 @@ const DesignDocs = () => {
       <section className="py-24">
         <div className="container mx-auto px-4 max-w-5xl relative">
           {/* Floating sidebar */}
-          <aside className="hidden xl:block fixed top-32 right-8 2xl:right-[calc((100vw-64rem)/2-12rem)] w-48 z-10">
+          <aside className="hidden xl:block fixed top-32 right-8 2xl:right-[calc((100vw-64rem)/2-12rem)] w-52 z-10">
             <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
-              <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Quick Links</h3>
+              <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
+              {(design.version || design.branch) && (
+                <div className="space-y-2 pb-2 border-b border-border/40">
+                  {design.version && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Version</span>
+                      <span className="ml-auto font-mono font-semibold text-foreground">{design.version}</span>
+                    </div>
+                  )}
+                  {design.branch && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Branch</span>
+                      <span className="ml-auto font-mono font-semibold text-foreground">{design.branch}</span>
+                    </div>
+                  )}
+                </div>
+              )}
               <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
                 <Link to={`/designs/${id}`}>
                   <Cpu className="h-4 w-4 mr-2" /> {design.name} Overview
@@ -116,6 +134,11 @@ const DesignDocs = () => {
                 <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
                 </a>
+              </Button>
+              <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+                <Link to="/projects/start">
+                  <ArrowRight className="h-4 w-4 mr-2" /> Start a Project
+                </Link>
               </Button>
             </div>
           </aside>
