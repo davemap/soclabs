@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check, ArrowRight, Sparkles, Search, FlaskConical, Plus, Send, X, Lightbulb,
-  ChevronDown, Brain, Shield, Wrench, Cpu, Radio, Zap, CheckCircle, Code,
+  ChevronDown, Brain, Shield, Wrench, Cpu, Radio, Zap, CheckCircle, Code, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { interests as allInterests, Interest } from "@/data/interests";
 import { useUserInterests } from "@/hooks/useUserInterests";
+import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -67,6 +68,10 @@ const Interests = () => {
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposalName, setProposalName] = useState("");
   const [proposalDescription, setProposalDescription] = useState("");
+
+  // Build page IDs for unread tracking
+  const pageIds = useMemo(() => interests.map((i) => `interest-${i.slug}`), []);
+  const { unreadCounts } = useUnreadDiscussions(pageIds);
 
   const toggleInterest = (slug: string) => {
     if (!user) { navigate("/auth"); return; }
@@ -331,6 +336,7 @@ const Interests = () => {
                                             <div className="grid sm:grid-cols-2 gap-3 mb-4">
                                               {itemsInSubcat.map((interest) => {
                                                 const isSelected = isRegistered(interest.slug);
+                                                const unread = unreadCounts[`interest-${interest.slug}`] || 0;
                                                 return (
                                                   <Link
                                                     key={interest.slug}
@@ -347,20 +353,28 @@ const Interests = () => {
                                                         <h3 className="font-display font-bold text-sm group-hover:text-primary transition-colors">
                                                           {interest.name}
                                                         </h3>
-                                                        <button
-                                                          onClick={(e) => {
-                                                            e.preventDefault();
-                                                            toggleInterest(interest.slug);
-                                                          }}
-                                                          className={cn(
-                                                            "w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
-                                                            isSelected
-                                                              ? "border-primary bg-primary text-primary-foreground"
-                                                              : "border-border/60 hover:border-primary/50"
+                                                        <div className="flex items-center gap-1.5">
+                                                          {isSelected && unread > 0 && (
+                                                            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                                                              <MessageSquare className="h-2.5 w-2.5" />
+                                                              {unread}
+                                                            </span>
                                                           )}
-                                                        >
-                                                          {isSelected ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
-                                                        </button>
+                                                          <button
+                                                            onClick={(e) => {
+                                                              e.preventDefault();
+                                                              toggleInterest(interest.slug);
+                                                            }}
+                                                            className={cn(
+                                                              "w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
+                                                              isSelected
+                                                                ? "border-primary bg-primary text-primary-foreground"
+                                                                : "border-border/60 hover:border-primary/50"
+                                                            )}
+                                                          >
+                                                            {isSelected ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5 text-muted-foreground" />}
+                                                          </button>
+                                                        </div>
                                                       </div>
                                                       <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                                                         {interest.description}

@@ -5,73 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-interface Comment {
-  id: string;
-  author: string;
-  date: string;
-  text: string;
-  replies: Comment[];
-}
-
-interface Thread {
-  id: string;
-  subject: string;
-  comments: Comment[];
-}
-
-const mockThreads: Record<string, Thread[]> = {};
-
-function getInitialThreads(pageId: string): Thread[] {
-  if (mockThreads[pageId]) return mockThreads[pageId];
-
-  const threads: Thread[] = [
-    {
-      id: "t1",
-      subject: "General Discussion",
-      comments: [
-        {
-          id: "c1",
-          author: "Dr. Sarah Chen",
-          date: "2026-02-12",
-          text: "Great work on this! I'd love to see how it integrates with the NanoSoC extension port.",
-          replies: [
-            {
-              id: "c1r1",
-              author: "Maria Gonzalez",
-              date: "2026-02-13",
-              text: "Agreed — we tested a similar approach in our DSP project. Happy to share notes.",
-              replies: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "t2",
-      subject: "Technical Questions",
-      comments: [
-        {
-          id: "c2",
-          author: "Dr. Kenji Tanaka",
-          date: "2026-02-14",
-          text: "What clock frequency are you targeting for the FPGA implementation?",
-          replies: [],
-        },
-      ],
-    },
-  ];
-
-  mockThreads[pageId] = threads;
-  return threads;
-}
+import { useAuth } from "@/hooks/useAuth";
+import { useDiscussionComments, type DiscussionComment, type Thread } from "@/hooks/useDiscussionComments";
+import { useNavigate } from "react-router-dom";
 
 const CommentItem = ({
   comment,
   depth = 0,
   onReply,
 }: {
-  comment: Comment;
+  comment: DiscussionComment;
   depth?: number;
   onReply: (parentId: string, text: string) => void;
 }) => {
@@ -92,9 +35,9 @@ const CommentItem = ({
           <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
             <User className="h-3 w-3 text-primary" />
           </div>
-          <span className="text-sm font-medium">{comment.author}</span>
+          <span className="text-sm font-medium">{comment.author_name}</span>
           <span className="text-xs text-muted-foreground">
-            {new Date(comment.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            {new Date(comment.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
           </span>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed ml-8">{comment.text}</p>
@@ -134,15 +77,15 @@ const ThreadSection = ({
   onReply,
 }: {
   thread: Thread;
-  onAddComment: (threadId: string, text: string) => void;
-  onReply: (threadId: string, parentId: string, text: string) => void;
+  onAddComment: (threadSubject: string, text: string) => void;
+  onReply: (threadSubject: string, parentId: string, text: string) => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
 
   const handleAdd = () => {
     if (!newComment.trim()) return;
-    onAddComment(thread.id, newComment);
+    onAddComment(thread.subject, newComment);
     setNewComment("");
   };
 
@@ -174,7 +117,7 @@ const ThreadSection = ({
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                onReply={(parentId, text) => onReply(thread.id, parentId, text)}
+                onReply={(parentId, text) => onReply(thread.subject, parentId, text)}
               />
             ))}
           </div>
@@ -197,17 +140,8 @@ const ThreadSection = ({
   );
 };
 
-function countComments(comments: Comment[]): number {
+function countComments(comments: DiscussionComment[]): number {
   return comments.reduce((sum, c) => sum + 1 + countComments(c.replies), 0);
-}
-
-function addReplyToComments(comments: Comment[], parentId: string, reply: Comment): Comment[] {
-  return comments.map((c) => {
-    if (c.id === parentId) {
-      return { ...c, replies: [...c.replies, reply] };
-    }
-    return { ...c, replies: addReplyToComments(c.replies, parentId, reply) };
-  });
 }
 
 interface CommentsThreadsProps {
@@ -215,56 +149,28 @@ interface CommentsThreadsProps {
 }
 
 const CommentsThreads = ({ pageId }: CommentsThreadsProps) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [threads, setThreads] = useState<Thread[]>(() => getInitialThreads(pageId));
+  const { threads, loading, addComment } = useDiscussionComments(pageId);
   const [showNewThread, setShowNewThread] = useState(false);
   const [newSubject, setNewSubject] = useState("");
   const [newFirstComment, setNewFirstComment] = useState("");
 
-  const handleAddComment = (threadId: string, text: string) => {
-    const comment: Comment = {
-      id: `c-${Date.now()}`,
-      author: "You",
-      date: new Date().toISOString().split("T")[0],
-      text,
-      replies: [],
-    };
-    setThreads((prev) =>
-      prev.map((t) => (t.id === threadId ? { ...t, comments: [...t.comments, comment] } : t))
-    );
+  const handleAddComment = (threadSubject: string, text: string) => {
+    if (!user) { navigate("/auth"); return; }
+    addComment(threadSubject, text);
   };
 
-  const handleReply = (threadId: string, parentId: string, text: string) => {
-    const reply: Comment = {
-      id: `r-${Date.now()}`,
-      author: "You",
-      date: new Date().toISOString().split("T")[0],
-      text,
-      replies: [],
-    };
-    setThreads((prev) =>
-      prev.map((t) =>
-        t.id === threadId ? { ...t, comments: addReplyToComments(t.comments, parentId, reply) } : t
-      )
-    );
+  const handleReply = (threadSubject: string, parentId: string, text: string) => {
+    if (!user) { navigate("/auth"); return; }
+    addComment(threadSubject, text, parentId);
   };
 
   const handleCreateThread = () => {
+    if (!user) { navigate("/auth"); return; }
     if (!newSubject.trim() || !newFirstComment.trim()) return;
-    const thread: Thread = {
-      id: `t-${Date.now()}`,
-      subject: newSubject,
-      comments: [
-        {
-          id: `c-${Date.now()}`,
-          author: "You",
-          date: new Date().toISOString().split("T")[0],
-          text: newFirstComment,
-          replies: [],
-        },
-      ],
-    };
-    setThreads((prev) => [...prev, thread]);
+    addComment(newSubject.trim(), newFirstComment.trim());
     setNewSubject("");
     setNewFirstComment("");
     setShowNewThread(false);
@@ -307,16 +213,25 @@ const CommentsThreads = ({ pageId }: CommentsThreadsProps) => {
         </div>
       )}
 
-      <div className="space-y-3">
-        {threads.map((thread) => (
-          <ThreadSection
-            key={thread.id}
-            thread={thread}
-            onAddComment={handleAddComment}
-            onReply={handleReply}
-          />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading discussions…</p>
+      ) : threads.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-8 text-center">
+          <MessageSquare className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">No discussions yet. Start a new thread!</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {threads.map((thread) => (
+            <ThreadSection
+              key={thread.subject}
+              thread={thread}
+              onAddComment={handleAddComment}
+              onReply={handleReply}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

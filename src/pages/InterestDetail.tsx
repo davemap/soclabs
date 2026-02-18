@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import { interests } from "@/data/interests";
 import { communityMembers, communityProjects, technologies } from "@/data/mockData";
+import CommentsThreads from "@/components/CommentsThreads";
 
 const categoryColor: Record<string, string> = {
   Technologies: "bg-primary/10 text-primary",
@@ -261,6 +262,8 @@ const InterestDetail = () => {
                 </Button>
               </div>
             )}
+
+            <CommentsThreads pageId={`interest-${interest.slug}`} />
           </div>
         </div>
       </section>
