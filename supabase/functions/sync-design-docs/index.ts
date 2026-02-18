@@ -7,11 +7,22 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// GitLab API base for fetching raw files (uses project API with token auth)
+// GitLab API base
 const GITLAB_HOST = "https://git.soton.ac.uk";
-const GITLAB_PROJECT_PATH = "soclabs/accelerator-project";
-const GITLAB_FILE_DIR = "docs/build/qthelp";
-const GITLAB_REF = "main";
+
+// Per-design repository configuration
+const DESIGN_REPOS: Record<string, { projectPath: string; fileDir: string; ref: string }> = {
+  nanosoc: {
+    projectPath: "soclabs/accelerator-project",
+    fileDir: "docs/build/qthelp",
+    ref: "main",
+  },
+  megasoc: {
+    projectPath: "soclabs/megasoc_project",
+    fileDir: "docs/build/qthelp",
+    ref: "main",
+  },
+};
 
 // Documentation sections to sync for each design
 const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: string; sortOrder: number }[]> = {
@@ -21,12 +32,13 @@ const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: 
     { sectionId: "writing-software", title: "Writing Software", filename: "writing_software.html", sortOrder: 2 },
     { sectionId: "simulation", title: "Simulation", filename: "simulation.html", sortOrder: 3 },
     { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 4 },
-    {
-      sectionId: "asic-implementation",
-      title: "ASIC Implementation",
-      filename: "asic_implementation.html",
-      sortOrder: 5,
-    },
+    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 5 },
+  ],
+  megasoc: [
+    { sectionId: "getting-started", title: "Getting Started", filename: "getting_started.html", sortOrder: 0 },
+    { sectionId: "adding-your-ip", title: "Adding your IP", filename: "adding_your_ip.html", sortOrder: 1 },
+    { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 2 },
+    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 3 },
   ],
 };
 
@@ -34,10 +46,10 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function buildGitlabApiUrl(filename: string): string {
-  const encodedProject = encodeURIComponent(GITLAB_PROJECT_PATH);
-  const encodedPath = encodeURIComponent(`${GITLAB_FILE_DIR}/${filename}`);
-  return `${GITLAB_HOST}/api/v4/projects/${encodedProject}/repository/files/${encodedPath}/raw?ref=${GITLAB_REF}`;
+function buildGitlabApiUrl(filename: string, repo: { projectPath: string; fileDir: string; ref: string }): string {
+  const encodedProject = encodeURIComponent(repo.projectPath);
+  const encodedPath = encodeURIComponent(`${repo.fileDir}/${filename}`);
+  return `${GITLAB_HOST}/api/v4/projects/${encodedProject}/repository/files/${encodedPath}/raw?ref=${repo.ref}`;
 }
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
@@ -142,13 +154,14 @@ Deno.serve(async (req) => {
   try {
     const { designId } = await req.json();
 
-    if (!designId || !DESIGN_DOCS[designId]) {
+    if (!designId || !DESIGN_DOCS[designId] || !DESIGN_REPOS[designId]) {
       return new Response(JSON.stringify({ success: false, error: `Unknown design: ${designId}` }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    const repo = DESIGN_REPOS[designId];
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -158,8 +171,8 @@ Deno.serve(async (req) => {
 
     for (const section of sections) {
       try {
-        const rawUrl = buildGitlabApiUrl(section.filename);
-        const displayUrl = `${GITLAB_HOST}/${GITLAB_PROJECT_PATH}/-/blob/${GITLAB_REF}/${GITLAB_FILE_DIR}/${section.filename}`;
+        const rawUrl = buildGitlabApiUrl(section.filename, repo);
+        const displayUrl = `${GITLAB_HOST}/${repo.projectPath}/-/blob/${repo.ref}/${repo.fileDir}/${section.filename}`;
         console.log(`Fetching ${section.filename} via API...`);
         if (results.length > 0) await delay(500);
         const content = await convertHtmlToMarkdown(rawUrl);
