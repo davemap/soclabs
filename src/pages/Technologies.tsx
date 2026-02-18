@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import { interests as allInterests } from "@/data/interests";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +101,7 @@ function getSubcategories(groupKey: string) {
 }
 
 const Technologies = () => {
+  const { user } = useAuth();
   const { registeredSlugs, toggleInterest } = useUserInterests();
 
   // Map tech names to interest slugs for persistence
@@ -498,29 +500,11 @@ const Technologies = () => {
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button on each card to register your interest.
                   </p>
-                  {selectedCount > 0 && (
+                  {user && (
                     <div className="border-t border-border/40 pt-3 mt-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {selectedTechs.slice(0, 5).map((name) => (
-                          <button
-                            key={name}
-                            onClick={() => toggleTech(name)}
-                            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
-                          >
-                            {name}
-                            <X className="h-2 w-2" />
-                          </button>
-                        ))}
-                        {selectedTechs.length > 5 && (
-                          <span className="text-[10px] text-muted-foreground">+{selectedTechs.length - 5} more</span>
-                        )}
-                      </div>
-                      <Button asChild size="sm" className="w-full rounded-full text-xs">
-                        <Link to="/about#join">
-                          Register <ArrowRight className="ml-1.5 h-3 w-3" />
+                      <Button asChild variant="outline" size="sm" className="w-full rounded-full text-xs">
+                        <Link to="/profile">
+                          View my interests <ArrowRight className="ml-1.5 h-3 w-3" />
                         </Link>
                       </Button>
                     </div>
@@ -597,67 +581,11 @@ const Technologies = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Selected technologies summary */}
-                {selectedCount > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl border border-primary/20 bg-primary/5 p-5"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-display font-bold text-sm">Your Technologies</h3>
-                      <span className="text-xs text-primary font-semibold">{selectedCount}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {selectedTechs.map((name) => (
-                        <button
-                          key={name}
-                          onClick={() => toggleTech(name)}
-                          className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
-                        >
-                          {name}
-                          <X className="h-2.5 w-2.5" />
-                        </button>
-                      ))}
-                    </div>
-                    <Button asChild size="sm" className="w-full rounded-full text-xs">
-                      <Link to="/about#join">
-                        Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                      </Link>
-                    </Button>
-                  </motion.div>
-                )}
               </div>
             </aside>
           </div>
         </div>
       </section>
-
-      {/* Floating CTA — mobile/smaller screens */}
-      <AnimatePresence>
-        {selectedCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 xl:hidden"
-          >
-            <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-xl shadow-primary/10">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">
-                  {selectedCount} technolog{selectedCount !== 1 ? "ies" : "y"} selected
-                </span>
-              </div>
-              <Button asChild size="sm" className="rounded-full px-5">
-                <Link to="/about#join">
-                  Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Layout>
   );
 };

@@ -398,26 +398,13 @@ const Interests = () => {
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     Click on any section to expand it. Use the <Plus className="inline h-3 w-3 text-primary -mt-0.5" /> button to register your interest and connect with others working in the same area.
                   </p>
-                  {selectedCount > 0 && (
+                  {user && (
                     <div className="border-t border-border/40 pt-3 mt-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {selectedSlugs.slice(0, 5).map((interest) => (
-                          <button
-                            key={interest.slug}
-                            onClick={() => toggleInterest(interest.slug)}
-                            className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
-                          >
-                            {interest.name}
-                            <X className="h-2 w-2" />
-                          </button>
-                        ))}
-                        {selectedSlugs.length > 5 && (
-                          <span className="text-[10px] text-muted-foreground">+{selectedSlugs.length - 5} more</span>
-                        )}
-                      </div>
+                      <Button asChild variant="outline" size="sm" className="w-full rounded-full text-xs">
+                        <Link to="/profile">
+                          View my interests <ArrowRight className="ml-1.5 h-3 w-3" />
+                        </Link>
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -476,62 +463,11 @@ const Interests = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Selected summary */}
-                {selectedCount > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl border border-primary/20 bg-primary/5 p-5"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-display font-bold text-sm">Your Interests</h3>
-                      <span className="text-xs text-primary font-semibold">{selectedCount}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {selectedSlugs.map((interest) => (
-                        <button
-                          key={interest.slug}
-                          onClick={() => toggleInterest(interest.slug)}
-                          className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
-                        >
-                          {interest.name}
-                          <X className="h-2.5 w-2.5" />
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
               </div>
             </aside>
           </div>
         </div>
       </section>
-
-      {/* Floating CTA — mobile/smaller screens */}
-      <AnimatePresence>
-        {selectedCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 40 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 lg:hidden"
-          >
-            <div className="flex items-center gap-4 px-6 py-3 rounded-2xl border border-primary/20 bg-card/95 backdrop-blur-xl shadow-xl shadow-primary/10">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">
-                  {selectedCount} topic{selectedCount !== 1 ? "s" : ""} selected
-                </span>
-              </div>
-              <Button asChild size="sm" className="rounded-full px-5">
-                <Link to="/about#join">
-                  Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </Layout>
   );
 };
