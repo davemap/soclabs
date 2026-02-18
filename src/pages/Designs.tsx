@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Github, Cpu, ArrowRight, CheckCircle2, Plus, GitCompare } from "lucide-react";
+import { Github, Cpu, ArrowRight, CheckCircle2, Plus, GitCompare, BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -133,6 +133,11 @@ const Designs = () => {
                             <Button asChild className="rounded-full">
                               <Link to={`/designs/${design.id}`}>
                                 <ArrowRight className="h-4 w-4 mr-2" /> Explore Design
+                              </Link>
+                            </Button>
+                            <Button asChild variant="outline" className="rounded-full" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                              <Link to={`/designs/${design.id}/docs`} onClick={(e) => e.stopPropagation()}>
+                                <BookOpen className="h-4 w-4 mr-2" /> Documentation
                               </Link>
                             </Button>
                             <Button asChild variant="outline" className="rounded-full">
