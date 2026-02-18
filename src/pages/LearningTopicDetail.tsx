@@ -162,14 +162,12 @@ const LearningTopicDetail = () => {
             </nav>
           </div>
 
-          {/* Design flow toggle */}
-          <div className="max-w-6xl mx-auto mb-4">
-            <DesignFlowToggle />
-          </div>
-
           {/* Main content with floating sidebar */}
           <div className="max-w-6xl mx-auto flex gap-8">
             <div className="flex-1 min-w-0">
+              {/* Design flow toggle centred above stepper */}
+              <DesignFlowToggle size="compact" className="mb-3" />
+
               {/* Phase stepper + arrows - centred over content column */}
               <div className="max-w-2xl mx-auto mb-10">
                 <div className="flex items-center gap-2">

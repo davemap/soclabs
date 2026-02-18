@@ -255,11 +255,11 @@ const LearningHub = () => {
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
-            <DesignFlowToggle className="mt-4" />
+            <DesignFlowToggle className="mt-2" />
           </motion.div>
 
           {/* Progress stepper */}
-          <ScrollReveal className="max-w-4xl mx-auto mb-12">
+          <ScrollReveal className="max-w-4xl mx-auto mb-12 mt-6">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => clampedActive > 0 && goTo(clampedActive - 1)}
