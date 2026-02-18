@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight, ChevronLeft, ArrowRight, Cpu, Flame, HelpCircle } from "lucide-react";
@@ -9,6 +9,8 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { learningPhases, LearningPhase } from "@/data/mockData";
 import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
+import { useDesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
+import DesignFlowToggle from "@/components/DesignFlowToggle";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -225,9 +227,14 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
 
 const LearningHub = () => {
   const [searchParams] = useSearchParams();
+  const { flow } = useDesignFlow();
+  const phases = useMemo(() => filterPhasesForFlow(learningPhases, flow), [flow]);
   const phaseParam = searchParams.get("phase");
-  const initialIndex = phaseParam ? learningPhases.findIndex((p) => p.id === phaseParam) : 0;
+  const initialIndex = phaseParam ? phases.findIndex((p) => p.id === phaseParam) : 0;
   const [activePhase, setActivePhase] = useState(Math.max(0, initialIndex));
+
+  // Clamp activePhase when phases change (e.g. toggling flow)
+  const clampedActive = Math.min(activePhase, phases.length - 1);
 
   const goTo = (index: number) => {
     setActivePhase(index);
@@ -245,20 +252,21 @@ const LearningHub = () => {
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
               Hardware Design <span className="text-gradient">Learning Hub</span>
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
               A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
+            <DesignFlowToggle />
           </motion.div>
 
           {/* Progress stepper */}
           <ScrollReveal className="max-w-4xl mx-auto mb-12">
             <div className="flex items-center gap-2">
               <button
-                onClick={() => activePhase > 0 && goTo(activePhase - 1)}
-                disabled={activePhase === 0}
+                onClick={() => clampedActive > 0 && goTo(clampedActive - 1)}
+                disabled={clampedActive === 0}
                 className={cn(
                   "p-2 rounded-lg border transition-all shrink-0",
-                  activePhase === 0
+                  clampedActive === 0
                     ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
                     : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
                 )}
@@ -269,21 +277,21 @@ const LearningHub = () => {
               <div className="flex-1 relative">
                 <div className="flex items-center justify-between relative">
                   <div className="absolute top-5 h-0.5 bg-border" style={{ left: 20, right: 20 }} />
-                  {activePhase > 0 && (
+                  {clampedActive > 0 && (
                     <div
                       className="absolute top-5 h-0.5 bg-primary transition-all duration-500"
                       style={{
                         left: 20,
-                        width: `calc(${(activePhase / (learningPhases.length - 1)) * 100}%)`,
+                        width: `calc(${(clampedActive / (phases.length - 1)) * 100}%)`,
                       }}
                     />
                   )}
-                  {learningPhases.map((phase, i) => (
+                  {phases.map((phase, i) => (
                     <PhaseStepperIcon
                       key={phase.id}
                       phase={phase}
                       index={i}
-                      activeIndex={activePhase}
+                      activeIndex={clampedActive}
                       onSelect={goTo}
                     />
                   ))}
@@ -291,11 +299,11 @@ const LearningHub = () => {
               </div>
 
               <button
-                onClick={() => activePhase < learningPhases.length - 1 && goTo(activePhase + 1)}
-                disabled={activePhase === learningPhases.length - 1}
+                onClick={() => clampedActive < phases.length - 1 && goTo(clampedActive + 1)}
+                disabled={clampedActive === phases.length - 1}
                 className={cn(
                   "p-2 rounded-lg border transition-all shrink-0",
-                  activePhase === learningPhases.length - 1
+                  clampedActive === phases.length - 1
                     ? "border-border/40 text-muted-foreground/40 cursor-not-allowed"
                     : "border-border/60 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50"
                 )}
@@ -307,7 +315,7 @@ const LearningHub = () => {
 
           {/* Active phase with topic tree */}
           <div className="max-w-3xl mx-auto">
-            <PhaseSection phase={learningPhases[activePhase]} index={activePhase} />
+            <PhaseSection phase={phases[clampedActive]} index={clampedActive} />
           </div>
         </div>
       </section>

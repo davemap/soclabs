@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle, Users } from "lucide-react";
@@ -8,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useDesignFlow, filterPhasesForFlow, asicOnlyPhases } from "@/hooks/useDesignFlow";
+import DesignFlowToggle from "@/components/DesignFlowToggle";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -95,10 +98,21 @@ const weightedAvg = (values: number[]): number => {
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
   const { phaseId, topicId } = useParams();
+  const { flow } = useDesignFlow();
+  const phases = useMemo(() => filterPhasesForFlow(learningPhases, flow), [flow]);
 
-  const phase = learningPhases.find((p) => p.id === phaseId);
+  const phase = phases.find((p) => p.id === phaseId);
   const topicIndex = phase?.topics.findIndex((t) => t.id === topicId) ?? -1;
   const topic = phase?.topics[topicIndex];
+
+  // If current phase is ASIC-only and we're in FPGA mode, redirect
+  if (!phase && phaseId && asicOnlyPhases.has(phaseId)) {
+    const fallbackPhase = phases[phases.length - 1];
+    if (fallbackPhase) {
+      navigate(`/learn/${fallbackPhase.id}/${fallbackPhase.topics[0].id}`, { replace: true });
+      return null;
+    }
+  }
 
   if (!phase || !topic) {
     return (
@@ -113,12 +127,12 @@ const LearningTopicDetail = () => {
     );
   }
 
-  const phaseIndex = learningPhases.indexOf(phase);
-  const prevPhase = phaseIndex > 0 ? learningPhases[phaseIndex - 1] : null;
-  const nextPhase = phaseIndex < learningPhases.length - 1 ? learningPhases[phaseIndex + 1] : null;
+  const phaseIndex = phases.indexOf(phase);
+  const prevPhase = phaseIndex > 0 ? phases[phaseIndex - 1] : null;
+  const nextPhase = phaseIndex < phases.length - 1 ? phases[phaseIndex + 1] : null;
 
-  // Build prev/next across all phases and topics
-  const allTopics = learningPhases.flatMap((p) =>
+  // Build prev/next across all filtered phases and topics
+  const allTopics = phases.flatMap((p) =>
     p.topics.map((t) => ({ phaseId: p.id, topicId: t.id, title: t.title, phaseTitle: p.shortTitle }))
   );
   const globalIndex = allTopics.findIndex((t) => t.phaseId === phaseId && t.topicId === topicId);
@@ -148,9 +162,13 @@ const LearningTopicDetail = () => {
             </nav>
           </div>
 
+          {/* Design flow toggle */}
+          <div className="max-w-6xl mx-auto mb-4">
+            <DesignFlowToggle />
+          </div>
+
           {/* Main content with floating sidebar */}
           <div className="max-w-6xl mx-auto flex gap-8">
-            {/* Main content */}
             <div className="flex-1 min-w-0">
               {/* Phase stepper + arrows - centred over content column */}
               <div className="max-w-2xl mx-auto mb-10">
@@ -177,11 +195,11 @@ const LearningTopicDetail = () => {
                           className="absolute top-5 h-0.5 bg-primary transition-all duration-500"
                           style={{
                             left: 20,
-                            width: `calc(${(phaseIndex / (learningPhases.length - 1)) * 100}%)`,
+                            width: `calc(${(phaseIndex / (phases.length - 1)) * 100}%)`,
                           }}
                         />
                       )}
-                      {learningPhases.map((p, i) => (
+                      {phases.map((p, i) => (
                         <PhaseStepperIcon
                           key={p.id}
                           phase={p}

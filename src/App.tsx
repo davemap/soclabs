@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { DesignFlowProvider } from "@/hooks/useDesignFlow";
 import Index from "./pages/Index";
 import Designs from "./pages/Designs";
 import DesignDetail from "./pages/DesignDetail";
@@ -33,6 +34,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <DesignFlowProvider>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -68,6 +70,7 @@ const App = () => (
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
+    </DesignFlowProvider>
   </QueryClientProvider>
 );
 
