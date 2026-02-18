@@ -44,7 +44,7 @@ const DesignDetail = () => {
   }
 
   const relatedProjects = communityProjects.filter(
-    (p) => p.referenceSoc === design.name
+    (p) => p.referenceSoc.toLowerCase() === design.name.toLowerCase()
   );
 
   const relatedTechs = technologies.filter((t) =>
