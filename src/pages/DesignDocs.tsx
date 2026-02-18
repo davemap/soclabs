@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/Layout";
 import { referenceDesigns } from "@/data/mockData";
 import { nanosocDocs } from "@/data/nanosocDocs";
+import { megasocDocs } from "@/data/megasocDocs";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -51,7 +52,9 @@ const DesignDocs = () => {
     ? dbDocs.map((d) => ({ id: d.section_id, title: d.title, content: d.content }))
     : id === "nanosoc"
       ? nanosocDocs
-      : null;
+      : id === "megasoc"
+        ? megasocDocs
+        : null;
 
   const lastSynced = hasDbDocs ? dbDocs[0]?.last_synced_at : null;
 

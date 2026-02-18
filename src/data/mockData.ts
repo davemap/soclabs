@@ -123,7 +123,7 @@ export const referenceDesigns = [
       "Custom accelerator development",
       "Industry collaboration",
     ],
-    githubUrl: "https://github.com/soclabs/megasoc",
+    githubUrl: "https://git.soton.ac.uk/soclabs/megasoc_project",
     docsUrl: "https://docs.soclabs.org/megasoc",
     image: "/placeholder.svg",
     processor: "ARM Cortex-A53",
