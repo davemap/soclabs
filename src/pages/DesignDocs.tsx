@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, ExternalLink, RefreshCw } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, RefreshCw, Cpu, Github } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -97,7 +97,28 @@ const DesignDocs = () => {
   return (
     <Layout>
       <section className="py-24">
-        <div className="container mx-auto px-4 max-w-5xl">
+        <div className="container mx-auto px-4 max-w-5xl relative">
+          {/* Floating sidebar */}
+          <aside className="hidden xl:block fixed top-32 right-8 2xl:right-[calc((100vw-64rem)/2-12rem)] w-48 z-10">
+            <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
+              <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Quick Links</h3>
+              <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
+                <Link to={`/designs/${id}`}>
+                  <Cpu className="h-4 w-4 mr-2" /> {design.name} Overview
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
+                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4 mr-2" /> GitHub
+                </a>
+              </Button>
+              <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
+                </a>
+              </Button>
+            </div>
+          </aside>
           {/* Back link */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Link
