@@ -29,6 +29,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { communityProjects, communityMembers } from "@/data/mockData";
 import { interests } from "@/data/interests";
+import { useUserInterests } from "@/hooks/useUserInterests";
 import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 import AvatarCropDialog from "@/components/AvatarCropDialog";
 
@@ -42,6 +43,46 @@ interface ProfileData {
   organisations: string[] | null;
   expertise: string[] | null;
 }
+
+const RegisteredInterestsSection = () => {
+  const { registeredSlugs, loading, toggleInterest } = useUserInterests();
+  const registered = interests.filter((i) => registeredSlugs.has(i.slug));
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">My Interests</h3>
+        <span className="text-xs text-muted-foreground">
+          {registered.length} registered — manage on{" "}
+          <Link to="/technologies" className="text-primary hover:underline">Technologies</Link>{" & "}
+          <Link to="/interests" className="text-primary hover:underline">Discussions</Link> pages
+        </span>
+      </div>
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      ) : registered.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {registered.map((interest) => (
+            <button
+              key={interest.slug}
+              onClick={() => toggleInterest(interest.slug)}
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
+            >
+              {interest.name}
+              <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          No interests registered yet. Visit the{" "}
+          <Link to="/technologies" className="text-primary hover:underline">Technologies</Link> or{" "}
+          <Link to="/interests" className="text-primary hover:underline">Discussions</Link> pages to register your interests.
+        </p>
+      )}
+    </div>
+  );
+};
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -396,45 +437,8 @@ const Profile = () => {
 
             <Separator className="my-8" />
 
-            {/* Expertise */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Expertise</h3>
-                <span className="text-xs text-muted-foreground">
-                  {(profile?.expertise || []).length}/4 selected — shown on your public profile
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {interests.map((interest) => {
-                  const selected = (profile?.expertise || []).includes(interest.slug);
-                  const atLimit = (profile?.expertise || []).length >= 4 && !selected;
-                  return (
-                    <button
-                      key={interest.slug}
-                      disabled={atLimit}
-                      onClick={async () => {
-                        if (!user) return;
-                        const current = profile?.expertise || [];
-                        const next = selected
-                          ? current.filter((s) => s !== interest.slug)
-                          : [...current, interest.slug];
-                        const { error } = await supabase.from("profiles").update({ expertise: next } as any).eq("user_id", user.id);
-                        if (!error) setProfile((prev) => prev ? { ...prev, expertise: next } : prev);
-                      }}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
-                        selected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : atLimit
-                            ? "bg-muted text-muted-foreground/50 border-border/40 cursor-not-allowed"
-                            : "bg-card text-muted-foreground border-border/60 hover:border-primary/40 hover:text-foreground"
-                      }`}
-                    >
-                      {interest.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Registered Interests */}
+            <RegisteredInterestsSection />
 
             <Separator className="my-8" />
 

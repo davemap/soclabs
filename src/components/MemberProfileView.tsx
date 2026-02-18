@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -38,6 +38,18 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
   const { toast } = useToast();
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [registeredInterestSlugs, setRegisteredInterestSlugs] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchInterests = async () => {
+      const { data } = await supabase
+        .from("user_interests" as any)
+        .select("interest_slug")
+        .eq("user_id", profile.user_id);
+      setRegisteredInterestSlugs((data || []).map((r: any) => r.interest_slug));
+    };
+    fetchInterests();
+  }, [profile.user_id]);
 
   // Only blurb and hide_location are editable here
   const [blurb, setBlurb] = useState(profile.blurb || "");
@@ -167,10 +179,10 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
           )
         )}
 
-        {/* Expertise */}
-        {(profile.expertise || []).length > 0 && !editing && (
+        {/* Interests */}
+        {registeredInterestSlugs.length > 0 && !editing && (
           <div className="flex flex-wrap gap-2 mb-5">
-            {(profile.expertise as string[]).map((slug: string) => {
+            {registeredInterestSlugs.map((slug: string) => {
               const interest = allInterests.find((i) => i.slug === slug);
               return (
                 <Link

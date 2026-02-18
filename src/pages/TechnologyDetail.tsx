@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUserInterests } from "@/hooks/useUserInterests";
 import CommentsThreads from "@/components/CommentsThreads";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -61,12 +62,13 @@ const subcategoryBgColors: Record<string, string> = {
   "Shuttle Services": "bg-coral/10",
 };
 
-const RegisterInterestBox = ({ name, accentColor }: { name: string; accentColor: string }) => {
-  const [registered, setRegistered] = useState(false);
+const RegisterInterestBox = ({ slug, name, accentColor }: { slug: string; name: string; accentColor: string }) => {
+  const { isRegistered, toggleInterest } = useUserInterests();
+  const registered = isRegistered(slug);
 
   return (
     <button
-      onClick={() => setRegistered(!registered)}
+      onClick={() => toggleInterest(slug)}
       className={cn(
         "flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-300 shrink-0",
         registered
@@ -170,7 +172,7 @@ const TechnologyDetail = () => {
             </div>
             <div className="flex items-start justify-between gap-6 mb-4">
               <h1 className="text-4xl md:text-5xl font-display font-bold">{tech.name}</h1>
-              <RegisterInterestBox name={tech.name} accentColor={accentColor} />
+              <RegisterInterestBox slug={linkedSlugs[0] || tech.name} name={tech.name} accentColor={accentColor} />
             </div>
             <p className="text-lg text-muted-foreground leading-relaxed">
               {tech.longDescription || tech.description}

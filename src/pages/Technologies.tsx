@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useUserInterests } from "@/hooks/useUserInterests";
+import { interests as allInterests } from "@/data/interests";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -98,7 +100,26 @@ function getSubcategories(groupKey: string) {
 }
 
 const Technologies = () => {
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const { registeredSlugs, toggleInterest } = useUserInterests();
+
+  // Map tech names to interest slugs for persistence
+  const techNameToSlug = useMemo(() => {
+    const map: Record<string, string> = {};
+    allInterests.forEach((i) => { if (i.technologyName) map[i.technologyName] = i.slug; });
+    return map;
+  }, []);
+
+  const selectedTechs = useMemo(() => {
+    return allInterests
+      .filter((i) => i.technologyName && registeredSlugs.has(i.slug))
+      .map((i) => i.technologyName!);
+  }, [registeredSlugs, techNameToSlug]);
+
+  const toggleTech = useCallback((name: string) => {
+    const slug = techNameToSlug[name];
+    if (slug) toggleInterest(slug);
+  }, [techNameToSlug, toggleInterest]);
+
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map(g => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState<Record<string, string | null>>({});
@@ -107,12 +128,6 @@ const Technologies = () => {
   const [proposalName, setProposalName] = useState("");
   const [proposalGroup, setProposalGroup] = useState("Components");
   const [proposalDescription, setProposalDescription] = useState("");
-
-  const toggleTech = (name: string) => {
-    setSelectedTechs((prev) =>
-      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name]
-    );
-  };
 
   const toggleGroup = (key: string) => {
     setCollapsedGroups((prev) => {
