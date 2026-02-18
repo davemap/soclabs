@@ -2,3 +2,6 @@ project_id = "pcjpajdrqanbffiktxvy"
 
 [functions.sync-design-docs]
 verify_jwt = false
+
+[functions.invite-collaborator]
+verify_jwt = false
