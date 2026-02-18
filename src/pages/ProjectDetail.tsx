@@ -768,7 +768,7 @@ const ProjectDetail = () => {
                   )}
                 </div>
               ) : (dbProject as any).image_url ? (
-                <div className="rounded-xl border bg-card overflow-hidden">
+                <div className="rounded-xl border-x bg-card overflow-hidden">
                   <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-contain bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]" />
                 </div>
               ) : (
