@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check, ArrowRight, Sparkles, Search, FlaskConical, Plus, Send, X, Lightbulb,
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { interests as allInterests, Interest } from "@/data/interests";
+import { useUserInterests } from "@/hooks/useUserInterests";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 // Filter to Discussions only
@@ -55,7 +57,9 @@ function getSubcategories(groupKey: string) {
 }
 
 const Interests = () => {
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { registeredSlugs, toggleInterest: dbToggle, isRegistered } = useUserInterests();
   const [search, setSearch] = useState("");
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map((g) => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
@@ -64,8 +68,9 @@ const Interests = () => {
   const [proposalName, setProposalName] = useState("");
   const [proposalDescription, setProposalDescription] = useState("");
 
-  const toggleInterest = (name: string) => {
-    setSelectedInterests((prev) => prev.includes(name) ? prev.filter((i) => i !== name) : [...prev, name]);
+  const toggleInterest = (slug: string) => {
+    if (!user) { navigate("/auth"); return; }
+    dbToggle(slug);
   };
 
   const toggleGroup = (key: string) => {
@@ -91,8 +96,9 @@ const Interests = () => {
     setProposalDescription("");
     setProposalOpen(false);
   };
+  const selectedSlugs = interests.filter((i) => registeredSlugs.has(i.slug));
+  const selectedCount = selectedSlugs.length;
 
-  const selectedCount = selectedInterests.length;
 
   return (
     <Layout>
@@ -324,7 +330,7 @@ const Interests = () => {
                                           >
                                             <div className="grid sm:grid-cols-2 gap-3 mb-4">
                                               {itemsInSubcat.map((interest) => {
-                                                const isSelected = selectedInterests.includes(interest.name);
+                                                const isSelected = isRegistered(interest.slug);
                                                 return (
                                                   <Link
                                                     key={interest.slug}
@@ -344,8 +350,7 @@ const Interests = () => {
                                                         <button
                                                           onClick={(e) => {
                                                             e.preventDefault();
-                                                            e.stopPropagation();
-                                                            toggleInterest(interest.name);
+                                                            toggleInterest(interest.slug);
                                                           }}
                                                           className={cn(
                                                             "w-7 h-7 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
@@ -399,25 +404,20 @@ const Interests = () => {
                         <span className="text-xs font-medium text-primary">{selectedCount} selected</span>
                       </div>
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {selectedInterests.slice(0, 5).map((name) => (
+                        {selectedSlugs.slice(0, 5).map((interest) => (
                           <button
-                            key={name}
-                            onClick={() => toggleInterest(name)}
+                            key={interest.slug}
+                            onClick={() => toggleInterest(interest.slug)}
                             className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
                           >
-                            {name}
+                            {interest.name}
                             <X className="h-2 w-2" />
                           </button>
                         ))}
-                        {selectedInterests.length > 5 && (
-                          <span className="text-[10px] text-muted-foreground">+{selectedInterests.length - 5} more</span>
+                        {selectedSlugs.length > 5 && (
+                          <span className="text-[10px] text-muted-foreground">+{selectedSlugs.length - 5} more</span>
                         )}
                       </div>
-                      <Button asChild size="sm" className="w-full rounded-full text-xs">
-                        <Link to="/about#join">
-                          Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                        </Link>
-                      </Button>
                     </div>
                   )}
                 </div>
@@ -488,22 +488,17 @@ const Interests = () => {
                       <span className="text-xs text-primary font-semibold">{selectedCount}</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5 mb-4">
-                      {selectedInterests.map((name) => (
+                      {selectedSlugs.map((interest) => (
                         <button
-                          key={name}
-                          onClick={() => toggleInterest(name)}
+                          key={interest.slug}
+                          onClick={() => toggleInterest(interest.slug)}
                           className="inline-flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
                         >
-                          {name}
+                          {interest.name}
                           <X className="h-2.5 w-2.5" />
                         </button>
                       ))}
                     </div>
-                    <Button asChild size="sm" className="w-full rounded-full text-xs">
-                      <Link to="/about#join">
-                        Register <ArrowRight className="ml-1.5 h-3 w-3" />
-                      </Link>
-                    </Button>
                   </motion.div>
                 )}
               </div>
