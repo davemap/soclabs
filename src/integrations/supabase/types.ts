@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      design_docs: {
+        Row: {
+          content: string
+          created_at: string
+          design_id: string
+          id: string
+          last_synced_at: string
+          section_id: string
+          sort_order: number
+          source_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          design_id: string
+          id?: string
+          last_synced_at?: string
+          section_id: string
+          sort_order?: number
+          source_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          design_id?: string
+          id?: string
+          last_synced_at?: string
+          section_id?: string
+          sort_order?: number
+          source_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
