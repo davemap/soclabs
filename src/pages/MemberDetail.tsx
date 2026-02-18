@@ -1,14 +1,15 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Building2, FolderOpen, ExternalLink, ArrowRight, Calendar, User } from "lucide-react";
+import { ArrowLeft, MapPin, Building2, FolderOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/Layout";
+import MemberProfileView from "@/components/MemberProfileView";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { communityMembers, communityProjects, partners } from "@/data/mockData";
 import { interests } from "@/data/interests";
 
@@ -24,11 +25,10 @@ const statusColor = (status: string) => {
 const MemberDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
 
-  // Try mock member first
   const mockMember = communityMembers.find((m) => m.id === id);
 
-  // Real profile state
   const [profile, setProfile] = useState<any>(null);
   const [userProjects, setUserProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(!mockMember);
@@ -39,7 +39,6 @@ const MemberDetail = () => {
     const fetchProfile = async () => {
       setLoading(true);
 
-      // Try fetching by profile id first, then by user_id
       let { data } = await supabase
         .from("profiles")
         .select("*")
@@ -58,7 +57,6 @@ const MemberDetail = () => {
       if (data) {
         setProfile(data);
 
-        // Fetch user's projects
         const { data: projects } = await supabase
           .from("projects")
           .select("*")
@@ -74,7 +72,6 @@ const MemberDetail = () => {
     fetchProfile();
   }, [id, mockMember]);
 
-  // Loading state for DB profiles
   if (loading) {
     return (
       <Layout>
@@ -96,12 +93,10 @@ const MemberDetail = () => {
     );
   }
 
-  // Render mock member page (existing behavior)
   if (mockMember) {
     return <MockMemberPage member={mockMember} />;
   }
 
-  // Real profile not found
   if (!profile) {
     return (
       <Layout>
@@ -117,121 +112,25 @@ const MemberDetail = () => {
     );
   }
 
-  // Real profile page
-  const initials = (profile.full_name || profile.username || "U")
-    .split(" ")
-    .map((n: string) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const isOwnProfile = !!user && user.id === profile.user_id;
 
   return (
     <Layout>
       <section className="py-24">
         <div className="container mx-auto px-4 max-w-4xl">
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8"
-            >
-              <ArrowLeft className="h-4 w-4" /> Back
-            </button>
-          </motion.div>
-
-          {/* Profile Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-            <div className="flex items-start gap-5 mb-6">
-              <Avatar className="w-16 h-16 rounded-2xl">
-                {profile.avatar_url ? (
-                  <AvatarImage src={profile.avatar_url} alt={profile.full_name || profile.username} />
-                ) : null}
-                <AvatarFallback className="rounded-2xl bg-primary/10 text-primary font-display font-bold text-xl">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">
-                  {profile.full_name || profile.username || "Community Member"}
-                </h1>
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                  {profile.username && (
-                    <span className="flex items-center gap-1">
-                      <User className="h-3.5 w-3.5" /> @{profile.username}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" /> Joined {new Date(profile.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {profile.orcid && (
-              <div className="mb-4">
-                <a
-                  href={`https://orcid.org/${profile.orcid}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                  ORCID: {profile.orcid}
-                </a>
-              </div>
-            )}
-          </motion.div>
-
-          {/* Projects */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <FolderOpen className="h-5 w-5 text-primary" />
-              <h2 className="text-2xl font-display font-bold">Projects</h2>
-            </div>
-
-            {userProjects.length > 0 ? (
-              <div className="grid sm:grid-cols-2 gap-4">
-                {userProjects.map((project) => (
-                  <Link key={project.id} to={`/projects/${project.id}`} className="group">
-                    <Card className="h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-border/60">
-                      <CardContent className="p-5 flex flex-col h-full">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className={statusColor(project.status)}>
-                            {project.status}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">{project.reference_soc}</Badge>
-                        </div>
-                        <h3 className="font-display font-bold group-hover:text-primary transition-colors mb-2">
-                          {project.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground flex-1 leading-relaxed line-clamp-3 mb-3">
-                          {project.description}
-                        </p>
-                        <span className="inline-flex items-center gap-1 text-xs text-primary font-medium">
-                          View project <ArrowRight className="h-3 w-3" />
-                        </span>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-                <FolderOpen className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">No projects yet.</p>
-              </div>
-            )}
-          </motion.div>
+          <MemberProfileView
+            profile={profile}
+            userProjects={userProjects}
+            isOwnProfile={isOwnProfile}
+            onProfileUpdated={(updated) => setProfile(updated)}
+          />
         </div>
       </section>
     </Layout>
   );
 };
 
-/* ─── Mock member fallback (preserves existing mock data rendering) ─── */
+/* ─── Mock member fallback ─── */
 const MockMemberPage = ({ member }: { member: any }) => {
   const navigate = useNavigate();
 
