@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 // Base URL for raw file access from the GitLab repo
-const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/nanosoc-accelerator-project/-/raw/main/docs/build/qthelp";
+const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/nanosoc-accelerator-project/-/blob/main/docs/build/qthelp";
 
 // Documentation sections to sync for each design
 const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: string; sortOrder: number }[]> = {
