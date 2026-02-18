@@ -127,7 +127,7 @@ const DesignDocs = () => {
                       <p className="text-muted-foreground text-sm mt-1">
                         Sourced from the{" "}
                         <a
-                          href={design.githubUrl + "/-/blob/main/docs/build/qthelp"}
+                          href={design.githubUrl + "/-/blob/main/docs/build/html"}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-primary hover:underline inline-flex items-center gap-1"

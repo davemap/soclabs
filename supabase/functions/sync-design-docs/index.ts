@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 // Base URL for raw file access from the GitLab repo
-const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/nanosoc-accelerator-project/-/blob/main/docs/build/qthelp";
+const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/nanosoc-accelerator-project/-/raw/main/docs/build/html";
 
 // Documentation sections to sync for each design
 const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: string; sortOrder: number }[]> = {
@@ -33,9 +33,12 @@ function delay(ms: number) {
 
 async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const resp = await fetch(url, {
-      headers: { "User-Agent": "SoCLabs-DocSync/1.0" },
-    });
+    const gitlabToken = Deno.env.get("GITLAB_ACCESS_TOKEN");
+    const headers: Record<string, string> = { "User-Agent": "SoCLabs-DocSync/1.0" };
+    if (gitlabToken) {
+      headers["PRIVATE-TOKEN"] = gitlabToken;
+    }
+    const resp = await fetch(url, { headers });
     if (resp.ok) return resp;
     if (resp.status === 429 && i < retries - 1) {
       const waitMs = (i + 1) * 2000;
