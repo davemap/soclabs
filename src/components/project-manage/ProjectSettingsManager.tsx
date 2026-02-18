@@ -1,15 +1,16 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, Search, X, Check, Plus, ChevronDown, Cpu, Wrench, Server, Brain, Shield, Code, CheckCircle, Zap, Radio, Microchip, Cable, MemoryStick, Gauge, HardDrive, Rocket, FlaskConical } from "lucide-react";
+import { Save, Search, X, Check, Plus, ChevronDown, Cpu, Wrench, Server, Brain, Shield, Code, CheckCircle, Zap, Radio, Microchip, Cable, MemoryStick, Gauge, HardDrive, Rocket, FlaskConical, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { interests as allInterests } from "@/data/interests";
 import { technologies } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 
 interface ProjectData {
   id: string;
@@ -24,6 +25,7 @@ interface ProjectData {
   timeframe: string | null;
   interests: string[] | null;
   technologies: string[] | null;
+  organisations: string[] | null;
 }
 
 // ─── Technology groups (matches Technologies page) ───
@@ -312,6 +314,18 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
   const [discussionSearch, setDiscussionSearch] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // Organisation association state
+  const [dbOrganisations, setDbOrganisations] = useState<{ id: string; name: string; type: string; description: string | null; logo: string | null }[]>([]);
+  const [orgSearch, setOrgSearch] = useState("");
+  const [projectOrgs, setProjectOrgs] = useState<string[]>(project.organisations || []);
+  const [addingOrg, setAddingOrg] = useState(false);
+
+  useEffect(() => {
+    supabase.from("organisations").select("id, name, type, description, logo").order("name").then(({ data }) => {
+      if (data) setDbOrganisations(data);
+    });
+  }, []);
+
   const toggleTechnology = useCallback((name: string) => {
     setSelectedTechnologies((prev) => {
       const next = new Set(prev);
@@ -341,6 +355,38 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
         (!search || i.name.toLowerCase().includes(search.toLowerCase()) || i.description.toLowerCase().includes(search.toLowerCase())))
       .map((i) => ({ id: i.slug, name: i.name, description: i.description }));
   }, []);
+
+  const addOrganisation = async (orgId: string) => {
+    if (projectOrgs.includes(orgId)) return;
+    setAddingOrg(true);
+    const newOrgs = [...projectOrgs, orgId];
+    const { error } = await supabase.from("projects").update({ organisations: newOrgs }).eq("id", project.id);
+    if (error) toast.error("Failed to add organisation");
+    else {
+      toast.success("Organisation associated");
+      setProjectOrgs(newOrgs);
+      onUpdate();
+    }
+    setAddingOrg(false);
+  };
+
+  const removeOrganisation = async (orgId: string) => {
+    const newOrgs = projectOrgs.filter((id) => id !== orgId);
+    const { error } = await supabase.from("projects").update({ organisations: newOrgs }).eq("id", project.id);
+    if (error) toast.error("Failed to remove");
+    else {
+      toast.success("Organisation removed");
+      setProjectOrgs(newOrgs);
+      onUpdate();
+    }
+  };
+
+  const filteredOrgs = dbOrganisations.filter(
+    (o) => !projectOrgs.includes(o.id) &&
+      (!orgSearch || o.name.toLowerCase().includes(orgSearch.toLowerCase()))
+  );
+
+  const associatedOrgs = dbOrganisations.filter((o) => projectOrgs.includes(o.id));
 
   const save = async () => {
     setSaving(true);
@@ -377,6 +423,78 @@ export default function ProjectSettingsManager({ project, onUpdate }: { project:
             <SelectItem value="Completed">Completed</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+
+      {/* Associated Organisations */}
+      <div className="space-y-3">
+        <Label className="text-base font-display font-bold">Associated Organisations</Label>
+        <p className="text-xs text-muted-foreground">Link this project to organisations on the platform.</p>
+
+        {/* Currently associated */}
+        {associatedOrgs.length > 0 && (
+          <div className="grid gap-2">
+            {associatedOrgs.map((org) => (
+              <div key={org.id} className="flex items-center gap-3 rounded-lg border border-border/50 bg-card p-3 group">
+                <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                  <Building2 className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <Link to={`/partners/${org.id}`} className="text-sm font-display font-semibold hover:text-primary transition-colors">
+                    {org.name}
+                  </Link>
+                  <p className="text-xs text-muted-foreground capitalize">{org.type}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeOrganisation(org.id)}
+                  className="p-1 rounded-full text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Remove organisation"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Search and add */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search organisations to add..."
+            value={orgSearch}
+            onChange={(e) => setOrgSearch(e.target.value)}
+            className="w-full h-9 pl-9 pr-4 rounded-xl border border-border/60 bg-card text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+          />
+        </div>
+
+        {orgSearch && (
+          <div className="rounded-xl border border-border/50 bg-card max-h-48 overflow-y-auto">
+            {filteredOrgs.length === 0 ? (
+              <p className="p-3 text-sm text-muted-foreground text-center">No organisations found</p>
+            ) : (
+              filteredOrgs.slice(0, 10).map((org) => (
+                <button
+                  key={org.id}
+                  type="button"
+                  onClick={() => { addOrganisation(org.id); setOrgSearch(""); }}
+                  disabled={addingOrg}
+                  className="w-full flex items-center gap-3 p-3 text-left hover:bg-accent/30 transition-colors border-b border-border/30 last:border-0"
+                >
+                  <div className="p-1.5 rounded-lg bg-primary/10 shrink-0">
+                    <Building2 className="h-3.5 w-3.5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{org.name}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{org.type}</p>
+                  </div>
+                  <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Technologies */}
