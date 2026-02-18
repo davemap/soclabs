@@ -130,7 +130,15 @@ export default function ProjectContentManager({
     toast.success("Section removed");
   };
 
-  const handleDragStart = (index: number) => setDragIndex(index);
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    // Only allow drag when initiated from the grip handle
+    const target = e.target as HTMLElement;
+    if (!target.closest('[data-drag-handle]')) {
+      e.preventDefault();
+      return;
+    }
+    setDragIndex(index);
+  };
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     setDragOverIndex(index);
@@ -248,7 +256,7 @@ export default function ProjectContentManager({
         <Card
           key={section.id || `new-${i}`}
           draggable
-          onDragStart={() => handleDragStart(i)}
+          onDragStart={(e) => handleDragStart(e, i)}
           onDragOver={(e) => handleDragOver(e, i)}
           onDrop={(e) => handleDrop(e, i)}
           onDragEnd={handleDragEnd}
@@ -262,7 +270,7 @@ export default function ProjectContentManager({
         >
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <GripVertical className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab active:cursor-grabbing" />
+              <GripVertical data-drag-handle className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab active:cursor-grabbing" />
               <Input
                 placeholder="Section title (e.g. Architecture Overview)"
                 value={section.title}
