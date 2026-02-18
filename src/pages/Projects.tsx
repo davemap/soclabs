@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { communityProjects, referenceDesigns } from "@/data/mockData";
@@ -32,6 +33,7 @@ const Projects = () => {
   const [techFilter, setTechFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [dbProjects, setDbProjects] = useState<any[]>([]);
+  const [profilesMap, setProfilesMap] = useState<Record<string, { full_name: string | null; username: string | null; avatar_url: string | null }>>({});
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -42,8 +44,9 @@ const Projects = () => {
       if (!projects || projects.length === 0) return;
 
       const projectIds = projects.map((p) => p.id);
+      const userIds = [...new Set(projects.map((p) => p.user_id))];
 
-      const [{ data: milestones }, { data: phaseCompletions }] = await Promise.all([
+      const [{ data: milestones }, { data: phaseCompletions }, { data: profiles }] = await Promise.all([
         supabase
           .from("project_milestones")
           .select("*")
@@ -53,7 +56,15 @@ const Projects = () => {
           .from("project_phase_completions")
           .select("*")
           .in("project_id", projectIds),
+        supabase
+          .from("profiles")
+          .select("user_id, full_name, username, avatar_url")
+          .in("user_id", userIds),
       ]);
+
+      const pMap: Record<string, { full_name: string | null; username: string | null; avatar_url: string | null }> = {};
+      (profiles || []).forEach((p) => { pMap[p.user_id] = p; });
+      setProfilesMap(pMap);
 
       const mapped = projects.map((p) => {
         const pMilestones = (milestones || []).filter((m) => m.project_id === p.id);
@@ -78,10 +89,13 @@ const Projects = () => {
           }
         }
 
+        const ownerProfile = pMap[p.user_id];
         return {
           id: p.id,
           title: p.title,
-          author: "",
+          author: ownerProfile?.full_name || ownerProfile?.username || "",
+          authorAvatar: ownerProfile?.avatar_url || null,
+          userId: p.user_id,
           institution: "",
           description: p.description || "",
           referenceSoc: referenceDesigns.find((d) => d.id === p.reference_soc)?.name || p.reference_soc,
@@ -216,8 +230,18 @@ const Projects = () => {
                           </h3>
                           <ArrowRight className="h-4 w-4 mt-1 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                         </div>
-                        <p className="text-sm text-primary font-medium mb-1">{project.author}</p>
-                        <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
+                        {(project.author || project.authorAvatar) && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <Avatar className="h-5 w-5 text-[8px]">
+                              <AvatarImage src={project.authorAvatar ?? undefined} />
+                              <AvatarFallback>{(project.author || "U").slice(0, 2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm text-primary font-medium">{project.author}</span>
+                          </div>
+                        )}
+                        {!project.author && !project.authorAvatar && project.institution && (
+                          <p className="text-xs text-muted-foreground mb-3">{project.institution}</p>
+                        )}
                         <p className="text-sm text-muted-foreground mb-4 flex-1 leading-relaxed line-clamp-3">
                           {project.description}
                         </p>

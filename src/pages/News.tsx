@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, User, PenLine, Filter, X } from "lucide-react";
+import { Calendar, PenLine, Filter, X } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -209,8 +210,11 @@ const News = () => {
                           <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
                           <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">{article.summary}</p>
                           <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
-                            <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" /> {article.author}
+                            <span className="flex items-center gap-1.5">
+                              <Avatar className="h-4 w-4 text-[7px]">
+                                <AvatarFallback>{article.author.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              {article.author}
                             </span>
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />{" "}
