@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, MapPin, Building2, FolderOpen,
-  ExternalLink, Calendar, User, Pencil, X, Save, Loader2,
+  ExternalLink, Calendar, User, Pencil, X, Save, Loader2, Star,
 } from "lucide-react";
+import { interests as allInterests } from "@/data/interests";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -164,6 +165,25 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
           profile.blurb && (
             <p className="text-muted-foreground leading-relaxed mb-5">{profile.blurb}</p>
           )
+        )}
+
+        {/* Expertise */}
+        {(profile.expertise || []).length > 0 && !editing && (
+          <div className="flex flex-wrap gap-2 mb-5">
+            {(profile.expertise as string[]).map((slug: string) => {
+              const interest = allInterests.find((i) => i.slug === slug);
+              return (
+                <Link
+                  key={slug}
+                  to={`/interests/${slug}`}
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary/10 text-primary font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Star className="h-3 w-3" />
+                  {interest?.name || slug}
+                </Link>
+              );
+            })}
+          </div>
         )}
 
         {/* Hide location toggle (only visible in edit mode) */}
