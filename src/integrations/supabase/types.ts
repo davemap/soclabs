@@ -53,6 +53,92 @@ export type Database = {
         }
         Relationships: []
       }
+      organisation_join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          organisation_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          organisation_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          organisation_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organisation_join_requests_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organisations: {
+        Row: {
+          country: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          email: string | null
+          id: string
+          logo: string | null
+          long_description: string | null
+          name: string
+          type: string
+          updated_at: string
+          url: string | null
+          verified: boolean
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo?: string | null
+          long_description?: string | null
+          name: string
+          type?: string
+          updated_at?: string
+          url?: string | null
+          verified?: boolean
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          logo?: string | null
+          long_description?: string | null
+          name?: string
+          type?: string
+          updated_at?: string
+          url?: string | null
+          verified?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
