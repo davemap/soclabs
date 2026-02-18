@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Camera, Copy, Check, ExternalLink, Plus, Eye, Building2, Settings,
-  MoreHorizontal, Trash2, LogOut, UserCog, Crown,
+  Camera, ExternalLink, Plus, Eye, Building2, Settings, Search,
+  MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -26,15 +27,17 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { communityProjects, communityMembers, partners } from "@/data/mockData";
+import { communityProjects, communityMembers } from "@/data/mockData";
+import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 
-interface Profile {
+interface ProfileData {
   id: string;
   user_id: string;
   username: string | null;
   full_name: string | null;
   avatar_url: string | null;
   orcid: string | null;
+  organisations: string[] | null;
 }
 
 const Profile = () => {
@@ -43,21 +46,29 @@ const Profile = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [copied, setCopied] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  // Username editing
+  const [editingUsername, setEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [savingUsername, setSavingUsername] = useState(false);
 
   // Delete project state
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  // Leave project state
   const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
-  // Transfer ownership state
   const [transferTarget, setTransferTarget] = useState<string | null>(null);
   const [transferMembers, setTransferMembers] = useState<any[]>([]);
   const [selectedNewOwner, setSelectedNewOwner] = useState("");
   const [loadingTransferMembers, setLoadingTransferMembers] = useState(false);
+
+  // Organisations
+  const [allOrgs, setAllOrgs] = useState<any[]>([]);
+  const [orgSearch, setOrgSearch] = useState("");
+  const [pendingOrgRequests, setPendingOrgRequests] = useState<any[]>([]);
+  const [joiningOrg, setJoiningOrg] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -67,39 +78,50 @@ const Profile = () => {
     if (user) {
       fetchProfile();
       fetchDbProjects();
+      fetchOrganisations();
+      fetchPendingOrgRequests();
     }
   }, [user]);
 
   const fetchProfile = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (data) setProfile(data as Profile);
+    const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+    if (data) {
+      setProfile(data as ProfileData);
+      setNewUsername(data.username || "");
+    }
     setLoadingProfile(false);
   };
 
   const fetchDbProjects = async () => {
     if (!user) return;
-    // Get projects where user is owner OR invited member
-    const { data: ownedProjects } = await supabase
+    const { data: owned } = await supabase
       .from("projects")
       .select("id, title, description, status, user_id, invited_members")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
-
-    const { data: memberProjects } = await supabase
+    const { data: member } = await supabase
       .from("projects")
       .select("id, title, description, status, user_id, invited_members")
       .contains("invited_members", [user.id])
       .order("created_at", { ascending: false });
+    const all = [...(owned || []), ...(member || [])];
+    setDbProjects(Array.from(new Map(all.map((p) => [p.id, p])).values()));
+  };
 
-    // Merge and deduplicate
-    const all = [...(ownedProjects || []), ...(memberProjects || [])];
-    const unique = Array.from(new Map(all.map((p) => [p.id, p])).values());
-    setDbProjects(unique);
+  const fetchOrganisations = async () => {
+    const { data } = await supabase.from("organisations").select("*").order("name");
+    setAllOrgs(data || []);
+  };
+
+  const fetchPendingOrgRequests = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("organisation_join_requests")
+      .select("*, organisations(*)")
+      .eq("user_id", user.id)
+      .eq("status", "pending");
+    setPendingOrgRequests(data || []);
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,11 +153,20 @@ const Profile = () => {
     }
   };
 
-  const copyUserId = () => {
+  const handleSaveUsername = async () => {
     if (!user) return;
-    navigator.clipboard.writeText(user.id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setSavingUsername(true);
+    try {
+      const { error } = await supabase.from("profiles").update({ username: newUsername.trim() || null }).eq("user_id", user.id);
+      if (error) throw error;
+      setProfile((prev) => prev ? { ...prev, username: newUsername.trim() || null } : prev);
+      setEditingUsername(false);
+      toast({ title: "Username updated!" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSavingUsername(false);
+    }
   };
 
   const handleDeleteProject = async () => {
@@ -158,10 +189,7 @@ const Profile = () => {
       const project = dbProjects.find((p) => p.id === leaveTarget);
       if (!project) return;
       const updatedMembers = (project.invited_members || []).filter((m: string) => m !== user.id);
-      const { error } = await supabase
-        .from("projects")
-        .update({ invited_members: updatedMembers })
-        .eq("id", leaveTarget);
+      const { error } = await supabase.from("projects").update({ invited_members: updatedMembers }).eq("id", leaveTarget);
       if (error) throw error;
       setDbProjects((prev) => prev.filter((p) => p.id !== leaveTarget));
       toast({ title: "Left project" });
@@ -179,24 +207,11 @@ const Profile = () => {
     try {
       const project = dbProjects.find((p) => p.id === projectId);
       const memberIds = (project?.invited_members || []).filter((m: string) => m !== user?.id);
-
-      if (memberIds.length === 0) {
-        setTransferMembers([]);
-        setLoadingTransferMembers(false);
-        return;
-      }
-
-      // Fetch profiles for these member IDs
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, username")
-        .in("user_id", memberIds);
+      if (memberIds.length === 0) { setTransferMembers([]); setLoadingTransferMembers(false); return; }
+      const { data: profiles } = await supabase.from("profiles").select("user_id, full_name, username").in("user_id", memberIds);
       setTransferMembers(profiles || []);
-    } catch {
-      setTransferMembers([]);
-    } finally {
-      setLoadingTransferMembers(false);
-    }
+    } catch { setTransferMembers([]); }
+    finally { setLoadingTransferMembers(false); }
   };
 
   const handleTransferOwnership = async () => {
@@ -204,52 +219,67 @@ const Profile = () => {
     try {
       const project = dbProjects.find((p) => p.id === transferTarget);
       if (!project) return;
-
-      // Remove new owner from invited_members, add current owner
-      const updatedMembers = [
-        ...(project.invited_members || []).filter((m: string) => m !== selectedNewOwner),
-        user.id,
-      ];
-
-      const { error } = await supabase
-        .from("projects")
-        .update({
-          user_id: selectedNewOwner,
-          invited_members: updatedMembers,
-        })
-        .eq("id", transferTarget);
+      const updatedMembers = [...(project.invited_members || []).filter((m: string) => m !== selectedNewOwner), user.id];
+      const { error } = await supabase.from("projects").update({ user_id: selectedNewOwner, invited_members: updatedMembers }).eq("id", transferTarget);
       if (error) throw error;
-
-      // Update local state
-      setDbProjects((prev) =>
-        prev.map((p) =>
-          p.id === transferTarget
-            ? { ...p, user_id: selectedNewOwner, invited_members: updatedMembers }
-            : p
-        )
-      );
+      setDbProjects((prev) => prev.map((p) => p.id === transferTarget ? { ...p, user_id: selectedNewOwner, invited_members: updatedMembers } : p));
       toast({ title: "Ownership transferred" });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setTransferTarget(null);
-      setSelectedNewOwner("");
+    } finally { setTransferTarget(null); setSelectedNewOwner(""); }
+  };
+
+  const handleJoinOrg = async (orgId: string) => {
+    if (!user) return;
+    setJoiningOrg(orgId);
+    try {
+      const { error } = await supabase.from("organisation_join_requests").insert({
+        user_id: user.id,
+        organisation_id: orgId,
+      });
+      if (error) {
+        if (error.code === "23505") {
+          toast({ title: "Already requested", description: "You've already sent a request to this organisation.", variant: "destructive" });
+        } else throw error;
+      } else {
+        toast({ title: "Request sent!", description: "Your join request is pending approval." });
+        fetchPendingOrgRequests();
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally { setJoiningOrg(null); }
+  };
+
+  const handleCancelOrgRequest = async (requestId: string) => {
+    try {
+      const { error } = await supabase.from("organisation_join_requests").delete().eq("id", requestId);
+      if (error) throw error;
+      setPendingOrgRequests((prev) => prev.filter((r) => r.id !== requestId));
+      toast({ title: "Request cancelled" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     }
   };
 
-  // Match mock data
-  const matchedMember = communityMembers.find(
-    (m) => profile?.username && m.id === profile.username
-  );
+  // Mock member matching
+  const matchedMember = communityMembers.find((m) => profile?.username && m.id === profile.username);
   const mockProjects = matchedMember
-    ? communityProjects.filter(
-        (p) => p.authorId === matchedMember.id || p.collaboratorIds?.includes(matchedMember.id)
-      )
+    ? communityProjects.filter((p) => p.authorId === matchedMember.id || p.collaboratorIds?.includes(matchedMember.id))
     : [];
 
-  const userOrgs = matchedMember
-    ? partners.filter((o) => matchedMember.organisations.includes(o.id))
-    : [];
+  // Filter orgs for search
+  const profileOrgIds = profile?.organisations || [];
+  const pendingOrgIds = pendingOrgRequests.map((r) => r.organisation_id);
+  const filteredOrgs = allOrgs.filter((org) => {
+    if (profileOrgIds.includes(org.id)) return false;
+    if (pendingOrgIds.includes(org.id)) return false;
+    if (!orgSearch) return true;
+    return org.name.toLowerCase().includes(orgSearch.toLowerCase()) ||
+      org.country?.toLowerCase().includes(orgSearch.toLowerCase());
+  });
+
+  // Org objects for user's current orgs
+  const userOrgObjects = allOrgs.filter((o) => profileOrgIds.includes(o.id));
 
   if (authLoading || loadingProfile) {
     return (
@@ -262,11 +292,7 @@ const Profile = () => {
   }
 
   const initials = (profile?.full_name || profile?.username || user?.email || "U")
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+    .split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <Layout>
@@ -297,17 +323,39 @@ const Profile = () => {
                     <h2 className="text-xl font-semibold truncate">
                       {profile?.full_name || profile?.username || "User"}
                     </h2>
-                    {profile?.username && (
-                      <p className="text-sm text-muted-foreground truncate">@{profile.username}</p>
-                    )}
-                    <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                    {/* Username / Tag */}
+                    <div className="flex items-center gap-2 mt-1">
+                      {editingUsername ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
+                            <AtSign className="h-3.5 w-3.5 text-muted-foreground" />
+                            <Input
+                              value={newUsername}
+                              onChange={(e) => setNewUsername(e.target.value)}
+                              className="h-7 w-40 text-sm"
+                              placeholder="username"
+                            />
+                          </div>
+                          <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => { setEditingUsername(false); setNewUsername(profile?.username || ""); }} disabled={savingUsername}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                          <Button size="sm" className="h-7 px-2" onClick={handleSaveUsername} disabled={savingUsername}>
+                            {savingUsername ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setEditingUsername(true)}
+                          className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                        >
+                          <AtSign className="h-3.5 w-3.5" />
+                          {profile?.username || "Set username"}
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground truncate mt-0.5">{user?.email}</p>
                     {profile?.orcid && (
-                      <a
-                        href={`https://orcid.org/${profile.orcid}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
-                      >
+                      <a href={`https://orcid.org/${profile.orcid}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1">
                         ORCID: {profile.orcid}
                       </a>
                     )}
@@ -324,22 +372,6 @@ const Profile = () => {
                       </Link>
                     </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* User ID */}
-            <Card className="mb-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">User ID</CardTitle>
-                <CardDescription>Your unique identifier on SoC Labs</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-muted px-3 py-2 rounded text-xs font-mono truncate">{user?.id}</code>
-                  <Button size="icon" variant="outline" onClick={copyUserId} className="shrink-0">
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -391,16 +423,10 @@ const Profile = () => {
                                 {isOwner && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      onClick={() => openTransferDialog(p.id)}
-                                      className="cursor-pointer"
-                                    >
+                                    <DropdownMenuItem onClick={() => openTransferDialog(p.id)} className="cursor-pointer">
                                       <UserCog className="h-4 w-4 mr-2" /> Transfer Ownership
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() => setDeleteTarget(p.id)}
-                                      className="cursor-pointer text-destructive focus:text-destructive"
-                                    >
+                                    <DropdownMenuItem onClick={() => setDeleteTarget(p.id)} className="cursor-pointer text-destructive focus:text-destructive">
                                       <Trash2 className="h-4 w-4 mr-2" /> Delete Project
                                     </DropdownMenuItem>
                                   </>
@@ -408,10 +434,7 @@ const Profile = () => {
                                 {!isOwner && (
                                   <>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                      onClick={() => setLeaveTarget(p.id)}
-                                      className="cursor-pointer text-destructive focus:text-destructive"
-                                    >
+                                    <DropdownMenuItem onClick={() => setLeaveTarget(p.id)} className="cursor-pointer text-destructive focus:text-destructive">
                                       <LogOut className="h-4 w-4 mr-2" /> Leave Project
                                     </DropdownMenuItem>
                                   </>
@@ -445,52 +468,107 @@ const Profile = () => {
               )}
             </div>
 
+            <Separator className="my-8" />
+
             {/* Organisations */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">My Organisations</h3>
+                <CreateOrganisationDialog onCreated={fetchOrganisations} />
               </div>
-              {userOrgs.length > 0 && (
-                <div className="space-y-3 mb-4">
-                  {userOrgs.map((o) => (
-                    <Link key={o.id} to={`/partners/${o.id}`}>
-                      <Card className="hover:border-primary/30 transition-colors cursor-pointer">
-                        <CardContent className="py-4 flex items-center justify-between">
-                          <div>
-                            <p className="font-medium">{o.name}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-1">{o.description}</p>
-                          </div>
-                          <Badge variant="outline">{o.type}</Badge>
-                        </CardContent>
-                      </Card>
-                    </Link>
+
+              {/* Current orgs */}
+              {userOrgObjects.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {userOrgObjects.map((o) => (
+                    <Card key={o.id} className="border-border/60">
+                      <CardContent className="py-3 flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">{o.name}</p>
+                          <p className="text-xs text-muted-foreground">{o.country}</p>
+                        </div>
+                        <Badge variant="outline" className="text-xs">{o.type}</Badge>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               )}
+
+              {/* Pending requests */}
+              {pendingOrgRequests.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" /> Pending Requests
+                  </p>
+                  <div className="space-y-2">
+                    {pendingOrgRequests.map((req) => (
+                      <Card key={req.id} className="border-dashed border-amber-500/30">
+                        <CardContent className="py-3 flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-sm">{(req as any).organisations?.name || "Organisation"}</p>
+                            <p className="text-xs text-muted-foreground">Awaiting approval</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-xs text-muted-foreground hover:text-destructive"
+                            onClick={() => handleCancelOrgRequest(req.id)}
+                          >
+                            Cancel
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Search & Join */}
               <Card className="border-dashed">
-                <CardContent className="py-4">
+                <CardContent className="py-4 space-y-3">
                   <div className="flex items-center gap-3">
                     <Building2 className="h-5 w-5 text-muted-foreground shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium mb-1">Associate with an Organisation</p>
-                      <Select
-                        onValueChange={(orgId) => {
-                          if (orgId && !userOrgs.find((o) => o.id === orgId)) {
-                            navigate(`/partners/${orgId}`);
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Browse organisations..." />
-                        </SelectTrigger>
-                        <SelectContent className="bg-popover border border-border shadow-md z-50">
-                          {partners.map((org) => (
-                            <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <p className="text-sm font-medium">Join an Organisation</p>
                   </div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={orgSearch}
+                      onChange={(e) => setOrgSearch(e.target.value)}
+                      placeholder="Search organisations by name or country..."
+                      className="pl-9"
+                    />
+                  </div>
+                  {orgSearch && (
+                    <div className="max-h-60 overflow-y-auto space-y-1.5">
+                      {filteredOrgs.length > 0 ? (
+                        filteredOrgs.map((org) => (
+                          <div
+                            key={org.id}
+                            className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 hover:border-border transition-colors"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium truncate">{org.name}</p>
+                              <p className="text-xs text-muted-foreground">{org.country} · {org.type}</p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="shrink-0 text-xs"
+                              disabled={joiningOrg === org.id}
+                              onClick={() => handleJoinOrg(org.id)}
+                            >
+                              {joiningOrg === org.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Request to Join"}
+                            </Button>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-muted-foreground text-center py-4">
+                          No matching organisations found. Try creating a new one!
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -503,15 +581,11 @@ const Profile = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete project?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the project and all its content. This action cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogDescription>This will permanently delete the project and all its content. This action cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -521,15 +595,11 @@ const Profile = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Leave project?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You will be removed from this project. You can request to rejoin later.
-            </AlertDialogDescription>
+            <AlertDialogDescription>You will be removed from this project. You can request to rejoin later.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLeaveProject}>
-              Leave
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleLeaveProject}>Leave</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -539,35 +609,25 @@ const Profile = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Transfer Ownership</DialogTitle>
-            <DialogDescription>
-              Select a project member to become the new owner. You will become a regular member.
-            </DialogDescription>
+            <DialogDescription>Select a project member to become the new owner. You will become a regular member.</DialogDescription>
           </DialogHeader>
           {loadingTransferMembers ? (
             <p className="text-sm text-muted-foreground py-4">Loading members...</p>
           ) : transferMembers.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              No other members in this project. Invite someone first before transferring ownership.
-            </p>
+            <p className="text-sm text-muted-foreground py-4">No other members in this project. Invite someone first before transferring ownership.</p>
           ) : (
             <Select value={selectedNewOwner} onValueChange={setSelectedNewOwner}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select new owner..." />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select new owner..." /></SelectTrigger>
               <SelectContent className="bg-popover border border-border shadow-md z-50">
                 {transferMembers.map((m) => (
-                  <SelectItem key={m.user_id} value={m.user_id}>
-                    {m.full_name || m.username || m.user_id}
-                  </SelectItem>
+                  <SelectItem key={m.user_id} value={m.user_id}>{m.full_name || m.username || m.user_id}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setTransferTarget(null)}>Cancel</Button>
-            <Button onClick={handleTransferOwnership} disabled={!selectedNewOwner}>
-              Transfer
-            </Button>
+            <Button onClick={handleTransferOwnership} disabled={!selectedNewOwner}>Transfer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
