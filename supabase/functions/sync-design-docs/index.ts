@@ -32,13 +32,25 @@ const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: 
     { sectionId: "writing-software", title: "Writing Software", filename: "writing_software.html", sortOrder: 2 },
     { sectionId: "simulation", title: "Simulation", filename: "simulation.html", sortOrder: 3 },
     { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 4 },
-    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 5 },
+    {
+      sectionId: "asic-implementation",
+      title: "ASIC Implementation",
+      filename: "asic_implementation.html",
+      sortOrder: 5,
+    },
   ],
   megasoc: [
     { sectionId: "getting-started", title: "Getting Started", filename: "getting_started.html", sortOrder: 0 },
     { sectionId: "adding-your-ip", title: "Adding your IP", filename: "adding_your_ip.html", sortOrder: 1 },
-    { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 2 },
-    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 3 },
+    { sectionId: "writing-software", title: "Writing Software", filename: "writing_software.html", sortOrder: 2 },
+    { sectionId: "simulation", title: "Simulation", filename: "simulation.html", sortOrder: 3 },
+    { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 4 },
+    {
+      sectionId: "asic-implementation",
+      title: "ASIC Implementation",
+      filename: "asic_implementation.html",
+      sortOrder: 5,
+    },
   ],
 };
 
