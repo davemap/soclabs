@@ -7,18 +7,22 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Documentation sections to scrape for each design
+// Base URL for raw file access from the GitLab repo
+const GITLAB_RAW_BASE =
+  "https://git.soton.ac.uk/soclabs/accelerator-project/-/raw/main/docs/build/html";
+
+// Documentation sections to sync for each design
 const DESIGN_DOCS: Record<
   string,
-  { sectionId: string; title: string; url: string; sortOrder: number }[]
+  { sectionId: string; title: string; filename: string; sortOrder: number }[]
 > = {
   nanosoc: [
-    { sectionId: "getting-started", title: "Getting Started", url: "https://nanosoc-project.readthedocs.io/en/latest/getting_started.html", sortOrder: 0 },
-    { sectionId: "adding-your-ip", title: "Adding your IP", url: "https://nanosoc-project.readthedocs.io/en/latest/adding_your_ip.html", sortOrder: 1 },
-    { sectionId: "writing-software", title: "Writing Software", url: "https://nanosoc-project.readthedocs.io/en/latest/writing_software.html", sortOrder: 2 },
-    { sectionId: "simulation", title: "Simulation", url: "https://nanosoc-project.readthedocs.io/en/latest/simulation.html", sortOrder: 3 },
-    { sectionId: "fpga-flow", title: "FPGA Flow", url: "https://nanosoc-project.readthedocs.io/en/latest/fpga_build.html", sortOrder: 4 },
-    { sectionId: "asic-implementation", title: "ASIC Implementation", url: "https://nanosoc-project.readthedocs.io/en/latest/asic_implementation.html", sortOrder: 5 },
+    { sectionId: "getting-started", title: "Getting Started", filename: "getting_started.html", sortOrder: 0 },
+    { sectionId: "adding-your-ip", title: "Adding your IP", filename: "adding_your_ip.html", sortOrder: 1 },
+    { sectionId: "writing-software", title: "Writing Software", filename: "writing_software.html", sortOrder: 2 },
+    { sectionId: "simulation", title: "Simulation", filename: "simulation.html", sortOrder: 3 },
+    { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 4 },
+    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 5 },
   ],
 };
 
@@ -35,7 +39,7 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
     if (resp.status === 429 && i < retries - 1) {
       const waitMs = (i + 1) * 2000;
       console.log(`Rate limited on ${url}, waiting ${waitMs}ms...`);
-      await resp.text(); // consume body
+      await resp.text();
       await delay(waitMs);
       continue;
     }
@@ -45,16 +49,17 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   throw new Error(`Failed to fetch ${url} after ${retries} retries`);
 }
 
-async function scrapeReadTheDocs(url: string): Promise<string> {
+async function convertHtmlToMarkdown(url: string): Promise<string> {
   const resp = await fetchWithRetry(url);
-  // The content is typically within <div role="main"> or <div class="body">
+  const html = await resp.text();
   let content = html;
 
-  // Remove HTML tags but preserve structure with markdown-like formatting
-  // Extract body content between the main content div
-  const bodyMatch = content.match(/<div[^>]*role="main"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/i)
-    || content.match(/<div[^>]*class="body"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i)
-    || content.match(/<div[^>]*class="rst-content"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
+  // Extract body content from Sphinx-generated HTML
+  const bodyMatch =
+    content.match(/<div[^>]*role="main"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/i) ||
+    content.match(/<div[^>]*class="body"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
+    content.match(/<div[^>]*class="rst-content"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
+    content.match(/<div[^>]*class="document"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i);
 
   if (bodyMatch) {
     content = bodyMatch[1];
@@ -62,29 +67,25 @@ async function scrapeReadTheDocs(url: string): Promise<string> {
 
   // Convert HTML to rough markdown
   content = content
-    // Remove script and style tags
     .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
-    // Convert headers
     .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, "# $1\n\n")
     .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, "## $1\n\n")
     .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, "### $1\n\n")
     .replace(/<h4[^>]*>([\s\S]*?)<\/h4>/gi, "#### $1\n\n")
-    // Convert code blocks
     .replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, "\n```\n$1\n```\n")
     .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, "\n```\n$1\n```\n")
     .replace(/<code[^>]*>([\s\S]*?)<\/code>/gi, "`$1`")
-    // Convert lists
     .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "- $1\n")
     .replace(/<[uo]l[^>]*>/gi, "\n")
     .replace(/<\/[uo]l>/gi, "\n")
-    // Convert tables
     .replace(/<table[\s\S]*?<\/table>/gi, (match) => {
       const rows: string[] = [];
       const rowMatches = match.match(/<tr[\s\S]*?<\/tr>/gi) || [];
       rowMatches.forEach((row, i) => {
-        const cells = (row.match(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi) || [])
-          .map((cell) => cell.replace(/<[^>]+>/g, "").trim());
+        const cells = (row.match(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi) || []).map((cell) =>
+          cell.replace(/<[^>]+>/g, "").trim()
+        );
         rows.push("| " + cells.join(" | ") + " |");
         if (i === 0) {
           rows.push("| " + cells.map(() => "---").join(" | ") + " |");
@@ -92,30 +93,25 @@ async function scrapeReadTheDocs(url: string): Promise<string> {
       });
       return "\n" + rows.join("\n") + "\n";
     })
-    // Convert links
     .replace(/<a[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, "[$2]($1)")
-    // Convert bold/italic
     .replace(/<strong[^>]*>([\s\S]*?)<\/strong>/gi, "**$1**")
     .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, "*$1*")
-    // Convert paragraphs and breaks
     .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, "$1\n\n")
     .replace(/<br\s*\/?>/gi, "\n")
-    // Convert blockquotes
     .replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, inner) =>
-      inner.split("\n").map((l: string) => `> ${l}`).join("\n") + "\n"
+      inner
+        .split("\n")
+        .map((l: string) => `> ${l}`)
+        .join("\n") + "\n"
     )
-    // Remove remaining HTML tags
     .replace(/<[^>]+>/g, "")
-    // Decode HTML entities
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
-    // Remove permalink symbols
     .replace(/¶/g, "")
-    // Clean up whitespace
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
@@ -146,10 +142,10 @@ Deno.serve(async (req) => {
 
     for (const section of sections) {
       try {
-        console.log(`Scraping ${section.url}...`);
-        // Delay between requests to avoid rate limiting
-        if (results.length > 0) await delay(800);
-        const content = await scrapeReadTheDocs(section.url);
+        const rawUrl = `${GITLAB_RAW_BASE}/${section.filename}`;
+        console.log(`Fetching ${rawUrl}...`);
+        if (results.length > 0) await delay(500);
+        const content = await convertHtmlToMarkdown(rawUrl);
 
         const { error } = await supabase.from("design_docs").upsert(
           {
@@ -158,7 +154,7 @@ Deno.serve(async (req) => {
             title: section.title,
             content,
             sort_order: section.sortOrder,
-            source_url: section.url,
+            source_url: rawUrl,
             last_synced_at: new Date().toISOString(),
           },
           { onConflict: "design_id,section_id" }
@@ -172,7 +168,7 @@ Deno.serve(async (req) => {
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error(`Scrape error for ${section.sectionId}:`, msg);
+        console.error(`Fetch error for ${section.sectionId}:`, msg);
         results.push({ sectionId: section.sectionId, success: false, error: msg });
       }
     }
