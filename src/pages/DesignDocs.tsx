@@ -97,7 +97,7 @@ const DesignDocs = () => {
   return (
     <Layout>
       <section className="py-24">
-        <div className="container mx-auto px-4 max-w-5xl relative">
+        <div className="container mx-auto px-4 max-w-5xl xl:pr-60 relative">
           {/* Floating sidebar */}
           <aside className="hidden xl:block fixed top-32 right-8 2xl:right-[calc((100vw-64rem)/2-12rem)] w-52 z-10">
             <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
@@ -122,7 +122,7 @@ const DesignDocs = () => {
               )}
               <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
                 <Link to={`/designs/${id}`}>
-                  <Cpu className="h-4 w-4 mr-2" /> {design.name} Overview
+                  <Cpu className="h-4 w-4 mr-2" /> SoC Overview
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
