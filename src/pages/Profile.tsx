@@ -30,6 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { communityProjects, communityMembers } from "@/data/mockData";
 import { interests } from "@/data/interests";
 import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
+import AvatarCropDialog from "@/components/AvatarCropDialog";
 
 interface ProfileData {
   id: string;
@@ -52,8 +53,8 @@ const Profile = () => {
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
-
-  // Username editing
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [editingUsername, setEditingUsername] = useState(false);
   const [newUsername, setNewUsername] = useState("");
   const [savingUsername, setSavingUsername] = useState(false);
@@ -131,23 +132,38 @@ const Profile = () => {
     if (!file || !user) return;
     if (!file.type.startsWith("image/")) {
       toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       toast({ title: "File too large", description: "Max 5MB.", variant: "destructive" });
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result as string);
+      setCropDialogOpen(true);
+    };
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleCropSave = async (blob: Blob) => {
+    if (!user) return;
     setUploadingAvatar(true);
     try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      const path = `${user.id}/avatar.png`;
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, blob, { upsert: true, contentType: "image/png" });
       if (uploadError) throw uploadError;
       const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
-      const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
+      const avatarUrl = `${publicUrl}?t=${Date.now()}`;
+      const { error: updateError } = await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("user_id", user.id);
       if (updateError) throw updateError;
-      setProfile((prev) => prev ? { ...prev, avatar_url: publicUrl } : prev);
+      setProfile((prev) => prev ? { ...prev, avatar_url: avatarUrl } : prev);
       toast({ title: "Avatar updated!" });
+      setCropDialogOpen(false);
+      setCropImageSrc(null);
     } catch (err: any) {
       toast({ title: "Upload failed", description: err.message, variant: "destructive" });
     } finally {
@@ -675,6 +691,16 @@ const Profile = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {cropImageSrc && (
+        <AvatarCropDialog
+          open={cropDialogOpen}
+          imageSrc={cropImageSrc}
+          onClose={() => { setCropDialogOpen(false); setCropImageSrc(null); }}
+          onCropComplete={handleCropSave}
+          saving={uploadingAvatar}
+        />
+      )}
     </Layout>
   );
 };
