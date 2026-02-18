@@ -26,6 +26,7 @@ import Interests from "./pages/Interests";
 import InterestDetail from "./pages/InterestDetail";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import AccountSettings from "./pages/AccountSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/account-settings" element={<AccountSettings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
