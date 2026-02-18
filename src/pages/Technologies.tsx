@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useUserInterests } from "@/hooks/useUserInterests";
+import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 import { interests as allInterests } from "@/data/interests";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
@@ -110,6 +111,10 @@ const Technologies = () => {
     allInterests.forEach((i) => { if (i.technologyName) map[i.technologyName] = i.slug; });
     return map;
   }, []);
+
+  // Build page IDs for unread tracking
+  const techPageIds = useMemo(() => technologies.map((t) => `technology-${t.id}`), []);
+  const { unreadCounts } = useUnreadDiscussions(techPageIds);
 
   const selectedTechs = useMemo(() => {
     return allInterests
@@ -423,6 +428,7 @@ const Technologies = () => {
                                       <div className="grid md:grid-cols-2 gap-3">
                                         {techsInSubcat.map((tech) => {
                                           const isSelected = selectedTechs.includes(tech.name);
+                                          const unread = unreadCounts[`technology-${tech.id}`] || 0;
                                           return (
                                             <div key={tech.id} className="relative">
                                               <Link to={`/technologies/${tech.id}`}>
@@ -435,7 +441,15 @@ const Technologies = () => {
                                                   )}
                                                 >
                                                   <CardContent className="p-5 pr-14">
-                                                    <h3 className="font-display font-semibold mb-1">{tech.name}</h3>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                      <h3 className="font-display font-semibold">{tech.name}</h3>
+                                                      {isSelected && unread > 0 && (
+                                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                                                          <MessageSquare className="h-2.5 w-2.5" />
+                                                          {unread}
+                                                        </span>
+                                                      )}
+                                                    </div>
                                                     <p className="text-sm text-muted-foreground leading-relaxed mb-2">
                                                       {tech.description}
                                                     </p>

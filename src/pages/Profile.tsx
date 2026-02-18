@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Camera, ExternalLink, Plus, Eye, Building2, Settings, Search,
-  MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign,
+  MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,11 +27,12 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { communityProjects, communityMembers } from "@/data/mockData";
+import { communityProjects, communityMembers, technologies as techList } from "@/data/mockData";
 import { interests } from "@/data/interests";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 import AvatarCropDialog from "@/components/AvatarCropDialog";
+import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 
 interface ProfileData {
   id: string;
@@ -50,6 +51,19 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
   const registered = interests.filter((i) => registeredSlugs.has(i.slug));
   const expertise = profile?.expertise || [];
 
+  // Build page IDs for unread tracking (both technology and interest pages)
+  const pageIds = useMemo(() => {
+    return registered.map((i) => {
+      if (i.technologyName) {
+        const tech = techList.find((t: any) => t.name === i.technologyName);
+        return tech ? `technology-${tech.id}` : `interest-${i.slug}`;
+      }
+      return `interest-${i.slug}`;
+    });
+  }, [registered]);
+
+  const { unreadCounts } = useUnreadDiscussions(pageIds);
+
   const toggleExpertise = (slug: string) => {
     const isSelected = expertise.includes(slug);
     const next = isSelected ? expertise.filter((s) => s !== slug) : [...expertise, slug];
@@ -57,12 +71,23 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
     onExpertiseUpdate(next);
   };
 
+  // Total unread across all registered interests
+  const totalUnread = Object.values(unreadCounts).reduce((sum, n) => sum + n, 0);
+
   return (
     <div className="mb-8 space-y-6">
       {/* Registered Interests */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold">My Interests</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">My Interests</h3>
+            {totalUnread > 0 && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground">
+                <MessageSquare className="h-2.5 w-2.5" />
+                {totalUnread} new
+              </span>
+            )}
+          </div>
           <span className="text-xs text-muted-foreground">{registered.length} registered</span>
         </div>
         <p className="text-sm text-muted-foreground mb-3">
@@ -75,16 +100,24 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
           <p className="text-sm text-muted-foreground">Loading...</p>
         ) : registered.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {registered.map((interest) => (
-              <button
-                key={interest.slug}
-                onClick={() => toggleInterest(interest.slug)}
-                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
-              >
-                {interest.name}
-                <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
-              </button>
-            ))}
+            {registered.map((interest, idx) => {
+              const unread = unreadCounts[pageIds[idx]] || 0;
+              return (
+                <button
+                  key={interest.slug}
+                  onClick={() => toggleInterest(interest.slug)}
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
+                >
+                  {interest.name}
+                  {unread > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-primary-foreground text-primary text-[10px] font-bold">
+                      {unread}
+                    </span>
+                  )}
+                  <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+                </button>
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border p-6 text-center">

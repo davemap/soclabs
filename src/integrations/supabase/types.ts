@@ -53,6 +53,71 @@ export type Database = {
         }
         Relationships: []
       }
+      discussion_comments: {
+        Row: {
+          author_id: string
+          author_name: string
+          created_at: string
+          id: string
+          page_id: string
+          parent_id: string | null
+          text: string
+          thread_subject: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          author_name?: string
+          created_at?: string
+          id?: string
+          page_id: string
+          parent_id?: string | null
+          text: string
+          thread_subject?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          author_name?: string
+          created_at?: string
+          id?: string
+          page_id?: string
+          parent_id?: string | null
+          text?: string
+          thread_subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "discussion_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussion_read_status: {
+        Row: {
+          id: string
+          last_read_at: string
+          page_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_read_at?: string
+          page_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_read_at?: string
+          page_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       organisation_join_requests: {
         Row: {
           created_at: string
