@@ -131,10 +131,20 @@ const ProjectDetail = () => {
             // Fetch the profile separately since there's no FK relationship
             const { data: profile } = await supabase
               .from("profiles")
-              .select("username, full_name, avatar_url")
+              .select("username, full_name, avatar_url, expertise, organisations")
               .eq("user_id", data.user_id)
               .maybeSingle();
-            setDbProject({ ...data, profile });
+            // Fetch primary organisation name if available
+            let primaryOrgName: string | null = null;
+            if (profile?.organisations?.length) {
+              const { data: org } = await supabase
+                .from("organisations")
+                .select("name")
+                .eq("id", profile.organisations[0])
+                .maybeSingle();
+              primaryOrgName = org?.name || null;
+            }
+            setDbProject({ ...data, profile: { ...profile, primaryOrgName } });
           }
           setDbLoading(false);
         });
@@ -553,8 +563,13 @@ const ProjectDetail = () => {
     if (!id) return;
     const { data } = await supabase.from("projects").select("*").eq("id", id).maybeSingle();
     if (data) {
-      const { data: profile } = await supabase.from("profiles").select("username, full_name").eq("user_id", data.user_id).maybeSingle();
-      setDbProject({ ...data, profile });
+      const { data: profile } = await supabase.from("profiles").select("username, full_name, avatar_url, expertise, organisations").eq("user_id", data.user_id).maybeSingle();
+      let primaryOrgName: string | null = null;
+      if (profile?.organisations?.length) {
+        const { data: org } = await supabase.from("organisations").select("name").eq("id", profile.organisations[0]).maybeSingle();
+        primaryOrgName = org?.name || null;
+      }
+      setDbProject({ ...data, profile: { ...profile, primaryOrgName } });
     }
   };
 
@@ -1048,8 +1063,37 @@ const ProjectDetail = () => {
                       <Link to={`/community/${dbProject.user_id}`} className="text-sm font-display font-bold hover:text-primary transition-colors">
                         {dbProject.profile?.full_name || dbProject.profile?.username || "Community Member"}
                       </Link>
-                      <span className="text-xs text-muted-foreground mt-0.5">Project Owner</span>
+                      {dbProject.profile?.primaryOrgName && (
+                        <span className="text-xs text-muted-foreground mt-0.5">{dbProject.profile.primaryOrgName}</span>
+                      )}
+                      {!dbProject.profile?.primaryOrgName && (
+                        <span className="text-xs text-muted-foreground mt-0.5">Project Owner</span>
+                      )}
                     </div>
+
+                    {/* Expertise */}
+                    {dbProject.profile?.expertise?.length > 0 && (
+                      <div className="border-t border-border/60 mt-3 pt-3">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Expertise</h4>
+                        <div className="flex flex-wrap gap-1">
+                          {dbProject.profile.expertise.map((e: string) => (
+                            <Badge key={e} variant="secondary" className="text-[10px] px-2 py-0.5">
+                              {e}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* View Profile */}
+                    <div className="border-t border-border/60 mt-3 pt-3">
+                      <Button asChild variant="outline" size="sm" className="w-full rounded-lg justify-start">
+                        <Link to={`/community/${dbProject.user_id}`}>
+                          <User className="h-3.5 w-3.5 mr-2" /> View Profile
+                        </Link>
+                      </Button>
+                    </div>
+
                     {/* Sidebar collaborators */}
                     {projectCollaborators.filter(c => c.user_id !== dbProject.user_id).length > 0 && (
                       <div className="border-t border-border/60 mt-3 pt-3">
