@@ -44,6 +44,7 @@ interface ProfileData {
   expertise: string[] | null;
 }
 
+// Interests & expertise picker
 const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: ProfileData | null; onExpertiseUpdate: (next: string[]) => void }) => {
   const { registeredSlugs, loading, toggleInterest } = useUserInterests();
   const registered = interests.filter((i) => registeredSlugs.has(i.slug));
