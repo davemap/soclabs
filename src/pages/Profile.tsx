@@ -44,41 +44,95 @@ interface ProfileData {
   expertise: string[] | null;
 }
 
-const RegisteredInterestsSection = () => {
+const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: ProfileData | null; onExpertiseUpdate: (next: string[]) => void }) => {
   const { registeredSlugs, loading, toggleInterest } = useUserInterests();
   const registered = interests.filter((i) => registeredSlugs.has(i.slug));
+  const expertise = profile?.expertise || [];
+
+  const toggleExpertise = (slug: string) => {
+    const isSelected = expertise.includes(slug);
+    const next = isSelected ? expertise.filter((s) => s !== slug) : [...expertise, slug];
+    if (!isSelected && next.length > 4) return;
+    onExpertiseUpdate(next);
+  };
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold">My Interests</h3>
-        <span className="text-xs text-muted-foreground">
-          {registered.length} registered — manage on{" "}
-          <Link to="/technologies" className="text-primary hover:underline">Technologies</Link>{" & "}
-          <Link to="/interests" className="text-primary hover:underline">Discussions</Link> pages
-        </span>
-      </div>
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Loading...</p>
-      ) : registered.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {registered.map((interest) => (
-            <button
-              key={interest.slug}
-              onClick={() => toggleInterest(interest.slug)}
-              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
-            >
-              {interest.name}
-              <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
-            </button>
-          ))}
+    <div className="mb-8 space-y-6">
+      {/* Registered Interests */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold">My Interests</h3>
+          <span className="text-xs text-muted-foreground">{registered.length} registered</span>
         </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          No interests registered yet. Visit the{" "}
-          <Link to="/technologies" className="text-primary hover:underline">Technologies</Link> or{" "}
-          <Link to="/interests" className="text-primary hover:underline">Discussions</Link> pages to register your interests.
+        <p className="text-sm text-muted-foreground mb-3">
+          Register your interests on the{" "}
+          <Link to="/technologies" className="text-primary hover:underline font-medium">Technologies</Link> and{" "}
+          <Link to="/interests" className="text-primary hover:underline font-medium">Discussions</Link>{" "}
+          pages — they'll appear here automatically.
         </p>
+        {loading ? (
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        ) : registered.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {registered.map((interest) => (
+              <button
+                key={interest.slug}
+                onClick={() => toggleInterest(interest.slug)}
+                className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
+              >
+                {interest.name}
+                <X className="h-3 w-3 opacity-60 group-hover:opacity-100" />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-border p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-3">No interests registered yet.</p>
+            <div className="flex justify-center gap-2">
+              <Button size="sm" variant="outline" className="rounded-full" asChild>
+                <Link to="/technologies">Browse Technologies</Link>
+              </Button>
+              <Button size="sm" variant="outline" className="rounded-full" asChild>
+                <Link to="/interests">Browse Discussions</Link>
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Expertise Selection */}
+      {registered.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold">Expertise</h3>
+            <span className="text-xs text-muted-foreground">{expertise.length}/4 selected — shown on public profile</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">
+            Choose up to 4 of your registered interests to highlight as expertise on your public profile.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {registered.map((interest) => {
+              const isExpertise = expertise.includes(interest.slug);
+              const atLimit = expertise.length >= 4 && !isExpertise;
+              return (
+                <button
+                  key={interest.slug}
+                  disabled={atLimit}
+                  onClick={() => toggleExpertise(interest.slug)}
+                  className={`text-xs px-3 py-1.5 rounded-full border transition-all font-medium ${
+                    isExpertise
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : atLimit
+                        ? "bg-muted text-muted-foreground/50 border-border/40 cursor-not-allowed"
+                        : "bg-card text-muted-foreground border-border/60 hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  {interest.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -438,7 +492,14 @@ const Profile = () => {
             <Separator className="my-8" />
 
             {/* Registered Interests */}
-            <RegisteredInterestsSection />
+            <RegisteredInterestsSection
+              profile={profile}
+              onExpertiseUpdate={async (next) => {
+                if (!user) return;
+                const { error } = await supabase.from("profiles").update({ expertise: next } as any).eq("user_id", user.id);
+                if (!error) setProfile((prev) => prev ? { ...prev, expertise: next } : prev);
+              }}
+            />
 
             <Separator className="my-8" />
 
