@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { partners } from "@/data/mockData";
@@ -38,20 +38,13 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [fullName, setFullName] = useState(profile.full_name || "");
-  const [username, setUsername] = useState(profile.username || "");
+  // Only blurb and hide_location are editable here
   const [blurb, setBlurb] = useState(profile.blurb || "");
-  const [location, setLocation] = useState(profile.location || "");
-  const [orcid, setOrcid] = useState(profile.orcid || "");
-  const [orgIds, setOrgIds] = useState<string[]>(profile.organisations || []);
+  const [hideLocation, setHideLocation] = useState(profile.hide_location || false);
 
   const resetForm = () => {
-    setFullName(profile.full_name || "");
-    setUsername(profile.username || "");
     setBlurb(profile.blurb || "");
-    setLocation(profile.location || "");
-    setOrcid(profile.orcid || "");
-    setOrgIds(profile.organisations || []);
+    setHideLocation(profile.hide_location || false);
     setEditing(false);
   };
 
@@ -61,12 +54,8 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
       const { error } = await supabase
         .from("profiles")
         .update({
-          full_name: fullName.trim() || null,
-          username: username.trim() || null,
           blurb: blurb.trim(),
-          location: location.trim(),
-          orcid: orcid.trim() || null,
-          organisations: orgIds,
+          hide_location: hideLocation,
         })
         .eq("user_id", profile.user_id);
 
@@ -74,12 +63,8 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
 
       const updated = {
         ...profile,
-        full_name: fullName.trim() || null,
-        username: username.trim() || null,
         blurb: blurb.trim(),
-        location: location.trim(),
-        orcid: orcid.trim() || null,
-        organisations: orgIds,
+        hide_location: hideLocation,
       };
       onProfileUpdated?.(updated);
       setEditing(false);
@@ -99,6 +84,7 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
     .slice(0, 2);
 
   const memberOrgs = partners.filter((p) => (profile.organisations || []).includes(p.id));
+  const showLocation = profile.location && !profile.hide_location;
 
   return (
     <>
@@ -124,40 +110,25 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
               </AvatarFallback>
             </Avatar>
             <div>
-              {editing ? (
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Full Name</Label>
-                    <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Full Name" />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Username</Label>
-                    <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" />
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">
-                    {profile.full_name || profile.username || "Community Member"}
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    {profile.username && (
-                      <span className="flex items-center gap-1">
-                        <User className="h-3.5 w-3.5" /> @{profile.username}
-                      </span>
-                    )}
-                    {profile.location && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5" /> {profile.location}
-                      </span>
-                    )}
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" /> Joined{" "}
-                      {new Date(profile.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
-                    </span>
-                  </div>
-                </>
-              )}
+              <h1 className="text-3xl md:text-4xl font-display font-bold mb-1">
+                {profile.full_name || profile.username || "Community Member"}
+              </h1>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                {profile.username && (
+                  <span className="flex items-center gap-1">
+                    <User className="h-3.5 w-3.5" /> @{profile.username}
+                  </span>
+                )}
+                {showLocation && (
+                  <span className="flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5" /> {profile.location}
+                  </span>
+                )}
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" /> Joined{" "}
+                  {new Date(profile.created_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+                </span>
+              </div>
             </div>
           </div>
           {isOwnProfile && !editing && (
@@ -195,80 +166,61 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
           )
         )}
 
-        {/* Location (edit) */}
-        {editing && (
-          <div className="mb-5">
-            <Label className="text-xs text-muted-foreground">Location</Label>
-            <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. London, UK" />
+        {/* Hide location toggle (only visible in edit mode) */}
+        {editing && profile.location && (
+          <div className="flex items-center gap-3 mb-5 p-3 rounded-lg border border-border/60">
+            <Switch
+              checked={hideLocation}
+              onCheckedChange={setHideLocation}
+              id="hide-location"
+            />
+            <Label htmlFor="hide-location" className="text-sm cursor-pointer">
+              Hide location from public profile
+            </Label>
+            {profile.location && (
+              <span className="text-xs text-muted-foreground ml-auto">
+                Current: {profile.location}
+              </span>
+            )}
           </div>
         )}
 
-        {/* ORCID */}
-        {editing ? (
-          <div className="mb-5">
-            <Label className="text-xs text-muted-foreground">ORCID</Label>
-            <Input value={orcid} onChange={(e) => setOrcid(e.target.value)} placeholder="0000-0000-0000-0000" />
+        {/* ORCID (read-only, inherited from private profile) */}
+        {profile.orcid && (
+          <div className="mb-4">
+            <a
+              href={`https://orcid.org/${profile.orcid}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
+            >
+              <ExternalLink className="h-3 w-3" />
+              ORCID: {profile.orcid}
+            </a>
           </div>
-        ) : (
-          profile.orcid && (
-            <div className="mb-4">
-              <a
-                href={`https://orcid.org/${profile.orcid}`}
-                target="_blank"
-                rel="noreferrer"
+        )}
+
+        {/* Organisations (read-only, inherited from private profile) */}
+        {memberOrgs.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {memberOrgs.map((org) => (
+              <Link
+                key={org.id}
+                to={`/partners/${org.id}`}
                 className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
               >
-                <ExternalLink className="h-3 w-3" />
-                ORCID: {profile.orcid}
-              </a>
-            </div>
-          )
+                <Building2 className="h-3 w-3" />
+                {org.name}
+              </Link>
+            ))}
+          </div>
         )}
 
-        {/* Organisations */}
-        {editing ? (
-          <div className="mb-5">
-            <Label className="text-xs text-muted-foreground">Organisations</Label>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {partners.map((org) => {
-                const selected = orgIds.includes(org.id);
-                return (
-                  <button
-                    key={org.id}
-                    type="button"
-                    onClick={() =>
-                      setOrgIds((prev) =>
-                        selected ? prev.filter((id) => id !== org.id) : [...prev, org.id]
-                      )
-                    }
-                    className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all ${
-                      selected
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border/60 text-muted-foreground hover:border-border"
-                    }`}
-                  >
-                    <Building2 className="h-3 w-3" />
-                    {org.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          memberOrgs.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {memberOrgs.map((org) => (
-                <Link
-                  key={org.id}
-                  to={`/partners/${org.id}`}
-                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
-                >
-                  <Building2 className="h-3 w-3" />
-                  {org.name}
-                </Link>
-              ))}
-            </div>
-          )
+        {/* Hint for own profile in edit mode */}
+        {editing && (
+          <p className="text-xs text-muted-foreground mt-4 italic">
+            Name, username, ORCID, and organisations are managed from your <Link to="/profile" className="text-primary hover:underline">private profile</Link>.
+          </p>
         )}
       </motion.div>
 
