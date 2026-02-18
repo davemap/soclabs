@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useUserInterests } from "@/hooks/useUserInterests";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, FolderOpen, Tag, ExternalLink, Wrench, Check } from "lucide-react";
@@ -14,12 +15,13 @@ const categoryColor: Record<string, string> = {
   Activities: "bg-violet/10 text-violet",
 };
 
-const RegisterInterestBox = ({ interestName }: { interestName: string }) => {
-  const [registered, setRegistered] = useState(false);
+const RegisterInterestBox = ({ interestSlug, interestName }: { interestSlug: string; interestName: string }) => {
+  const { isRegistered, toggleInterest } = useUserInterests();
+  const registered = isRegistered(interestSlug);
 
   return (
     <button
-      onClick={() => setRegistered(!registered)}
+      onClick={() => toggleInterest(interestSlug)}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-300 shrink-0 ${
         registered
           ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
@@ -98,7 +100,7 @@ const InterestDetail = () => {
 
             <div className="flex items-start justify-between gap-6 mb-4">
               <h1 className="text-4xl md:text-5xl font-display font-bold">{interest.name}</h1>
-              <RegisterInterestBox interestName={interest.name} />
+              <RegisterInterestBox interestSlug={interest.slug} interestName={interest.name} />
             </div>
             <p className="text-lg text-muted-foreground leading-relaxed">{interest.description}</p>
           </motion.div>
