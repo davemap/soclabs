@@ -97,51 +97,7 @@ const DesignDocs = () => {
   return (
     <Layout>
       <section className="py-24">
-        <div className="container mx-auto px-4 max-w-5xl xl:pr-60 relative">
-          {/* Floating sidebar */}
-          <aside className="hidden xl:block fixed top-32 right-8 2xl:right-[calc((100vw-64rem)/2-12rem)] w-52 z-10">
-            <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
-              <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
-              {(design.version || design.branch) && (
-                <div className="space-y-2 pb-2 border-b border-border/40">
-                  {design.version && (
-                    <div className="flex items-center gap-2 text-xs">
-                      <Tag className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-muted-foreground">Version</span>
-                      <span className="ml-auto font-mono font-semibold text-foreground">{design.version}</span>
-                    </div>
-                  )}
-                  {design.branch && (
-                    <div className="flex items-center gap-2 text-xs">
-                      <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-muted-foreground">Branch</span>
-                      <span className="ml-auto font-mono font-semibold text-foreground">{design.branch}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-              <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
-                <Link to={`/designs/${id}`}>
-                  <Cpu className="h-4 w-4 mr-2" /> SoC Overview
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
-                <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4 mr-2" /> GitHub
-                </a>
-              </Button>
-              <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
-                <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
-                </a>
-              </Button>
-              <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
-                <Link to="/projects/start">
-                  <ArrowRight className="h-4 w-4 mr-2" /> Start a Project
-                </Link>
-              </Button>
-            </div>
-          </aside>
+        <div className="container mx-auto px-4">
           {/* Back link */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <Link
@@ -152,73 +108,123 @@ const DesignDocs = () => {
             </Link>
           </motion.div>
 
-          {/* Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/10">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-display font-bold">{design.name} Documentation</h1>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Sourced from the{" "}
-                    <a href={design.docsUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
-                      official ReadTheDocs <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </p>
-                </div>
-              </div>
-              <Button variant="outline" size="sm" className="rounded-full shrink-0" onClick={handleSync} disabled={syncing}>
-                <RefreshCw className={`h-4 w-4 mr-1.5 ${syncing ? "animate-spin" : ""}`} />
-                {syncing ? "Syncing…" : "Sync Docs"}
-              </Button>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-              <Badge variant="secondary">{design.processor}</Badge>
-              <Badge variant="outline">v{design.version || "latest"}</Badge>
-              {lastSynced && (
-                <span className="text-xs text-muted-foreground ml-2">
-                  Last synced: {new Date(lastSynced).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                </span>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Documentation tabs */}
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-full rounded-xl" />
-              <Skeleton className="h-96 w-full rounded-2xl" />
-            </div>
-          ) : sections ? (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-              <Tabs defaultValue={sections[0].id} className="w-full">
-                <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/50 p-1.5 rounded-xl mb-8">
-                  {sections.map((section) => (
-                    <TabsTrigger
-                      key={section.id}
-                      value={section.id}
-                      className="rounded-lg text-xs sm:text-sm px-3 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
-                    >
-                      {section.title}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {sections.map((section) => (
-                  <TabsContent key={section.id} value={section.id}>
-                    <div className="rounded-2xl border bg-card p-6 md:p-10">
-                      <h2 className="text-2xl font-display font-bold mb-6">{section.title}</h2>
-                      <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-table:border-collapse prose-th:border prose-th:border-border prose-th:px-3 prose-th:py-2 prose-th:bg-muted/50 prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2 prose-a:text-primary">
-                        <ReactMarkdown>{section.content}</ReactMarkdown>
-                      </div>
+          <div className="flex gap-6 items-start max-w-5xl mx-auto">
+            {/* Main column */}
+            <div className="flex-1 min-w-0">
+              {/* Header */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mb-10">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-primary/10">
+                      <BookOpen className="h-6 w-6 text-primary" />
                     </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </motion.div>
-          ) : null}
+                    <div>
+                      <h1 className="text-3xl md:text-4xl font-display font-bold">{design.name} Documentation</h1>
+                      <p className="text-muted-foreground text-sm mt-1">
+                        Sourced from the{" "}
+                        <a href={design.docsUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                          official ReadTheDocs <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" className="rounded-full shrink-0" onClick={handleSync} disabled={syncing}>
+                    <RefreshCw className={`h-4 w-4 mr-1.5 ${syncing ? "animate-spin" : ""}`} />
+                    {syncing ? "Syncing…" : "Sync Docs"}
+                  </Button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mt-4">
+                  <Badge variant="secondary">{design.processor}</Badge>
+                  <Badge variant="outline">v{design.version || "latest"}</Badge>
+                  {lastSynced && (
+                    <span className="text-xs text-muted-foreground ml-2">
+                      Last synced: {new Date(lastSynced).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+
+              {/* Documentation tabs */}
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <Skeleton className="h-96 w-full rounded-2xl" />
+                </div>
+              ) : sections ? (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                  <Tabs defaultValue={sections[0].id} className="w-full">
+                    <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-muted/50 p-1.5 rounded-xl mb-8">
+                      {sections.map((section) => (
+                        <TabsTrigger
+                          key={section.id}
+                          value={section.id}
+                          className="rounded-lg text-xs sm:text-sm px-3 py-2 data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        >
+                          {section.title}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {sections.map((section) => (
+                      <TabsContent key={section.id} value={section.id}>
+                        <div className="rounded-2xl border bg-card p-6 md:p-10">
+                          <h2 className="text-2xl font-display font-bold mb-6">{section.title}</h2>
+                          <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-table:border-collapse prose-th:border prose-th:border-border prose-th:px-3 prose-th:py-2 prose-th:bg-muted/50 prose-td:border prose-td:border-border prose-td:px-3 prose-td:py-2 prose-a:text-primary">
+                            <ReactMarkdown>{section.content}</ReactMarkdown>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </motion.div>
+              ) : null}
+            </div>
+
+            {/* Sticky sidebar — matches DesignDetail layout */}
+            <aside className="hidden lg:block w-56 shrink-0 sticky top-24">
+              <div className="rounded-xl border border-border/60 bg-card p-4 space-y-3 shadow-sm">
+                <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Get Started</h3>
+                {(design.version || design.branch) && (
+                  <div className="space-y-2 pb-2 border-b border-border/40">
+                    {design.version && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-muted-foreground">Version</span>
+                        <span className="ml-auto font-mono font-semibold text-foreground">{design.version}</span>
+                      </div>
+                    )}
+                    {design.branch && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <GitBranch className="h-3.5 w-3.5 text-muted-foreground" />
+                        <span className="text-muted-foreground">Branch</span>
+                        <span className="ml-auto font-mono font-semibold text-foreground">{design.branch}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
+                  <Link to={`/designs/${id}`}>
+                    <Cpu className="h-4 w-4 mr-2" /> SoC Overview
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
+                  <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4 mr-2" /> GitHub
+                  </a>
+                </Button>
+                <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+                  <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
+                  </a>
+                </Button>
+                <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+                  <Link to="/projects/start">
+                    <ArrowRight className="h-4 w-4 mr-2" /> Start a Project
+                  </Link>
+                </Button>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
     </Layout>
