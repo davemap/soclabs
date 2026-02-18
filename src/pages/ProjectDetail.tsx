@@ -26,6 +26,7 @@ import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinR
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
 import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
 import CompleteTaskDialog from "@/components/project-manage/CompleteTaskDialog";
+import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -211,24 +212,37 @@ const ProjectDetail = () => {
     setSavingTime(false);
   };
 
-  // Project image upload
+  // Project image upload with crop
   const [uploadingImage, setUploadingImage] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !dbProject) return;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result as string);
+      setCropDialogOpen(true);
+    };
+    reader.readAsDataURL(file);
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
+  const handleCroppedImage = async (blob: Blob) => {
+    if (!dbProject) return;
     setUploadingImage(true);
-    const ext = file.name.split('.').pop();
-    const path = `${dbProject.id}/cover.${ext}`;
-    const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+    const path = `${dbProject.id}/cover.png`;
+    const { error: uploadError } = await supabase.storage.from("project-content").upload(path, blob, { upsert: true, contentType: "image/png" });
     if (uploadError) { toast.error("Upload failed"); setUploadingImage(false); return; }
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const { data: urlData } = supabase.storage.from("project-content").getPublicUrl(path);
     const { error } = await supabase.from("projects").update({ image_url: urlData.publicUrl }).eq("id", dbProject.id);
     if (error) toast.error("Failed to save image");
     else { toast.success("Image updated"); refreshDbProject(); }
     setUploadingImage(false);
-    if (imageInputRef.current) imageInputRef.current.value = "";
+    setCropDialogOpen(false);
+    setCropImageSrc(null);
   };
 
   // Inline edit state for title & description
@@ -720,7 +734,7 @@ const ProjectDetail = () => {
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={handleImageUpload}
+                    onChange={handleImageSelect}
                   />
                   <button
                     type="button"
@@ -730,23 +744,32 @@ const ProjectDetail = () => {
                   >
                     {(dbProject as any).image_url ? (
                       <div className="relative">
-                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-64 object-cover" />
+                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-contain bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white">
                           <Upload className="h-5 w-5" />
                           <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Change Image"}</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                      <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
                         <ImageIcon className="h-10 w-10 mb-2 opacity-40" />
                         <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Click to add a project image"}</span>
                       </div>
                     )}
                   </button>
+                  {cropImageSrc && (
+                    <ProjectImageCropDialog
+                      open={cropDialogOpen}
+                      imageSrc={cropImageSrc}
+                      onClose={() => { setCropDialogOpen(false); setCropImageSrc(null); }}
+                      onCropComplete={handleCroppedImage}
+                      saving={uploadingImage}
+                    />
+                  )}
                 </div>
               ) : (dbProject as any).image_url ? (
                 <div className="rounded-xl border bg-card overflow-hidden">
-                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-64 object-cover" />
+                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-contain bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]" />
                 </div>
               ) : (
                 <div className="rounded-xl border bg-card overflow-hidden">
