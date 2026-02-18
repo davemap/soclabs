@@ -237,7 +237,8 @@ const ProjectDetail = () => {
     const { error: uploadError } = await supabase.storage.from("project-content").upload(path, blob, { upsert: true, contentType: "image/png" });
     if (uploadError) { toast.error("Upload failed"); setUploadingImage(false); return; }
     const { data: urlData } = supabase.storage.from("project-content").getPublicUrl(path);
-    const { error } = await supabase.from("projects").update({ image_url: urlData.publicUrl }).eq("id", dbProject.id);
+    const cacheBust = `?t=${Date.now()}`;
+    const { error } = await supabase.from("projects").update({ image_url: urlData.publicUrl + cacheBust }).eq("id", dbProject.id);
     if (error) toast.error("Failed to save image");
     else { toast.success("Image updated"); refreshDbProject(); }
     setUploadingImage(false);
