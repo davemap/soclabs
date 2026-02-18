@@ -10,6 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/Layout";
 import { communityProjects, communityMembers, referenceDesigns, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import CommentsThreads from "@/components/CommentsThreads";
 import MilestoneTracker from "@/components/MilestoneTracker";
 import ProjectMilestones from "@/components/ProjectMilestones";
@@ -749,7 +752,7 @@ const ProjectDetail = () => {
                   {dbContent.map((section: any) => (
                     <div key={section.id} className="mb-8">
                       {section.title && <h2>{section.title}</h2>}
-                      <ReactMarkdown>{section.body}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{section.body}</ReactMarkdown>
                     </div>
                   ))}
                 </div>
@@ -1368,7 +1371,7 @@ const ProjectDetail = () => {
                   prose-td:border-b prose-td:border-border/40 prose-td:py-2 prose-td:pr-4 prose-td:text-muted-foreground
                   prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
               >
-                <ReactMarkdown>{project.content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{project.content}</ReactMarkdown>
               </motion.div>
 
               {/* Collaborators */}
