@@ -1680,17 +1680,24 @@ const InviteCollaboratorInput = ({ projectId, existingEmails, onInvited }: { pro
       return;
     }
     setSending(true);
-    const { error } = await supabase
-      .from("projects")
-      .update({ email_invites: [...existingEmails, trimmed] })
-      .eq("id", projectId);
-    setSending(false);
-    if (error) toast.error("Failed to send invite");
-    else {
-      toast.success(`Invitation added for ${trimmed}`);
+    try {
+      const { data, error } = await supabase.functions.invoke("invite-collaborator", {
+        body: { email: trimmed, projectId },
+      });
+      if (error) throw error;
+      if (data?.status === "existing_user_added") {
+        toast.success(`${trimmed} already has an account and was added as a collaborator!`);
+      } else if (data?.status === "invite_sent") {
+        toast.success(`Invitation email sent to ${trimmed}`);
+      } else {
+        toast.success(`${trimmed} will be auto-added when they create an account`);
+      }
       setEmail("");
       onInvited();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send invite");
     }
+    setSending(false);
   };
 
   return (
