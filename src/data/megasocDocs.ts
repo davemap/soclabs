@@ -44,6 +44,20 @@ This sets the environment variables and creates visibility to the scripts in the
 Click "Sync Docs" above to fetch the latest content from the megaSoC repository.`,
   },
   {
+    id: "writing-software",
+    title: "Writing Software",
+    content: `Documentation for writing software for megaSoC will be synced from the repository.
+
+Click "Sync Docs" above to fetch the latest content from the megaSoC repository.`,
+  },
+  {
+    id: "simulation",
+    title: "Simulation",
+    content: `Documentation for simulating megaSoC designs will be synced from the repository.
+
+Click "Sync Docs" above to fetch the latest content from the megaSoC repository.`,
+  },
+  {
     id: "fpga-flow",
     title: "FPGA Flow",
     content: `Documentation for the megaSoC FPGA build flow will be synced from the repository.
