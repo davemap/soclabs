@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Camera, ExternalLink, Plus, Eye, Building2, Settings, Search,
+  Camera, ExternalLink, Plus, Eye, Building2, Settings, Search, UserPlus,
   MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -201,6 +201,7 @@ const Profile = () => {
   const [orgSearch, setOrgSearch] = useState("");
   const [pendingOrgRequests, setPendingOrgRequests] = useState<any[]>([]);
   const [joiningOrg, setJoiningOrg] = useState<string | null>(null);
+  const [projectJoinRequests, setProjectJoinRequests] = useState<any[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -212,8 +213,29 @@ const Profile = () => {
       fetchDbProjects();
       fetchOrganisations();
       fetchPendingOrgRequests();
+      fetchProjectJoinRequests();
     }
   }, [user]);
+
+  const fetchProjectJoinRequests = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("project_join_requests")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (data) {
+      // Fetch project titles
+      const projectIds = [...new Set(data.map((r) => r.project_id))];
+      const { data: projects } = await supabase
+        .from("projects")
+        .select("id, title")
+        .in("id", projectIds);
+      const projectMap = new Map(projects?.map((p) => [p.id, p.title]) || []);
+      setProjectJoinRequests(data.map((r) => ({ ...r, projectTitle: projectMap.get(r.project_id) || "Unknown Project" })));
+    }
+  };
+
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -626,6 +648,60 @@ const Profile = () => {
                 <p className="text-sm text-muted-foreground">No projects associated with your account yet.</p>
               )}
             </div>
+
+            {/* Project Join Requests */}
+            {projectJoinRequests.length > 0 && (
+              <>
+                <Separator className="my-8" />
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <UserPlus className="h-5 w-5 text-primary" />
+                    <h3 className="text-lg font-semibold">My Project Join Requests</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {projectJoinRequests.map((req) => (
+                      <Card key={req.id} className={req.status === "pending" ? "border-dashed border-amber-500/30" : "border-border/60"}>
+                        <CardContent className="py-3 flex items-center justify-between gap-3">
+                          <Link to={`/projects/${req.project_id}`} className="flex-1 min-w-0 hover:text-primary transition-colors">
+                            <p className="font-medium text-sm truncate">{req.projectTitle}</p>
+                            {req.message && (
+                              <p className="text-xs text-muted-foreground truncate">{req.message}</p>
+                            )}
+                          </Link>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Badge
+                              variant={req.status === "approved" || req.status === "accepted" ? "secondary" : "outline"}
+                              className="text-xs capitalize"
+                            >
+                              {req.status}
+                            </Badge>
+                            {req.status === "pending" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs text-muted-foreground hover:text-destructive h-7 px-2"
+                                onClick={async () => {
+                                  try {
+                                    const { error } = await supabase.from("project_join_requests").delete().eq("id", req.id);
+                                    if (error) throw error;
+                                    setProjectJoinRequests((prev) => prev.filter((r) => r.id !== req.id));
+                                    toast({ title: "Request cancelled" });
+                                  } catch (err: any) {
+                                    toast({ title: "Error", description: err.message, variant: "destructive" });
+                                  }
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             <Separator className="my-8" />
 
