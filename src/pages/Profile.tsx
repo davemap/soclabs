@@ -236,6 +236,9 @@ const Profile = () => {
     }
   };
 
+  // Unread discussion counts for projects
+  const projectPageIds = useMemo(() => dbProjects.map((p) => `project-${p.id}`), [dbProjects]);
+  const { unreadCounts: projectUnreadCounts } = useUnreadDiscussions(projectPageIds);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -583,6 +586,12 @@ const Profile = () => {
                                 <Badge variant="secondary" className="text-[10px] gap-1 shrink-0">
                                   <Crown className="h-3 w-3" /> Owner
                                 </Badge>
+                              )}
+                              {(projectUnreadCounts[`project-${p.id}`] || 0) > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground shrink-0">
+                                  <MessageSquare className="h-2.5 w-2.5" />
+                                  {projectUnreadCounts[`project-${p.id}`]}
+                                </span>
                               )}
                             </div>
                             <p className="text-sm text-muted-foreground line-clamp-1">{p.description}</p>
