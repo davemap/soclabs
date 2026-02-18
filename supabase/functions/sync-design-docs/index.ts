@@ -8,21 +8,22 @@ const corsHeaders = {
 };
 
 // Base URL for raw file access from the GitLab repo
-const GITLAB_RAW_BASE =
-  "https://git.soton.ac.uk/soclabs/accelerator-project/-/raw/main/docs/build/html";
+const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/accelerator-project/-/raw/main/docs/build/qthelp";
 
 // Documentation sections to sync for each design
-const DESIGN_DOCS: Record<
-  string,
-  { sectionId: string; title: string; filename: string; sortOrder: number }[]
-> = {
+const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: string; sortOrder: number }[]> = {
   nanosoc: [
     { sectionId: "getting-started", title: "Getting Started", filename: "getting_started.html", sortOrder: 0 },
     { sectionId: "adding-your-ip", title: "Adding your IP", filename: "adding_your_ip.html", sortOrder: 1 },
     { sectionId: "writing-software", title: "Writing Software", filename: "writing_software.html", sortOrder: 2 },
     { sectionId: "simulation", title: "Simulation", filename: "simulation.html", sortOrder: 3 },
     { sectionId: "fpga-flow", title: "FPGA Flow", filename: "fpga_build.html", sortOrder: 4 },
-    { sectionId: "asic-implementation", title: "ASIC Implementation", filename: "asic_implementation.html", sortOrder: 5 },
+    {
+      sectionId: "asic-implementation",
+      title: "ASIC Implementation",
+      filename: "asic_implementation.html",
+      sortOrder: 5,
+    },
   ],
 };
 
@@ -84,7 +85,7 @@ async function convertHtmlToMarkdown(url: string): Promise<string> {
       const rowMatches = match.match(/<tr[\s\S]*?<\/tr>/gi) || [];
       rowMatches.forEach((row, i) => {
         const cells = (row.match(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi) || []).map((cell) =>
-          cell.replace(/<[^>]+>/g, "").trim()
+          cell.replace(/<[^>]+>/g, "").trim(),
         );
         rows.push("| " + cells.join(" | ") + " |");
         if (i === 0) {
@@ -98,11 +99,13 @@ async function convertHtmlToMarkdown(url: string): Promise<string> {
     .replace(/<em[^>]*>([\s\S]*?)<\/em>/gi, "*$1*")
     .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, "$1\n\n")
     .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (_, inner) =>
-      inner
-        .split("\n")
-        .map((l: string) => `> ${l}`)
-        .join("\n") + "\n"
+    .replace(
+      /<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi,
+      (_, inner) =>
+        inner
+          .split("\n")
+          .map((l: string) => `> ${l}`)
+          .join("\n") + "\n",
     )
     .replace(/<[^>]+>/g, "")
     .replace(/&amp;/g, "&")
@@ -127,10 +130,10 @@ Deno.serve(async (req) => {
     const { designId } = await req.json();
 
     if (!designId || !DESIGN_DOCS[designId]) {
-      return new Response(
-        JSON.stringify({ success: false, error: `Unknown design: ${designId}` }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ success: false, error: `Unknown design: ${designId}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -157,7 +160,7 @@ Deno.serve(async (req) => {
             source_url: rawUrl,
             last_synced_at: new Date().toISOString(),
           },
-          { onConflict: "design_id,section_id" }
+          { onConflict: "design_id,section_id" },
         );
 
         if (error) {
@@ -173,16 +176,15 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({ success: true, results }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: true, results }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error) {
     console.error("Error:", error);
     const msg = error instanceof Error ? error.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ success: false, error: msg }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: false, error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
