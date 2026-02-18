@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2, Tag, GitBranch } from "lucide-react";
+import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2, Tag, GitBranch, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -263,8 +263,13 @@ const DesignDetail = () => {
                   </div>
                 )}
                 <Button asChild className="w-full rounded-lg justify-start" size="sm">
+                  <Link to={`/designs/${design.id}/docs`}>
+                    <BookOpen className="h-4 w-4 mr-2" /> Documentation
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
                   <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" /> Docs & Guide
+                    <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
                   </a>
                 </Button>
                 <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
