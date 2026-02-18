@@ -122,7 +122,7 @@ const DesignDocs = () => {
                       <h1 className="text-3xl md:text-4xl font-display font-bold">{design.name} Documentation</h1>
                       <p className="text-muted-foreground text-sm mt-1">
                         Sourced from the{" "}
-                        <a href={design.githubUrl + "/-/tree/main/docs/build/html"} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
+                        <a href={design.githubUrl + "/-/tree/main/docs/build/qthelp"} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
                           repository docs <ExternalLink className="h-3 w-3" />
                         </a>
                       </p>
