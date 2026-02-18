@@ -54,7 +54,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<Blob> {
 
 const ProjectImageCropDialog = ({ open, imageSrc, onClose, onCropComplete, saving }: ProjectImageCropDialogProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState([1]);
+  const [zoom, setZoom] = useState([0.5]);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const onCropDone = useCallback((_: Area, croppedPixels: Area) => {
@@ -91,7 +91,7 @@ const ProjectImageCropDialog = ({ open, imageSrc, onClose, onCropComplete, savin
           <Slider
             value={zoom}
             onValueChange={setZoom}
-            min={1}
+            min={0.2}
             max={3}
             step={0.05}
             className="flex-1"
