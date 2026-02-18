@@ -268,11 +268,6 @@ const DesignDetail = () => {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
-                  <a href={design.docsUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" /> ReadTheDocs
-                  </a>
-                </Button>
-                <Button asChild variant="outline" className="w-full rounded-lg justify-start" size="sm">
                   <a href={design.githubUrl} target="_blank" rel="noopener noreferrer">
                     <Github className="h-4 w-4 mr-2" /> GitHub
                   </a>
