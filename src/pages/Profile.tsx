@@ -1,15 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Camera, Mail, Lock, Copy, Check, ExternalLink, Plus, Eye, Building2 } from "lucide-react";
+import {
+  Camera, Copy, Check, ExternalLink, Plus, Eye, Building2, Settings,
+  MoreHorizontal, Trash2, LogOut, UserCog, Crown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,24 +46,27 @@ const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [newEmail, setNewEmail] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [updating, setUpdating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
+  // Delete project state
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  // Leave project state
+  const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
+  // Transfer ownership state
+  const [transferTarget, setTransferTarget] = useState<string | null>(null);
+  const [transferMembers, setTransferMembers] = useState<any[]>([]);
+  const [selectedNewOwner, setSelectedNewOwner] = useState("");
+  const [loadingTransferMembers, setLoadingTransferMembers] = useState(false);
+
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/auth");
-    }
+    if (!authLoading && !user) navigate("/auth");
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
       fetchDbProjects();
-      setNewEmail(user.email ?? "");
     }
   }, [user]);
 
@@ -62,26 +77,34 @@ const Profile = () => {
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
-
     if (data) setProfile(data as Profile);
     setLoadingProfile(false);
   };
 
   const fetchDbProjects = async () => {
     if (!user) return;
-    const { data } = await supabase
+    // Get projects where user is owner OR invited member
+    const { data: ownedProjects } = await supabase
       .from("projects")
-      .select("id, title, description, status")
+      .select("id, title, description, status, user_id, invited_members")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (data) setDbProjects(data);
+    const { data: memberProjects } = await supabase
+      .from("projects")
+      .select("id, title, description, status, user_id, invited_members")
+      .contains("invited_members", [user.id])
+      .order("created_at", { ascending: false });
+
+    // Merge and deduplicate
+    const all = [...(ownedProjects || []), ...(memberProjects || [])];
+    const unique = Array.from(new Map(all.map((p) => [p.id, p])).values());
+    setDbProjects(unique);
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-
     if (!file.type.startsWith("image/")) {
       toast({ title: "Invalid file", description: "Please upload an image file.", variant: "destructive" });
       return;
@@ -90,68 +113,21 @@ const Profile = () => {
       toast({ title: "File too large", description: "Max 5MB.", variant: "destructive" });
       return;
     }
-
     setUploadingAvatar(true);
     try {
       const ext = file.name.split(".").pop();
       const path = `${user.id}/avatar.${ext}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { upsert: true });
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
       if (uploadError) throw uploadError;
-
       const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
-
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: publicUrl })
-        .eq("user_id", user.id);
+      const { error: updateError } = await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
       if (updateError) throw updateError;
-
       setProfile((prev) => prev ? { ...prev, avatar_url: publicUrl } : prev);
       toast({ title: "Avatar updated!" });
     } catch (err: any) {
       toast({ title: "Upload failed", description: err.message, variant: "destructive" });
     } finally {
       setUploadingAvatar(false);
-    }
-  };
-
-  const handleUpdateEmail = async () => {
-    if (!newEmail) return;
-    setUpdating(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
-      if (error) throw error;
-      toast({ title: "Confirmation sent", description: "Check your new email to confirm the change." });
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleUpdatePassword = async () => {
-    if (newPassword.length < 6) {
-      toast({ title: "Password too short", description: "Minimum 6 characters.", variant: "destructive" });
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast({ title: "Passwords don't match", variant: "destructive" });
-      return;
-    }
-    setUpdating(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      toast({ title: "Password updated!" });
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setUpdating(false);
     }
   };
 
@@ -162,22 +138,114 @@ const Profile = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Match mock data by email or username
+  const handleDeleteProject = async () => {
+    if (!deleteTarget) return;
+    try {
+      const { error } = await supabase.from("projects").delete().eq("id", deleteTarget);
+      if (error) throw error;
+      setDbProjects((prev) => prev.filter((p) => p.id !== deleteTarget));
+      toast({ title: "Project deleted" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleLeaveProject = async () => {
+    if (!leaveTarget || !user) return;
+    try {
+      const project = dbProjects.find((p) => p.id === leaveTarget);
+      if (!project) return;
+      const updatedMembers = (project.invited_members || []).filter((m: string) => m !== user.id);
+      const { error } = await supabase
+        .from("projects")
+        .update({ invited_members: updatedMembers })
+        .eq("id", leaveTarget);
+      if (error) throw error;
+      setDbProjects((prev) => prev.filter((p) => p.id !== leaveTarget));
+      toast({ title: "Left project" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setLeaveTarget(null);
+    }
+  };
+
+  const openTransferDialog = async (projectId: string) => {
+    setTransferTarget(projectId);
+    setLoadingTransferMembers(true);
+    setSelectedNewOwner("");
+    try {
+      const project = dbProjects.find((p) => p.id === projectId);
+      const memberIds = (project?.invited_members || []).filter((m: string) => m !== user?.id);
+
+      if (memberIds.length === 0) {
+        setTransferMembers([]);
+        setLoadingTransferMembers(false);
+        return;
+      }
+
+      // Fetch profiles for these member IDs
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, username")
+        .in("user_id", memberIds);
+      setTransferMembers(profiles || []);
+    } catch {
+      setTransferMembers([]);
+    } finally {
+      setLoadingTransferMembers(false);
+    }
+  };
+
+  const handleTransferOwnership = async () => {
+    if (!transferTarget || !selectedNewOwner || !user) return;
+    try {
+      const project = dbProjects.find((p) => p.id === transferTarget);
+      if (!project) return;
+
+      // Remove new owner from invited_members, add current owner
+      const updatedMembers = [
+        ...(project.invited_members || []).filter((m: string) => m !== selectedNewOwner),
+        user.id,
+      ];
+
+      const { error } = await supabase
+        .from("projects")
+        .update({
+          user_id: selectedNewOwner,
+          invited_members: updatedMembers,
+        })
+        .eq("id", transferTarget);
+      if (error) throw error;
+
+      // Update local state
+      setDbProjects((prev) =>
+        prev.map((p) =>
+          p.id === transferTarget
+            ? { ...p, user_id: selectedNewOwner, invited_members: updatedMembers }
+            : p
+        )
+      );
+      toast({ title: "Ownership transferred" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setTransferTarget(null);
+      setSelectedNewOwner("");
+    }
+  };
+
+  // Match mock data
   const matchedMember = communityMembers.find(
     (m) => profile?.username && m.id === profile.username
   );
-
   const mockProjects = matchedMember
     ? communityProjects.filter(
         (p) => p.authorId === matchedMember.id || p.collaboratorIds?.includes(matchedMember.id)
       )
     : [];
-
-  // Combine mock + real database projects
-  const allProjects = [
-    ...dbProjects.map((p) => ({ id: p.id, title: p.title, description: p.description, status: p.status, isDb: true })),
-    ...mockProjects.map((p) => ({ id: p.id, title: p.title, description: p.description, status: p.status, isDb: false })),
-  ];
 
   const userOrgs = matchedMember
     ? partners.filter((o) => matchedMember.organisations.includes(o.id))
@@ -223,13 +291,7 @@ const Profile = () => {
                     >
                       <Camera className="h-5 w-5 text-white" />
                     </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarUpload}
-                    />
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h2 className="text-xl font-semibold truncate">
@@ -250,10 +312,15 @@ const Profile = () => {
                       </a>
                     )}
                   </div>
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex flex-col gap-2 shrink-0">
                     <Button size="sm" variant="outline" className="rounded-full" asChild>
                       <Link to={`/community/${user?.id}`}>
                         <Eye className="h-3.5 w-3.5 mr-1.5" /> View Public Profile
+                      </Link>
+                    </Button>
+                    <Button size="sm" variant="ghost" className="rounded-full" asChild>
+                      <Link to="/account-settings">
+                        <Settings className="h-3.5 w-3.5 mr-1.5" /> Account Settings
                       </Link>
                     </Button>
                   </div>
@@ -269,67 +336,11 @@ const Profile = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-muted px-3 py-2 rounded text-xs font-mono truncate">
-                    {user?.id}
-                  </code>
+                  <code className="flex-1 bg-muted px-3 py-2 rounded text-xs font-mono truncate">{user?.id}</code>
                   <Button size="icon" variant="outline" onClick={copyUserId} className="shrink-0">
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Email */}
-            <Card className="mb-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Email Address</CardTitle>
-                <CardDescription>Update your email — a confirmation will be sent</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button onClick={handleUpdateEmail} disabled={updating || newEmail === user?.email}>
-                    Update
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Password */}
-            <Card className="mb-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">Change Password</CardTitle>
-                <CardDescription>Set a new password (min 6 characters)</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label htmlFor="new-password" className="text-xs">New Password</Label>
-                  <Input
-                    id="new-password"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="confirm-password" className="text-xs">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                  />
-                </div>
-                <Button onClick={handleUpdatePassword} disabled={updating || !newPassword}>
-                  Change Password
-                </Button>
               </CardContent>
             </Card>
 
@@ -345,9 +356,74 @@ const Profile = () => {
                   </Link>
                 </Button>
               </div>
-              {allProjects.length > 0 ? (
+              {dbProjects.length > 0 || mockProjects.length > 0 ? (
                 <div className="space-y-3">
-                  {allProjects.map((p) => (
+                  {dbProjects.map((p) => {
+                    const isOwner = p.user_id === user?.id;
+                    return (
+                      <Card key={p.id} className="hover:border-primary/30 transition-colors">
+                        <CardContent className="py-4 flex items-center justify-between gap-3">
+                          <Link to={`/projects/${p.id}`} className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <p className="font-medium truncate">{p.title}</p>
+                              {isOwner && (
+                                <Badge variant="secondary" className="text-[10px] gap-1 shrink-0">
+                                  <Crown className="h-3 w-3" /> Owner
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground line-clamp-1">{p.description}</p>
+                          </Link>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Badge variant="secondary">{p.status}</Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-popover border border-border shadow-md z-50">
+                                <DropdownMenuItem asChild>
+                                  <Link to={`/projects/${p.id}`} className="cursor-pointer">
+                                    <ExternalLink className="h-4 w-4 mr-2" /> View Project
+                                  </Link>
+                                </DropdownMenuItem>
+                                {isOwner && (
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      onClick={() => openTransferDialog(p.id)}
+                                      className="cursor-pointer"
+                                    >
+                                      <UserCog className="h-4 w-4 mr-2" /> Transfer Ownership
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => setDeleteTarget(p.id)}
+                                      className="cursor-pointer text-destructive focus:text-destructive"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" /> Delete Project
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                                {!isOwner && (
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      onClick={() => setLeaveTarget(p.id)}
+                                      className="cursor-pointer text-destructive focus:text-destructive"
+                                    >
+                                      <LogOut className="h-4 w-4 mr-2" /> Leave Project
+                                    </DropdownMenuItem>
+                                  </>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                  {mockProjects.map((p) => (
                     <Link key={p.id} to={`/projects/${p.id}`}>
                       <Card className="hover:border-primary/30 transition-colors cursor-pointer">
                         <CardContent className="py-4 flex items-center justify-between">
@@ -407,11 +483,9 @@ const Profile = () => {
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Browse organisations..." />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-popover border border-border shadow-md z-50">
                           {partners.map((org) => (
-                            <SelectItem key={org.id} value={org.id}>
-                              {org.name}
-                            </SelectItem>
+                            <SelectItem key={org.id} value={org.id}>{org.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -423,6 +497,80 @@ const Profile = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the project and all its content. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Leave Confirmation */}
+      <AlertDialog open={!!leaveTarget} onOpenChange={(open) => !open && setLeaveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave project?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will be removed from this project. You can request to rejoin later.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLeaveProject}>
+              Leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Transfer Ownership Dialog */}
+      <Dialog open={!!transferTarget} onOpenChange={(open) => !open && setTransferTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Transfer Ownership</DialogTitle>
+            <DialogDescription>
+              Select a project member to become the new owner. You will become a regular member.
+            </DialogDescription>
+          </DialogHeader>
+          {loadingTransferMembers ? (
+            <p className="text-sm text-muted-foreground py-4">Loading members...</p>
+          ) : transferMembers.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4">
+              No other members in this project. Invite someone first before transferring ownership.
+            </p>
+          ) : (
+            <Select value={selectedNewOwner} onValueChange={setSelectedNewOwner}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select new owner..." />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border border-border shadow-md z-50">
+                {transferMembers.map((m) => (
+                  <SelectItem key={m.user_id} value={m.user_id}>
+                    {m.full_name || m.username || m.user_id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTransferTarget(null)}>Cancel</Button>
+            <Button onClick={handleTransferOwnership} disabled={!selectedNewOwner}>
+              Transfer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
