@@ -59,6 +59,7 @@ export type Database = {
           blurb: string | null
           created_at: string
           full_name: string | null
+          hide_location: boolean | null
           id: string
           location: string | null
           orcid: string | null
@@ -72,6 +73,7 @@ export type Database = {
           blurb?: string | null
           created_at?: string
           full_name?: string | null
+          hide_location?: boolean | null
           id?: string
           location?: string | null
           orcid?: string | null
@@ -85,6 +87,7 @@ export type Database = {
           blurb?: string | null
           created_at?: string
           full_name?: string | null
+          hide_location?: boolean | null
           id?: string
           location?: string | null
           orcid?: string | null
