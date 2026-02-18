@@ -7,8 +7,11 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Base URL for raw file access from the GitLab repo
-const GITLAB_RAW_BASE = "https://git.soton.ac.uk/soclabs/nanosoc-accelerator-project/-/raw/main/docs/build/qthelp";
+// GitLab API base for fetching raw files (uses project API with token auth)
+const GITLAB_HOST = "https://git.soton.ac.uk";
+const GITLAB_PROJECT_PATH = "soclabs/nanosoc-accelerator-project";
+const GITLAB_FILE_DIR = "docs/build/qthelp";
+const GITLAB_REF = "main";
 
 // Documentation sections to sync for each design
 const DESIGN_DOCS: Record<string, { sectionId: string; title: string; filename: string; sortOrder: number }[]> = {
@@ -31,6 +34,12 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function buildGitlabApiUrl(filename: string): string {
+  const encodedProject = encodeURIComponent(GITLAB_PROJECT_PATH);
+  const encodedPath = encodeURIComponent(`${GITLAB_FILE_DIR}/${filename}`);
+  return `${GITLAB_HOST}/api/v4/projects/${encodedProject}/repository/files/${encodedPath}/raw?ref=${GITLAB_REF}`;
+}
+
 async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const gitlabToken = Deno.env.get("GITLAB_ACCESS_TOKEN");
@@ -47,7 +56,8 @@ async function fetchWithRetry(url: string, retries = 3): Promise<Response> {
       await delay(waitMs);
       continue;
     }
-    await resp.text();
+    const body = await resp.text();
+    console.error(`Fetch failed (${resp.status}): ${body.substring(0, 200)}`);
     throw new Error(`Failed to fetch ${url}: ${resp.status}`);
   }
   throw new Error(`Failed to fetch ${url} after ${retries} retries`);
@@ -148,8 +158,9 @@ Deno.serve(async (req) => {
 
     for (const section of sections) {
       try {
-        const rawUrl = `${GITLAB_RAW_BASE}/${section.filename}`;
-        console.log(`Fetching ${rawUrl}...`);
+        const rawUrl = buildGitlabApiUrl(section.filename);
+        const displayUrl = `${GITLAB_HOST}/${GITLAB_PROJECT_PATH}/-/blob/${GITLAB_REF}/${GITLAB_FILE_DIR}/${section.filename}`;
+        console.log(`Fetching ${section.filename} via API...`);
         if (results.length > 0) await delay(500);
         const content = await convertHtmlToMarkdown(rawUrl);
 
@@ -160,7 +171,7 @@ Deno.serve(async (req) => {
             title: section.title,
             content,
             sort_order: section.sortOrder,
-            source_url: rawUrl,
+            source_url: displayUrl,
             last_synced_at: new Date().toISOString(),
           },
           { onConflict: "design_id,section_id" },
