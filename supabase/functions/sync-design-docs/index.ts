@@ -9,7 +9,7 @@ const corsHeaders = {
 
 // GitLab API base for fetching raw files (uses project API with token auth)
 const GITLAB_HOST = "https://git.soton.ac.uk";
-const GITLAB_PROJECT_PATH = "soclabs/nanosoc-accelerator-project";
+const GITLAB_PROJECT_PATH = "soclabs/accelerator-project";
 const GITLAB_FILE_DIR = "docs/build/qthelp";
 const GITLAB_REF = "main";
 
