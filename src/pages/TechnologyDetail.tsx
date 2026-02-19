@@ -3,7 +3,7 @@ import { useUserInterests } from "@/hooks/useUserInterests";
 import CommentsThreads from "@/components/CommentsThreads";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, ExternalLink, ArrowRight, Users, FolderOpen, Check, Tag, Github, Plus } from "lucide-react";
+import { ArrowLeft, ExternalLink, ArrowRight, Users, FolderOpen, Check, Tag, Github, Plus, BookOpen } from "lucide-react";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { Card, CardContent } from "@/components/ui/card";
@@ -60,38 +60,6 @@ const subcategoryBgColors: Record<string, string> = {
   "Silicon Validation": "bg-sky-500/10",
   "FPGA Boards": "bg-primary/10",
   "Shuttle Services": "bg-coral/10",
-};
-
-const RegisterInterestBox = ({ slug, name, accentColor }: { slug: string; name: string; accentColor: string }) => {
-  const { isRegistered, toggleInterest } = useUserInterests();
-  const registered = isRegistered(slug);
-
-  return (
-    <button
-      onClick={() => toggleInterest(slug)}
-      className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-300 shrink-0",
-        registered
-          ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-          : "border-border/60 bg-card hover:border-primary/40"
-      )}
-      title={registered ? "Interest registered" : `Register interest in ${name}`}
-    >
-      <div
-        className={cn(
-          "w-8 h-8 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all duration-200",
-          registered
-            ? "border-primary bg-primary text-primary-foreground"
-            : "border-border"
-        )}
-      >
-        {registered ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4 text-muted-foreground" />}
-      </div>
-      <span className="text-sm font-display font-semibold whitespace-nowrap">
-        {registered ? "Interested" : "Register Interest"}
-      </span>
-    </button>
-  );
 };
 
 const TechnologyDetail = () => {
@@ -160,225 +128,282 @@ const TechnologyDetail = () => {
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
 
-          {/* Header with Register Interest */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl mx-auto mb-12"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Badge variant="outline" className={cn(accentColor)}>{(tech as any).group}</Badge>
-              <Badge variant="outline" className={cn("border-l-2", borderColor, accentColor)}>{tech.category}</Badge>
-            </div>
-            <div className="flex items-start justify-between gap-6 mb-4">
-              <h1 className="text-4xl md:text-5xl font-display font-bold">{tech.name}</h1>
-              <RegisterInterestBox slug={linkedSlugs[0] || tech.name} name={tech.name} accentColor={accentColor} />
-            </div>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              {tech.longDescription || tech.description}
-            </p>
-          </motion.div>
-
-          <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 mb-16">
-            {/* Features */}
-            <ScrollReveal className="md:col-span-2">
-              <div className={cn("rounded-2xl border-2 bg-card p-7", borderColor)}>
-                <h2 className={cn("text-lg font-display font-bold mb-4", accentColor)}>Key Features</h2>
-                <ul className="space-y-2">
-                  {tech.features?.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                      <ArrowRight className={cn("h-3 w-3 mt-1.5 shrink-0", accentColor)} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </ScrollReveal>
-
-            {/* Links */}
-            <ScrollReveal delay={0.1}>
-              <div className={cn("rounded-2xl border-2 bg-card p-7", borderColor)}>
-                <h2 className={cn("text-lg font-display font-bold mb-4", accentColor)}>Resources</h2>
-                <div className="space-y-3">
-                  {tech.links?.map((link, i) => (
-                    <a
-                      key={i}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn("flex items-center gap-2 text-sm hover:opacity-80 transition-colors", accentColor)}
-                    >
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-
-          {/* Reference SoCs */}
-          <ScrollReveal className="max-w-4xl mx-auto mb-16">
-            <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
-              <h2 className="text-2xl font-display font-bold mb-6">
-                Reference SoCs using <span className={accentColor}>{tech.name}</span>
-              </h2>
-              {relatedDesigns.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {relatedDesigns.map((design) => (
-                    <Link key={design.id} to={`/designs/${design.id}`}>
-                      <Card className={cn("hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full border-2", borderColor)}>
-                        <CardContent className="p-6">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-display font-bold">{design.name}</h3>
-                            {design.provenIn?.map((p, i) => (
-                              <Badge key={i} variant="outline" className="text-[10px]">
-                                {p.type}
-                              </Badge>
-                            ))}
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">{design.tagline}</p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No reference SoCs currently use this technology.</p>
-              )}
-            </div>
-          </ScrollReveal>
-
-          {/* Community Projects */}
-          <ScrollReveal className="max-w-4xl mx-auto mb-16">
-            <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
-              <div className="flex items-center gap-2 mb-6">
-                <FolderOpen className={cn("h-5 w-5", accentColor)} />
-                <h2 className="text-2xl font-display font-bold">
-                  Projects using <span className={accentColor}>{tech.name}</span>
-                </h2>
-                <span className="text-sm text-muted-foreground ml-1">({matchedProjects.length})</span>
-              </div>
-              {matchedProjects.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {matchedProjects.map((project) => (
-                    <Link key={project.id} to={`/projects/${project.id}`}>
-                      <Card className={cn("hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full border-2", borderColor)}>
-                        <CardContent className="p-6">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge
-                              variant="outline"
-                              className={
-                                project.status === "Completed"
-                                  ? "border-green-500/30 text-green-400"
-                                  : project.status === "In Progress"
-                                  ? "border-primary/30 text-primary"
-                                  : "border-border text-muted-foreground"
-                              }
-                            >
-                              {project.status}
-                            </Badge>
-                            {project.referenceSoc && (
-                              <Badge variant="outline" className={cn("text-[10px]", accentColor, borderColor)}>
-                                {project.referenceSoc}
-                              </Badge>
-                            )}
-                          </div>
-                          <h3 className="font-display font-semibold mb-1">{project.title}</h3>
-                          <p className="text-xs text-muted-foreground mb-2">{project.author} · {project.institution}</p>
-                          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{project.description}</p>
-                        </CardContent>
-                      </Card>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-                  <FolderOpen className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">No community projects currently use this technology.</p>
-                  <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
-                    <Link to="/projects">Browse all projects</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
-          </ScrollReveal>
-
-          {/* Interested People — moved to bottom */}
-          <div className="max-w-4xl mx-auto">
-            <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
+          <div className="flex gap-6 items-start max-w-5xl mx-auto">
+            {/* Main column */}
+            <div className="flex-1 min-w-0">
+              {/* Header */}
               <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                className="flex items-center gap-2 mb-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-12"
               >
-                <Users className={cn("h-5 w-5", accentColor)} />
-                <h2 className="text-2xl font-display font-bold">People Interested</h2>
-                <span className="text-sm text-muted-foreground ml-1">({interestedMembers.length})</span>
+                <div className="flex items-center gap-2 mb-4">
+                  <Badge variant="outline" className={cn(accentColor)}>{(tech as any).group}</Badge>
+                  <Badge variant="outline" className={cn("border-l-2", borderColor, accentColor)}>{tech.category}</Badge>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">{tech.name}</h1>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {tech.longDescription || tech.description}
+                </p>
               </motion.div>
 
-              {interestedMembers.length > 0 ? (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {interestedMembers.map((member, i) => (
-                    <motion.div
-                      key={member.id}
-                      initial={{ opacity: 0, y: 15 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <Card className={cn("h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-2", borderColor)}>
-                        <CardContent className="p-5">
-                          <Link to={`/community/${member.id}`} className="group">
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", bgColor)}>
-                                <span className={cn("font-display font-bold text-sm", accentColor)}>
-                                  {member.name.split(" ").map((n) => n[0]).join("")}
-                                </span>
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-display font-bold text-sm truncate group-hover:text-primary transition-colors">{member.name}</h3>
-                                <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
-                              </div>
-                            </div>
-                            <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
-                            <div className="flex flex-wrap gap-1 mb-3">
-                              {member.expertise.map((e) => (
-                                <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
-                                  {e}
-                                </span>
-                              ))}
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {member.projects.map((p) => (
-                                <span key={p} className={cn("text-xs px-2 py-0.5 rounded-full font-medium", bgColor, accentColor)}>
-                                  {p}
-                                </span>
-                              ))}
-                            </div>
+              <div className="space-y-12">
+                {/* Features */}
+                <ScrollReveal>
+                  <div className={cn("rounded-2xl border-2 bg-card p-7", borderColor)}>
+                    <h2 className={cn("text-lg font-display font-bold mb-4", accentColor)}>Key Features</h2>
+                    <ul className="space-y-2">
+                      {tech.features?.map((f, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <ArrowRight className={cn("h-3 w-3 mt-1.5 shrink-0", accentColor)} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </ScrollReveal>
+
+                {/* Reference SoCs */}
+                <ScrollReveal>
+                  <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
+                    <h2 className="text-2xl font-display font-bold mb-6">
+                      Reference SoCs using <span className={accentColor}>{tech.name}</span>
+                    </h2>
+                    {relatedDesigns.length > 0 ? (
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {relatedDesigns.map((design) => (
+                          <Link key={design.id} to={`/designs/${design.id}`}>
+                            <Card className={cn("hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full border-2", borderColor)}>
+                              <CardContent className="p-6">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h3 className="font-display font-bold">{design.name}</h3>
+                                  {design.provenIn?.map((p, i) => (
+                                    <Badge key={i} variant="outline" className="text-[10px]">
+                                      {p.type}
+                                    </Badge>
+                                  ))}
+                                </div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{design.tagline}</p>
+                              </CardContent>
+                            </Card>
                           </Link>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">No reference SoCs currently use this technology.</p>
+                    )}
+                  </div>
+                </ScrollReveal>
+
+                {/* Community Projects */}
+                <ScrollReveal>
+                  <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
+                    <div className="flex items-center gap-2 mb-6">
+                      <FolderOpen className={cn("h-5 w-5", accentColor)} />
+                      <h2 className="text-2xl font-display font-bold">
+                        Projects using <span className={accentColor}>{tech.name}</span>
+                      </h2>
+                      <span className="text-sm text-muted-foreground ml-1">({matchedProjects.length})</span>
+                    </div>
+                    {matchedProjects.length > 0 ? (
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {matchedProjects.map((project) => (
+                          <Link key={project.id} to={`/projects/${project.id}`}>
+                            <Card className={cn("hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-full border-2", borderColor)}>
+                              <CardContent className="p-6">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge
+                                    variant="outline"
+                                    className={
+                                      project.status === "Completed"
+                                        ? "border-green-500/30 text-green-400"
+                                        : project.status === "In Progress"
+                                        ? "border-primary/30 text-primary"
+                                        : "border-border text-muted-foreground"
+                                    }
+                                  >
+                                    {project.status}
+                                  </Badge>
+                                  {project.referenceSoc && (
+                                    <Badge variant="outline" className={cn("text-[10px]", accentColor, borderColor)}>
+                                      {project.referenceSoc}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <h3 className="font-display font-semibold mb-1">{project.title}</h3>
+                                <p className="text-xs text-muted-foreground mb-2">{project.author} · {project.institution}</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{project.description}</p>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                        <FolderOpen className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                        <p className="text-muted-foreground text-sm">No community projects currently use this technology.</p>
+                        <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
+                          <Link to="/projects">Browse all projects</Link>
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </ScrollReveal>
+
+                {/* Interested People */}
+                <div className={cn("rounded-2xl border-2 bg-card/50 p-7", borderColor)}>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    className="flex items-center gap-2 mb-6"
+                  >
+                    <Users className={cn("h-5 w-5", accentColor)} />
+                    <h2 className="text-2xl font-display font-bold">People Interested</h2>
+                    <span className="text-sm text-muted-foreground ml-1">({interestedMembers.length})</span>
+                  </motion.div>
+
+                  {interestedMembers.length > 0 ? (
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      {interestedMembers.map((member, i) => (
+                        <motion.div
+                          key={member.id}
+                          initial={{ opacity: 0, y: 15 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: i * 0.05 }}
+                        >
+                          <Card className={cn("h-full hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border-2", borderColor)}>
+                            <CardContent className="p-5">
+                              <Link to={`/community/${member.id}`} className="group">
+                                <div className="flex items-center gap-3 mb-3">
+                                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", bgColor)}>
+                                    <span className={cn("font-display font-bold text-sm", accentColor)}>
+                                      {member.name.split(" ").map((n) => n[0]).join("")}
+                                    </span>
+                                  </div>
+                                  <div className="min-w-0">
+                                    <h3 className="font-display font-bold text-sm truncate group-hover:text-primary transition-colors">{member.name}</h3>
+                                    <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
+                                <div className="flex flex-wrap gap-1 mb-3">
+                                  {member.expertise.map((e) => (
+                                    <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
+                                      {e}
+                                    </span>
+                                  ))}
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                  {member.projects.map((p) => (
+                                    <span key={p} className={cn("text-xs px-2 py-0.5 rounded-full font-medium", bgColor, accentColor)}>
+                                      {p}
+                                    </span>
+                                  ))}
+                                </div>
+                              </Link>
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+                      <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
+                      <p className="text-muted-foreground text-sm">No community members have registered interest in this technology yet.</p>
+                      <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
+                        <Link to="/about#join">Be the first to join</Link>
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-                  <Users className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="text-muted-foreground text-sm">No community members have registered interest in this technology yet.</p>
-                  <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
-                    <Link to="/about#join">Be the first to join</Link>
-                  </Button>
-                </div>
-              )}
+
+                <CommentsThreads pageId={`technology-${tech.id}`} />
+              </div>
             </div>
 
-            <CommentsThreads pageId={`technology-${tech.id}`} />
+            {/* Sticky sidebar */}
+            <SidebarPanel
+              tech={tech}
+              linkedSlug={linkedSlugs[0] || tech.name}
+              accentColor={accentColor}
+              borderColor={borderColor}
+            />
           </div>
         </div>
       </section>
     </Layout>
+  );
+};
+
+/* ── Sidebar component ── */
+const SidebarPanel = ({ tech, linkedSlug, accentColor, borderColor }: {
+  tech: (typeof technologies)[number];
+  linkedSlug: string;
+  accentColor: string;
+  borderColor: string;
+}) => {
+  const { isRegistered, toggleInterest } = useUserInterests();
+  const registered = isRegistered(linkedSlug);
+
+  return (
+    <aside className="hidden lg:block w-56 shrink-0 sticky top-24 space-y-3">
+      {/* Register Interest */}
+      <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+        <button
+          onClick={() => toggleInterest(linkedSlug)}
+          className={cn(
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-display font-semibold transition-all duration-200",
+            registered
+              ? "bg-primary text-primary-foreground"
+              : "bg-secondary text-secondary-foreground hover:bg-primary/10"
+          )}
+        >
+          {registered ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {registered ? "Interested" : "Register Interest"}
+        </button>
+      </div>
+
+      {/* Resources */}
+      {tech.links && tech.links.length > 0 && (
+        <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+          <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h3>
+          <div className="space-y-1.5">
+            {tech.links.map((link, i) => (
+              <a
+                key={i}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-accent/40",
+                  accentColor
+                )}
+              >
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{link.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Quick links */}
+      <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+        <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-3">Explore</h3>
+        <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+          <Link to="/technologies">
+            <ArrowRight className="h-4 w-4 mr-2" /> All Technologies
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" className="w-full rounded-lg justify-start text-primary" size="sm">
+          <Link to="/projects/start">
+            <ArrowRight className="h-4 w-4 mr-2" /> Start a Project
+          </Link>
+        </Button>
+      </div>
+    </aside>
   );
 };
 
