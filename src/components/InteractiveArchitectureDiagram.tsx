@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowUpDown, ExternalLink as ExternalLinkIcon, X, Info } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowUpDown, ExternalLink as ExternalLinkIcon, X, Info, ArrowRight, Microchip, Settings2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Block {
@@ -8,6 +11,9 @@ interface Block {
   type: string;
   external?: boolean;
   info?: string;
+  techId?: string;
+  gateCount?: string;
+  configOptions?: string[];
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -237,6 +243,45 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
                     {selectedBlock.info}
                   </p>
+                )}
+
+                {/* Gate count & config options */}
+                <div className="mt-4 flex flex-wrap gap-4">
+                  {selectedBlock.gateCount && (
+                    <div className="flex items-center gap-2">
+                      <Microchip className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Gate count:</span>
+                      <Badge variant="secondary" className="text-xs font-mono">{selectedBlock.gateCount}</Badge>
+                    </div>
+                  )}
+                </div>
+
+                {selectedBlock.configOptions && selectedBlock.configOptions.length > 0 && (
+                  <div className="mt-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Settings2 className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-xs font-semibold text-muted-foreground">Configuration Options</span>
+                    </div>
+                    <div className="space-y-1">
+                      {selectedBlock.configOptions.map((opt, i) => (
+                        <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                          <span className="mt-0.5 shrink-0 w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                          <span>{opt}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Learn More link */}
+                {selectedBlock.techId && (
+                  <div className="mt-4 pt-3 border-t border-border/30">
+                    <Button asChild variant="outline" size="sm" className="rounded-full">
+                      <Link to={`/technologies/${selectedBlock.techId}`}>
+                        Learn More <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                      </Link>
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
