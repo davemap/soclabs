@@ -139,8 +139,10 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
   return (
     <div className="rounded-2xl border border-border/60 bg-white dark:bg-card p-5 md:p-8">
-      {/* Legend */}
-      <p className="text-sm text-muted-foreground mb-6 pb-4 border-b border-border/30">Click on any component to learn more about the technology.</p>
+      {/* Interactivity hint */}
+      <p className="text-sm text-muted-foreground mb-6 pb-4 border-b border-border/30">
+        Expand the CPU Subsystem and Peripherals groups to explore their internal architecture. Click on any individual block or bus to view detailed technical information, gate counts, and links to related learning resources.
+      </p>
 
       {/* Block diagram */}
       <div className="max-w-[750px] mx-auto py-4 relative" ref={diagramRef}>
