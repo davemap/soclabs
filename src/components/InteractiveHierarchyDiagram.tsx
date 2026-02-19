@@ -65,12 +65,12 @@ const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode;
   return (
     <button
       onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
-      className={`rounded-lg border-2 ${s.border} ${s.bg} p-3 md:p-4 text-left transition-all duration-150 hover:shadow-md hover:scale-[1.02] w-full aspect-square flex flex-col items-center justify-center gap-1.5 ${
+      className={`rounded-lg border-2 ${s.border} ${s.bg} p-3 md:p-4 text-left transition-all duration-150 hover:shadow-md hover:scale-[1.02] w-full h-full flex flex-col items-center justify-center gap-1.5 ${
         node.userDesigned ? "!border-dashed !border-rose-400" : ""
       } ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : ""}`}
     >
       <NodeIcon className={`h-5 w-5 ${s.label} shrink-0`} />
-      <span className={`text-[10px] md:text-xs font-semibold ${s.label} text-center leading-tight`}>{node.name}</span>
+      <span className={`text-[10px] md:text-xs font-semibold ${s.label} text-center leading-tight line-clamp-2`}>{node.name}</span>
       {node.userDesigned && (
         <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
       )}
@@ -189,7 +189,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       </div>
 
       {/* Children grid - paginated */}
-      <div className="flex-1 min-h-0 mt-4">
+      <div className="flex-1 min-h-0 mt-4" style={{ minHeight: "120px" }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
