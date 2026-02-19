@@ -20,7 +20,14 @@ const DesignDetail = () => {
   const design = referenceDesigns.find((d) => d.id === id);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
-  const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">("architecture");
+  const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
+    const saved = sessionStorage.getItem(`diagram-view-${id}`);
+    return saved === "hierarchy" ? "hierarchy" : "architecture";
+  });
+
+  useEffect(() => {
+    if (id) sessionStorage.setItem(`diagram-view-${id}`, diagramView);
+  }, [diagramView, id]);
 
   useEffect(() => {
     if (!design) return;
