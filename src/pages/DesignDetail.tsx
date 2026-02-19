@@ -161,7 +161,7 @@ const DesignDetail = () => {
               {/* Interactive Architecture Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-2xl font-display font-bold mb-4">System Architecture</h2>
-                <p className="text-muted-foreground text-sm mb-6">Click on any component to learn more about the technology.</p>
+                <p className="text-muted-foreground text-sm mb-6">Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources.</p>
                 <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
               </motion.div>
 
