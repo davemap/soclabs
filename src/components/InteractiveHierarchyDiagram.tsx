@@ -129,7 +129,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 /* ── Zoomed-in view ── */
 const ITEMS_PER_PAGE = 2;
 
-const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode, onSelect }: {
+const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode, onSelect, designName }: {
   node: HierarchyNode;
   depth: number;
   onZoom: (node: HierarchyNode) => void;
@@ -137,11 +137,22 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
   onNavigate: (index: number) => void;
   selectedNode: HierarchyNode | null;
   onSelect: (node: HierarchyNode, depth: number) => void;
+  designName: string;
 }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
   const children = node.children || [];
   const totalPages = Math.ceil(children.length / ITEMS_PER_PAGE);
-  const [page, setPage] = useState(0);
+
+  const pageKey = `hierarchy-page-${designName}-${node.name}`;
+  const [page, setPage] = useState(() => {
+    const saved = sessionStorage.getItem(pageKey);
+    const p = saved ? parseInt(saved, 10) : 0;
+    return p >= 0 && p < totalPages ? p : 0;
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem(pageKey, String(page));
+  }, [page, pageKey]);
 
   const visibleChildren = useMemo(
     () => children.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE),
@@ -450,8 +461,46 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
   }, [hierarchy, designName]);
 
   const [navStack, setNavStack] = useState<HierarchyNode[]>(restoreNavStack);
-  const [selectedNode, setSelectedNode] = useState<HierarchyNode | null>(null);
-  const [selectedDepth, setSelectedDepth] = useState(0);
+
+  // Restore selected node from sessionStorage
+  const restoreSelected = useCallback((): { node: HierarchyNode | null; depth: number } => {
+    try {
+      const key = `hierarchy-selected-${designName}`;
+      const saved = sessionStorage.getItem(key);
+      if (!saved) return { node: null, depth: 0 };
+      const { name, depth } = JSON.parse(saved) as { name: string; depth: number };
+
+      // Search the full hierarchy tree for the node by name
+      const findNode = (nodes: HierarchyNode[]): HierarchyNode | null => {
+        for (const n of nodes) {
+          if (n.name === name) return n;
+          if (n.children) {
+            const found = findNode(n.children);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      const found = findNode(hierarchy);
+      return found ? { node: found, depth } : { node: null, depth: 0 };
+    } catch {
+      return { node: null, depth: 0 };
+    }
+  }, [hierarchy, designName]);
+
+  const restored = restoreSelected();
+  const [selectedNode, setSelectedNode] = useState<HierarchyNode | null>(restored.node);
+  const [selectedDepth, setSelectedDepth] = useState(restored.depth);
+
+  // Persist selected node to sessionStorage
+  useEffect(() => {
+    const key = `hierarchy-selected-${designName}`;
+    if (selectedNode) {
+      sessionStorage.setItem(key, JSON.stringify({ name: selectedNode.name, depth: selectedDepth }));
+    } else {
+      sessionStorage.removeItem(key);
+    }
+  }, [selectedNode, selectedDepth, designName]);
 
   // Persist navStack names to sessionStorage whenever it changes
   useEffect(() => {
@@ -492,6 +541,7 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
         <div>
           <AnimatePresence mode="wait">
             <ZoomedView
+              designName={designName}
               key={currentZoomed.name}
               node={currentZoomed}
               depth={currentDepth}
