@@ -107,18 +107,15 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
             <ZoomIn className="h-4 w-4 ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors" />
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {node.children?.slice(0, 6).map(child => {
+            {node.children?.map(child => {
               const cs = layerStyles[Math.min(depth + 1, layerStyles.length - 1)];
               const isGroup = child.children && child.children.length > 0;
               return (
-                <span key={child.name} className={`text-[10px] md:text-xs px-2 py-1 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium ${isGroup ? "font-bold" : ""}`}>
+                <span key={child.name} className={`text-[10px] md:text-xs px-2 py-1 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium truncate max-w-[120px] ${isGroup ? "font-bold" : ""}`}>
                   {child.name}
                 </span>
               );
             })}
-            {(node.children?.length || 0) > 6 && (
-              <span className="text-[10px] md:text-xs px-2 py-1 text-muted-foreground">+{(node.children?.length || 0) - 6} more</span>
-            )}
           </div>
         </div>
       </button>
@@ -127,7 +124,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 };
 
 /* ── Zoomed-in view ── */
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 6;
 
 const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode, onSelect }: {
   node: HierarchyNode;
@@ -202,8 +199,8 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
             transition={{ duration: 0.15 }}
             className="grid gap-3 h-full"
             style={{
-              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 3)}, 1fr)`,
-              gridTemplateRows: "1fr",
+              gridTemplateColumns: `repeat(3, 1fr)`,
+              gridTemplateRows: `repeat(${Math.ceil(visibleChildren.length / 3)}, 1fr)`,
             }}
           >
             {visibleChildren.map(child => {
