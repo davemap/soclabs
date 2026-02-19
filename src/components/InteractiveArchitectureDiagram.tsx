@@ -40,6 +40,13 @@ const typeColors: Record<string, { bg: string; border: string; text: string }> =
 
 const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-foreground" };
 
+const apbBusBlock: Block = {
+  name: "APB Bus",
+  type: "interconnect",
+  info: "APB (Advanced Peripheral Bus) is the simplest AMBA protocol, designed for low-bandwidth peripherals. An AHB-to-APB bridge converts high-performance bus transactions into the simpler two-phase APB protocol (setup + access), reducing peripheral complexity and power consumption.",
+  techId: "apb",
+};
+
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
@@ -133,9 +140,8 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
           <span className="font-display font-bold text-sm tracking-wide">{busName}</span>
         </button>
 
-        {/* Slaves row */}
+        {/* Slaves row - fixed positions */}
         <div className="flex justify-center gap-4 mt-1 flex-wrap items-start">
-          {/* Non-peripheral slaves (e.g. SRAM) */}
           {nonPeripheralSlaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusArrow />
@@ -143,7 +149,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             </div>
           ))}
 
-          {/* Peripherals group */}
+          {/* Peripherals group - collapsed button only */}
           {peripherals.length > 0 && (
             <div className="flex flex-col items-center">
               <BusArrow />
@@ -163,48 +169,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   {peripherals.length} blocks {peripheralsExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                 </span>
               </button>
-
-              {/* Expanded peripherals with APB bus */}
-              <AnimatePresence>
-                {peripheralsExpanded && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-3">
-                      {/* APB Bus bar */}
-                      <Link
-                        to="/technologies/apb"
-                        className={`
-                          block w-full h-7 rounded-md border-2 mb-2 flex items-center justify-center
-                          bg-white dark:bg-card border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400
-                          hover:shadow-md transition-all duration-200 no-underline
-                        `}
-                      >
-                        <Layers className="h-3.5 w-3.5 mr-1.5" />
-                        <span className="font-display font-bold text-[11px] tracking-wide">APB Bus</span>
-                      </Link>
-                      <div className="flex flex-wrap gap-3 justify-center">
-                        {peripherals.map((b) => (
-                          <div key={b.name} className="flex flex-col items-center">
-                            <div className="flex flex-col items-center mb-1">
-                              <svg width="12" height="16" viewBox="0 0 12 16" className="text-amber-300 dark:text-amber-500/60">
-                                <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
-                                <polygon points="3,4 6,0 9,4" fill="currentColor" />
-                                <polygon points="3,12 6,16 9,12" fill="currentColor" />
-                              </svg>
-                            </div>
-                            <BlockNode block={b} className="w-24 h-16 px-1.5" />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           )}
 
@@ -232,6 +196,49 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             );
           })}
         </div>
+
+        {/* Expanded peripherals region - full width below the slaves row */}
+        <AnimatePresence>
+          {peripheralsExpanded && peripherals.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden mt-3"
+            >
+              <div className="rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-3">
+                {/* APB Bus bar */}
+                <button
+                  onClick={() => handleClick(apbBusBlock)}
+                  className={`
+                    w-full h-7 rounded-md border-2 mb-2 flex items-center justify-center
+                    bg-white dark:bg-card border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400
+                    ${selectedBlock?.name === "APB Bus" ? "ring-2 ring-current shadow-lg" : ""}
+                    hover:shadow-md transition-all duration-200
+                  `}
+                >
+                  <Layers className="h-3.5 w-3.5 mr-1.5" />
+                  <span className="font-display font-bold text-[11px] tracking-wide">APB Bus</span>
+                </button>
+                <div className="flex flex-wrap gap-3 justify-center">
+                  {peripherals.map((b) => (
+                    <div key={b.name} className="flex flex-col items-center">
+                      <div className="flex flex-col items-center mb-1">
+                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-amber-300 dark:text-amber-500/60">
+                          <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
+                          <polygon points="3,4 6,0 9,4" fill="currentColor" />
+                          <polygon points="3,12 6,16 9,12" fill="currentColor" />
+                        </svg>
+                      </div>
+                      <BlockNode block={b} className="w-24 h-16 px-1.5" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Info Panel */}
