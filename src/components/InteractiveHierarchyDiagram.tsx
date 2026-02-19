@@ -127,7 +127,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 };
 
 /* ── Zoomed-in view ── */
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 2;
 
 const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode, onSelect }: {
   node: HierarchyNode;
@@ -202,7 +202,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
             transition={{ duration: 0.15 }}
             className="grid gap-3 h-full"
             style={{
-              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 3)}, 1fr)`,
+              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 2)}, 1fr)`,
               gridTemplateRows: "1fr",
             }}
           >
