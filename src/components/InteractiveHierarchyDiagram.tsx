@@ -97,25 +97,28 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
           node.userDesigned ? "!border-dashed !border-rose-400" : ""
         } ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg" : ""}`}
       >
-        <div className="px-4 py-3 md:py-4">
+        <div className={`px-4 py-3 md:py-4 ${square ? "flex-1 flex flex-col min-h-0" : ""}`}>
           <div className="flex items-center gap-2">
             <Layers className={`h-4 w-4 ${s.label} shrink-0`} />
-            <span className={`font-display font-bold text-sm md:text-base ${s.label}`}>{node.name}</span>
+            <span className={`font-display font-bold text-sm md:text-base ${s.label} truncate`}>{node.name}</span>
             {node.userDesigned && (
-              <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
+              <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none shrink-0">USER IP</span>
             )}
-            <ZoomIn className="h-4 w-4 ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors" />
+            <ZoomIn className="h-4 w-4 ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors shrink-0" />
           </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {node.children?.map(child => {
+          <div className={`mt-2 flex flex-wrap gap-1 overflow-hidden ${square ? "flex-1" : "max-h-[60px]"}`}>
+            {node.children?.slice(0, 6).map(child => {
               const cs = layerStyles[Math.min(depth + 1, layerStyles.length - 1)];
               const isGroup = child.children && child.children.length > 0;
               return (
-                <span key={child.name} className={`text-[10px] md:text-xs px-2 py-1 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium truncate max-w-[120px] ${isGroup ? "font-bold" : ""}`}>
+                <span key={child.name} className={`text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium truncate max-w-[100px] ${isGroup ? "font-bold" : ""}`}>
                   {child.name}
                 </span>
               );
             })}
+            {(node.children?.length || 0) > 6 && (
+              <span className="text-[9px] md:text-[10px] px-1.5 py-0.5 text-muted-foreground">+{(node.children?.length || 0) - 6}</span>
+            )}
           </div>
         </div>
       </button>
@@ -152,7 +155,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
-      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
+      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] h-[320px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
       <div className="flex items-center gap-1 mb-4 flex-wrap">
@@ -189,7 +192,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       </div>
 
       {/* Children grid - paginated */}
-      <div className="flex-1 min-h-0 mt-4" style={{ minHeight: "120px" }}>
+      <div className="flex-1 min-h-0 mt-4 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
