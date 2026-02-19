@@ -49,33 +49,13 @@ const InfoPanel = ({ node, onClose }: { node: HierarchyNode; onClose: () => void
   </motion.div>
 );
 
-/* ── Single pad square ── */
-const PadSquare = ({ pad, horizontal = false }: { pad: HierarchyNode; horizontal?: boolean }) => {
-  const [info, setInfo] = useState(false);
-  return (
-    <div className="relative group flex items-center justify-center">
-      <button
-        onClick={e => { e.stopPropagation(); setInfo(v => !v); }}
-        className={`rounded-sm border-2 transition-all duration-150 hover:scale-110 hover:shadow-md ${
-          horizontal ? "w-6 h-4 md:w-7 md:h-5" : "w-4 h-6 md:w-5 md:h-7"
-        } ${
-          pad.userDesigned
-            ? "border-dashed border-rose-400 bg-rose-50 dark:bg-rose-900/30"
-            : "border-slate-400 dark:border-slate-500 bg-background hover:border-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/30"
-        }`}
-        title={pad.name}
-      />
-      <div className={`absolute z-40 px-2 py-1 rounded bg-foreground text-background text-[10px] font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${
-        horizontal ? "bottom-full mb-1 left-1/2 -translate-x-1/2" : "left-full ml-1.5 top-1/2 -translate-y-1/2"
-      }`}>
-        {pad.name}
-      </div>
-      <AnimatePresence>
-        {info && pad.description && <InfoPanel node={pad} onClose={() => setInfo(false)} />}
-      </AnimatePresence>
-    </div>
-  );
-};
+/* ── Simple static pad square (non-interactive, just visual) ── */
+const PadSquare = ({ pad }: { pad: HierarchyNode }) => (
+  <div
+    className="w-5 h-5 md:w-6 md:h-6 rounded-[2px] border border-slate-400 dark:border-slate-500 bg-background"
+    title={pad.name}
+  />
+);
 
 /* ── Leaf block ── */
 const LeafBlock = ({ node, depth }: { node: HierarchyNode; depth: number }) => {
@@ -293,7 +273,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
   const left = pads.slice(topCount + rightCount + bottomCount);
 
   return (
-    <div className="relative rounded-2xl border-[3px] border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-800/50 p-1 md:p-1.5">
+    <div className="relative rounded-2xl border-[3px] border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-800/50 p-1 md:p-1.5 aspect-square max-w-[600px] mx-auto">
       {/* Outer label */}
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600">
         <div className="flex items-center gap-1.5">
@@ -316,36 +296,38 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
       </AnimatePresence>
 
       {/* Grid layout: pad ring surrounding the chip */}
-      <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] gap-0 mt-2">
+      <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] h-full gap-0 mt-2">
         {/* Top-left corner */}
         <div />
         {/* Top pads */}
-        <div className="flex justify-around items-end px-2 pb-1.5">
-          {top.map(p => <PadSquare key={p.name} pad={p} horizontal />)}
+        <div className="flex justify-around items-end px-1 pb-1">
+          {top.map(p => <PadSquare key={p.name} pad={p} />)}
         </div>
         {/* Top-right corner */}
         <div />
 
         {/* Left pads */}
-        <div className="flex flex-col justify-around items-end py-2 pr-1.5">
+        <div className="flex flex-col justify-around items-end py-1 pr-1">
           {left.map(p => <PadSquare key={p.name} pad={p} />)}
         </div>
 
         {/* Center: the chip */}
-        <div className="p-2 md:p-3">
-          <GroupPreview node={chipNode} depth={1} onZoom={onZoomChip} />
+        <div className="p-1.5 md:p-2 flex items-center justify-center">
+          <div className="w-full h-full">
+            <GroupPreview node={chipNode} depth={1} onZoom={onZoomChip} />
+          </div>
         </div>
 
         {/* Right pads */}
-        <div className="flex flex-col justify-around items-start py-2 pl-1.5">
+        <div className="flex flex-col justify-around items-start py-1 pl-1">
           {right.map(p => <PadSquare key={p.name} pad={p} />)}
         </div>
 
         {/* Bottom-left corner */}
         <div />
         {/* Bottom pads */}
-        <div className="flex justify-around items-start px-2 pt-1.5">
-          {bottom.map(p => <PadSquare key={p.name} pad={p} horizontal />)}
+        <div className="flex justify-around items-start px-1 pt-1">
+          {bottom.map(p => <PadSquare key={p.name} pad={p} />)}
         </div>
         {/* Bottom-right corner */}
         <div />
