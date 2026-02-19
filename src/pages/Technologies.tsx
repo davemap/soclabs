@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare, Cable as CableIcon } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare, Cable as CableIcon, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
@@ -26,6 +26,7 @@ const subcategoryIconMap: Record<string, React.ElementType> = {
   Peripherals: Radio,
   "Memory Controllers": MemoryStick,
   "Hardware Acceleration": Gauge,
+  "DMA Controllers": ArrowLeftRight,
   "RTL Design": Code,
   Verification: CheckCircle,
   Synthesis: CircuitBoard,
@@ -77,6 +78,7 @@ const subcategoryColors: Record<string, string> = {
   Peripherals: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400",
   "Memory Controllers": "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   "Hardware Acceleration": "bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  "DMA Controllers": "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
   "RTL Design": "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400",
   Verification: "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400",
   Synthesis: "bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400",

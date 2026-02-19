@@ -36,7 +36,7 @@ export const referenceDesigns = [
         { name: "Boot ROM", type: "memory", techId: "memory-controllers", gateCount: "~0.3K", info: "A small read-only memory containing the initial boot sequence and vector table. Mapped at the reset vector address, it initialises the processor state and branches to the main application in instruction memory." }
       ] },
       { name: "AHB-Lite Bus", type: "interconnect", techId: "ahb-lite", gateCount: "~1.5K", info: "A single-master AHB-Lite interconnect with a simple address decoder routing transactions to peripheral slaves. Supports 32-bit data transfers with single-cycle slave access for tightly-coupled peripherals.", configOptions: ["AHB-Lite single-master (default)", "AHB5-Lite with TrustZone (optional)"] },
-      { name: "DMA Controller", type: "dma", techId: "amba-interconnect", gateCount: "~3K", info: "A lightweight 2-channel DMA controller enabling autonomous data transfers between peripherals and memory without CPU intervention. Supports byte, half-word, and word transfers with configurable priority levels.", configOptions: ["PL230 (default — 2 channels, basic)", "PL330 (optional — 8 channels, micro-coded)"] },
+      { name: "DMA Controller", type: "dma", techId: "dma-controller", gateCount: "~3K", info: "A lightweight 2-channel DMA controller enabling autonomous data transfers between peripherals and memory without CPU intervention. Supports byte, half-word, and word transfers with configurable priority levels.", configOptions: ["PL230 (default — 2 channels, basic)", "PL330 (optional — 8 channels, micro-coded)"] },
       { name: "GPIO", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~0.8K", info: "16-bit general-purpose I/O port with configurable direction, pull-up/pull-down resistors, and interrupt generation on rising/falling edges. Directly to FPGA/ASIC pads for external connectivity.", configOptions: ["8-bit port", "16-bit port (default)", "32-bit port"] },
       { name: "UART", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~1.2K", info: "Full-duplex UART with configurable baud rate (up to 3 Mbaud), 8N1/8E1 framing, and 16-byte TX/RX FIFOs. Serves as the primary serial debug and communication interface to external hosts.", configOptions: ["APB UART (PL011 — default)", "Simple UART (minimal, ~0.4K gates)"] },
       { name: "Timer", type: "peripheral", techId: "standard-peripherals", gateCount: "~0.6K", info: "32-bit dual-channel timer/counter with prescaler, auto-reload, and interrupt generation. Supports periodic timebase generation and input capture for timing measurements.", configOptions: ["Dual-channel (default)", "Quad-channel (+0.3K gates)"] },
@@ -70,9 +70,9 @@ export const referenceDesigns = [
             { name: "Instruction Memory", type: "module", description: "Instruction Memory — single-cycle SRAM, default 16KB. Mapped at 0x00000000. Can be preloaded with firmware image.", techId: "memory-controllers" },
             { name: "Data Memory", type: "module", description: "Data Memory — single-cycle SRAM, default 16KB. Mapped at 0x20000000 for stack, heap, and globals.", techId: "memory-controllers" },
           ]},
-          { name: "DMA Subsystem", type: "group", description: "DMA Subsystem (u_ss_dma). Contains two DMA controllers with AHB-Lite master ports and APB configuration ports. DMAC_0 handles expansion region transfers, DMAC_1 is available for additional channels.", techId: "amba-interconnect", children: [
-            { name: "DMA Controller 0", type: "module", description: "Primary DMA Controller — 4-channel DMA (PL230 or DMA-350). Channels 0-1 for expansion region DRQ, channels 2-3 for EXTIO data stream DMA requests. AHB master + APB config.", techId: "amba-interconnect" },
-            { name: "DMA Controller 1", type: "module", description: "Secondary DMA Controller — 2-channel DMA. Additional autonomous transfers. AHB master + APB config.", techId: "amba-interconnect" },
+          { name: "DMA Subsystem", type: "group", description: "DMA Subsystem (u_ss_dma). Contains two DMA controllers with AHB-Lite master ports and APB configuration ports. DMAC_0 handles expansion region transfers, DMAC_1 is available for additional channels.", techId: "dma-controller", children: [
+            { name: "DMA Controller 0", type: "module", description: "Primary DMA Controller — 4-channel DMA (PL230 or DMA-350). Channels 0-1 for expansion region DRQ, channels 2-3 for EXTIO data stream DMA requests. AHB master + APB config.", techId: "dma-controller" },
+            { name: "DMA Controller 1", type: "module", description: "Secondary DMA Controller — 2-channel DMA. Additional autonomous transfers. AHB master + APB config.", techId: "dma-controller" },
           ]},
           { name: "Debug Subsystem", type: "group", description: "Debug Subsystem (u_ss_debug). SoC-level debug access via ADP (ARM Debug Processor) with AHB-Lite master for memory access, GPIO interface (GPO8/GPI8), and AXI-Stream byte interfaces for ADP/STDIN/STDOUT.", techId: "standard-peripherals", children: [
             { name: "ADP Controller", type: "module", description: "ARM Debug Processor — provides non-intrusive AHB master debug access via command-line interface. Supports memory read/write, system reset, and GPIO control.", techId: "standard-peripherals" },
@@ -147,7 +147,7 @@ export const referenceDesigns = [
       { name: "AHB Bus Matrix", type: "interconnect", techId: "ahb", gateCount: "~5K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput.", configOptions: ["2×3 matrix (default)", "3×4 matrix (extended, +2K gates)"] },
       { name: "SRAM (128 KB)", type: "memory", techId: "memory-controllers", gateCount: "~1K (controller)", info: "128 KB of zero-wait-state SRAM split into two banks for concurrent access by the processor and DMA controller. Provides ample space for stack, heap, and data buffers.", configOptions: ["64 KB (reduced)", "128 KB (default)", "256 KB (extended)"] },
       { name: "Flash (256 KB)", type: "memory", techId: "memory-controllers", gateCount: "~2K (controller)", info: "256 KB of embedded flash memory for non-volatile code and constant storage. Includes a flash accelerator to minimise wait states and support execute-in-place (XIP) operation.", configOptions: ["128 KB", "256 KB (default)", "512 KB"] },
-      { name: "DMA Controller", type: "dma", techId: "amba-interconnect", gateCount: "~8K", info: "8-channel DMA controller with programmable priority and burst transfers. Acts as a bus master on the AHB matrix, enabling high-throughput peripheral-to-memory and memory-to-memory transfers without CPU overhead.", configOptions: ["DMA-230 (default — 8 channels, simple)", "DMA-350 (optional — 16 channels, command-list, +12K gates)"] },
+      { name: "DMA Controller", type: "dma", techId: "dma-controller", gateCount: "~8K", info: "8-channel DMA controller with programmable priority and burst transfers. Acts as a bus master on the AHB matrix, enabling high-throughput peripheral-to-memory and memory-to-memory transfers without CPU overhead.", configOptions: ["DMA-230 (default — 8 channels, simple)", "DMA-350 (optional — 16 channels, command-list, +12K gates)"] },
       { name: "Debug Controller", type: "debug", external: true, techId: "standard-peripherals", gateCount: "~6K", info: "ARM CoreSight debug subsystem with SWD/JTAG interface, ETM trace, and ITM stimulus ports. Provides full non-intrusive debug with hardware breakpoints, data watchpoints, and real-time trace via TPIU.", configOptions: ["SWD + 4 breakpoints (default)", "SWD + JTAG + ETM trace (full, +3K gates)"] },
       { name: "GPIO", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~1.5K", info: "32-bit GPIO port with alternate function multiplexing, Schmitt-trigger inputs, and configurable drive strength. Directly to FPGA/ASIC I/O pads for board-level connectivity.", configOptions: ["16-bit port", "32-bit port (default)"] },
       { name: "UART", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~1.5K", info: "Two UART channels with hardware flow control (CTS/RTS), DMA support, and configurable baud rates up to 6 Mbaud. Used for debug console and inter-device serial communication.", configOptions: ["PL011 single channel", "PL011 dual channel (default)", "PL011 + IrDA (optional)"] },
@@ -202,7 +202,7 @@ export const referenceDesigns = [
       { name: "AHB Bus Matrix", type: "interconnect", techId: "ahb", gateCount: "~8K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves with configurable arbitration.", configOptions: ["AHB matrix (default)", "AXI/ACE coherent interconnect (optional)"] },
       { name: "SRAM (128 KB)", type: "memory", techId: "memory-controllers", gateCount: "~1K (controller)", info: "128 KB tightly-coupled SRAM for low-latency data access. Used primarily for DMA buffers and performance-critical data structures.", configOptions: ["128 KB (default)", "256 KB (extended)", "512 KB (large)"] },
       { name: "Flash (256 KB)", type: "memory", techId: "memory-controllers", gateCount: "~2K (controller)", info: "256 KB embedded flash for bootloader and persistent configuration storage. Includes ECC protection and sector-level erase granularity.", configOptions: ["256 KB (default)", "1 MB (extended)"] },
-      { name: "DMA Controller", type: "dma", techId: "amba-interconnect", gateCount: "~15K", info: "16-channel DMA controller with scatter-gather support, linked-list descriptors, and per-channel priority. Handles high-bandwidth peripheral servicing with minimal CPU intervention.", configOptions: ["DMA-230 (basic — 8 channels)", "DMA-330 (default — 16 channels, micro-coded)", "DMA-350 (advanced — 32 channels, security extensions, +20K gates)"] },
+      { name: "DMA Controller", type: "dma", techId: "dma-controller", gateCount: "~15K", info: "16-channel DMA controller with scatter-gather support, linked-list descriptors, and per-channel priority. Handles high-bandwidth peripheral servicing with minimal CPU intervention.", configOptions: ["DMA-230 (basic — 8 channels)", "DMA-330 (default — 16 channels, micro-coded)", "DMA-350 (advanced — 32 channels, security extensions, +20K gates)"] },
       { name: "Debug Controller", type: "debug", external: true, techId: "standard-peripherals", gateCount: "~10K", info: "ARM CoreSight debug and trace subsystem with JTAG/SWD access, ETM program trace, and cross-trigger interface (CTI). Supports multi-core debug synchronisation and real-time trace export.", configOptions: ["SWD + ETM (default)", "Full CoreSight with CTI + TPIU (optional, +5K gates)"] },
       { name: "GPIO", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~2K", info: "64-bit GPIO with per-pin alternate function selection, interrupt generation, and configurable slew rate. Directly to FPGA/ASIC I/O pads.", configOptions: ["32-bit port", "64-bit port (default)"] },
       { name: "UART", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~3K", info: "Four UART channels with DMA support, hardware flow control, and IrDA encoding. Provides debug console and high-speed serial communication up to 12 Mbaud.", configOptions: ["PL011 dual channel", "PL011 quad channel (default)", "PL011 + IrDA (optional)"] },
@@ -1837,6 +1837,54 @@ export const technologies = [
       "Memory Protection Unit (MPU)",
     ],
     links: [{ label: "ARM Cortex-M3 Documentation", url: "https://developer.arm.com/Processors/Cortex-M3" }],
+  },
+
+  // ── Components > DMA Controllers ──
+  {
+    id: "pl230-dma",
+    name: "ARM PL230 DMA Controller",
+    group: "Components",
+    category: "DMA Controllers",
+    description:
+      "A lightweight micro-DMA controller with 2–4 channels, ideal for small SoCs like nanoSoC where minimal gate overhead is critical.",
+    longDescription:
+      "The PL230 (µDMA) is ARM's smallest DMA controller, designed for Cortex-M class SoCs where gate count and power must be minimised. It supports primary and alternate descriptor-based transfers with ping-pong and scatter-gather modes. Each channel is independently programmable for source/destination address, transfer size, and data width. The PL230 is the default DMA in the nanoSoC reference design.",
+    features: [
+      "2–4 independently configurable channels",
+      "Primary + alternate descriptor-based operation",
+      "Ping-pong mode for continuous streaming",
+      "Scatter-gather for complex transfer patterns",
+      "Byte, half-word, and word transfer widths",
+      "~3K gates for 2-channel configuration",
+      "AHB-Lite master + APB slave configuration port",
+    ],
+    links: [
+      { label: "PL230 µDMA Technical Reference", url: "https://developer.arm.com/documentation/ddi0479/latest" },
+      { label: "ARM DesignStart", url: "https://www.arm.com/resources/designstart" },
+    ],
+  },
+  {
+    id: "dma-350",
+    name: "ARM DMA-350",
+    group: "Components",
+    category: "DMA Controllers",
+    description:
+      "A highly configurable, security-aware DMA controller with command-list operation, stream interfaces, and up to 32 channels for mid-to-large SoCs.",
+    longDescription:
+      "The DMA-350 is ARM's latest-generation DMA controller, designed for Cortex-M33/M55/M85 and Cortex-A class SoCs. It introduces command-list-based operation (replacing simple descriptors), AXI-Stream interfaces for direct accelerator data paths, TrustZone security extensions, and up to 32 independently configurable channels. The DMA-350 is available as an option in nanoSoC and is the default DMA in milliSoC and megaSoC.",
+    features: [
+      "Up to 32 independently configurable channels",
+      "Command-list operation for complex transfer sequences",
+      "AXI-Stream interfaces for accelerator data paths",
+      "TrustZone security extensions per channel",
+      "Linked-list descriptor support",
+      "Configurable: small (2ch, ~5K), default (2ch + stream, ~8K), big (3ch + stream, ~12K)",
+      "AHB/AXI master + APB slave configuration port",
+    ],
+    links: [
+      { label: "DMA-350 Technical Reference", url: "https://developer.arm.com/documentation/102525/latest" },
+      { label: "ARM Corstone SSE-300", url: "https://developer.arm.com/Processors/Corstone-300" },
+    ],
   },
 
   // ── Components > System Interconnects ──
