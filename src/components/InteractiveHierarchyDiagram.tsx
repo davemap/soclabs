@@ -40,11 +40,11 @@ const PadSquare = ({ pad }: { pad: HierarchyNode }) => (
 );
 
 /* ── Leaf block ── */
-const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode; depth: number; isSelected?: boolean; onSelect?: (node: HierarchyNode) => void }) => {
+const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode; depth: number; isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
   return (
     <button
-      onClick={e => { e.stopPropagation(); onSelect?.(node); }}
+      onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
       className={`rounded-lg border-2 ${s.border} ${s.bg} px-3 py-2 md:px-4 md:py-3 text-left transition-all duration-150 hover:shadow-md hover:scale-[1.02] w-full ${
         node.userDesigned ? "!border-dashed !border-rose-400" : ""
       } ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : ""}`}
@@ -66,7 +66,7 @@ const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode;
 /* ── Compact preview for a zoomable group ── */
 const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelect }: {
   node: HierarchyNode; depth: number; onZoom: () => void; square?: boolean;
-  isSelected?: boolean; onSelect?: (node: HierarchyNode) => void;
+  isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void;
 }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
 
@@ -74,7 +74,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
     <div className={`relative ${square ? "h-full" : ""}`}>
       <button
         type="button"
-        onClick={e => { e.stopPropagation(); onSelect?.(node); }}
+        onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
         onDoubleClick={e => { e.stopPropagation(); onZoom(); }}
         className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group cursor-pointer ${
           square ? "h-full flex flex-col" : ""
@@ -119,7 +119,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
   breadcrumb: HierarchyNode[];
   onNavigate: (index: number) => void;
   selectedNode: HierarchyNode | null;
-  onSelect: (node: HierarchyNode) => void;
+  onSelect: (node: HierarchyNode, depth: number) => void;
 }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
 
@@ -160,7 +160,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
         <Layers className={`h-5 w-5 ${s.label}`} />
         <h3 className={`font-display font-bold text-lg md:text-xl ${s.label}`}>{node.name}</h3>
         {node.description && (
-          <button onClick={() => onSelect(node)} className="p-1 rounded-md hover:bg-muted ml-auto">
+          <button onClick={() => onSelect(node, depth)} className="p-1 rounded-md hover:bg-muted ml-auto">
             <Info className={`h-4 w-4 ${selectedNode?.name === node.name ? "text-primary" : "text-muted-foreground/40"}`} />
           </button>
         )}
@@ -191,9 +191,9 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
   padNode: HierarchyNode;
   chipNode: HierarchyNode;
   onZoomChip: () => void;
-  onSelectChip: (node: HierarchyNode) => void;
+  onSelectChip: (node: HierarchyNode, depth: number) => void;
   isChipSelected: boolean;
-  onSelectPad: (node: HierarchyNode) => void;
+  onSelectPad: (node: HierarchyNode, depth: number) => void;
   isPadSelected: boolean;
 }) => {
   const pads = padNode.children || [];
@@ -213,7 +213,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
   return (
     <button
       type="button"
-      onClick={() => onSelectPad(padNode)}
+      onClick={() => onSelectPad(padNode, -1)}
       className={`relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] mx-auto overflow-hidden w-full text-left transition-all hover:shadow-md ${
         isPadSelected ? "ring-2 ring-offset-2 ring-amber-400 shadow-lg" : ""
       }`}
@@ -242,7 +242,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
           {/* Center: the chip */}
           <div className="p-1 md:p-2">
             <div
-              onClick={e => { e.stopPropagation(); onSelectChip(chipNode); }}
+              onClick={e => { e.stopPropagation(); onSelectChip(chipNode, 1); }}
               onDoubleClick={e => { e.stopPropagation(); onZoomChip(); }}
               className={`w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center transition-all group cursor-pointer ${
                 isChipSelected ? "ring-2 ring-offset-2 ring-sky-400 shadow-lg" : ""
@@ -279,8 +279,12 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
 };
 
 /* ── Bottom Description Panel (like architecture view) ── */
-const SelectedNodePanel = ({ node, onClose }: { node: HierarchyNode; onClose: () => void }) => {
-  const s = layerStyles[0]; // Use a neutral style
+const SelectedNodePanel = ({ node, depth, onClose }: { node: HierarchyNode; depth: number; onClose: () => void }) => {
+  // Special amber style for pad ring (depth -1), otherwise use layerStyles
+  const isPadLevel = depth < 0;
+  const s = isPadLevel
+    ? { bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-400 dark:border-amber-500", label: "text-amber-700 dark:text-amber-300" }
+    : layerStyles[Math.min(depth, layerStyles.length - 1)];
 
   return (
     <motion.div
@@ -351,6 +355,7 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
 
   const [navStack, setNavStack] = useState<HierarchyNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<HierarchyNode | null>(null);
+  const [selectedDepth, setSelectedDepth] = useState(0);
 
   const zoomInto = useCallback((node: HierarchyNode) => {
     setNavStack(prev => [...prev, node]);
@@ -366,8 +371,9 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
     setSelectedNode(null);
   }, []);
 
-  const handleSelect = useCallback((node: HierarchyNode) => {
+  const handleSelect = useCallback((node: HierarchyNode, depth: number) => {
     setSelectedNode(prev => prev?.name === node.name ? null : node);
+    setSelectedDepth(depth);
   }, []);
 
   const currentZoomed = navStack.length > 0 ? navStack[navStack.length - 1] : null;
@@ -433,7 +439,7 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
       {/* Bottom description panel */}
       <AnimatePresence mode="wait">
         {selectedNode && (
-          <SelectedNodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+          <SelectedNodePanel node={selectedNode} depth={selectedDepth} onClose={() => setSelectedNode(null)} />
         )}
       </AnimatePresence>
     </div>
