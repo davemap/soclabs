@@ -133,19 +133,19 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 aspect-square max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
-      <div className="flex items-center gap-1 mb-4 flex-wrap">
+      <div className="flex items-center gap-1.5 mb-5 flex-wrap">
         {breadcrumb.map((b, i) => {
           const isLast = i === breadcrumb.length - 1;
           const bs = layerStyles[Math.min(i, layerStyles.length - 1)];
           return (
-            <span key={b.name} className="flex items-center gap-1">
-              {i > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />}
+            <span key={b.name} className="flex items-center gap-1.5">
+              {i > 0 && <ChevronRight className="h-4 w-4 text-muted-foreground/30 shrink-0" />}
               {isLast ? (
-                <span className={`text-xs font-bold ${bs.label}`}>{b.name}</span>
+                <span className={`text-sm md:text-base font-bold ${bs.label}`}>{b.name}</span>
               ) : (
                 <button
                   onClick={() => onNavigate(i)}
-                  className={`text-xs font-medium ${bs.label} hover:underline transition-colors cursor-zoom-out`}
+                  className={`text-sm md:text-base font-medium ${bs.label} hover:underline transition-colors cursor-zoom-out`}
                 >
                   {b.name}
                 </button>
@@ -403,25 +403,6 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
               onSelect={handleSelect}
             />
           </AnimatePresence>
-          {/* Bottom zoom-out buttons */}
-          <div className="flex items-center gap-2 mt-3">
-            <button
-              onClick={() => navigateTo(navStack.length - 2)}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-primary/20 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 hover:border-primary/40 transition-all"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {navStack.length > 1 ? navStack[navStack.length - 2].name : "Chip Overview"}
-            </button>
-            {navStack.length > 1 && (
-              <button
-                onClick={() => navigateTo(-1)}
-                className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-muted-foreground/15 text-muted-foreground text-sm font-medium hover:bg-muted/50 hover:border-muted-foreground/30 transition-all"
-              >
-                <CircuitBoard className="h-4 w-4" />
-                Top Level
-              </button>
-            )}
-          </div>
         </div>
       ) : !padNode || !chipNode ? (
         <div className="space-y-3">
