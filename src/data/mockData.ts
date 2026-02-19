@@ -30,7 +30,7 @@ export const referenceDesigns = [
       "NanoSoC is built around the ARM Cortex-M0 processor — the smallest ARM core — connected via an AHB-Lite bus to a set of essential peripherals. The design philosophy is simplicity: every block is fully documented and intended to be understood, modified, and extended by students and researchers.\n\nThe bus topology is a single-master AHB-Lite with a simple address decoder routing transactions to peripheral slaves. An extension port allows users to attach custom accelerators or additional peripherals without modifying the core interconnect.",
     blockDiagram: [
       { name: "ARM Cortex-M0", type: "processor", techId: "arm-cortex-m0", gateCount: "~12K", info: "The ARM Cortex-M0 is the smallest ARM processor, optimised for ultra-low gate count and minimal power. In NanoSoC it runs at up to 50 MHz with a single-cycle multiplier, providing a 0.9 DMIPS/MHz performance profile ideal for embedded control tasks.", configOptions: ["Cortex-M0 (default — minimal gate count)", "Cortex-M0+ (optional — improved performance, +2K gates)"] },
-      { name: "AHB-Lite Bus", type: "interconnect", techId: "amba-interconnect", gateCount: "~1.5K", info: "A single-master AHB-Lite interconnect with a simple address decoder routing transactions to peripheral slaves. Supports 32-bit data transfers with single-cycle slave access for tightly-coupled peripherals.", configOptions: ["AHB-Lite single-master (default)", "AHB5-Lite with TrustZone (optional)"] },
+      { name: "AHB-Lite Bus", type: "interconnect", techId: "ahb-lite", gateCount: "~1.5K", info: "A single-master AHB-Lite interconnect with a simple address decoder routing transactions to peripheral slaves. Supports 32-bit data transfers with single-cycle slave access for tightly-coupled peripherals.", configOptions: ["AHB-Lite single-master (default)", "AHB5-Lite with TrustZone (optional)"] },
       { name: "SRAM (32 KB)", type: "memory", techId: "memory-controllers", gateCount: "~0.5K (controller)", info: "32 KB of single-cycle SRAM providing code and data storage. Mapped at the base of the address space for zero-wait-state access from the Cortex-M0. Sufficient for typical embedded firmware images.", configOptions: ["16 KB (reduced footprint)", "32 KB (default)", "64 KB (extended)"] },
       { name: "DMA Controller", type: "controller", techId: "amba-interconnect", gateCount: "~3K", info: "A lightweight 2-channel DMA controller enabling autonomous data transfers between peripherals and memory without CPU intervention. Supports byte, half-word, and word transfers with configurable priority levels.", configOptions: ["PL230 (default — 2 channels, basic)", "PL330 (optional — 8 channels, micro-coded)"] },
       { name: "GPIO", type: "peripheral", external: true, techId: "standard-peripherals", gateCount: "~0.8K", info: "16-bit general-purpose I/O port with configurable direction, pull-up/pull-down resistors, and interrupt generation on rising/falling edges. Directly to FPGA/ASIC pads for external connectivity.", configOptions: ["8-bit port", "16-bit port (default)", "32-bit port"] },
@@ -82,7 +82,7 @@ export const referenceDesigns = [
       "milliSoC is a production-grade SoC built around the ARM Cortex-M3 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
     blockDiagram: [
       { name: "ARM Cortex-M3", type: "processor", techId: "arm-cortex-m3", gateCount: "~40K", info: "The ARM Cortex-M3 processor with hardware multiply/divide and Thumb-2 ISA, running at up to 100 MHz. Provides 1.25 DMIPS/MHz with a 3-stage pipeline, MPU, and bit-banding for atomic peripheral access.", configOptions: ["Cortex-M3 (default)", "Cortex-M4 (optional — DSP + FPU, +15K gates)"] },
-      { name: "AHB Bus Matrix", type: "interconnect", techId: "amba-interconnect", gateCount: "~5K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput.", configOptions: ["2×3 matrix (default)", "3×4 matrix (extended, +2K gates)"] },
+      { name: "AHB Bus Matrix", type: "interconnect", techId: "ahb", gateCount: "~5K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput.", configOptions: ["2×3 matrix (default)", "3×4 matrix (extended, +2K gates)"] },
       { name: "SRAM (128 KB)", type: "memory", techId: "memory-controllers", gateCount: "~1K (controller)", info: "128 KB of zero-wait-state SRAM split into two banks for concurrent access by the processor and DMA controller. Provides ample space for stack, heap, and data buffers.", configOptions: ["64 KB (reduced)", "128 KB (default)", "256 KB (extended)"] },
       { name: "Flash (256 KB)", type: "memory", techId: "memory-controllers", gateCount: "~2K (controller)", info: "256 KB of embedded flash memory for non-volatile code and constant storage. Includes a flash accelerator to minimise wait states and support execute-in-place (XIP) operation.", configOptions: ["128 KB", "256 KB (default)", "512 KB"] },
       { name: "DMA Controller", type: "controller", techId: "amba-interconnect", gateCount: "~8K", info: "8-channel DMA controller with programmable priority and burst transfers. Acts as a bus master on the AHB matrix, enabling high-throughput peripheral-to-memory and memory-to-memory transfers without CPU overhead.", configOptions: ["DMA-230 (default — 8 channels, simple)", "DMA-350 (optional — 16 channels, command-list, +12K gates)"] },
@@ -137,7 +137,7 @@ export const referenceDesigns = [
       "megaSoC is a production-grade SoC built around the ARM Cortex-A53 processor with a multi-layer AHB bus matrix enabling concurrent master access. The design includes a DMA controller for efficient data movement, a comprehensive peripheral set, and a dedicated accelerator interface slot for custom hardware extensions.\n\nThe multi-layer bus matrix supports simultaneous transactions from the processor and DMA controller to different slaves, significantly improving system throughput. The accelerator slot provides a standardised AHB slave interface with interrupt and DMA request lines, making it straightforward to integrate custom IP.",
     blockDiagram: [
       { name: "ARM Cortex-A53", type: "processor", techId: "arm-cortex-m3", gateCount: "~500K", info: "64-bit ARMv8-A application processor with quad-issue in-order pipeline, NEON SIMD, and cryptographic extensions. Configured in single-core mode running at up to 1 GHz for high-throughput application workloads.", configOptions: ["Single-core (default)", "Dual-core (optional, ~1M gates)"] },
-      { name: "AHB Bus Matrix", type: "interconnect", techId: "amba-interconnect", gateCount: "~8K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves with configurable arbitration.", configOptions: ["AHB matrix (default)", "AXI/ACE coherent interconnect (optional)"] },
+      { name: "AHB Bus Matrix", type: "interconnect", techId: "ahb", gateCount: "~8K", info: "Multi-layer AHB bus matrix enabling concurrent master access. Supports simultaneous transactions from the processor and DMA controller to different slaves with configurable arbitration.", configOptions: ["AHB matrix (default)", "AXI/ACE coherent interconnect (optional)"] },
       { name: "SRAM (128 KB)", type: "memory", techId: "memory-controllers", gateCount: "~1K (controller)", info: "128 KB tightly-coupled SRAM for low-latency data access. Used primarily for DMA buffers and performance-critical data structures.", configOptions: ["128 KB (default)", "256 KB (extended)", "512 KB (large)"] },
       { name: "Flash (256 KB)", type: "memory", techId: "memory-controllers", gateCount: "~2K (controller)", info: "256 KB embedded flash for bootloader and persistent configuration storage. Includes ECC protection and sector-level erase granularity.", configOptions: ["256 KB (default)", "1 MB (extended)"] },
       { name: "DMA Controller", type: "controller", techId: "amba-interconnect", gateCount: "~15K", info: "16-channel DMA controller with scatter-gather support, linked-list descriptors, and per-channel priority. Handles high-bandwidth peripheral servicing with minimal CPU intervention.", configOptions: ["DMA-230 (basic — 8 channels)", "DMA-330 (default — 16 channels, micro-coded)", "DMA-350 (advanced — 32 channels, security extensions, +20K gates)"] },
@@ -1780,22 +1780,68 @@ export const technologies = [
   // ── Components > System Interconnects ──
   {
     id: "amba-interconnect",
-    name: "AMBA Interconnect (AHB / AXI / APB)",
+    name: "AMBA Protocol Family",
     group: "Components",
     category: "System Interconnects",
     description:
-      "ARM's Advanced Microcontroller Bus Architecture protocols for on-chip communication between processors, peripherals, and memory.",
+      "ARM's Advanced Microcontroller Bus Architecture — the umbrella specification covering AHB, AHB-Lite, AXI, and APB on-chip bus protocols.",
     longDescription:
-      "AMBA (Advanced Microcontroller Bus Architecture) is the de-facto standard for on-chip interconnects in ARM-based SoCs. AHB-Lite provides a simple single-master bus, AXI enables high-performance multi-master access with out-of-order transactions, and APB offers a low-power interface for slow peripherals.",
+      "AMBA (Advanced Microcontroller Bus Architecture) is ARM's open standard for on-chip interconnects, defining a family of bus protocols optimised for different performance and complexity trade-offs. The specification has evolved through several generations (AMBA 2, 3, 4, 5) introducing progressively higher-performance protocols while maintaining backward compatibility.",
     features: [
-      "AHB-Lite: simple single-master bus",
+      "Open, royalty-free specification",
+      "AHB-Lite: simple single-master bus for small SoCs",
+      "AHB: multi-master bus with arbitration",
       "AXI: high-performance, out-of-order, multi-master",
-      "APB: low-power peripheral bus",
-      "Bus matrix for concurrent access",
-      "Well-documented open specification",
-      "Widely supported by IP vendors",
+      "APB: low-power peripheral bus bridge",
+      "Widely adopted by IP vendors worldwide",
     ],
     links: [{ label: "AMBA Specification", url: "https://developer.arm.com/architectures/system-architectures/amba" }],
+  },
+  {
+    id: "ahb-lite",
+    name: "AMBA AHB-Lite",
+    group: "Components",
+    category: "System Interconnects",
+    description:
+      "A simplified single-master variant of AMBA AHB, providing a lightweight on-chip bus ideal for small, low-power SoCs like nanoSoC.",
+    longDescription:
+      "AHB-Lite is the simplest member of the AMBA bus family, designed for single-master systems where a single processor or DMA controller drives all bus transactions. It eliminates the arbitration and split/retry logic of full AHB, resulting in a minimal gate count interconnect that is easy to understand and implement. AHB-Lite is the standard interconnect for Cortex-M0/M0+ based designs and is used in the nanoSoC reference design.",
+    features: [
+      "Single-master architecture — no arbitration overhead",
+      "32-bit data bus with byte/half-word/word transfers",
+      "Simple address decoder for slave routing",
+      "Single-cycle slave access for tightly-coupled peripherals",
+      "Pipelined address/data phases for throughput",
+      "Minimal gate count (~1.5K gates for decoder + mux)",
+      "Optional AHB5-Lite extension with TrustZone support",
+    ],
+    links: [
+      { label: "AMBA AHB-Lite Spec (IHI 0033)", url: "https://developer.arm.com/documentation/ihi0033/latest" },
+      { label: "ARM DesignStart", url: "https://www.arm.com/resources/designstart" },
+    ],
+  },
+  {
+    id: "ahb",
+    name: "AMBA AHB / AHB Bus Matrix",
+    group: "Components",
+    category: "System Interconnects",
+    description:
+      "Full multi-master AHB bus with arbitration and optional bus matrix topology, enabling concurrent master access in mid-range SoCs like milliSoC.",
+    longDescription:
+      "Full AHB extends AHB-Lite with multi-master arbitration, split transactions, and retry support. When configured as a bus matrix (e.g. ARM's BusMatrix IP), it allows simultaneous transactions from multiple masters (processor + DMA) to different slaves, significantly improving system throughput. AHB bus matrices are the standard interconnect for Cortex-M3/M4/M7 based production SoCs.",
+    features: [
+      "Multi-master with round-robin or priority-based arbitration",
+      "Bus matrix topology for concurrent master-slave access",
+      "Split and retry transaction support",
+      "32-bit data bus (extendable to 64/128-bit)",
+      "Configurable matrix dimensions (e.g. 2×3, 3×4)",
+      "~5K gates for a typical 2×3 matrix configuration",
+      "Used in milliSoC and megaSoC reference designs",
+    ],
+    links: [
+      { label: "AMBA AHB Spec (IHI 0011)", url: "https://developer.arm.com/documentation/ihi0011/latest" },
+      { label: "ARM CoreLink BusMatrix", url: "https://developer.arm.com/ip-products/system-ip/corelink" },
+    ],
   },
 
   // ── Components > Peripherals ──
