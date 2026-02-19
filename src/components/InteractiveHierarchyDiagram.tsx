@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft, Microchip, ArrowRight, Cpu, MemoryStick, Network, Bug, Timer, Shield, Zap, Radio, HardDrive, Clock, RotateCcw, Pin, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -425,9 +425,43 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
   const padNode = hierarchy.find(n => n.name.toLowerCase().includes("pad"));
   const chipNode = hierarchy.find(n => !n.name.toLowerCase().includes("pad"));
 
-  const [navStack, setNavStack] = useState<HierarchyNode[]>([]);
+  // Restore navStack from sessionStorage by matching node names through the hierarchy
+  const restoreNavStack = useCallback((): HierarchyNode[] => {
+    try {
+      const key = `hierarchy-nav-${designName}`;
+      const saved = sessionStorage.getItem(key);
+      if (!saved) return [];
+      const names: string[] = JSON.parse(saved);
+      if (!Array.isArray(names) || names.length === 0) return [];
+
+      // Walk the hierarchy to resolve node references
+      const stack: HierarchyNode[] = [];
+      let pool = hierarchy;
+      for (const name of names) {
+        const found = pool.find(n => n.name === name);
+        if (!found) break;
+        stack.push(found);
+        pool = found.children || [];
+      }
+      return stack;
+    } catch {
+      return [];
+    }
+  }, [hierarchy, designName]);
+
+  const [navStack, setNavStack] = useState<HierarchyNode[]>(restoreNavStack);
   const [selectedNode, setSelectedNode] = useState<HierarchyNode | null>(null);
   const [selectedDepth, setSelectedDepth] = useState(0);
+
+  // Persist navStack names to sessionStorage whenever it changes
+  useEffect(() => {
+    const key = `hierarchy-nav-${designName}`;
+    if (navStack.length === 0) {
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, JSON.stringify(navStack.map(n => n.name)));
+    }
+  }, [navStack, designName]);
 
   const zoomInto = useCallback((node: HierarchyNode) => {
     setNavStack(prev => [...prev, node]);
