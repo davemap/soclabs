@@ -60,6 +60,10 @@ const techIdStyles: Record<string, { bg: string; border: string; label: string }
   "apb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
   "axi": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
   "amba-interconnect": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  // DMA Controllers (indigo)
+  "dma-controller": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
+  "pl230-dma": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
+  "dma-350": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
   // Serial Protocols (amber)
   "uart-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
   "spi-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
