@@ -385,17 +385,20 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
           </div>
 
           {/* Center: the chip */}
-          <div className="p-1 md:p-2">
-            <div
+            <div className="p-1 md:p-2">
+            {(() => {
+              const cs = getNodeStyle(chipNode, 1);
+              return (
+              <div
               onClick={e => { e.stopPropagation(); onSelectChip(chipNode, 1); }}
               onDoubleClick={e => { e.stopPropagation(); onZoomChip(); }}
-              className={`w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center transition-all group cursor-pointer ${
-                isChipSelected ? "ring-2 ring-offset-2 ring-sky-400 shadow-lg" : ""
+              className={`w-full h-full rounded-xl border-2 ${cs.border} ${cs.bg} flex flex-col items-center justify-center transition-all group cursor-pointer ${
+                isChipSelected ? "ring-2 ring-offset-2 ring-current shadow-lg" : ""
               }`}
             >
               <div className="flex flex-col items-center">
-                <Layers className="h-5 w-5 text-sky-700 dark:text-sky-300 mb-1" />
-                <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
+                <Layers className={`h-5 w-5 ${cs.label} mb-1`} />
+                <span className={`font-display font-bold text-sm md:text-base ${cs.label}`}>{chipNode.name}</span>
               </div>
               <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
                 {chipNode.children?.slice(0, 4).map(child => {
@@ -409,6 +412,8 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
               </div>
               <ZoomIn className="mt-2 h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
             </div>
+              );
+            })()}
           </div>
 
           <div className="flex flex-col justify-around items-start py-1 pl-1">
