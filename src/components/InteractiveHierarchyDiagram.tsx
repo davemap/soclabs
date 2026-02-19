@@ -181,21 +181,23 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
         )}
       </div>
 
-      {/* Children - fill remaining space */}
-      <div className="flex-1 grid gap-3 mt-4 auto-rows-fr" style={{
-        gridTemplateColumns: `repeat(auto-fill, minmax(${(node.children?.length || 0) <= 3 ? "200px" : "140px"}, 1fr))`
-      }}>
-        {node.children?.map(child => {
-          const hasChildren = child.children && child.children.length > 0;
-          if (hasChildren) {
-            return (
-              <div key={child.name}>
-                <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} square isSelected={selectedNode?.name === child.name} onSelect={onSelect} />
-              </div>
-            );
-          }
-          return <div key={child.name}><LeafBlock node={child} depth={depth + 1} isSelected={selectedNode?.name === child.name} onSelect={onSelect} /></div>;
-        })}
+      {/* Children - scrollable within square frame */}
+      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden mt-4 pr-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+        <div className="grid gap-3 auto-rows-fr" style={{
+          gridTemplateColumns: `repeat(auto-fill, minmax(${(node.children?.length || 0) <= 3 ? "200px" : "140px"}, 1fr))`
+        }}>
+          {node.children?.map(child => {
+            const hasChildren = child.children && child.children.length > 0;
+            if (hasChildren) {
+              return (
+                <div key={child.name}>
+                  <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} square isSelected={selectedNode?.name === child.name} onSelect={onSelect} />
+                </div>
+              );
+            }
+            return <div key={child.name}><LeafBlock node={child} depth={depth + 1} isSelected={selectedNode?.name === child.name} onSelect={onSelect} /></div>;
+          })}
+        </div>
       </div>
     </motion.div>
   );
