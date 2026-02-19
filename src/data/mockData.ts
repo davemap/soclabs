@@ -1843,6 +1843,29 @@ export const technologies = [
       { label: "ARM CoreLink BusMatrix", url: "https://developer.arm.com/ip-products/system-ip/corelink" },
     ],
   },
+  {
+    id: "apb",
+    name: "AMBA APB",
+    group: "Components",
+    category: "System Interconnects",
+    description:
+      "ARM's low-power peripheral bus protocol, used as a bridge from AHB/AXI to low-bandwidth peripherals like GPIO, UART, timers, and watchdog.",
+    longDescription:
+      "APB (Advanced Peripheral Bus) is the simplest AMBA protocol, designed for low-bandwidth peripherals that don't require the performance of AHB or AXI. An AHB-to-APB bridge converts high-performance bus transactions into the simpler two-phase APB protocol (setup + access), reducing peripheral complexity and power consumption. APB peripherals typically require only a few hundred gates of bus interface logic.",
+    features: [
+      "Two-phase protocol (setup + access) — minimal complexity",
+      "Single master (bridge from AHB/AXI)",
+      "No burst transfers — single word read/write only",
+      "Low gate count peripheral interface (~200 gates)",
+      "Wait state support via PREADY",
+      "Error response via PSLVERR",
+      "APB4 adds protection and strobe signals",
+    ],
+    links: [
+      { label: "AMBA APB Spec (IHI 0024)", url: "https://developer.arm.com/documentation/ihi0024/latest" },
+      { label: "ARM CMSDK APB Components", url: "https://developer.arm.com/Tools%20and%20Software/Corstone-101" },
+    ],
+  },
 
   // ── Components > Peripherals ──
   {
