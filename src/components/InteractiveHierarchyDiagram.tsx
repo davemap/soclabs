@@ -232,7 +232,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
       style={hatchStyle}
-      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] min-h-[320px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
+      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] ${children.length > 1 ? "min-h-[320px]" : ""} mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
       <div className="flex items-center gap-1 mb-4 flex-wrap">
@@ -277,7 +277,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
             transition={{ duration: 0.15 }}
             className="grid gap-3 h-full"
             style={{
-              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 2)}, 1fr)`,
+              gridTemplateColumns: visibleChildren.length === 1 ? "1fr" : `repeat(${Math.min(visibleChildren.length, 2)}, 1fr)`,
               gridTemplateRows: "1fr",
             }}
           >
