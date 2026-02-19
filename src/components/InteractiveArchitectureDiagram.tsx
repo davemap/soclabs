@@ -1,13 +1,13 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight as ArrowRightIcon, ArrowUpDown, Bug, ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { technologies } from "@/data/mockData";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowUpDown, ExternalLink as ExternalLinkIcon, X, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Block {
   name: string;
   type: string;
   external?: boolean;
+  info?: string;
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -70,34 +70,9 @@ const defaultStyle = {
   hoverBorder: "",
 };
 
-// Map block names to technology page IDs
-const blockToTechId: Record<string, string> = {
-  "ARM Cortex-M0": "arm-cortex-m0",
-  "ARM Cortex-M3": "arm-cortex-m3",
-  "ARM Cortex-A53": "arm-cortex-m3",
-  "AHB-Lite Bus": "amba-interconnect",
-  "AHB Bus Matrix": "amba-interconnect",
-  "GPIO": "standard-peripherals",
-  "UART": "standard-peripherals",
-  "SPI": "standard-peripherals",
-  "I2C": "standard-peripherals",
-  "Timer": "standard-peripherals",
-  "Watchdog": "standard-peripherals",
-  "RTC": "standard-peripherals",
-  "SRAM (32 KB)": "memory-controllers",
-  "SRAM (128 KB)": "memory-controllers",
-  "Flash (256 KB)": "memory-controllers",
-  "DMA Controller": "amba-interconnect",
-  "Extension Port": "hw-acceleration",
-  "Accelerator Slot": "hw-acceleration",
-  "Debug Controller": "standard-peripherals",
-};
-
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
-  const navigate = useNavigate();
-  const [hoveredBlock, setHoveredBlock] = useState<string | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
 
-  // Separate blocks into bus masters (above bus), the bus itself, and bus slaves (below bus)
   const processors = blocks.filter((b) => b.type === "processor");
   const controllers = blocks.filter((b) => b.type === "controller");
   const interconnects = blocks.filter((b) => b.type === "interconnect");
@@ -109,29 +84,25 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const slaves = [...memories, ...peripherals, ...interfaces];
 
   const handleClick = (block: Block) => {
-    const techId = blockToTechId[block.name];
-    if (techId) navigate(`/technologies/${techId}`);
+    setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
   };
 
   const BlockNode = ({ block, className = "" }: { block: Block; className?: string }) => {
     const style = blockTypeStyles[block.type] || defaultStyle;
-    const techId = blockToTechId[block.name];
-    const tech = techId ? technologies.find((t) => t.id === techId) : null;
-    const isClickable = !!techId;
+    const isSelected = selectedBlock?.name === block.name;
 
     return (
       <TooltipProvider key={block.name} delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              onClick={() => isClickable && handleClick(block)}
-              onMouseEnter={() => setHoveredBlock(block.name)}
-              onMouseLeave={() => setHoveredBlock(null)}
+              onClick={() => handleClick(block)}
               className={`
-                flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 
+                flex flex-col items-center justify-center gap-1 rounded-xl border-2 
                 ${style.bg} ${style.border} ${style.text}
                 ${block.external ? "ring-2 ring-orange-400/40 ring-offset-1 ring-offset-transparent" : ""}
-                ${isClickable ? `cursor-pointer ${style.hoverBorder} hover:-translate-y-0.5` : "cursor-default"}
+                ${isSelected ? `${style.hoverBorder.replace("hover:", "")} scale-[1.03]` : ""}
+                cursor-pointer ${style.hoverBorder} hover:-translate-y-0.5
                 transition-all duration-300 group min-w-0
                 ${className}
               `}
@@ -139,35 +110,24 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}</span>
               <span className="font-display font-semibold text-xs text-center leading-tight">{block.name}</span>
               {block.external && (
-                <span className="flex items-center gap-0.5 text-[10px] text-orange-400 font-medium mt-0.5">
+                <span className="flex items-center gap-0.5 text-[10px] text-orange-400 font-medium">
                   <ExternalLinkIcon className="h-2.5 w-2.5" /> External
                 </span>
               )}
-              {isClickable && (
-                <ArrowRightIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              )}
+              <Info className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-xs">
-            {tech ? (
-              <div>
-                <p className="font-semibold text-sm">{tech.name}</p>
-                <p className="text-xs text-muted-foreground mt-1">{tech.description}</p>
-                <p className="text-xs text-primary mt-1.5">Click to view details →</p>
-              </div>
-            ) : (
-              <p className="text-sm">{block.name} ({block.type})</p>
-            )}
+          <TooltipContent side="top" className="max-w-[180px]">
+            <p className="text-xs">Click for details on <span className="font-semibold">{block.name}</span></p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
     );
   };
 
-  // Vertical connector stub
   const BusStub = ({ direction }: { direction: "up" | "down" }) => (
     <div className="flex flex-col items-center">
-      <div className={`w-0.5 ${direction === "up" ? "h-5" : "h-5"} bg-cyan-500/40`} />
+      <div className={`w-0.5 h-5 bg-cyan-500/40`} />
       <ArrowUpDown className="h-3 w-3 text-cyan-500/50" />
     </div>
   );
@@ -197,7 +157,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       </div>
 
       <div className="min-w-[600px]">
-        {/* ── Bus Masters (above bus) ── */}
+        {/* Bus Masters */}
         <div className="flex justify-center gap-3 mb-1 px-4">
           {masters.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
@@ -207,7 +167,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
           ))}
         </div>
 
-        {/* ── The Bus ── */}
+        {/* The Bus */}
         <div className="relative mx-4">
           <div className="w-full h-12 rounded-lg bg-gradient-to-r from-cyan-500/20 via-cyan-500/30 to-cyan-500/20 border-2 border-cyan-500/40 flex items-center justify-center">
             <span className="font-display font-bold text-sm text-cyan-400 tracking-wide">
@@ -216,12 +176,12 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
           </div>
         </div>
 
-        {/* ── Bus Slaves (below bus) ── */}
+        {/* Bus Slaves */}
         <div className="flex justify-center gap-3 mt-1 px-4">
           {slaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusStub direction="up" />
-              <BlockNode block={b} className="px-3 py-2.5 w-24 h-22" />
+              <BlockNode block={b} className="px-3 py-2.5 w-24 h-[5.5rem]" />
             </div>
           ))}
         </div>
@@ -233,6 +193,56 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
           {designName} System
         </span>
       </div>
+
+      {/* Info Panel */}
+      <AnimatePresence mode="wait">
+        {selectedBlock && (
+          <motion.div
+            key={selectedBlock.name}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-4 pt-4 border-t border-border/40">
+              <div className={`rounded-xl border-2 p-5 ${(blockTypeStyles[selectedBlock.type] || defaultStyle).bg} ${(blockTypeStyles[selectedBlock.type] || defaultStyle).border}`}>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`p-2 rounded-lg ${(blockTypeStyles[selectedBlock.type] || defaultStyle).bg} ${(blockTypeStyles[selectedBlock.type] || defaultStyle).text}`}>
+                      {blockTypeIcon[selectedBlock.type] || <Cpu className="h-5 w-5" />}
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-display font-bold text-sm">{selectedBlock.name}</h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className={`text-xs font-medium capitalize ${(blockTypeStyles[selectedBlock.type] || defaultStyle).text}`}>
+                          {selectedBlock.type}
+                        </span>
+                        {selectedBlock.external && (
+                          <span className="text-[10px] text-orange-400 font-medium flex items-center gap-0.5">
+                            <ExternalLinkIcon className="h-2.5 w-2.5" /> External Interface
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedBlock(null)}
+                    className="p-1 rounded-md hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                {selectedBlock.info && (
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    {selectedBlock.info}
+                  </p>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
