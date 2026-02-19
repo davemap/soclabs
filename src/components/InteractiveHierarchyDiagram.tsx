@@ -153,19 +153,19 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 aspect-square max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
-      <div className="flex items-center gap-1.5 mb-5 flex-wrap">
+      <div className="flex items-center gap-1 mb-4 flex-wrap">
         {breadcrumb.map((b, i) => {
           const isLast = i === breadcrumb.length - 1;
           const bs = layerStyles[Math.min(i, layerStyles.length - 1)];
           return (
-            <span key={b.name} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronRight className="h-4 w-4 text-muted-foreground/30 shrink-0" />}
+            <span key={b.name} className="flex items-center gap-1">
+              {i > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />}
               {isLast ? (
-                <span className={`text-sm md:text-base font-bold ${bs.label}`}>{b.name}</span>
+                <span className={`text-xs font-bold ${bs.label}`}>{b.name}</span>
               ) : (
                 <button
                   onClick={() => onNavigate(i)}
-                  className={`text-sm md:text-base font-medium ${bs.label} hover:underline transition-colors cursor-zoom-out`}
+                  className={`text-xs font-medium ${bs.label} hover:underline transition-colors cursor-zoom-out`}
                 >
                   {b.name}
                 </button>
@@ -231,13 +231,14 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
   const left = pads.slice(topCount + rightCount + bottomCount);
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelectPad(padNode, -1)}
-      className={`relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] mx-auto overflow-hidden w-full text-left transition-all hover:shadow-md ${
-        isPadSelected ? "ring-2 ring-offset-2 ring-amber-400 shadow-lg" : ""
-      }`}
-    >
+    <div className="flex items-center justify-center pt-4">
+      <button
+        type="button"
+        onClick={() => onSelectPad(padNode, -1)}
+        className={`relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] w-full overflow-hidden text-left transition-all hover:shadow-md ${
+          isPadSelected ? "ring-2 ring-offset-2 ring-amber-400 shadow-lg" : ""
+        }`}
+      >
       {/* Outer label */}
       <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-4 py-1 rounded-b-lg bg-amber-200 dark:bg-amber-800 border border-t-0 border-amber-300 dark:border-amber-600">
         <div className="flex items-center gap-2">
@@ -294,7 +295,8 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
           <div />
         </div>
       </div>
-    </button>
+      </button>
+    </div>
   );
 };
 
