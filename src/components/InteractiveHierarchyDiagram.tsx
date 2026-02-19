@@ -127,6 +127,8 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 };
 
 /* ── Zoomed-in view ── */
+const ITEMS_PER_PAGE = 3;
+
 const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode, onSelect }: {
   node: HierarchyNode;
   depth: number;
@@ -137,6 +139,14 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
   onSelect: (node: HierarchyNode, depth: number) => void;
 }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  const children = node.children || [];
+  const totalPages = Math.ceil(children.length / ITEMS_PER_PAGE);
+  const [page, setPage] = useState(0);
+
+  const visibleChildren = useMemo(
+    () => children.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE),
+    [children, page]
+  );
 
   return (
     <motion.div
@@ -181,24 +191,66 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
         )}
       </div>
 
-      {/* Children - scrollable within square frame */}
-      <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden mt-4 pr-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-        <div className="grid gap-3 auto-rows-fr" style={{
-          gridTemplateColumns: `repeat(auto-fill, minmax(${(node.children?.length || 0) <= 3 ? "200px" : "140px"}, 1fr))`
-        }}>
-          {node.children?.map(child => {
-            const hasChildren = child.children && child.children.length > 0;
-            if (hasChildren) {
-              return (
-                <div key={child.name}>
-                  <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} square isSelected={selectedNode?.name === child.name} onSelect={onSelect} />
-                </div>
-              );
-            }
-            return <div key={child.name}><LeafBlock node={child} depth={depth + 1} isSelected={selectedNode?.name === child.name} onSelect={onSelect} /></div>;
-          })}
-        </div>
+      {/* Children grid - paginated */}
+      <div className="flex-1 min-h-0 mt-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={page}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.15 }}
+            className="grid gap-3 h-full"
+            style={{
+              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 3)}, 1fr)`,
+              gridTemplateRows: "1fr",
+            }}
+          >
+            {visibleChildren.map(child => {
+              const hasChildren = child.children && child.children.length > 0;
+              if (hasChildren) {
+                return (
+                  <div key={child.name}>
+                    <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} square isSelected={selectedNode?.name === child.name} onSelect={onSelect} />
+                  </div>
+                );
+              }
+              return <div key={child.name}><LeafBlock node={child} depth={depth + 1} isSelected={selectedNode?.name === child.name} onSelect={onSelect} /></div>;
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
+
+      {/* Pagination bar */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 mt-4 pt-3 border-t border-border/30">
+          <button
+            onClick={(e) => { e.stopPropagation(); setPage(p => Math.max(0, p - 1)); }}
+            disabled={page === 0}
+            className="p-1.5 rounded-lg hover:bg-muted/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalPages }).map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setPage(i); }}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === page ? `scale-125 ${s.label.replace("text-", "bg-")}` : "bg-muted-foreground/20 hover:bg-muted-foreground/40"
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setPage(p => Math.min(totalPages - 1, p + 1)); }}
+            disabled={page === totalPages - 1}
+            className="p-1.5 rounded-lg hover:bg-muted/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 };
