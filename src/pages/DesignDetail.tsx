@@ -162,41 +162,36 @@ const DesignDetail = () => {
 
               {/* Interactive Architecture / Hierarchy Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-display font-bold">
-                    {diagramView === "architecture" ? "System Architecture" : "System Hierarchy"}
-                  </h2>
-                  {design.moduleHierarchy && (
-                    <div className="flex items-center bg-muted/60 rounded-lg p-1 gap-0.5">
-                      <button
-                        onClick={() => setDiagramView("architecture")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                          diagramView === "architecture"
-                            ? "bg-background shadow-sm text-foreground"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        <Layers className="h-3.5 w-3.5" />
-                        Architecture
-                      </button>
-                      <button
-                        onClick={() => setDiagramView("hierarchy")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-                          diagramView === "hierarchy"
-                            ? "bg-background shadow-sm text-foreground"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        <FolderTree className="h-3.5 w-3.5" />
-                        Hierarchy
-                      </button>
-                    </div>
-                  )}
-                </div>
+                {design.moduleHierarchy && (
+                  <div className="flex items-center gap-1 bg-muted rounded-xl p-1.5 mb-6">
+                    <button
+                      onClick={() => setDiagramView("architecture")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                        diagramView === "architecture"
+                          ? "bg-background shadow-md text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <Layers className="h-4 w-4" />
+                      System Architecture
+                    </button>
+                    <button
+                      onClick={() => setDiagramView("hierarchy")}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                        diagramView === "hierarchy"
+                          ? "bg-background shadow-md text-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      <FolderTree className="h-4 w-4" />
+                      Chip Hierarchy
+                    </button>
+                  </div>
+                )}
                 <p className="text-muted-foreground text-sm mb-6">
                   {diagramView === "architecture"
                     ? "Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources."
-                    : "Browse the design's module hierarchy. Click on any file or module to view its description and related documentation."}
+                    : "Explore the physical chip hierarchy from the outermost pad ring down to individual IP blocks. Click on any layer to view its description."}
                 </p>
                 {diagramView === "architecture" ? (
                   <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
