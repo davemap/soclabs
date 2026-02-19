@@ -1862,8 +1862,8 @@ export const technologies = [
   {
     id: "ahb-lite",
     name: "AMBA AHB-Lite",
-    group: "Components",
-    category: "System Interconnects",
+    group: "Protocols",
+    category: "Bus Protocols",
     description:
       "A simplified single-master variant of AMBA AHB, providing a lightweight on-chip bus ideal for small, low-power SoCs like nanoSoC.",
     longDescription:
@@ -1885,8 +1885,8 @@ export const technologies = [
   {
     id: "ahb",
     name: "AMBA AHB / AHB Bus Matrix",
-    group: "Components",
-    category: "System Interconnects",
+    group: "Protocols",
+    category: "Bus Protocols",
     description:
       "Full multi-master AHB bus with arbitration and optional bus matrix topology, enabling concurrent master access in mid-range SoCs like milliSoC.",
     longDescription:
@@ -1908,8 +1908,8 @@ export const technologies = [
   {
     id: "apb",
     name: "AMBA APB",
-    group: "Components",
-    category: "System Interconnects",
+    group: "Protocols",
+    category: "Bus Protocols",
     description:
       "ARM's low-power peripheral bus protocol, used as a bridge from AHB/AXI to low-bandwidth peripherals like GPIO, UART, timers, and watchdog.",
     longDescription:
@@ -1926,6 +1926,93 @@ export const technologies = [
     links: [
       { label: "AMBA APB Spec (IHI 0024)", url: "https://developer.arm.com/documentation/ihi0024/latest" },
       { label: "ARM CMSDK APB Components", url: "https://developer.arm.com/Tools%20and%20Software/Corstone-101" },
+    ],
+  },
+  {
+    id: "axi",
+    name: "AMBA AXI / AXI-Lite",
+    group: "Protocols",
+    category: "Bus Protocols",
+    description:
+      "ARM's high-performance on-chip interconnect protocol with separate read/write channels and burst support. AXI-Lite is a simplified variant for register-mapped peripherals.",
+    longDescription:
+      "AXI (Advanced eXtensible Interface) is the highest-performance protocol in the AMBA family, supporting multiple outstanding transactions, out-of-order completion, and separate address/data channels for reads and writes. AXI4 adds Quality of Service (QoS) signalling. AXI-Lite is a simplified variant that omits bursts and ID tags, making it ideal for simple register-mapped control interfaces.",
+    features: [
+      "Separate read and write address/data channels",
+      "Burst transfers up to 256 beats",
+      "Out-of-order transaction completion",
+      "Multiple outstanding transaction support",
+      "AXI-Lite: simplified register-mapped variant",
+      "AXI-Stream: point-to-point data streaming",
+      "QoS signalling for priority-based arbitration",
+    ],
+    links: [
+      { label: "AMBA AXI Spec (IHI 0022)", url: "https://developer.arm.com/documentation/ihi0022/latest" },
+      { label: "AXI Protocol Overview", url: "https://developer.arm.com/architectures/system-architectures/amba/amba-4" },
+    ],
+  },
+  {
+    id: "uart-protocol",
+    name: "UART Protocol",
+    group: "Protocols",
+    category: "Serial Protocols",
+    description:
+      "Universal Asynchronous Receiver-Transmitter — a simple, widely-used serial communication protocol for point-to-point data transfer.",
+    longDescription:
+      "UART is one of the oldest and most ubiquitous serial communication protocols, providing full-duplex, asynchronous data transfer between two devices. It requires no clock signal, instead using start/stop bits and an agreed baud rate. UART is the standard debug and console interface in embedded SoCs and is used extensively in the SoC Labs reference designs.",
+    features: [
+      "Full-duplex asynchronous communication",
+      "Configurable baud rate (9600 to 3 Mbaud+)",
+      "Start/stop bit framing (8N1, 8E1, etc.)",
+      "Hardware flow control (RTS/CTS) optional",
+      "TX/RX FIFO buffering",
+      "Interrupt-driven or DMA-driven operation",
+    ],
+    links: [
+      { label: "UART Protocol Guide", url: "https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter" },
+    ],
+  },
+  {
+    id: "spi-protocol",
+    name: "SPI Protocol",
+    group: "Protocols",
+    category: "Serial Protocols",
+    description:
+      "Serial Peripheral Interface — a synchronous, full-duplex master-slave protocol for high-speed short-distance communication.",
+    longDescription:
+      "SPI (Serial Peripheral Interface) is a synchronous serial communication protocol widely used for interfacing with sensors, displays, flash memory, and other peripherals. It uses a master-slave architecture with separate MOSI/MISO data lines and a shared clock (SCLK). SPI supports higher data rates than UART and I2C, making it ideal for data-intensive peripherals.",
+    features: [
+      "Synchronous, full-duplex communication",
+      "Master-slave architecture with chip select (CS)",
+      "Configurable clock polarity and phase (CPOL/CPHA)",
+      "Data rates up to 50+ MHz",
+      "No addressing — uses chip select for device selection",
+      "Quad-SPI (QSPI) variant for flash memory interfaces",
+    ],
+    links: [
+      { label: "SPI Protocol Overview", url: "https://en.wikipedia.org/wiki/Serial_Peripheral_Interface" },
+    ],
+  },
+  {
+    id: "pcie-protocol",
+    name: "PCIe",
+    group: "Protocols",
+    category: "High-Speed Protocols",
+    description:
+      "Peripheral Component Interconnect Express — a high-speed, point-to-point serial interconnect for chip-to-chip and board-level communication.",
+    longDescription:
+      "PCIe (PCI Express) is the industry-standard high-speed serial interconnect for connecting processors to GPUs, SSDs, network cards, and custom accelerators. It uses a packet-based, lane-scalable architecture (×1, ×4, ×8, ×16) with each lane providing full-duplex serial communication. PCIe is increasingly used in advanced SoC designs for high-bandwidth off-chip connectivity.",
+    features: [
+      "Point-to-point serial architecture",
+      "Lane-scalable: ×1 to ×16 configurations",
+      "PCIe Gen 3: 8 GT/s per lane (~1 GB/s per lane)",
+      "PCIe Gen 4: 16 GT/s per lane (~2 GB/s per lane)",
+      "PCIe Gen 5: 32 GT/s per lane (~4 GB/s per lane)",
+      "Packet-based transaction layer with TLP",
+      "Memory-mapped and I/O-mapped addressing",
+    ],
+    links: [
+      { label: "PCI-SIG Specifications", url: "https://pcisig.com/specifications" },
     ],
   },
 

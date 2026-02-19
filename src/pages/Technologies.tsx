@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare, Cable as CableIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
@@ -34,6 +34,10 @@ const subcategoryIconMap: Record<string, React.ElementType> = {
   "Silicon Validation": FlaskConical,
   "FPGA Boards": HardDrive,
   "Shuttle Services": Rocket,
+  // Protocol subcategories
+  "Bus Protocols": Cable,
+  "Serial Protocols": Radio,
+  "High-Speed Protocols": Zap,
 };
 
 // Map EDA category names to learning phase IDs
@@ -53,6 +57,7 @@ const phaseIdToEdaCategory: Record<string, string> = Object.fromEntries(
 // Build the tree: group → subcategory → technologies
 const groups = [
   { key: "Components", label: "Components", icon: Cpu, description: "IP blocks that make up your SoC" },
+  { key: "Protocols", label: "Protocols", icon: CableIcon, description: "On-chip and off-chip communication standards" },
   { key: "EDA Tooling", label: "EDA Tooling", icon: Wrench, description: "Tools for each stage of the design flow" },
   { key: "Infrastructure", label: "Infrastructure", icon: Server, description: "Boards, services, and fabrication" },
 ];
@@ -80,10 +85,15 @@ const subcategoryColors: Record<string, string> = {
   "Silicon Validation": "bg-slate-100 dark:bg-slate-500/10 text-slate-600 dark:text-slate-400",
   "FPGA Boards": "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400",
   "Shuttle Services": "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  // Protocol subcategories
+  "Bus Protocols": "bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400",
+  "Serial Protocols": "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  "High-Speed Protocols": "bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400",
 };
 
 const groupColors: Record<string, string> = {
   Components: "border-primary/30",
+  Protocols: "border-sky-500/30",
   "EDA Tooling": "border-violet/30",
   Infrastructure: "border-coral/30",
 };

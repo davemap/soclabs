@@ -54,11 +54,17 @@ const techIdStyles: Record<string, { bg: string; border: string; label: string }
   "arm-cortex-m0": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
   "arm-cortex-m3": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
   "arm-cortex-m7": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
-  // Interconnects (sky)
+  // Bus Protocols (sky)
   "ahb-lite": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
   "ahb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
   "apb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
-  "amba-interconnect": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
+  "axi": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  "amba-interconnect": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  // Serial Protocols (amber)
+  "uart-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
+  "spi-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
+  // High-Speed Protocols (violet)
+  "pcie-protocol": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
   // Memory (emerald)
   "memory-controllers": { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", label: "text-emerald-600 dark:text-emerald-400" },
   // Peripherals (amber)
