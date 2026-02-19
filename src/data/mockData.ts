@@ -98,7 +98,7 @@ export const referenceDesigns = [
             { name: "Expansion SRAM High", type: "module", description: "Upper expansion SRAM — default 16KB single-cycle SRAM. Second SRAM bank for double-buffering or larger data sets.", techId: "memory-controllers" },
             { name: "Custom Accelerator", type: "module", userDesigned: true, description: "User-defined accelerator subsystem. AHB slave + DMA request/done signals + CPU interrupt lines. Integrate your custom IP here.", techId: "hw-acceleration" },
           ]},
-          { name: "extio8x4_axis_initiator", type: "module", description: "External I/O interface (u_extio8x4_axis_initiator). 8-bit × 4-channel AXI-Stream to 4-bit parallel I/O bridge. Routes ADP and DATA streams to P1[0:6] pads when FT1248MODE is low.", techId: "standard-peripherals" },
+          { name: "External I/O Bridge", type: "module", description: "External I/O interface — 8-bit × 4-channel AXI-Stream to 4-bit parallel I/O bridge. Routes ADP and DATA streams to P1[0:6] pads when FT1248MODE is low.", techId: "standard-peripherals" },
         ]},
       ]},
     ],
