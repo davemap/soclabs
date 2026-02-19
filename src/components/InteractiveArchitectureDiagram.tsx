@@ -382,13 +382,19 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                       ))}
                     </div>
 
-                    {/* The Bus */}
+                    {/* The Bus — clickable */}
                     <div className="relative mx-1">
-                      <div className="w-full h-8 rounded bg-gradient-to-r from-cyan-500/20 via-cyan-500/30 to-cyan-500/20 border border-cyan-500/40 flex items-center justify-center">
-                        <span className="font-display font-bold text-[10px] text-cyan-400 tracking-wide">
+                      <button
+                        onClick={() => {
+                          const busBlock = interconnects[0];
+                          if (busBlock) handleClick(busBlock);
+                        }}
+                        className={`w-full h-8 rounded bg-gradient-to-r from-cyan-500/20 via-cyan-500/30 to-cyan-500/20 border border-cyan-500/40 flex items-center justify-center cursor-pointer hover:border-cyan-400 hover:from-cyan-500/30 hover:via-cyan-500/40 hover:to-cyan-500/30 transition-all duration-300 group ${selectedBlock?.name === busName ? "ring-2 ring-cyan-400/60 border-cyan-400" : ""}`}
+                      >
+                        <span className="font-display font-bold text-[10px] text-cyan-400 tracking-wide group-hover:text-cyan-300 transition-colors">
                           {busName}
                         </span>
-                      </div>
+                      </button>
                     </div>
 
                     {/* Bus Slaves */}
