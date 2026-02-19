@@ -89,10 +89,13 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       subsystemExpanded === sub.name && sub.subBlocks?.some(sb => sb.name === block.name)
     );
     const isInternalBus = block.name === "AHB Lite" && subsystemExpanded;
+    const isPeripheralChild = peripheralsExpanded && (
+      block.type === "peripheral" || block.name === "APB Bus"
+    );
 
     setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
 
-    if (!isSubBlockOfExpanded && !isInternalBus) {
+    if (!isSubBlockOfExpanded && !isInternalBus && !isPeripheralChild) {
       setPeripheralsExpanded(false);
       setSubsystemExpanded(null);
     }
