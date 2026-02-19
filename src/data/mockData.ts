@@ -48,7 +48,7 @@ export const referenceDesigns = [
       ] },
     ],
     moduleHierarchy: [
-      { name: "nanosoc_chip_pads", type: "group", description: "The outermost physical layer — the I/O pad ring connecting the silicon die to package pins. Active pads are grouped into Port 0 (P0[15:0]) and Port 1 (P1[15:0]) GPIO banks, plus dedicated SWD, power, and clock/reset pads.", children: [
+      { name: "Chip Padring", type: "group", description: "The outermost physical layer — the I/O pad ring connecting the silicon die to package pins. Active pads are grouped into Port 0 (P0[15:0]) and Port 1 (P1[15:0]) GPIO banks, plus dedicated SWD, power, and clock/reset pads.", children: [
         { name: "P0[15:0]", type: "module", description: "Port 0 GPIO pad bank — 16 bidirectional pads with configurable drive strength, output enable, and alternate function muxing.", techId: "standard-peripherals" },
         { name: "P1[15:0]", type: "module", description: "Port 1 GPIO pad bank — 16 bidirectional pads. Lower pins (P1[0:7]) are muxed for FT1248 or EXTIO8x4 interface depending on P1[7] mode select.", techId: "standard-peripherals" },
         { name: "SWDIO", type: "module", description: "Serial Wire Debug bidirectional data pad with output enable control. Active during debug sessions.", techId: "standard-peripherals" },
