@@ -1,8 +1,9 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree } from "lucide-react";
 import InteractiveArchitectureDiagram from "@/components/InteractiveArchitectureDiagram";
+import InteractiveHierarchyDiagram from "@/components/InteractiveHierarchyDiagram";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +20,7 @@ const DesignDetail = () => {
   const design = referenceDesigns.find((d) => d.id === id);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
+  const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">("architecture");
 
   useEffect(() => {
     if (!design) return;
@@ -158,11 +160,49 @@ const DesignDetail = () => {
                 </div>
               </motion.div>
 
-              {/* Interactive Architecture Diagram */}
+              {/* Interactive Architecture / Hierarchy Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">System Architecture</h2>
-                <p className="text-muted-foreground text-sm mb-6">Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources.</p>
-                <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-display font-bold">
+                    {diagramView === "architecture" ? "System Architecture" : "System Hierarchy"}
+                  </h2>
+                  {design.moduleHierarchy && (
+                    <div className="flex items-center bg-muted/60 rounded-lg p-1 gap-0.5">
+                      <button
+                        onClick={() => setDiagramView("architecture")}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                          diagramView === "architecture"
+                            ? "bg-background shadow-sm text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <Layers className="h-3.5 w-3.5" />
+                        Architecture
+                      </button>
+                      <button
+                        onClick={() => setDiagramView("hierarchy")}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
+                          diagramView === "hierarchy"
+                            ? "bg-background shadow-sm text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <FolderTree className="h-3.5 w-3.5" />
+                        Hierarchy
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="text-muted-foreground text-sm mb-6">
+                  {diagramView === "architecture"
+                    ? "Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources."
+                    : "Browse the design's module hierarchy. Click on any file or module to view its description and related documentation."}
+                </p>
+                {diagramView === "architecture" ? (
+                  <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
+                ) : design.moduleHierarchy ? (
+                  <InteractiveHierarchyDiagram hierarchy={design.moduleHierarchy} designName={design.name} />
+                ) : null}
               </motion.div>
 
               {/* Related Technologies */}
