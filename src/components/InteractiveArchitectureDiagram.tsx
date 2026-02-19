@@ -21,38 +21,49 @@ interface InteractiveArchitectureDiagramProps {
 }
 
 const blockTypeIcon: Record<string, React.ReactNode> = {
-  processor: <Cpu className="h-4 w-4" />,
-  interconnect: <Layers className="h-4 w-4" />,
-  memory: <MemoryStick className="h-4 w-4" />,
-  peripheral: <Radio className="h-4 w-4" />,
-  controller: <Cpu className="h-4 w-4" />,
-  interface: <Plug className="h-4 w-4" />,
+  processor: <Cpu className="h-6 w-6" />,
+  interconnect: <Layers className="h-6 w-6" />,
+  memory: <MemoryStick className="h-6 w-6" />,
+  peripheral: <Radio className="h-6 w-6" />,
+  controller: <Cpu className="h-6 w-6" />,
+  interface: <Plug className="h-6 w-6" />,
 };
 
-const typeColors: Record<string, { bg: string; border: string; text: string; pad: string }> = {
-  processor: { bg: "bg-blue-100/80 dark:bg-blue-500/15", border: "border-blue-300 dark:border-blue-500/40", text: "text-blue-700 dark:text-blue-400", pad: "bg-blue-300 dark:bg-blue-500/50" },
-  controller: { bg: "bg-violet-100/80 dark:bg-violet-500/15", border: "border-violet-300 dark:border-violet-500/40", text: "text-violet-700 dark:text-violet-400", pad: "bg-violet-300 dark:bg-violet-500/50" },
-  interconnect: { bg: "bg-indigo-100/80 dark:bg-indigo-500/15", border: "border-indigo-300 dark:border-indigo-500/40", text: "text-indigo-700 dark:text-indigo-400", pad: "bg-indigo-300 dark:bg-indigo-500/50" },
-  memory: { bg: "bg-green-100/80 dark:bg-green-500/15", border: "border-green-300 dark:border-green-500/40", text: "text-green-700 dark:text-green-400", pad: "bg-green-300 dark:bg-green-500/50" },
-  peripheral: { bg: "bg-amber-100/80 dark:bg-amber-500/15", border: "border-amber-300 dark:border-amber-500/40", text: "text-amber-700 dark:text-amber-400", pad: "bg-amber-300 dark:bg-amber-500/50" },
-  interface: { bg: "bg-rose-100/80 dark:bg-rose-500/15", border: "border-rose-300 dark:border-rose-500/40", text: "text-rose-700 dark:text-rose-400", pad: "bg-rose-300 dark:bg-rose-500/50" },
+const typeColors: Record<string, { bg: string; border: string; text: string }> = {
+  processor: { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", text: "text-blue-600 dark:text-blue-400" },
+  controller: { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", text: "text-violet-600 dark:text-violet-400" },
+  interconnect: { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", text: "text-indigo-600 dark:text-indigo-400" },
+  memory: { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", text: "text-emerald-600 dark:text-emerald-400" },
+  peripheral: { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", text: "text-amber-600 dark:text-amber-400" },
+  interface: { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", text: "text-rose-600 dark:text-rose-400" },
 };
 
-const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-foreground", pad: "bg-muted-foreground/30" };
+const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-foreground" };
 
-const padSignalNames: Record<string, string[]> = {
-  "GPIO": ["IO[0]", "IO[1]", "IO[2]", "IO[3]", "IO[4]", "IO[5]"],
-  "UART": ["TXD", "RXD", "CTS", "RTS"],
-  "Debug Controller": ["SWDIO", "SWDCK", "SWO", "nRST"],
-};
+const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
 
-  // Connector arrow between block and bus
+  const processors = blocks.filter((b) => b.type === "processor");
+  const controllers = blocks.filter((b) => b.type === "controller");
+  const interconnects = blocks.filter((b) => b.type === "interconnect");
+  const memories = blocks.filter((b) => b.type === "memory");
+  const peripherals = blocks.filter((b) => b.type === "peripheral");
+  const interfaces = blocks.filter((b) => b.type === "interface");
+
+  const masters = [...processors, ...controllers];
+  const slaves = [...memories, ...peripherals, ...interfaces];
+  const busName = interconnects[0]?.name || "System Bus";
+
+  const handleClick = (block: Block) => {
+    setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
+  };
+
   const BusArrow = () => (
-    <div className="flex flex-col items-center my-1">
-      <svg width="14" height="24" viewBox="0 0 14 24" className="text-indigo-400 dark:text-indigo-500/70">
-        <line x1="7" y1="0" x2="7" y2="24" stroke="currentColor" strokeWidth="1.5" />
-        <polygon points="4,5 7,0 10,5" fill="currentColor" />
-        <polygon points="4,19 7,24 10,19" fill="currentColor" />
+    <div className="flex flex-col items-center py-1">
+      <svg width="16" height="28" viewBox="0 0 16 28" className="text-indigo-300 dark:text-indigo-500/60">
+        <line x1="8" y1="0" x2="8" y2="28" stroke="currentColor" strokeWidth="2" />
+        <polygon points="4,6 8,0 12,6" fill="currentColor" />
+        <polygon points="4,22 8,28 12,22" fill="currentColor" />
       </svg>
     </div>
   );
@@ -65,47 +76,47 @@ const padSignalNames: Record<string, string[]> = {
       <button
         onClick={() => handleClick(block)}
         className={`
-          flex flex-col items-center justify-center gap-1 rounded-lg border
-          ${c.bg} ${c.border} ${c.text}
-          ${isSelected ? "ring-2 ring-offset-2 ring-current scale-[1.03]" : ""}
+          flex flex-col items-center justify-center gap-1.5 rounded-xl border-2
+          bg-white dark:bg-card ${c.border} ${c.text}
+          ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
           cursor-pointer hover:scale-[1.02] hover:shadow-md
           transition-all duration-200 ${className}
         `}
       >
-        <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}</span>
-        <span className="font-display font-semibold text-[11px] text-center leading-tight px-1">{block.name}</span>
+        <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-6 w-6" />}</span>
+        <span className="font-display font-bold text-xs text-center leading-tight px-1">{block.name}</span>
       </button>
     );
   };
 
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/50 p-4 md:p-6 overflow-x-auto">
+    <div className="rounded-2xl border border-border/60 bg-white dark:bg-card p-5 md:p-8">
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mb-5 pb-3 border-b border-border/40">
+      <div className="flex flex-wrap gap-4 mb-6 pb-4 border-b border-border/30">
         {Object.entries(typeColors).map(([type, c]) => {
           if (!blocks.some((b) => b.type === type)) return null;
           return (
-            <div key={type} className="flex items-center gap-1.5">
-              <div className={`w-3 h-3 rounded-sm ${c.bg} border ${c.border}`} />
-              <span className="text-xs text-muted-foreground capitalize">{type}</span>
+            <div key={type} className="flex items-center gap-2">
+              <div className={`w-3.5 h-3.5 rounded ${c.bg} border-2 ${c.border}`} />
+              <span className="text-sm text-muted-foreground capitalize">{type}</span>
             </div>
           );
         })}
       </div>
 
-      {/* Simple block diagram */}
-      <div className="max-w-[640px] mx-auto rounded-xl border border-border/50 bg-muted/20 p-6 md:p-8">
+      {/* Block diagram */}
+      <div className="max-w-[700px] mx-auto py-4">
 
-        {/* Design label */}
-        <div className="text-center mb-6">
-          <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">{designName} System Architecture</span>
+        {/* Title */}
+        <div className="text-center mb-8">
+          <h3 className="text-sm font-display font-bold text-muted-foreground uppercase tracking-widest">{designName} System Architecture</h3>
         </div>
 
         {/* Masters row */}
-        <div className="flex justify-center gap-4 mb-1">
+        <div className="flex justify-center gap-5 mb-1">
           {masters.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
-              <BlockNode block={b} className="w-28 h-20 px-2" />
+              <BlockNode block={b} className="w-32 h-24 px-3" />
               <BusArrow />
             </div>
           ))}
@@ -115,21 +126,22 @@ const padSignalNames: Record<string, string[]> = {
         <button
           onClick={() => { const bus = interconnects[0]; if (bus) handleClick(bus); }}
           className={`
-            w-full h-9 rounded-md border flex items-center justify-center
-            ${typeColors.interconnect.bg} ${typeColors.interconnect.border} ${typeColors.interconnect.text}
-            ${selectedBlock?.name === busName ? "ring-2 ring-current" : ""}
+            w-full h-10 rounded-lg border-2 flex items-center justify-center
+            bg-white dark:bg-card ${typeColors.interconnect.border} ${typeColors.interconnect.text}
+            ${selectedBlock?.name === busName ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
             cursor-pointer hover:shadow-md transition-all duration-200
           `}
         >
-          <span className="font-display font-bold text-xs tracking-wide">{busName}</span>
+          <Layers className="h-4 w-4 mr-2" />
+          <span className="font-display font-bold text-sm tracking-wide">{busName}</span>
         </button>
 
         {/* Slaves row */}
-        <div className="flex justify-center gap-3 mt-1 flex-wrap">
+        <div className="flex justify-center gap-4 mt-1 flex-wrap">
           {slaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusArrow />
-              <BlockNode block={b} className="w-24 h-[4.5rem] px-1.5" />
+              <BlockNode block={b} className="w-28 h-20 px-2" />
             </div>
           ))}
         </div>
@@ -146,40 +158,31 @@ const padSignalNames: Record<string, string[]> = {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 pt-4 border-t border-border/40">
+            <div className="mt-6 pt-5 border-t border-border/30">
               <div className={`rounded-xl border-2 p-5 ${(typeColors[selectedBlock.type] || defaultColor).bg} ${(typeColors[selectedBlock.type] || defaultColor).border}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`p-2 rounded-lg ${(typeColors[selectedBlock.type] || defaultColor).bg} ${(typeColors[selectedBlock.type] || defaultColor).text}`}>
-                      {blockTypeIcon[selectedBlock.type] || <Cpu className="h-5 w-5" />}
+                    <div className={`p-2.5 rounded-lg ${(typeColors[selectedBlock.type] || defaultColor).bg} ${(typeColors[selectedBlock.type] || defaultColor).text}`}>
+                      {blockTypeIcon[selectedBlock.type] || <Cpu className="h-6 w-6" />}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-display font-bold text-sm">{selectedBlock.name}</h4>
+                      <h4 className="font-display font-bold text-base">{selectedBlock.name}</h4>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-xs font-medium capitalize ${(typeColors[selectedBlock.type] || defaultColor).text}`}>
+                        <span className={`text-sm font-medium capitalize ${(typeColors[selectedBlock.type] || defaultColor).text}`}>
                           {selectedBlock.type}
                         </span>
                         {selectedBlock.external && (
-                          <span className="text-[10px] text-orange-500 dark:text-orange-400 font-medium flex items-center gap-0.5">
-                            <ExternalLinkIcon className="h-2.5 w-2.5" /> External I/O
+                          <span className="text-xs text-muted-foreground font-medium flex items-center gap-0.5">
+                            <ExternalLinkIcon className="h-3 w-3" /> External I/O
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
-                  <button onClick={() => setSelectedBlock(null)} className="p-1 rounded-md hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors shrink-0">
+                  <button onClick={() => setSelectedBlock(null)} className="p-1.5 rounded-lg hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors shrink-0">
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-
-                {selectedBlock.external && padSignalNames[selectedBlock.name] && (
-                  <div className="mt-3 flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] text-orange-500 dark:text-orange-400 font-semibold uppercase tracking-wider">Pads:</span>
-                    {padSignalNames[selectedBlock.name].map((s) => (
-                      <Badge key={s} variant="outline" className="text-[10px] font-mono border-orange-400/40 text-orange-500 dark:text-orange-400">{s}</Badge>
-                    ))}
-                  </div>
-                )}
 
                 {selectedBlock.info && (
                   <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{selectedBlock.info}</p>
@@ -188,9 +191,9 @@ const padSignalNames: Record<string, string[]> = {
                 <div className="mt-4 flex flex-wrap gap-4">
                   {selectedBlock.gateCount && (
                     <div className="flex items-center gap-2">
-                      <Microchip className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Gate count:</span>
-                      <Badge variant="secondary" className="text-xs font-mono">{selectedBlock.gateCount}</Badge>
+                      <Microchip className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Gate count:</span>
+                      <Badge variant="secondary" className="text-sm font-mono">{selectedBlock.gateCount}</Badge>
                     </div>
                   )}
                 </div>
@@ -198,13 +201,13 @@ const padSignalNames: Record<string, string[]> = {
                 {selectedBlock.configOptions && selectedBlock.configOptions.length > 0 && (
                   <div className="mt-3">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Settings2 className="h-3.5 w-3.5 text-muted-foreground" />
-                      <span className="text-xs font-semibold text-muted-foreground">Configuration Options</span>
+                      <Settings2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-semibold text-muted-foreground">Configuration Options</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       {selectedBlock.configOptions.map((opt, i) => (
-                        <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                          <span className="mt-0.5 shrink-0 w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
+                        <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                          <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-muted-foreground/40" />
                           <span>{opt}</span>
                         </div>
                       ))}
