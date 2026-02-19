@@ -65,19 +65,22 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const subsystemBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const processors = blocks.filter((b) => b.type === "processor");
   const controllers = blocks.filter((b) => b.type === "controller");
-  const subsystems = blocks.filter((b) => b.type === "subsystem");
   const interconnects = blocks.filter((b) => b.type === "interconnect");
   const memories = blocks.filter((b) => b.type === "memory");
   const peripherals = blocks.filter((b) => b.type === "peripheral");
   const interfaces = blocks.filter((b) => b.type === "interface");
+  const allSubsystems = blocks.filter((b) => b.type === "subsystem");
 
-  const masters = [...subsystems, ...processors, ...controllers];
-  const expansionBlocks = interfaces.filter((b) => b.name.toLowerCase().includes("expansion"));
-  const nonPeripheralSlaves = [...memories, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
+  // Subsystems in the masters row are those that contain processors or controllers
+  const masterSubsystems = allSubsystems.filter((s) => s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "controller"));
+  const slaveSubsystems = allSubsystems.filter((s) => !s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "controller"));
+
+  const masters = [...masterSubsystems, ...processors, ...controllers];
+  const nonPeripheralSlaves = [...memories, ...interfaces, ...slaveSubsystems];
   const busName = interconnects[0]?.name || "System Bus";
 
   const handleClick = (block: Block) => {
-    const isSubBlockOfExpanded = subsystems.some(sub =>
+    const isSubBlockOfExpanded = allSubsystems.some(sub =>
       subsystemExpanded === sub.name && sub.subBlocks?.some(sb => sb.name === block.name)
     );
     const isInternalBus = block.name === "AHB Lite" && subsystemExpanded;
@@ -141,7 +144,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
         {/* Expanded subsystem region — above masters */}
         <AnimatePresence>
-          {subsystems.map((sub) =>
+          {masterSubsystems.map((sub) =>
             subsystemExpanded === sub.name && sub.subBlocks ? (
               <motion.div
                 key={sub.name}
@@ -236,7 +239,31 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
           {nonPeripheralSlaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusArrow />
-              <BlockNode block={b} className="w-28 h-20 px-2" />
+              {b.type === "subsystem" && b.subBlocks ? (
+                <button
+                  ref={(el) => { subsystemBtnRefs.current[b.name] = el; }}
+                  onClick={() => {
+                    setSubsystemExpanded((prev) => (prev === b.name ? null : b.name));
+                    setPeripheralsExpanded(false);
+                    setSelectedBlock(null);
+                  }}
+                  className={`
+                    flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed
+                    bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
+                    ${subsystemExpanded === b.name ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
+                    cursor-pointer hover:scale-[1.02] hover:shadow-md
+                    transition-all duration-200 w-28 h-20 px-2
+                  `}
+                >
+                  <Box className="h-6 w-6" />
+                  <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
+                  <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                    {b.subBlocks.length} blocks {subsystemExpanded === b.name ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  </span>
+                </button>
+              ) : (
+                <BlockNode block={b} className="w-28 h-20 px-2" />
+              )}
             </div>
           ))}
 
@@ -266,30 +293,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               </button>
             </div>
           )}
-
-          {/* Expansion Region — dashed */}
-          {expansionBlocks.map((b) => {
-            const c = typeColors[b.type] || defaultColor;
-            const isSelected = selectedBlock?.name === b.name;
-            return (
-              <div key={b.name} className="flex flex-col items-center">
-                <BusArrow />
-                <button
-                  onClick={() => handleClick(b)}
-                  className={`
-                    flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed
-                    bg-white dark:bg-card ${c.border} ${c.text}
-                    ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
-                    cursor-pointer hover:scale-[1.02] hover:shadow-md
-                    transition-all duration-200 w-28 h-20 px-2
-                  `}
-                >
-                  <Plug className="h-6 w-6" />
-                  <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
-                </button>
-              </div>
-            );
-          })}
         </div>
 
         {/* Expanded peripherals region - full width below the slaves row */}
@@ -338,6 +341,50 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 </div>
               </div>
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Expanded slave subsystem region - below slaves row */}
+        <AnimatePresence>
+          {slaveSubsystems.map((sub) =>
+            subsystemExpanded === sub.name && sub.subBlocks ? (
+              <motion.div
+                key={sub.name}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden mt-1"
+              >
+                {/* Connector line — dynamically aligned to subsystem button center */}
+                <div className="relative h-4">
+                  {(() => {
+                    const btnEl = subsystemBtnRefs.current[sub.name];
+                    const containerEl = diagramRef.current;
+                    if (btnEl && containerEl) {
+                      const btnRect = btnEl.getBoundingClientRect();
+                      const containerRect = containerEl.getBoundingClientRect();
+                      const centerX = btnRect.left + btnRect.width / 2 - containerRect.left;
+                      return (
+                        <svg className="absolute top-0 text-sky-300 dark:text-sky-500/60" style={{ left: centerX - 1, width: 2, height: 16 }}>
+                          <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+                        </svg>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    {sub.subBlocks.map((sb) => (
+                      <div key={sb.name} className="flex flex-col items-center">
+                        <BlockNode block={sb} className="w-32 h-24 px-3" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ) : null
           )}
         </AnimatePresence>
       </div>
