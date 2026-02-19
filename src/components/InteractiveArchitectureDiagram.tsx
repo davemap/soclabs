@@ -167,24 +167,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     ))}
                   </div>
                 </div>
-                {/* Connector line — dynamically aligned to subsystem button center */}
-                <div className="relative h-4">
-                  {(() => {
-                    const btnEl = subsystemBtnRefs.current[sub.name];
-                    const containerEl = diagramRef.current;
-                    if (btnEl && containerEl) {
-                      const btnRect = btnEl.getBoundingClientRect();
-                      const containerRect = containerEl.getBoundingClientRect();
-                      const centerX = btnRect.left + btnRect.width / 2 - containerRect.left;
-                      return (
-                        <svg className={`absolute top-0 ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).text}`} style={{ left: centerX - 1, width: 2, height: 16 }}>
-                          <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-                        </svg>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
               </motion.div>
             ) : null
           )}
@@ -309,12 +291,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               transition={{ duration: 0.2 }}
               className="overflow-hidden mt-1"
             >
-              {/* Connector line from peripherals button to expanded region */}
-              <div className="flex justify-center">
-                <svg width="2" height="16" className="text-amber-300 dark:text-amber-500/60">
-                  <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-                </svg>
-              </div>
               <div className="rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-4">
                 {/* APB Bus bar */}
                 <button
@@ -332,13 +308,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 <div className="flex flex-wrap gap-4 justify-center">
                   {peripherals.map((b) => (
                     <div key={b.name} className="flex flex-col items-center">
-                      <div className="flex flex-col items-center mb-1">
-                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-sky-300 dark:text-sky-500/60">
-                          <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
-                          <polygon points="3,4 6,0 9,4" fill="currentColor" />
-                          <polygon points="3,12 6,16 9,12" fill="currentColor" />
-                        </svg>
-                      </div>
                       <BlockNode block={b} className="w-28 h-20 px-2" />
                     </div>
                   ))}
