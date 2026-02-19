@@ -162,42 +162,47 @@ const DesignDetail = () => {
 
               {/* Interactive Architecture / Hierarchy Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                {design.moduleHierarchy && (
-                  <div className="flex items-center gap-0 rounded-xl border border-border/60 overflow-hidden mb-6">
-                    <button
-                      onClick={() => setDiagramView("architecture")}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 ${
-                        diagramView === "architecture"
-                          ? "bg-primary text-primary-foreground shadow-inner"
-                          : "bg-card text-muted-foreground hover:text-foreground hover:bg-accent/40"
-                      }`}
-                    >
-                      <Layers className="h-4 w-4" />
-                      System Architecture
-                    </button>
-                    <button
-                      onClick={() => setDiagramView("hierarchy")}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 border-l border-border/60 ${
-                        diagramView === "hierarchy"
-                          ? "bg-primary text-primary-foreground shadow-inner"
-                          : "bg-card text-muted-foreground hover:text-foreground hover:bg-accent/40"
-                      }`}
-                    >
-                      <FolderTree className="h-4 w-4" />
-                      Chip Hierarchy
-                    </button>
-                  </div>
-                )}
-                <p className="text-muted-foreground text-sm mb-6">
-                  {diagramView === "architecture"
-                    ? "Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources."
-                    : "Explore the physical chip hierarchy from the outermost pad ring down to individual IP blocks. Click on any layer to view its description."}
-                </p>
-                {diagramView === "architecture" ? (
-                  <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
-                ) : design.moduleHierarchy ? (
-                  <InteractiveHierarchyDiagram hierarchy={design.moduleHierarchy} designName={design.name} />
-                ) : null}
+                <div className="rounded-2xl border border-border/60 bg-card p-5 md:p-8">
+                  <h2 className="text-2xl font-display font-bold mb-4">
+                    {diagramView === "architecture" ? "System Architecture" : "Chip Hierarchy"}
+                  </h2>
+                  {design.moduleHierarchy && (
+                    <div className="flex items-center gap-0 rounded-xl border border-border/60 overflow-hidden mb-5">
+                      <button
+                        onClick={() => setDiagramView("architecture")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                          diagramView === "architecture"
+                            ? "bg-primary text-primary-foreground shadow-inner"
+                            : "bg-background text-muted-foreground hover:text-foreground hover:bg-accent/40"
+                        }`}
+                      >
+                        <Layers className="h-4 w-4" />
+                        Architecture
+                      </button>
+                      <button
+                        onClick={() => setDiagramView("hierarchy")}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 border-l border-border/60 ${
+                          diagramView === "hierarchy"
+                            ? "bg-primary text-primary-foreground shadow-inner"
+                            : "bg-background text-muted-foreground hover:text-foreground hover:bg-accent/40"
+                        }`}
+                      >
+                        <FolderTree className="h-4 w-4" />
+                        Hierarchy
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-muted-foreground text-sm mb-6">
+                    {diagramView === "architecture"
+                      ? "Expand subsystems to explore their internal architecture. Click on any block or bus to view technical details and related learning resources."
+                      : "Explore the physical chip hierarchy from the outermost pad ring down to individual IP blocks. Click on any layer to view its description."}
+                  </p>
+                  {diagramView === "architecture" ? (
+                    <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
+                  ) : design.moduleHierarchy ? (
+                    <InteractiveHierarchyDiagram hierarchy={design.moduleHierarchy} designName={design.name} />
+                  ) : null}
+                </div>
               </motion.div>
 
               {/* Related Technologies */}
