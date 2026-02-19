@@ -48,6 +48,35 @@ const layerStyles = [
   { bg: "bg-rose-50 dark:bg-rose-900/20", border: "border-rose-300 dark:border-rose-600", label: "text-rose-700 dark:text-rose-300" },
 ];
 
+/* ── techId → color mapping aligned with architecture diagram typeColors ── */
+const techIdStyles: Record<string, { bg: string; border: string; label: string }> = {
+  // Processors (blue)
+  "arm-cortex-m0": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
+  "arm-cortex-m3": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
+  "arm-cortex-m7": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
+  // Interconnects (sky)
+  "ahb-lite": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  "ahb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  "apb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  "amba-interconnect": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
+  // Memory (emerald)
+  "memory-controllers": { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", label: "text-emerald-600 dark:text-emerald-400" },
+  // Peripherals (amber)
+  "standard-peripherals": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
+  // Hardware acceleration (violet)
+  "hw-acceleration": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
+  // Debug (slate)
+  "debug": { bg: "bg-slate-100 dark:bg-slate-500/10", border: "border-slate-300 dark:border-slate-500/30", label: "text-slate-600 dark:text-slate-400" },
+  // Interface (rose)
+  "system-integration": { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", label: "text-rose-600 dark:text-rose-400" },
+};
+
+/** Get style for a node: prefer techId-based color, fall back to depth-based */
+const getNodeStyle = (node: HierarchyNode, depth: number) => {
+  if (node.techId && techIdStyles[node.techId]) return techIdStyles[node.techId];
+  return layerStyles[Math.min(depth, layerStyles.length - 1)];
+};
+
 /* ── Info Panel (removed floating version - now using bottom panel) ── */
 
 /* ── Simple static pad square (non-interactive, just visual) ── */
@@ -60,7 +89,7 @@ const PadSquare = ({ pad }: { pad: HierarchyNode }) => (
 
 /* ── Leaf block ── */
 const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode; depth: number; isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void }) => {
-  const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  const s = getNodeStyle(node, depth);
   const NodeIcon = getNodeIcon(node);
   return (
     <button
@@ -83,7 +112,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
   node: HierarchyNode; depth: number; onZoom: () => void; square?: boolean;
   isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void;
 }) => {
-  const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  const s = getNodeStyle(node, depth);
 
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
@@ -108,7 +137,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
           </div>
           <div className={`mt-2 flex flex-wrap gap-1 overflow-hidden ${square ? "flex-1" : "max-h-[60px]"}`}>
             {node.children?.slice(0, 6).map(child => {
-              const cs = layerStyles[Math.min(depth + 1, layerStyles.length - 1)];
+              const cs = getNodeStyle(child, depth + 1);
               const isGroup = child.children && child.children.length > 0;
               return (
                 <span key={child.name} className={`text-[9px] md:text-[10px] px-1.5 py-0.5 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium truncate max-w-[100px] ${isGroup ? "font-bold" : ""}`}>
@@ -139,7 +168,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
   onSelect: (node: HierarchyNode, depth: number) => void;
   designName: string;
 }) => {
-  const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  const s = getNodeStyle(node, depth);
   const children = node.children || [];
   const totalPages = Math.ceil(children.length / ITEMS_PER_PAGE);
 
@@ -172,7 +201,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       <div className="flex items-center gap-1 mb-4 flex-wrap">
         {breadcrumb.map((b, i) => {
           const isLast = i === breadcrumb.length - 1;
-          const bs = layerStyles[Math.min(i, layerStyles.length - 1)];
+          const bs = getNodeStyle(b, i);
           return (
             <span key={b.name} className="flex items-center gap-1">
               {i > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />}
@@ -333,7 +362,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
               </div>
               <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
                 {chipNode.children?.slice(0, 4).map(child => {
-                  const cs = layerStyles[Math.min(2, layerStyles.length - 1)];
+                  const cs = getNodeStyle(child, 2);
                   return (
                     <span key={child.name} className={`text-[10px] md:text-xs px-2 py-0.5 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium`}>
                       {child.name}
@@ -367,7 +396,7 @@ const SelectedNodePanel = ({ node, depth, onClose }: { node: HierarchyNode; dept
   const isPadLevel = depth < 0;
   const s = isPadLevel
     ? { bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-400 dark:border-amber-500", label: "text-amber-700 dark:text-amber-300" }
-    : layerStyles[Math.min(depth, layerStyles.length - 1)];
+    : getNodeStyle(node, depth);
 
   return (
     <motion.div
