@@ -219,10 +219,10 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
       }`}
     >
       {/* Outer label */}
-      <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-0.5 rounded-b-lg bg-amber-200 dark:bg-amber-800 border border-t-0 border-amber-300 dark:border-amber-600">
-        <div className="flex items-center gap-1.5">
-          <CircuitBoard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
-          <span className="font-display font-bold text-[11px] text-amber-700 dark:text-amber-300 uppercase tracking-wider">{padNode.name}</span>
+      <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-4 py-1 rounded-b-lg bg-amber-200 dark:bg-amber-800 border border-t-0 border-amber-300 dark:border-amber-600">
+        <div className="flex items-center gap-2">
+          <CircuitBoard className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+          <span className="font-display font-bold text-sm md:text-base text-amber-700 dark:text-amber-300">{padNode.name}</span>
         </div>
       </div>
 
