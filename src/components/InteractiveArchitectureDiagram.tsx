@@ -164,7 +164,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 </span>
               </button>
 
-              {/* Expanded peripherals */}
+              {/* Expanded peripherals with APB bus */}
               <AnimatePresence>
                 {peripheralsExpanded && (
                   <motion.div
@@ -174,10 +174,29 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <div className="mt-2 rounded-xl border-2 border-dashed ${typeColors.peripheral.border} bg-amber-50/50 dark:bg-amber-500/5 p-3">
+                    <div className="mt-2 rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-3">
+                      {/* APB Bus bar */}
+                      <Link
+                        to="/technologies/apb"
+                        className={`
+                          block w-full h-7 rounded-md border-2 mb-2 flex items-center justify-center
+                          bg-white dark:bg-card border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400
+                          hover:shadow-md transition-all duration-200 no-underline
+                        `}
+                      >
+                        <Layers className="h-3.5 w-3.5 mr-1.5" />
+                        <span className="font-display font-bold text-[11px] tracking-wide">APB Bus</span>
+                      </Link>
                       <div className="flex flex-wrap gap-3 justify-center">
                         {peripherals.map((b) => (
                           <div key={b.name} className="flex flex-col items-center">
+                            <div className="flex flex-col items-center mb-1">
+                              <svg width="12" height="16" viewBox="0 0 12 16" className="text-amber-300 dark:text-amber-500/60">
+                                <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
+                                <polygon points="3,4 6,0 9,4" fill="currentColor" />
+                                <polygon points="3,12 6,16 9,12" fill="currentColor" />
+                              </svg>
+                            </div>
                             <BlockNode block={b} className="w-24 h-16 px-1.5" />
                           </div>
                         ))}
