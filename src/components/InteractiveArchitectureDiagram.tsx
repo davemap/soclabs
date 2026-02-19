@@ -40,88 +40,19 @@ const typeColors: Record<string, { bg: string; border: string; text: string; pad
 
 const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-foreground", pad: "bg-muted-foreground/30" };
 
-// Which external blocks go to which edge
-const padEdgeMap: Record<string, "top" | "right" | "bottom" | "left"> = {
-  "GPIO": "bottom",
-  "UART": "left",
-  "Debug Controller": "right",
-};
-
 const padSignalNames: Record<string, string[]> = {
   "GPIO": ["IO[0]", "IO[1]", "IO[2]", "IO[3]", "IO[4]", "IO[5]"],
   "UART": ["TXD", "RXD", "CTS", "RTS"],
   "Debug Controller": ["SWDIO", "SWDCK", "SWO", "nRST"],
 };
 
-const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
-  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-
-  const processors = blocks.filter((b) => b.type === "processor");
-  const controllers = blocks.filter((b) => b.type === "controller");
-  const interconnects = blocks.filter((b) => b.type === "interconnect");
-  const memories = blocks.filter((b) => b.type === "memory");
-  const peripherals = blocks.filter((b) => b.type === "peripheral");
-  const interfaces = blocks.filter((b) => b.type === "interface");
-
-  const masters = [...processors, ...controllers];
-  const slaves = [...memories, ...peripherals, ...interfaces];
-  const externalBlocks = blocks.filter((b) => b.external);
-  const busName = interconnects[0]?.name || "System Bus";
-
-  const handleClick = (block: Block) => {
-    setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
-  };
-
-  // Build pad arrays per edge
-  const buildEdgePads = (edge: "top" | "right" | "bottom" | "left") => {
-    const edgeExternals = externalBlocks.filter((b) => padEdgeMap[b.name] === edge);
-    const pads: { label: string; type: "signal" | "power"; blockType?: string }[] = [];
-
-    // Power pads first
-    pads.push({ label: "VDD", type: "power" });
-    pads.push({ label: "VSS", type: "power" });
-
-    edgeExternals.forEach((b) => {
-      const signals = padSignalNames[b.name] || [];
-      signals.forEach((s) => pads.push({ label: s, type: "signal", blockType: b.type }));
-    });
-
-    // Fill to at least 10
-    while (pads.length < 10) {
-      pads.push({ label: pads.length % 2 === 0 ? "VDD" : "VSS", type: "power" });
-    }
-    return pads;
-  };
-
-  const PadStrip = ({ edge }: { edge: "top" | "right" | "bottom" | "left" }) => {
-    const pads = buildEdgePads(edge);
-    const isVert = edge === "left" || edge === "right";
-
-    return (
-      <div className={`flex ${isVert ? "flex-col" : "flex-row"} items-center justify-center gap-1`}>
-        {pads.map((p, i) => {
-          const color = p.type === "signal" && p.blockType
-            ? (typeColors[p.blockType] || defaultColor).pad
-            : "bg-rose-300/60 dark:bg-rose-500/30";
-          return (
-            <div
-              key={`${edge}-${i}`}
-              className={`${isVert ? "w-3.5 h-3.5" : "w-3.5 h-3.5"} ${color} rounded-[2px] border ${p.type === "power" ? "border-rose-300/40 dark:border-rose-500/20" : "border-current/20"}`}
-              title={p.label}
-            />
-          );
-        })}
-      </div>
-    );
-  };
-
   // Connector arrow between block and bus
   const BusArrow = () => (
-    <div className="flex flex-col items-center my-0.5">
-      <svg width="12" height="20" viewBox="0 0 12 20" className="text-indigo-400 dark:text-indigo-500/70">
-        <line x1="6" y1="0" x2="6" y2="20" stroke="currentColor" strokeWidth="1.5" />
-        <polygon points="3,4 6,0 9,4" fill="currentColor" />
-        <polygon points="3,16 6,20 9,16" fill="currentColor" />
+    <div className="flex flex-col items-center my-1">
+      <svg width="14" height="24" viewBox="0 0 14 24" className="text-indigo-400 dark:text-indigo-500/70">
+        <line x1="7" y1="0" x2="7" y2="24" stroke="currentColor" strokeWidth="1.5" />
+        <polygon points="4,5 7,0 10,5" fill="currentColor" />
+        <polygon points="4,19 7,24 10,19" fill="currentColor" />
       </svg>
     </div>
   );
@@ -134,15 +65,15 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       <button
         onClick={() => handleClick(block)}
         className={`
-          flex flex-col items-center justify-center gap-0.5 rounded-md border
+          flex flex-col items-center justify-center gap-1 rounded-lg border
           ${c.bg} ${c.border} ${c.text}
-          ${isSelected ? "ring-2 ring-offset-1 ring-current scale-[1.03]" : ""}
+          ${isSelected ? "ring-2 ring-offset-2 ring-current scale-[1.03]" : ""}
           cursor-pointer hover:scale-[1.02] hover:shadow-md
           transition-all duration-200 ${className}
         `}
       >
-        <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-3.5 w-3.5" />}</span>
-        <span className="font-display font-semibold text-[9px] text-center leading-tight px-0.5">{block.name}</span>
+        <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}</span>
+        <span className="font-display font-semibold text-[11px] text-center leading-tight px-1">{block.name}</span>
       </button>
     );
   };
@@ -150,103 +81,57 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-4 md:p-6 overflow-x-auto">
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mb-4 pb-3 border-b border-border/40">
+      <div className="flex flex-wrap gap-3 mb-5 pb-3 border-b border-border/40">
         {Object.entries(typeColors).map(([type, c]) => {
           if (!blocks.some((b) => b.type === type)) return null;
           return (
             <div key={type} className="flex items-center gap-1.5">
-              <div className={`w-2.5 h-2.5 rounded-sm ${c.bg} border ${c.border}`} />
+              <div className={`w-3 h-3 rounded-sm ${c.bg} border ${c.border}`} />
               <span className="text-xs text-muted-foreground capitalize">{type}</span>
             </div>
           );
         })}
-        <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border/40">
-          <div className="w-2.5 h-2.5 rounded-sm bg-rose-300/60 dark:bg-rose-500/30 border border-rose-300/40 dark:border-rose-500/20" />
-          <span className="text-xs text-muted-foreground">I/O Pad</span>
-        </div>
       </div>
 
-      {/* Chip floorplan */}
-      <div className="min-w-[500px] max-w-[700px] mx-auto">
-        {/* Outer package */}
-        <div className="relative border-2 border-zinc-400/50 dark:border-zinc-600/60 rounded-lg bg-zinc-100/50 dark:bg-zinc-900/60 p-1">
+      {/* Simple block diagram */}
+      <div className="max-w-[640px] mx-auto rounded-xl border border-border/50 bg-muted/20 p-6 md:p-8">
 
-          {/* Pin 1 notch */}
-          <div className="absolute top-1.5 left-1.5 w-3 h-3 rounded-full border border-zinc-400/40 dark:border-zinc-600/50" />
+        {/* Design label */}
+        <div className="text-center mb-6">
+          <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">{designName} System Architecture</span>
+        </div>
 
-          {/* Top pads */}
-          <div className="flex justify-center py-1.5">
-            <PadStrip edge="top" />
-          </div>
-
-          <div className="flex">
-            {/* Left pads */}
-            <div className="flex items-center px-1.5">
-              <PadStrip edge="left" />
+        {/* Masters row */}
+        <div className="flex justify-center gap-4 mb-1">
+          {masters.map((b) => (
+            <div key={b.name} className="flex flex-col items-center">
+              <BlockNode block={b} className="w-28 h-20 px-2" />
+              <BusArrow />
             </div>
+          ))}
+        </div>
 
-            {/* Die area */}
-            <div className="flex-1 mx-1">
-              <div className="relative rounded-md border border-zinc-300 dark:border-zinc-600/40 bg-white/80 dark:bg-zinc-800/80 p-4 min-h-[320px] flex flex-col">
+        {/* Bus bar */}
+        <button
+          onClick={() => { const bus = interconnects[0]; if (bus) handleClick(bus); }}
+          className={`
+            w-full h-9 rounded-md border flex items-center justify-center
+            ${typeColors.interconnect.bg} ${typeColors.interconnect.border} ${typeColors.interconnect.text}
+            ${selectedBlock?.name === busName ? "ring-2 ring-current" : ""}
+            cursor-pointer hover:shadow-md transition-all duration-200
+          `}
+        >
+          <span className="font-display font-bold text-xs tracking-wide">{busName}</span>
+        </button>
 
-                {/* Die label */}
-                <div className="absolute -top-2 left-3 px-2 bg-white dark:bg-zinc-800 rounded text-[9px] font-mono text-muted-foreground uppercase tracking-widest">
-                  {designName}
-                </div>
-
-                {/* Masters row */}
-                <div className="flex justify-center gap-3 mb-1">
-                  {masters.map((b) => (
-                    <div key={b.name} className="flex flex-col items-center">
-                      <BlockNode block={b} className="w-20 h-16 px-1.5" />
-                      <BusArrow />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bus bar */}
-                <button
-                  onClick={() => { const bus = interconnects[0]; if (bus) handleClick(bus); }}
-                  className={`
-                    w-full h-7 rounded-sm border flex items-center justify-center
-                    ${typeColors.interconnect.bg} ${typeColors.interconnect.border} ${typeColors.interconnect.text}
-                    ${selectedBlock?.name === busName ? "ring-2 ring-current" : ""}
-                    cursor-pointer hover:shadow-md transition-all duration-200
-                  `}
-                >
-                  <span className="font-display font-bold text-[10px] tracking-wide">{busName}</span>
-                </button>
-
-                {/* Slaves row */}
-                <div className="flex justify-center gap-2 mt-1 flex-wrap">
-                  {slaves.map((b) => (
-                    <div key={b.name} className="flex flex-col items-center">
-                      <BusArrow />
-                      <BlockNode block={b} className="w-[4.5rem] h-14 px-1" />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Spacer */}
-                <div className="flex-1" />
-              </div>
+        {/* Slaves row */}
+        <div className="flex justify-center gap-3 mt-1 flex-wrap">
+          {slaves.map((b) => (
+            <div key={b.name} className="flex flex-col items-center">
+              <BusArrow />
+              <BlockNode block={b} className="w-24 h-[4.5rem] px-1.5" />
             </div>
-
-            {/* Right pads */}
-            <div className="flex items-center px-1.5">
-              <PadStrip edge="right" />
-            </div>
-          </div>
-
-          {/* Bottom pads */}
-          <div className="flex justify-center py-1.5">
-            <PadStrip edge="bottom" />
-          </div>
-
-          {/* Package label */}
-          <div className="absolute bottom-1 right-2 text-[7px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-            {designName} QFP
-          </div>
+          ))}
         </div>
       </div>
 
