@@ -65,20 +65,15 @@ const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode;
   return (
     <button
       onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
-      className={`rounded-lg border-2 ${s.border} ${s.bg} px-3 py-2 md:px-4 md:py-3 text-left transition-all duration-150 hover:shadow-md hover:scale-[1.02] w-full ${
+      className={`rounded-lg border-2 ${s.border} ${s.bg} p-3 md:p-4 text-left transition-all duration-150 hover:shadow-md hover:scale-[1.02] w-full aspect-square flex flex-col items-center justify-center gap-1.5 ${
         node.userDesigned ? "!border-dashed !border-rose-400" : ""
       } ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : ""}`}
     >
-      <div className="flex items-center gap-2">
-        <NodeIcon className={`h-3.5 w-3.5 ${s.label} shrink-0`} />
-        <span className={`text-xs md:text-sm font-semibold ${s.label}`}>{node.name}</span>
-        {node.userDesigned && (
-          <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
-        )}
-        {node.description && (
-          <Info className={`h-3 w-3 ml-auto shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground/40"}`} />
-        )}
-      </div>
+      <NodeIcon className={`h-5 w-5 ${s.label} shrink-0`} />
+      <span className={`text-[10px] md:text-xs font-semibold ${s.label} text-center leading-tight`}>{node.name}</span>
+      {node.userDesigned && (
+        <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
+      )}
     </button>
   );
 };
