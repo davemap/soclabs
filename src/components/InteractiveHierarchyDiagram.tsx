@@ -199,7 +199,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
             transition={{ duration: 0.15 }}
             className="grid gap-3 h-full"
             style={{
-              gridTemplateColumns: `repeat(3, 1fr)`,
+              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 3)}, 1fr)`,
               gridTemplateRows: `repeat(${Math.ceil(visibleChildren.length / 3)}, 1fr)`,
             }}
           >
