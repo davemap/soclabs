@@ -39,66 +39,73 @@ interface InteractiveHierarchyDiagramProps {
   designName: string;
 }
 
-const layerStyles = [
-  { bg: "", border: "border-gray-300 dark:border-gray-600", label: "text-gray-700 dark:text-gray-300", hatchOpacity: 0.12, hatchSpacing: 6 },
-  { bg: "", border: "border-gray-300/80 dark:border-gray-600/70", label: "text-gray-600 dark:text-gray-400", hatchOpacity: 0.09, hatchSpacing: 8 },
-  { bg: "", border: "border-gray-200 dark:border-gray-600/50", label: "text-gray-500 dark:text-gray-400", hatchOpacity: 0.07, hatchSpacing: 10 },
-  { bg: "", border: "border-gray-200/80 dark:border-gray-500/40", label: "text-gray-500 dark:text-gray-500", hatchOpacity: 0.05, hatchSpacing: 12 },
-  { bg: "", border: "border-gray-200/60 dark:border-gray-500/30", label: "text-gray-400 dark:text-gray-500", hatchOpacity: 0.04, hatchSpacing: 14 },
-  { bg: "", border: "border-gray-200/50 dark:border-gray-500/20", label: "text-gray-400 dark:text-gray-500", hatchOpacity: 0.03, hatchSpacing: 16 },
+const layerHatchDensity = [
+  { opacity: 0.12, spacing: 6 },
+  { opacity: 0.09, spacing: 8 },
+  { opacity: 0.07, spacing: 10 },
+  { opacity: 0.05, spacing: 12 },
+  { opacity: 0.04, spacing: 14 },
+  { opacity: 0.03, spacing: 16 },
 ];
 
 /* Generate a repeating diagonal-line SVG data URI for hatched backgrounds */
-const makeHatchBg = (opacity: number, spacing: number, isDark: boolean) => {
-  const color = isDark ? `rgba(255,255,255,${opacity})` : `rgba(0,0,0,${opacity})`;
+const makeHatchBg = (opacity: number, spacing: number, isDark: boolean, hue?: string) => {
+  // hue is an optional CSS color like "59,130,246" (RGB) for tinted hatching
+  const color = hue
+    ? `rgba(${hue},${opacity})`
+    : isDark ? `rgba(255,255,255,${opacity})` : `rgba(0,0,0,${opacity})`;
   const svg = `<svg width="${spacing}" height="${spacing}" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="${spacing}" x2="${spacing}" y2="0" stroke="${color}" stroke-width="1"/></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 };
 
 /* ── techId → color mapping aligned with architecture diagram typeColors ── */
-const techIdStyles: Record<string, { bg: string; border: string; label: string }> = {
+const techIdStyles: Record<string, { bg: string; border: string; label: string; hatchRgb?: string }> = {
   // Processors (blue)
-  "arm-cortex-m0": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
-  "arm-cortex-m3": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
-  "arm-cortex-m7": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400" },
+  "arm-cortex-m0": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400", hatchRgb: "59,130,246" },
+  "arm-cortex-m3": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400", hatchRgb: "59,130,246" },
+  "arm-cortex-m7": { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", label: "text-blue-600 dark:text-blue-400", hatchRgb: "59,130,246" },
   // Bus Protocols (sky)
-  "ahb-lite": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
-  "ahb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
-  "apb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
-  "axi": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
-  "amba-interconnect": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400" },
+  "ahb-lite": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400", hatchRgb: "14,165,233" },
+  "ahb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400", hatchRgb: "14,165,233" },
+  "apb": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400", hatchRgb: "14,165,233" },
+  "axi": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400", hatchRgb: "14,165,233" },
+  "amba-interconnect": { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", label: "text-sky-600 dark:text-sky-400", hatchRgb: "14,165,233" },
   // DMA Controllers (indigo)
-  "dma-controller": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
-  "pl230-dma": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
-  "dma-350": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400" },
+  "dma-controller": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400", hatchRgb: "99,102,241" },
+  "pl230-dma": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400", hatchRgb: "99,102,241" },
+  "dma-350": { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", label: "text-indigo-600 dark:text-indigo-400", hatchRgb: "99,102,241" },
   // Serial Protocols (amber)
-  "uart-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
-  "spi-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
+  "uart-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400", hatchRgb: "245,158,11" },
+  "spi-protocol": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400", hatchRgb: "245,158,11" },
   // High-Speed Protocols (violet)
-  "pcie-protocol": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
+  "pcie-protocol": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400", hatchRgb: "139,92,246" },
   // Memory (emerald)
-  "memory-controllers": { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", label: "text-emerald-600 dark:text-emerald-400" },
+  "memory-controllers": { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", label: "text-emerald-600 dark:text-emerald-400", hatchRgb: "16,185,129" },
   // Peripherals (amber)
-  "standard-peripherals": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400" },
+  "standard-peripherals": { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", label: "text-amber-600 dark:text-amber-400", hatchRgb: "245,158,11" },
   // Hardware acceleration (violet)
-  "hw-acceleration": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400" },
+  "hw-acceleration": { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", label: "text-violet-600 dark:text-violet-400", hatchRgb: "139,92,246" },
   // Debug (slate)
-  "debug": { bg: "bg-slate-100 dark:bg-slate-500/10", border: "border-slate-300 dark:border-slate-500/30", label: "text-slate-600 dark:text-slate-400" },
+  "debug": { bg: "bg-slate-100 dark:bg-slate-500/10", border: "border-slate-300 dark:border-slate-500/30", label: "text-slate-600 dark:text-slate-400", hatchRgb: "100,116,139" },
   // Interface (rose)
-  "system-integration": { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", label: "text-rose-600 dark:text-rose-400" },
+  "system-integration": { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", label: "text-rose-600 dark:text-rose-400", hatchRgb: "244,63,94" },
 };
 
-/** Get style for a node: prefer techId-based color, fall back to depth-based hatched */
+/** Get style for a node: prefer techId-based color, fall back to neutral */
 const getNodeStyle = (node: HierarchyNode, depth: number) => {
-  if (node.techId && techIdStyles[node.techId]) return { ...techIdStyles[node.techId], hatchOpacity: 0, hatchSpacing: 0 };
-  const ls = layerStyles[Math.min(depth, layerStyles.length - 1)];
-  return { ...ls, label: ls.label };
+  if (node.techId && techIdStyles[node.techId]) return techIdStyles[node.techId];
+  // Neutral fallback for structural groupings
+  return { bg: "", border: "border-gray-300 dark:border-gray-600", label: "text-gray-600 dark:text-gray-400", hatchRgb: undefined as string | undefined };
 };
 
-/** Build inline style for hatched background (only for non-techId nodes) */
-const getHatchStyle = (style: ReturnType<typeof getNodeStyle>, isDark: boolean): React.CSSProperties => {
-  if (!('hatchOpacity' in style) || !(style as any).hatchOpacity) return {};
-  return { backgroundImage: makeHatchBg((style as any).hatchOpacity, (style as any).hatchSpacing, isDark), backgroundRepeat: "repeat" };
+/** Build inline style for hatched background on group containers */
+const getHatchStyle = (style: ReturnType<typeof getNodeStyle>, depth: number, isDark: boolean, isGroup: boolean): React.CSSProperties => {
+  if (!isGroup) return {};
+  const density = layerHatchDensity[Math.min(depth, layerHatchDensity.length - 1)];
+  return {
+    backgroundImage: makeHatchBg(density.opacity, density.spacing, isDark, style.hatchRgb),
+    backgroundRepeat: "repeat",
+  };
 };
 
 /* ── Info Panel (removed floating version - now using bottom panel) ── */
@@ -138,7 +145,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 }) => {
   const s = getNodeStyle(node, depth);
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-  const hatchStyle = getHatchStyle(s, isDark);
+  const hatchStyle = getHatchStyle(s, depth, isDark, true);
 
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
@@ -197,7 +204,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
 }) => {
   const s = getNodeStyle(node, depth);
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-  const hatchStyle = getHatchStyle(s, isDark);
+  const hatchStyle = getHatchStyle(s, depth, isDark, true);
   const children = node.children || [];
   const totalPages = Math.ceil(children.length / ITEMS_PER_PAGE);
 
