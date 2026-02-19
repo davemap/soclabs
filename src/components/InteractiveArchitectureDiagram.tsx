@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp, Box } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,8 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
   const [subsystemExpanded, setSubsystemExpanded] = useState<string | null>(null);
-
+  const diagramRef = useRef<HTMLDivElement>(null);
+  const subsystemBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const processors = blocks.filter((b) => b.type === "processor");
   const controllers = blocks.filter((b) => b.type === "controller");
   const subsystems = blocks.filter((b) => b.type === "subsystem");
@@ -136,7 +137,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       </div>
 
       {/* Block diagram */}
-      <div className="max-w-[750px] mx-auto py-4">
+      <div className="max-w-[750px] mx-auto py-4 relative" ref={diagramRef}>
 
         {/* Expanded subsystem region — above masters */}
         <AnimatePresence>
@@ -151,19 +152,31 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 className="overflow-hidden mb-4"
               >
                 <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
-                  <div className="flex flex-wrap gap-4 justify-center mb-3">
+                  <div className="flex flex-wrap gap-4 justify-center">
                     {sub.subBlocks.map((sb) => (
                       <div key={sb.name} className="flex flex-col items-center">
-                        <BlockNode block={sb} className="w-28 h-20 px-2" />
+                        <BlockNode block={sb} className="w-32 h-24 px-3" />
                       </div>
                     ))}
                   </div>
                 </div>
-                {/* Connector line from expanded region to subsystem button — aligned to the subsystem's position */}
-                <div className="flex justify-center" style={{ marginLeft: masters.length > 1 ? `${(masters.indexOf(sub) - (masters.length - 1) / 2) * 148}px` : undefined }}>
-                  <svg width="2" height="16" className="text-sky-300 dark:text-sky-500/60">
-                    <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
-                  </svg>
+                {/* Connector line — dynamically aligned to subsystem button center */}
+                <div className="relative h-4">
+                  {(() => {
+                    const btnEl = subsystemBtnRefs.current[sub.name];
+                    const containerEl = diagramRef.current;
+                    if (btnEl && containerEl) {
+                      const btnRect = btnEl.getBoundingClientRect();
+                      const containerRect = containerEl.getBoundingClientRect();
+                      const centerX = btnRect.left + btnRect.width / 2 - containerRect.left;
+                      return (
+                        <svg className="absolute top-0 text-sky-300 dark:text-sky-500/60" style={{ left: centerX - 1, width: 2, height: 16 }}>
+                          <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+                        </svg>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
               </motion.div>
             ) : null
@@ -176,6 +189,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             <div key={b.name} className="flex flex-col items-center">
               {b.type === "subsystem" ? (
                 <button
+                  ref={(el) => { subsystemBtnRefs.current[b.name] = el; }}
                   onClick={() => {
                     setSubsystemExpanded((prev) => (prev === b.name ? null : b.name));
                     setPeripheralsExpanded(false);
