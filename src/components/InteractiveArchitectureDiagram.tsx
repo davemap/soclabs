@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowDown, ArrowRight as ArrowRightIcon } from "lucide-react";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight as ArrowRightIcon, ArrowUpDown } from "lucide-react";
 import { technologies } from "@/data/mockData";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -15,56 +15,50 @@ interface InteractiveArchitectureDiagramProps {
 }
 
 const blockTypeIcon: Record<string, React.ReactNode> = {
-  processor: <Cpu className="h-5 w-5" />,
-  interconnect: <Layers className="h-5 w-5" />,
-  memory: <MemoryStick className="h-5 w-5" />,
-  peripheral: <Radio className="h-5 w-5" />,
-  controller: <Cpu className="h-5 w-5" />,
-  interface: <Plug className="h-5 w-5" />,
+  processor: <Cpu className="h-4 w-4" />,
+  interconnect: <Layers className="h-4 w-4" />,
+  memory: <MemoryStick className="h-4 w-4" />,
+  peripheral: <Radio className="h-4 w-4" />,
+  controller: <Cpu className="h-4 w-4" />,
+  interface: <Plug className="h-4 w-4" />,
 };
 
-const blockTypeStyles: Record<string, { bg: string; border: string; text: string; hoverBorder: string; glow: string }> = {
+const blockTypeStyles: Record<string, { bg: string; border: string; text: string; hoverBorder: string }> = {
   processor: {
-    bg: "bg-primary/10",
-    border: "border-primary/30",
+    bg: "bg-primary/15",
+    border: "border-primary/40",
     text: "text-primary",
-    hoverBorder: "hover:border-primary",
-    glow: "hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)]",
+    hoverBorder: "hover:border-primary hover:shadow-[0_0_16px_hsl(var(--primary)/0.2)]",
   },
   interconnect: {
-    bg: "bg-cyan-500/10",
-    border: "border-cyan-500/30",
+    bg: "bg-cyan-500/15",
+    border: "border-cyan-500/40",
     text: "text-cyan-400",
     hoverBorder: "hover:border-cyan-400",
-    glow: "hover:shadow-[0_0_20px_rgba(34,211,238,0.15)]",
   },
   memory: {
-    bg: "bg-amber-500/10",
-    border: "border-amber-500/30",
+    bg: "bg-amber-500/15",
+    border: "border-amber-500/40",
     text: "text-amber-400",
-    hoverBorder: "hover:border-amber-400",
-    glow: "hover:shadow-[0_0_20px_rgba(251,191,36,0.15)]",
+    hoverBorder: "hover:border-amber-400 hover:shadow-[0_0_16px_rgba(251,191,36,0.2)]",
   },
   peripheral: {
-    bg: "bg-emerald-500/10",
-    border: "border-emerald-500/30",
+    bg: "bg-emerald-500/15",
+    border: "border-emerald-500/40",
     text: "text-emerald-400",
-    hoverBorder: "hover:border-emerald-400",
-    glow: "hover:shadow-[0_0_20px_rgba(52,211,153,0.15)]",
+    hoverBorder: "hover:border-emerald-400 hover:shadow-[0_0_16px_rgba(52,211,153,0.2)]",
   },
   controller: {
-    bg: "bg-violet-500/10",
-    border: "border-violet-500/30",
+    bg: "bg-violet-500/15",
+    border: "border-violet-500/40",
     text: "text-violet-400",
-    hoverBorder: "hover:border-violet-400",
-    glow: "hover:shadow-[0_0_20px_rgba(167,139,250,0.15)]",
+    hoverBorder: "hover:border-violet-400 hover:shadow-[0_0_16px_rgba(167,139,250,0.2)]",
   },
   interface: {
-    bg: "bg-rose-500/10",
-    border: "border-rose-500/30",
+    bg: "bg-rose-500/15",
+    border: "border-rose-500/40",
     text: "text-rose-400",
-    hoverBorder: "hover:border-rose-400",
-    glow: "hover:shadow-[0_0_20px_rgba(251,113,133,0.15)]",
+    hoverBorder: "hover:border-rose-400 hover:shadow-[0_0_16px_rgba(251,113,133,0.2)]",
   },
 };
 
@@ -72,15 +66,14 @@ const defaultStyle = {
   bg: "bg-muted",
   border: "border-border",
   text: "text-foreground",
-  hoverBorder: "hover:border-foreground/50",
-  glow: "",
+  hoverBorder: "",
 };
 
 // Map block names to technology page IDs
 const blockToTechId: Record<string, string> = {
   "ARM Cortex-M0": "arm-cortex-m0",
   "ARM Cortex-M3": "arm-cortex-m3",
-  "ARM Cortex-A53": "arm-cortex-m3", // closest match
+  "ARM Cortex-A53": "arm-cortex-m3",
   "AHB-Lite Bus": "amba-interconnect",
   "AHB Bus Matrix": "amba-interconnect",
   "GPIO": "standard-peripherals",
@@ -102,32 +95,27 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const navigate = useNavigate();
   const [hoveredBlock, setHoveredBlock] = useState<string | null>(null);
 
+  // Separate blocks into bus masters (above bus), the bus itself, and bus slaves (below bus)
   const processors = blocks.filter((b) => b.type === "processor");
-  const interconnects = blocks.filter((b) => b.type === "interconnect");
   const controllers = blocks.filter((b) => b.type === "controller");
+  const interconnects = blocks.filter((b) => b.type === "interconnect");
   const memories = blocks.filter((b) => b.type === "memory");
   const peripherals = blocks.filter((b) => b.type === "peripheral");
   const interfaces = blocks.filter((b) => b.type === "interface");
 
+  const masters = [...processors, ...controllers];
+  const slaves = [...memories, ...peripherals, ...interfaces];
+
   const handleClick = (block: Block) => {
     const techId = blockToTechId[block.name];
-    if (techId) {
-      navigate(`/technologies/${techId}`);
-    }
+    if (techId) navigate(`/technologies/${techId}`);
   };
 
-  const renderBlock = (block: Block, size: "lg" | "md" | "sm" = "md") => {
+  const BlockNode = ({ block, className = "" }: { block: Block; className?: string }) => {
     const style = blockTypeStyles[block.type] || defaultStyle;
     const techId = blockToTechId[block.name];
     const tech = techId ? technologies.find((t) => t.id === techId) : null;
     const isClickable = !!techId;
-    const isHovered = hoveredBlock === block.name;
-
-    const sizeClasses = {
-      lg: "px-6 py-4",
-      md: "px-4 py-3",
-      sm: "px-3 py-2.5",
-    };
 
     return (
       <TooltipProvider key={block.name} delayDuration={200}>
@@ -138,18 +126,17 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               onMouseEnter={() => setHoveredBlock(block.name)}
               onMouseLeave={() => setHoveredBlock(null)}
               className={`
-                relative flex items-center gap-2.5 ${sizeClasses[size]} rounded-xl border-2 
+                flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 
                 ${style.bg} ${style.border} ${style.text}
-                ${isClickable ? `cursor-pointer ${style.hoverBorder} ${style.glow} hover:-translate-y-0.5` : "cursor-default"}
-                transition-all duration-300 group
+                ${isClickable ? `cursor-pointer ${style.hoverBorder} hover:-translate-y-0.5` : "cursor-default"}
+                transition-all duration-300 group min-w-0
+                ${className}
               `}
             >
-              <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-5 w-5" />}</span>
-              <span className={`font-display font-semibold ${size === "sm" ? "text-xs" : "text-sm"}`}>
-                {block.name}
-              </span>
+              <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}</span>
+              <span className="font-display font-semibold text-xs text-center leading-tight">{block.name}</span>
               {isClickable && (
-                <ArrowRightIcon className={`h-3.5 w-3.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity shrink-0`} />
+                <ArrowRightIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               )}
             </button>
           </TooltipTrigger>
@@ -169,17 +156,18 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
     );
   };
 
-  const ConnectionLine = ({ className = "" }: { className?: string }) => (
-    <div className={`flex justify-center ${className}`}>
-      <div className="flex flex-col items-center">
-        <div className="w-0.5 h-4 bg-border/60" />
-        <ArrowDown className="h-3 w-3 text-muted-foreground/40 -mt-0.5" />
-      </div>
+  // Vertical connector stub
+  const BusStub = ({ direction }: { direction: "up" | "down" }) => (
+    <div className="flex flex-col items-center">
+      <div className={`w-0.5 ${direction === "up" ? "h-5" : "h-5"} bg-cyan-500/40`} />
+      <ArrowUpDown className="h-3 w-3 text-cyan-500/50" />
     </div>
   );
 
+  const busName = interconnects[0]?.name || "System Bus";
+
   return (
-    <div className="rounded-2xl border border-border/60 bg-card/50 p-6 md:p-8">
+    <div className="rounded-2xl border border-border/60 bg-card/50 p-5 md:p-8 overflow-x-auto">
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-6 pb-4 border-b border-border/40">
         {Object.entries(blockTypeStyles).map(([type, style]) => {
@@ -194,73 +182,43 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
         })}
       </div>
 
-      {/* Processor Layer */}
-      <div className="flex justify-center gap-4 flex-wrap">
-        {processors.map((b) => renderBlock(b, "lg"))}
-      </div>
+      <div className="min-w-[600px]">
+        {/* ── Bus Masters (above bus) ── */}
+        <div className="flex justify-center gap-3 mb-1 px-4">
+          {masters.map((b) => (
+            <div key={b.name} className="flex flex-col items-center">
+              <BlockNode block={b} className="px-4 py-3 w-28 h-24" />
+              <BusStub direction="down" />
+            </div>
+          ))}
+        </div>
 
-      <ConnectionLine />
+        {/* ── The Bus ── */}
+        <div className="relative mx-4">
+          <div className="w-full h-12 rounded-lg bg-gradient-to-r from-cyan-500/20 via-cyan-500/30 to-cyan-500/20 border-2 border-cyan-500/40 flex items-center justify-center">
+            <span className="font-display font-bold text-sm text-cyan-400 tracking-wide">
+              {busName}
+            </span>
+          </div>
+        </div>
 
-      {/* Interconnect Layer */}
-      <div className="flex justify-center">
-        <div className="w-full max-w-lg">
-          {interconnects.map((b) => (
-            <div key={b.name} className="w-full">
-              {renderBlock({ ...b }, "md")}
+        {/* ── Bus Slaves (below bus) ── */}
+        <div className="flex justify-center gap-3 mt-1 px-4">
+          {slaves.map((b) => (
+            <div key={b.name} className="flex flex-col items-center">
+              <BusStub direction="up" />
+              <BlockNode block={b} className="px-3 py-2.5 w-24 h-22" />
             </div>
           ))}
         </div>
       </div>
 
-      <ConnectionLine />
-
-      {/* Controllers */}
-      {controllers.length > 0 && (
-        <>
-          <div className="flex justify-center gap-3 flex-wrap">
-            {controllers.map((b) => renderBlock(b, "md"))}
-          </div>
-          <ConnectionLine />
-        </>
-      )}
-
-      {/* Memory + Peripherals Layer */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Memory */}
-        <div>
-          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
-            Memory
-          </p>
-          <div className="flex flex-col gap-2">
-            {memories.map((b) => renderBlock(b, "sm"))}
-          </div>
-        </div>
-
-        {/* Peripherals */}
-        <div>
-          <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
-            Peripherals
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {peripherals.map((b) => renderBlock(b, "sm"))}
-          </div>
-        </div>
+      {/* SoC label */}
+      <div className="mt-6 pt-4 border-t border-border/40 text-center">
+        <span className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-widest">
+          {designName} System
+        </span>
       </div>
-
-      {/* Interfaces */}
-      {interfaces.length > 0 && (
-        <>
-          <ConnectionLine className="mt-4" />
-          <div>
-            <p className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
-              External Interfaces
-            </p>
-            <div className="flex justify-center gap-3 flex-wrap">
-              {interfaces.map((b) => renderBlock(b, "md"))}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

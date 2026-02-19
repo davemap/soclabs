@@ -132,13 +132,6 @@ const DesignDetail = () => {
                 </div>
               </motion.div>
 
-              {/* Interactive Architecture Diagram */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">System Architecture</h2>
-                <p className="text-muted-foreground text-sm mb-6">Click on any component to learn more about the technology.</p>
-                <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
-              </motion.div>
-
               {/* Features & Use Cases */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid md:grid-cols-2 gap-8">
                 <div>
@@ -163,6 +156,13 @@ const DesignDetail = () => {
                     ))}
                   </ul>
                 </div>
+              </motion.div>
+
+              {/* Interactive Architecture Diagram */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <h2 className="text-2xl font-display font-bold mb-4">System Architecture</h2>
+                <p className="text-muted-foreground text-sm mb-6">Click on any component to learn more about the technology.</p>
+                <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
               </motion.div>
 
               {/* Related Technologies */}
