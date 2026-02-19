@@ -294,7 +294,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
       </div>
 
       {/* Grid: pad ring surrounding the chip, square via padding trick */}
-      <div className="relative w-full" style={{ paddingBottom: "100%" }}>
+      <div className="relative w-full" style={{ paddingBottom: "50%" }}>
         <div className="absolute inset-0 grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] p-1 md:p-1.5">
           <div />
           <div className="flex justify-around items-end px-1 pb-1 pt-4">
