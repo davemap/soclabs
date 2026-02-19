@@ -145,12 +145,15 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 }) => {
   const s = getNodeStyle(node, depth);
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  const hatchStyle = getHatchStyle(s, depth, isDark, true);
+
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
       <button
         type="button"
         onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
         onDoubleClick={e => { e.stopPropagation(); onZoom(); }}
+        style={hatchStyle}
         className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group cursor-pointer ${
           square ? "h-full flex flex-col" : ""
         } ${
@@ -229,7 +232,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
       style={hatchStyle}
-      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] ${children.length > 1 ? "min-h-[320px]" : ""} mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
+      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] min-h-[320px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
       <div className="flex items-center gap-1 mb-4 flex-wrap">
@@ -274,7 +277,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
             transition={{ duration: 0.15 }}
             className="grid gap-3 h-full"
             style={{
-              gridTemplateColumns: visibleChildren.length === 1 ? "1fr" : `repeat(${Math.min(visibleChildren.length, 2)}, 1fr)`,
+              gridTemplateColumns: `repeat(${Math.min(visibleChildren.length, 2)}, 1fr)`,
               gridTemplateRows: "1fr",
             }}
           >
