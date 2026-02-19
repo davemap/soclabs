@@ -47,6 +47,60 @@ export const referenceDesigns = [
         { name: "Custom Accelerator", type: "interface", userDesigned: true, techId: "hw-acceleration", gateCount: "User-defined", info: "A user-defined hardware accelerator slot connected via the AHB-Lite slave interface. This is where students and researchers integrate their own custom IP — such as DSP filters, ML inference engines, or crypto blocks." }
       ] },
     ],
+    moduleHierarchy: [
+      { name: "rtl/", type: "group", description: "Top-level RTL source directory containing all synthesisable hardware modules.", children: [
+        { name: "nanosoc_chip.v", type: "module", language: "verilog", description: "Top-level chip wrapper. Instantiates the SoC core, pad ring, and clock/reset generation logic. This is the module synthesised for FPGA or ASIC targets.", techId: "system-integration" },
+        { name: "nanosoc_core.v", type: "module", language: "verilog", description: "SoC core module containing the CPU subsystem, bus interconnect, and all peripherals. Defines the top-level address map and interrupt wiring." },
+        { name: "cpu/", type: "group", description: "CPU subsystem modules including the processor wrapper and tightly-coupled memories.", children: [
+          { name: "cortexm0_wrapper.v", type: "module", language: "verilog", description: "Wrapper around the ARM Cortex-M0 processor macro. Connects the processor's AHB-Lite master port to the system bus and maps local memory interfaces.", techId: "arm-cortex-m0" },
+          { name: "imem_controller.v", type: "module", language: "verilog", description: "Instruction memory controller providing single-cycle read access. Implements the AHB-Lite slave interface for the instruction ROM/RAM.", techId: "memory-controllers" },
+          { name: "dmem_controller.v", type: "module", language: "verilog", description: "Data memory controller with byte/halfword/word write enables. Implements the AHB-Lite slave interface for the data SRAM.", techId: "memory-controllers" },
+          { name: "boot_rom.v", type: "module", language: "verilog", description: "Read-only boot memory containing the initial vector table and boot sequence. Contents generated from firmware build.", techId: "memory-controllers" },
+        ]},
+        { name: "bus/", type: "group", description: "Bus interconnect and address decode logic.", children: [
+          { name: "ahblite_interconnect.v", type: "module", language: "verilog", description: "AHB-Lite bus fabric with address decoder and default slave. Routes master transactions to the appropriate slave based on the memory map.", techId: "ahb-lite" },
+          { name: "ahb_address_decode.v", type: "module", language: "verilog", description: "Parameterised address decoder generating slave select signals from the AHB address bus. Configured via the system memory map header.", techId: "ahb-lite" },
+          { name: "apb_bridge.v", type: "module", language: "verilog", description: "AHB-to-APB bridge converting high-performance bus transactions to the simpler APB protocol for low-bandwidth peripherals.", techId: "apb" },
+        ]},
+        { name: "peripherals/", type: "group", description: "APB peripheral modules connected via the APB bridge.", children: [
+          { name: "apb_gpio.v", type: "module", language: "verilog", description: "16-bit GPIO controller with configurable direction, interrupt generation, and pull resistor control.", techId: "standard-peripherals" },
+          { name: "apb_uart.v", type: "module", language: "verilog", description: "UART transmitter/receiver with 16-byte FIFOs, configurable baud rate, and interrupt support.", techId: "standard-peripherals" },
+          { name: "apb_timer.v", type: "module", language: "verilog", description: "Dual-channel 32-bit timer with prescaler, auto-reload, and interrupt generation.", techId: "standard-peripherals" },
+          { name: "apb_watchdog.v", type: "module", language: "verilog", description: "Watchdog timer with lock register to prevent accidental disable. Generates reset on timeout.", techId: "standard-peripherals" },
+        ]},
+        { name: "dma/", type: "group", description: "DMA controller modules.", children: [
+          { name: "dma_controller.v", type: "module", language: "verilog", description: "2-channel DMA controller (PL230) enabling autonomous peripheral-to-memory transfers. Implements an AHB-Lite master interface.", techId: "amba-interconnect" },
+          { name: "dma_channel.v", type: "module", language: "verilog", description: "Single DMA channel with source/destination address registers, transfer count, and configurable transfer width." },
+        ]},
+        { name: "debug/", type: "group", description: "Debug access port and trace modules.", children: [
+          { name: "swd_interface.v", type: "module", language: "verilog", description: "Serial Wire Debug (SWD) interface implementing the ARM CoreSight DAP protocol for non-intrusive debug access.", techId: "standard-peripherals" },
+          { name: "debug_apb.v", type: "module", language: "verilog", description: "Debug APB interface providing register access to breakpoints, watchpoints, and system control." },
+        ]},
+        { name: "expansion/", type: "group", description: "Expansion subsystem for custom accelerators and additional memory.", children: [
+          { name: "expansion_wrapper.v", type: "module", language: "verilog", description: "Wrapper providing the AHB-Lite slave interface and address decode for the expansion region.", techId: "hw-acceleration" },
+          { name: "sram_32k.v", type: "module", language: "verilog", description: "32 KB SRAM controller with single-cycle access. Provides storage for accelerator data or additional program memory.", techId: "memory-controllers" },
+          { name: "accel_slot.v", type: "module", language: "verilog", userDesigned: true, description: "User-defined accelerator slot. Replace this stub with your custom hardware IP — DSP, ML inference, crypto, or any other function.", techId: "hw-acceleration" },
+        ]},
+      ]},
+      { name: "tb/", type: "group", description: "Testbench and verification environment.", children: [
+        { name: "nanosoc_tb.sv", type: "module", language: "systemverilog", description: "Top-level testbench instantiating the chip wrapper with clock generation, reset sequencing, and VCD dump control." },
+        { name: "ahb_monitor.sv", type: "module", language: "systemverilog", description: "AHB-Lite bus monitor checking protocol compliance and logging all bus transactions for waveform analysis." },
+        { name: "uart_driver.sv", type: "module", language: "systemverilog", description: "UART stimulus driver for sending and receiving serial data in simulation. Used for firmware print output capture." },
+      ]},
+      { name: "sw/", type: "group", description: "Firmware and software sources for the Cortex-M0.", children: [
+        { name: "startup.s", type: "file", language: "assembly", description: "Cortex-M0 startup code defining the vector table, reset handler, and stack initialisation." },
+        { name: "main.c", type: "file", language: "c", description: "Main application entry point. Initialises peripherals and runs the main firmware loop." },
+        { name: "hal/", type: "group", description: "Hardware abstraction layer for peripheral register access.", children: [
+          { name: "gpio.h", type: "file", language: "c", description: "GPIO register definitions and helper functions for pin configuration and read/write operations." },
+          { name: "uart.h", type: "file", language: "c", description: "UART register definitions and helper functions for serial transmit/receive." },
+          { name: "timer.h", type: "file", language: "c", description: "Timer register definitions and helper functions for delay and periodic interrupt configuration." },
+        ]},
+      ]},
+      { name: "constraints/", type: "group", description: "FPGA constraint files for pin mapping and timing.", children: [
+        { name: "artix7.xdc", type: "file", language: "constraint", description: "Xilinx Artix-7 pin constraints mapping SoC I/O to FPGA board pins. Includes clock definition and I/O standard assignments." },
+        { name: "cyclonev.sdc", type: "file", language: "constraint", description: "Intel Cyclone V timing constraints and pin assignments for the DE10-Lite development board." },
+      ]},
+    ],
     relatedTechnologies: ["ARM Cortex-M0", "Vivado / Quartus", "Yosys", "UVM / cocotb"],
     developmentProjectId: "nanosoc-dev",
     version: "1.2.0",
