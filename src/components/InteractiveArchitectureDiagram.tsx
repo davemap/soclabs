@@ -15,6 +15,7 @@ interface Block {
   configOptions?: string[];
   subBlocks?: Block[];
   icon?: string;
+  userDesigned?: boolean;
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -111,19 +112,25 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
     const c = typeColors[block.type] || defaultColor;
     const isSelected = selectedBlock?.name === block.name;
     const isSubsystem = block.type === "subsystem";
+    const isUserDesigned = block.userDesigned;
 
     return (
       <button
         onClick={() => handleClick(block)}
         className={`
-          flex flex-col items-center justify-center gap-1.5 rounded-xl border-2
-          ${isSubsystem ? "border-dashed" : ""}
-          bg-white dark:bg-card ${c.border} ${c.text}
+          relative flex flex-col items-center justify-center gap-1.5 rounded-xl border-2
+          ${isSubsystem || isUserDesigned ? "border-dashed" : ""}
+          ${isUserDesigned ? "bg-gradient-to-b from-white to-rose-50/50 dark:from-card dark:to-rose-500/5" : "bg-white dark:bg-card"} ${c.border} ${c.text}
           ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
           cursor-pointer hover:scale-[1.02] hover:shadow-md
           transition-all duration-200 ${className}
         `}
       >
+        {isUserDesigned && (
+          <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-rose-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full leading-none whitespace-nowrap tracking-wide">
+            USER IP
+          </span>
+        )}
         <span className="shrink-0">{blockTypeIcon[block.icon || block.type] || <Cpu className="h-6 w-6" />}</span>
         <span className="font-display font-bold text-xs text-center leading-tight px-1">{block.name}</span>
       </button>
