@@ -152,7 +152,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
-      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 aspect-square max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
+      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
       <div className="flex items-center gap-1 mb-4 flex-wrap">
