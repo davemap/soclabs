@@ -52,7 +52,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
   const masters = [...processors, ...controllers];
   const expansionBlocks = interfaces.filter((b) => b.name.toLowerCase().includes("expansion"));
-  const slaves = [...memories, ...peripherals, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
+  const regularSlaves = [...memories, ...peripherals, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
   const busName = interconnects[0]?.name || "System Bus";
 
   const handleClick = (block: Block) => {
@@ -108,42 +108,14 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       {/* Block diagram */}
       <div className="max-w-[750px] mx-auto py-4">
 
-        {/* Masters + Expansion Region row */}
-        <div className="flex items-end justify-center gap-6 mb-1">
-          {/* Masters */}
-          <div className="flex gap-4">
-            {masters.map((b) => (
-              <div key={b.name} className="flex flex-col items-center">
-                <BlockNode block={b} className="w-32 h-24 px-3" />
-                <BusArrow />
-              </div>
-            ))}
-          </div>
-
-          {/* Expansion Region — large block beside masters, connected to bus */}
-          {expansionBlocks.map((b) => {
-            const c = typeColors[b.type] || defaultColor;
-            const isSelected = selectedBlock?.name === b.name;
-            return (
-              <div key={b.name} className="flex flex-col items-center">
-                <button
-                  onClick={() => handleClick(b)}
-                  className={`
-                    flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed
-                    bg-white dark:bg-card ${c.border} ${c.text}
-                    ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
-                    cursor-pointer hover:scale-[1.02] hover:shadow-md
-                    transition-all duration-200 w-40 h-24 px-3
-                  `}
-                >
-                  <Plug className="h-6 w-6" />
-                  <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
-                  <span className="text-[9px] text-muted-foreground">User IP goes here</span>
-                </button>
-                <BusArrow />
-              </div>
-            );
-          })}
+        {/* Masters row */}
+        <div className="flex justify-center gap-5 mb-1">
+          {masters.map((b) => (
+            <div key={b.name} className="flex flex-col items-center">
+              <BlockNode block={b} className="w-32 h-24 px-3" />
+              <BusArrow />
+            </div>
+          ))}
         </div>
 
         {/* Bus bar */}
@@ -162,12 +134,36 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
         {/* Slaves row */}
         <div className="flex justify-center gap-4 mt-1 flex-wrap">
-          {slaves.map((b) => (
+          {regularSlaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusArrow />
               <BlockNode block={b} className="w-28 h-20 px-2" />
             </div>
           ))}
+
+          {/* Expansion Region — dashed, distinct from regular slaves */}
+          {expansionBlocks.map((b) => {
+            const c = typeColors[b.type] || defaultColor;
+            const isSelected = selectedBlock?.name === b.name;
+            return (
+              <div key={b.name} className="flex flex-col items-center">
+                <BusArrow />
+                <button
+                  onClick={() => handleClick(b)}
+                  className={`
+                    flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed
+                    bg-white dark:bg-card ${c.border} ${c.text}
+                    ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
+                    cursor-pointer hover:scale-[1.02] hover:shadow-md
+                    transition-all duration-200 w-28 h-20 px-2
+                  `}
+                >
+                  <Plug className="h-6 w-6" />
+                  <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
 
