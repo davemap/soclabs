@@ -389,7 +389,8 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
   }, []);
 
   const currentZoomed = navStack.length > 0 ? navStack[navStack.length - 1] : null;
-  const currentDepth = navStack.length;
+  // Depth offset: if padNode exists, the pad ring is depth 0, so zoomed nodes start at depth 1
+  const currentDepth = padNode ? navStack.length + 1 : navStack.length;
 
   return (
     <div className="rounded-2xl border border-border/60 bg-white dark:bg-card p-5 md:p-8">
@@ -401,8 +402,15 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
               node={currentZoomed}
               depth={currentDepth}
               onZoom={zoomInto}
-              breadcrumb={navStack}
-              onNavigate={navigateTo}
+              breadcrumb={padNode ? [padNode, ...navStack] : navStack}
+              onNavigate={(index) => {
+                // index 0 = padNode (root), index 1+ = navStack entries
+                if (padNode) {
+                  navigateTo(index - 1);
+                } else {
+                  navigateTo(index);
+                }
+              }}
               selectedNode={selectedNode}
               onSelect={handleSelect}
             />
