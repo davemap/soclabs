@@ -121,6 +121,32 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       {/* Block diagram */}
       <div className="max-w-[750px] mx-auto py-4">
 
+        {/* Expanded subsystem region — above masters */}
+        <AnimatePresence>
+          {subsystems.map((sub) =>
+            subsystemExpanded === sub.name && sub.subBlocks ? (
+              <motion.div
+                key={sub.name}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden mb-2"
+              >
+                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-3">
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    {sub.subBlocks.map((sb) => (
+                      <div key={sb.name} className="flex flex-col items-center">
+                        <BlockNode block={sb} className="w-24 h-16 px-1.5" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ) : null
+          )}
+        </AnimatePresence>
+
         {/* Masters row */}
         <div className="flex justify-center gap-5 mb-1">
           {masters.map((b) => (
@@ -149,32 +175,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             </div>
           ))}
         </div>
-
-        {/* Expanded subsystem region */}
-        <AnimatePresence>
-          {subsystems.map((sub) =>
-            subsystemExpanded === sub.name && sub.subBlocks ? (
-              <motion.div
-                key={sub.name}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden mb-2"
-              >
-                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-3">
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    {sub.subBlocks.map((sb) => (
-                      <div key={sb.name} className="flex flex-col items-center">
-                        <BlockNode block={sb} className="w-24 h-16 px-1.5" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            ) : null
-          )}
-        </AnimatePresence>
 
         {/* Bus bar */}
         <button
