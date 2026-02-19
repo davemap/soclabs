@@ -180,16 +180,14 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
         })}
       </div>
 
-      {/* Title */}
-      <div className="flex items-center gap-2 mb-1">
+      {/* Title - clickable to show info */}
+      <button
+        onClick={() => onSelect(node, depth)}
+        className="flex items-center gap-2 mb-1 text-left hover:opacity-80 transition-opacity"
+      >
         <Layers className={`h-5 w-5 ${s.label}`} />
         <h3 className={`font-display font-bold text-lg md:text-xl ${s.label}`}>{node.name}</h3>
-        {node.description && (
-          <button onClick={() => onSelect(node, depth)} className="p-1 rounded-md hover:bg-muted ml-auto">
-            <Info className={`h-4 w-4 ${selectedNode?.name === node.name ? "text-primary" : "text-muted-foreground/40"}`} />
-          </button>
-        )}
-      </div>
+      </button>
 
       {/* Children grid - paginated */}
       <div className="flex-1 min-h-0 mt-4">
