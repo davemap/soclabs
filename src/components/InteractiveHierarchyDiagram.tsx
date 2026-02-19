@@ -52,7 +52,7 @@ const InfoPanel = ({ node, onClose }: { node: HierarchyNode; onClose: () => void
 /* ── Simple static pad square (non-interactive, just visual) ── */
 const PadSquare = ({ pad }: { pad: HierarchyNode }) => (
   <div
-    className="w-5 h-5 md:w-6 md:h-6 rounded-[2px] border border-slate-400 dark:border-slate-500 bg-background"
+    className="w-5 h-5 md:w-6 md:h-6 rounded-[2px] border border-amber-400 dark:border-amber-500 bg-amber-100 dark:bg-amber-900/40"
     title={pad.name}
   />
 );
@@ -275,12 +275,12 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
   const left = pads.slice(topCount + rightCount + bottomCount);
 
   return (
-    <div className="relative rounded-2xl border-[3px] border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-800/50 max-w-[600px] mx-auto overflow-hidden">
+    <div className="relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] mx-auto overflow-hidden">
       {/* Outer label */}
-      <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-0.5 rounded-b-lg bg-slate-200 dark:bg-slate-700 border border-t-0 border-slate-300 dark:border-slate-600">
+      <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-0.5 rounded-b-lg bg-amber-200 dark:bg-amber-800 border border-t-0 border-amber-300 dark:border-amber-600">
         <div className="flex items-center gap-1.5">
-          <CircuitBoard className="h-3 w-3 text-slate-500 dark:text-slate-400" />
-          <span className="font-display font-bold text-[11px] text-slate-600 dark:text-slate-300 uppercase tracking-wider">{padNode.name}</span>
+          <CircuitBoard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+          <span className="font-display font-bold text-[11px] text-amber-700 dark:text-amber-300 uppercase tracking-wider">{padNode.name}</span>
           {padNode.description && (
             <button onClick={() => setShowPadInfo(v => !v)} className="p-0.5 rounded hover:bg-muted">
               <Info className={`h-3 w-3 ${showPadInfo ? "text-primary" : "text-muted-foreground/40"}`} />
