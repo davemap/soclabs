@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { referenceDesigns, communityProjects, technologies } from "@/data/mockData";
+import CommunityProjectsCarousel from "@/components/CommunityProjectsCarousel";
 import { supabase } from "@/integrations/supabase/client";
 
 const blockTypeIcon: Record<string, React.ReactNode> = {
@@ -212,71 +213,11 @@ const DesignDetail = () => {
 
               {/* Community Projects */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
-                <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
-                {(mockProjects.length > 0 || dbProjects.length > 0) ? (
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {dbProjects.map((project) => (
-                      <Link to={`/projects/${project.id}`} key={project.id}>
-                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
-                          <CardContent className="p-5">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge
-                                variant="outline"
-                                className={`text-xs ${
-                                  project.status === "Completed"
-                                    ? "border-green-500/30 text-green-400"
-                                    : project.status === "In Progress"
-                                    ? "border-primary/30 text-primary"
-                                    : "border-border text-muted-foreground"
-                                }`}
-                              >
-                                {project.status}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">{project.target_technology || project.reference_soc}</Badge>
-                            </div>
-                            <h3 className="font-display font-semibold mb-1">{project.title}</h3>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                    {mockProjects.map((project) => (
-                      <Link to={`/projects/${project.id}`} key={project.id}>
-                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
-                          <CardContent className="p-5">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge
-                                variant="outline"
-                                className={`text-xs ${
-                                  project.status === "Completed"
-                                    ? "border-green-500/30 text-green-400"
-                                    : project.status === "In Progress"
-                                    ? "border-primary/30 text-primary"
-                                    : "border-border text-muted-foreground"
-                                }`}
-                              >
-                                {project.status}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">{project.technology}</Badge>
-                            </div>
-                            <h3 className="font-display font-semibold mb-1">{project.title}</h3>
-                            <p className="text-xs text-primary mb-2">{project.author} — {project.institution}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-                    <Cpu className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">No community projects have been built on {design.name} yet.</p>
-                    <Button asChild variant="outline" size="sm" className="mt-4 rounded-full">
-                      <Link to="/projects/start">Start a project</Link>
-                    </Button>
-                  </div>
-                )}
+                <CommunityProjectsCarousel
+                  design={design}
+                  mockProjects={mockProjects}
+                  dbProjects={dbProjects}
+                />
               </motion.div>
               </div>
             </div>
