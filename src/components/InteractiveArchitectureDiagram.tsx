@@ -14,6 +14,7 @@ interface Block {
   gateCount?: string;
   configOptions?: string[];
   subBlocks?: Block[];
+  icon?: string;
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -106,19 +107,21 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const BlockNode = ({ block, className = "" }: { block: Block; className?: string }) => {
     const c = typeColors[block.type] || defaultColor;
     const isSelected = selectedBlock?.name === block.name;
+    const isSubsystem = block.type === "subsystem";
 
     return (
       <button
         onClick={() => handleClick(block)}
         className={`
           flex flex-col items-center justify-center gap-1.5 rounded-xl border-2
+          ${isSubsystem ? "border-dashed" : ""}
           bg-white dark:bg-card ${c.border} ${c.text}
           ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : "shadow-sm"}
           cursor-pointer hover:scale-[1.02] hover:shadow-md
           transition-all duration-200 ${className}
         `}
       >
-        <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-6 w-6" />}</span>
+        <span className="shrink-0">{blockTypeIcon[block.icon || block.type] || <Cpu className="h-6 w-6" />}</span>
         <span className="font-display font-bold text-xs text-center leading-tight px-1">{block.name}</span>
       </button>
     );
@@ -154,7 +157,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden mb-4"
               >
-                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
+                <div className={`rounded-xl border-2 border-dashed p-4 ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).border} ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).bg}`}>
                   <div className="flex flex-wrap gap-4 justify-center">
                     {sub.subBlocks.map((sb) => (
                       <div key={sb.name} className="flex flex-col items-center">
@@ -173,7 +176,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                       const containerRect = containerEl.getBoundingClientRect();
                       const centerX = btnRect.left + btnRect.width / 2 - containerRect.left;
                       return (
-                        <svg className="absolute top-0 text-sky-300 dark:text-sky-500/60" style={{ left: centerX - 1, width: 2, height: 16 }}>
+                        <svg className={`absolute top-0 ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).text}`} style={{ left: centerX - 1, width: 2, height: 16 }}>
                           <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
                         </svg>
                       );
@@ -199,14 +202,14 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     setSelectedBlock(null);
                   }}
                   className={`
-                    flex flex-col items-center justify-center gap-1 rounded-xl border-2
-                    bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
+                    flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed
+                    bg-white dark:bg-card ${typeColors[b.icon || "subsystem"]?.border || typeColors.subsystem.border} ${typeColors[b.icon || "subsystem"]?.text || typeColors.subsystem.text}
                     ${subsystemExpanded === b.name ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
                     cursor-pointer hover:scale-[1.02] hover:shadow-md
                     transition-all duration-200 w-32 h-24 px-3
                   `}
                 >
-                  <Box className="h-6 w-6" />
+                  {blockTypeIcon[b.icon || "subsystem"] || <Box className="h-6 w-6" />}
                   <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
                   <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
                     {b.subBlocks?.length || 0} blocks {subsystemExpanded === b.name ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -249,13 +252,13 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   }}
                   className={`
                     flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed
-                    bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
+                    bg-white dark:bg-card ${typeColors[b.icon || "subsystem"]?.border || typeColors.subsystem.border} ${typeColors[b.icon || "subsystem"]?.text || typeColors.subsystem.text}
                     ${subsystemExpanded === b.name ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
                     cursor-pointer hover:scale-[1.02] hover:shadow-md
                     transition-all duration-200 w-32 h-24 px-3
                   `}
                 >
-                  <Box className="h-6 w-6" />
+                  {blockTypeIcon[b.icon || "subsystem"] || <Box className="h-6 w-6" />}
                   <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
                   <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
                     {b.subBlocks.length} blocks {subsystemExpanded === b.name ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -366,7 +369,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                       const containerRect = containerEl.getBoundingClientRect();
                       const centerX = btnRect.left + btnRect.width / 2 - containerRect.left;
                       return (
-                        <svg className="absolute top-0 text-sky-300 dark:text-sky-500/60" style={{ left: centerX - 1, width: 2, height: 16 }}>
+                        <svg className={`absolute top-0 ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).text}`} style={{ left: centerX - 1, width: 2, height: 16 }}>
                           <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
                         </svg>
                       );
@@ -374,7 +377,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     return null;
                   })()}
                 </div>
-                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
+                <div className={`rounded-xl border-2 border-dashed p-4 ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).border} ${(typeColors[sub.icon || "subsystem"] || typeColors.subsystem).bg}`}>
                   <div className="flex flex-wrap gap-4 justify-center">
                     {sub.subBlocks.map((sb) => (
                       <div key={sb.name} className="flex flex-col items-center">
