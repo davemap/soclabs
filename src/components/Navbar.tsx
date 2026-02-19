@@ -40,20 +40,28 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden lg:flex items-center gap-0.5">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={cn(
-                "px-3 py-2 text-sm rounded-lg transition-all font-nav",
-                location.pathname === link.to
-                  ? "text-primary-foreground bg-primary/20 font-semibold"
-                  : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = link.to === "/" 
+              ? location.pathname === "/" 
+              : location.pathname.startsWith(link.to);
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={cn(
+                  "relative px-3 py-2 text-sm rounded-lg transition-all font-nav",
+                  isActive
+                    ? "text-primary-foreground font-semibold"
+                    : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
+                )}
+              >
+                {link.label}
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[2px] rounded-full bg-electric" />
+                )}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
@@ -119,7 +127,7 @@ const Navbar = () => {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "px-3 py-2.5 text-sm rounded-lg transition-all font-nav",
-                  location.pathname === link.to
+                  (link.to === "/" ? location.pathname === "/" : location.pathname.startsWith(link.to))
                     ? "text-primary-foreground bg-primary/20 font-semibold"
                     : "text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10"
                 )}
