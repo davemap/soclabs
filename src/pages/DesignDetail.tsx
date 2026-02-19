@@ -163,13 +163,13 @@ const DesignDetail = () => {
               {/* Interactive Architecture / Hierarchy Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 {design.moduleHierarchy && (
-                  <div className="flex items-center gap-1 bg-muted rounded-xl p-1.5 mb-6">
+                  <div className="flex items-center gap-0 rounded-xl border border-border/60 overflow-hidden mb-6">
                     <button
                       onClick={() => setDiagramView("architecture")}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 ${
                         diagramView === "architecture"
-                          ? "bg-background shadow-md text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-primary text-primary-foreground shadow-inner"
+                          : "bg-card text-muted-foreground hover:text-foreground hover:bg-accent/40"
                       }`}
                     >
                       <Layers className="h-4 w-4" />
@@ -177,10 +177,10 @@ const DesignDetail = () => {
                     </button>
                     <button
                       onClick={() => setDiagramView("hierarchy")}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-all duration-200 border-l border-border/60 ${
                         diagramView === "hierarchy"
-                          ? "bg-background shadow-md text-foreground"
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-primary text-primary-foreground shadow-inner"
+                          : "bg-card text-muted-foreground hover:text-foreground hover:bg-accent/40"
                       }`}
                     >
                       <FolderTree className="h-4 w-4" />
