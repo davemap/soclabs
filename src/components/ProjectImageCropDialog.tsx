@@ -79,12 +79,12 @@ const ProjectImageCropDialog = ({ open, imageSrc, onClose, onCropComplete, savin
             crop={crop}
             zoom={zoom[0]}
             aspect={16 / 9}
-            objectFit="horizontal-cover"
+            objectFit="contain"
             showGrid
             onCropChange={setCrop}
             onZoomChange={(z) => setZoom([z])}
             onCropComplete={onCropDone}
-            minZoom={1}
+            minZoom={0.1}
             maxZoom={3}
           />
         </div>
@@ -93,7 +93,7 @@ const ProjectImageCropDialog = ({ open, imageSrc, onClose, onCropComplete, savin
           <Slider
             value={zoom}
             onValueChange={setZoom}
-            min={1}
+            min={0.1}
             max={3}
             step={0.05}
             className="flex-1"
