@@ -40,12 +40,12 @@ interface InteractiveHierarchyDiagramProps {
 }
 
 const layerStyles = [
-  { bg: "bg-slate-100 dark:bg-slate-800/60", border: "border-slate-300 dark:border-slate-600", label: "text-slate-600 dark:text-slate-300" },
-  { bg: "bg-sky-50 dark:bg-sky-900/30", border: "border-sky-300 dark:border-sky-600", label: "text-sky-700 dark:text-sky-300" },
-  { bg: "bg-violet-50 dark:bg-violet-900/20", border: "border-violet-300 dark:border-violet-600", label: "text-violet-700 dark:text-violet-300" },
-  { bg: "bg-emerald-50 dark:bg-emerald-900/20", border: "border-emerald-300 dark:border-emerald-600", label: "text-emerald-700 dark:text-emerald-300" },
-  { bg: "bg-amber-50 dark:bg-amber-900/20", border: "border-amber-300 dark:border-amber-600", label: "text-amber-700 dark:text-amber-300" },
-  { bg: "bg-rose-50 dark:bg-rose-900/20", border: "border-rose-300 dark:border-rose-600", label: "text-rose-700 dark:text-rose-300" },
+  { bg: "bg-gray-100/80 dark:bg-gray-800/50", border: "border-gray-300 dark:border-gray-600", label: "text-gray-700 dark:text-gray-300" },
+  { bg: "bg-gray-50 dark:bg-gray-800/30", border: "border-gray-250 dark:border-gray-600/70", label: "text-gray-600 dark:text-gray-400" },
+  { bg: "bg-gray-100/50 dark:bg-gray-700/25", border: "border-gray-200 dark:border-gray-600/50", label: "text-gray-500 dark:text-gray-400" },
+  { bg: "bg-gray-50/60 dark:bg-gray-700/15", border: "border-gray-200/80 dark:border-gray-500/40", label: "text-gray-500 dark:text-gray-500" },
+  { bg: "bg-white/80 dark:bg-gray-700/10", border: "border-gray-200/60 dark:border-gray-500/30", label: "text-gray-400 dark:text-gray-500" },
+  { bg: "bg-white/60 dark:bg-gray-600/10", border: "border-gray-150 dark:border-gray-500/20", label: "text-gray-400 dark:text-gray-500" },
 ];
 
 /* ── techId → color mapping aligned with architecture diagram typeColors ── */
