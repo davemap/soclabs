@@ -50,6 +50,13 @@ const apbBusBlock: Block = {
   techId: "apb",
 };
 
+const ahbBusBlock: Block = {
+  name: "AHB Lite",
+  type: "interconnect",
+  info: "AHB-Lite is a simplified version of the AMBA AHB protocol, used for single-master systems. It provides high-bandwidth, pipelined transfers between the processor and tightly-coupled memories (instruction and data), enabling single-cycle access latency.",
+  techId: "ahb",
+};
+
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
@@ -70,6 +77,8 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
   const handleClick = (block: Block) => {
     setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
+    setPeripheralsExpanded(false);
+    setSubsystemExpanded(null);
   };
 
   const BusArrow = () => (
@@ -131,16 +140,35 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="overflow-hidden mb-2"
+                className="overflow-hidden mb-4"
               >
-                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-3">
-                  <div className="flex flex-wrap gap-3 justify-center">
+                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-4">
+                  <div className="flex flex-wrap gap-4 justify-center mb-3">
                     {sub.subBlocks.map((sb) => (
                       <div key={sb.name} className="flex flex-col items-center">
-                        <BlockNode block={sb} className="w-24 h-16 px-1.5" />
+                        <BlockNode block={sb} className="w-28 h-20 px-2" />
                       </div>
                     ))}
                   </div>
+                  {/* AHB Bus bar inside subsystem */}
+                  <button
+                    onClick={() => handleClick(ahbBusBlock)}
+                    className={`
+                      w-full h-7 rounded-md border-2 flex items-center justify-center
+                      bg-white dark:bg-card border-sky-300 dark:border-sky-500/30 text-sky-600 dark:text-sky-400
+                      ${selectedBlock?.name === "AHB Lite" ? "ring-2 ring-current shadow-lg" : ""}
+                      hover:shadow-md transition-all duration-200
+                    `}
+                  >
+                    <Layers className="h-3.5 w-3.5 mr-1.5" />
+                    <span className="font-display font-bold text-[11px] tracking-wide">AHB Lite</span>
+                  </button>
+                </div>
+                {/* Connector line from expanded region to subsystem button */}
+                <div className="flex justify-center">
+                  <svg width="2" height="16" className="text-sky-300 dark:text-sky-500/60">
+                    <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+                  </svg>
                 </div>
               </motion.div>
             ) : null
@@ -153,7 +181,11 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             <div key={b.name} className="flex flex-col items-center">
               {b.type === "subsystem" ? (
                 <button
-                  onClick={() => setSubsystemExpanded((prev) => (prev === b.name ? null : b.name))}
+                  onClick={() => {
+                    setSubsystemExpanded((prev) => (prev === b.name ? null : b.name));
+                    setPeripheralsExpanded(false);
+                    setSelectedBlock(null);
+                  }}
                   className={`
                     flex flex-col items-center justify-center gap-1 rounded-xl border-2
                     bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
@@ -204,7 +236,11 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             <div className="flex flex-col items-center">
               <BusArrow />
               <button
-                onClick={() => setPeripheralsExpanded((p) => !p)}
+                onClick={() => {
+                  setPeripheralsExpanded((p) => !p);
+                  setSubsystemExpanded(null);
+                  setSelectedBlock(null);
+                }}
                 className={`
                   flex flex-col items-center justify-center gap-1 rounded-xl border-2
                   bg-white dark:bg-card ${typeColors.peripheral.border} ${typeColors.peripheral.text}
@@ -255,14 +291,20 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden mt-3"
+              className="overflow-hidden mt-1"
             >
-              <div className="rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-3">
+              {/* Connector line from peripherals button to expanded region */}
+              <div className="flex justify-center">
+                <svg width="2" height="16" className="text-amber-300 dark:text-amber-500/60">
+                  <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
+                </svg>
+              </div>
+              <div className="rounded-xl border-2 border-dashed border-amber-300 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/5 p-4">
                 {/* APB Bus bar */}
                 <button
                   onClick={() => handleClick(apbBusBlock)}
                   className={`
-                    w-full h-7 rounded-md border-2 mb-2 flex items-center justify-center
+                    w-full h-7 rounded-md border-2 mb-3 flex items-center justify-center
                     bg-white dark:bg-card border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400
                     ${selectedBlock?.name === "APB Bus" ? "ring-2 ring-current shadow-lg" : ""}
                     hover:shadow-md transition-all duration-200
@@ -271,7 +313,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   <Layers className="h-3.5 w-3.5 mr-1.5" />
                   <span className="font-display font-bold text-[11px] tracking-wide">APB Bus</span>
                 </button>
-                <div className="flex flex-wrap gap-3 justify-center">
+                <div className="flex flex-wrap gap-4 justify-center">
                   {peripherals.map((b) => (
                     <div key={b.name} className="flex flex-col items-center">
                       <div className="flex flex-col items-center mb-1">
@@ -281,7 +323,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                           <polygon points="3,12 6,16 9,12" fill="currentColor" />
                         </svg>
                       </div>
-                      <BlockNode block={b} className="w-24 h-16 px-1.5" />
+                      <BlockNode block={b} className="w-28 h-20 px-2" />
                     </div>
                   ))}
                 </div>
