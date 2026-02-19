@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp, Box } from "lucide-react";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp, Box, Bug, ArrowLeftRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,15 +27,17 @@ const blockTypeIcon: Record<string, React.ReactNode> = {
   interconnect: <Layers className="h-6 w-6" />,
   memory: <MemoryStick className="h-6 w-6" />,
   peripheral: <Radio className="h-6 w-6" />,
-  controller: <Cpu className="h-6 w-6" />,
+  dma: <ArrowLeftRight className="h-6 w-6" />,
+  debug: <Bug className="h-6 w-6" />,
   interface: <Plug className="h-6 w-6" />,
   subsystem: <Box className="h-6 w-6" />,
 };
 
 const typeColors: Record<string, { bg: string; border: string; text: string }> = {
   processor: { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", text: "text-blue-600 dark:text-blue-400" },
-  controller: { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", text: "text-violet-600 dark:text-violet-400" },
-  interconnect: { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", text: "text-indigo-600 dark:text-indigo-400" },
+  dma: { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", text: "text-violet-600 dark:text-violet-400" },
+  debug: { bg: "bg-slate-100 dark:bg-slate-500/10", border: "border-slate-300 dark:border-slate-500/30", text: "text-slate-600 dark:text-slate-400" },
+  interconnect: { bg: "bg-purple-50 dark:bg-purple-500/10", border: "border-purple-200 dark:border-purple-500/30", text: "text-purple-600 dark:text-purple-400" },
   memory: { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", text: "text-emerald-600 dark:text-emerald-400" },
   peripheral: { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", text: "text-amber-600 dark:text-amber-400" },
   interface: { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", text: "text-rose-600 dark:text-rose-400" },
@@ -65,18 +67,19 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const diagramRef = useRef<HTMLDivElement>(null);
   const subsystemBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const processors = blocks.filter((b) => b.type === "processor");
-  const controllers = blocks.filter((b) => b.type === "controller");
+  const dmaControllers = blocks.filter((b) => b.type === "dma");
+  const debugControllers = blocks.filter((b) => b.type === "debug");
   const interconnects = blocks.filter((b) => b.type === "interconnect");
   const memories = blocks.filter((b) => b.type === "memory");
   const peripherals = blocks.filter((b) => b.type === "peripheral");
   const interfaces = blocks.filter((b) => b.type === "interface");
   const allSubsystems = blocks.filter((b) => b.type === "subsystem");
 
-  // Subsystems in the masters row are those that contain processors or controllers
-  const masterSubsystems = allSubsystems.filter((s) => s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "controller"));
-  const slaveSubsystems = allSubsystems.filter((s) => !s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "controller"));
+  // Subsystems in the masters row are those that contain processors
+  const masterSubsystems = allSubsystems.filter((s) => s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "dma" || sb.type === "debug"));
+  const slaveSubsystems = allSubsystems.filter((s) => !s.subBlocks?.some((sb) => sb.type === "processor" || sb.type === "dma" || sb.type === "debug"));
 
-  const masters = [...masterSubsystems, ...processors, ...controllers];
+  const masters = [...masterSubsystems, ...processors, ...dmaControllers, ...debugControllers];
   const nonPeripheralSlaves = [...memories, ...interfaces, ...slaveSubsystems];
   const busName = interconnects[0]?.name || "System Bus";
 
@@ -320,7 +323,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   onClick={() => handleClick(apbBusBlock)}
                   className={`
                     w-full h-7 rounded-md border-2 mb-3 flex items-center justify-center
-                    bg-white dark:bg-card border-amber-300 dark:border-amber-500/30 text-amber-600 dark:text-amber-400
+                    bg-white dark:bg-card border-purple-200 dark:border-purple-500/30 text-purple-600 dark:text-purple-400
                     ${selectedBlock?.name === "APB Bus" ? "ring-2 ring-current shadow-lg" : ""}
                     hover:shadow-md transition-all duration-200
                   `}
@@ -332,7 +335,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   {peripherals.map((b) => (
                     <div key={b.name} className="flex flex-col items-center">
                       <div className="flex flex-col items-center mb-1">
-                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-amber-300 dark:text-amber-500/60">
+                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-purple-300 dark:text-purple-500/60">
                           <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
                           <polygon points="3,4 6,0 9,4" fill="currentColor" />
                           <polygon points="3,12 6,16 9,12" fill="currentColor" />
