@@ -311,10 +311,25 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
           {left.map(p => <PadSquare key={p.name} pad={p} />)}
         </div>
 
-        {/* Center: the chip */}
-        <div className="p-1.5 md:p-2 flex items-center justify-center">
-          <div className="w-full h-full">
-            <GroupPreview node={chipNode} depth={1} onZoom={onZoomChip} />
+        {/* Center: the chip - fills the entire inner area */}
+        <div className="p-1.5 md:p-2">
+          <div
+            onClick={onZoomChip}
+            className="w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center cursor-zoom-in hover:shadow-lg hover:scale-[1.01] transition-all group"
+          >
+            <Layers className="h-5 w-5 text-sky-700 dark:text-sky-300 mb-1" />
+            <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
+            <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
+              {chipNode.children?.slice(0, 4).map(child => {
+                const isGroup = child.children && child.children.length > 0;
+                return (
+                  <span key={child.name} className="text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-violet-300 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium">
+                    {child.name}
+                  </span>
+                );
+              })}
+            </div>
+            <ZoomIn className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary mt-2 transition-colors" />
           </div>
         </div>
 
