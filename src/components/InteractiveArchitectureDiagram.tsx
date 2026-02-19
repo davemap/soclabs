@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon } from "lucide-react";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,6 +42,7 @@ const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-fore
 
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
 
   const processors = blocks.filter((b) => b.type === "processor");
   const controllers = blocks.filter((b) => b.type === "controller");
@@ -52,7 +53,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
   const masters = [...processors, ...controllers];
   const expansionBlocks = interfaces.filter((b) => b.name.toLowerCase().includes("expansion"));
-  const regularSlaves = [...memories, ...peripherals, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
+  const nonPeripheralSlaves = [...memories, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
   const busName = interconnects[0]?.name || "System Bus";
 
   const handleClick = (block: Block) => {
@@ -133,15 +134,62 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
         </button>
 
         {/* Slaves row */}
-        <div className="flex justify-center gap-4 mt-1 flex-wrap">
-          {regularSlaves.map((b) => (
+        <div className="flex justify-center gap-4 mt-1 flex-wrap items-start">
+          {/* Non-peripheral slaves (e.g. SRAM) */}
+          {nonPeripheralSlaves.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
               <BusArrow />
               <BlockNode block={b} className="w-28 h-20 px-2" />
             </div>
           ))}
 
-          {/* Expansion Region — dashed, distinct from regular slaves */}
+          {/* Peripherals group */}
+          {peripherals.length > 0 && (
+            <div className="flex flex-col items-center">
+              <BusArrow />
+              <button
+                onClick={() => setPeripheralsExpanded((p) => !p)}
+                className={`
+                  flex flex-col items-center justify-center gap-1 rounded-xl border-2
+                  bg-white dark:bg-card ${typeColors.peripheral.border} ${typeColors.peripheral.text}
+                  ${peripheralsExpanded ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
+                  cursor-pointer hover:scale-[1.02] hover:shadow-md
+                  transition-all duration-200 w-28 h-20 px-2
+                `}
+              >
+                <Radio className="h-6 w-6" />
+                <span className="font-display font-bold text-xs">Peripherals</span>
+                <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                  {peripherals.length} blocks {peripheralsExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                </span>
+              </button>
+
+              {/* Expanded peripherals */}
+              <AnimatePresence>
+                {peripheralsExpanded && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-2 rounded-xl border-2 border-dashed ${typeColors.peripheral.border} bg-amber-50/50 dark:bg-amber-500/5 p-3">
+                      <div className="flex flex-wrap gap-3 justify-center">
+                        {peripherals.map((b) => (
+                          <div key={b.name} className="flex flex-col items-center">
+                            <BlockNode block={b} className="w-24 h-16 px-1.5" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Expansion Region — dashed */}
           {expansionBlocks.map((b) => {
             const c = typeColors[b.type] || defaultColor;
             const isSelected = selectedBlock?.name === b.name;
