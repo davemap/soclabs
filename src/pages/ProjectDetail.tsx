@@ -745,7 +745,7 @@ const ProjectDetail = () => {
                   >
                     {(dbProject as any).image_url ? (
                       <div className="relative">
-                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-contain bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]" />
+                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-cover" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white">
                           <Upload className="h-5 w-5" />
                           <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Change Image"}</span>
@@ -769,8 +769,8 @@ const ProjectDetail = () => {
                   )}
                 </div>
               ) : (dbProject as any).image_url ? (
-                <div className="rounded-xl bg-card overflow-hidden">
-                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-contain bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px]" />
+                <div className="rounded-xl overflow-hidden">
+                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-cover" />
                 </div>
               ) : (
                 <div className="rounded-xl border bg-card overflow-hidden">

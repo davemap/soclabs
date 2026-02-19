@@ -73,7 +73,7 @@ const ProjectImageCropDialog = ({ open, imageSrc, onClose, onCropComplete, savin
         <DialogHeader>
           <DialogTitle>Crop Project Image</DialogTitle>
         </DialogHeader>
-        <div className="relative w-full h-80 bg-[repeating-conic-gradient(hsl(var(--muted))_0%_25%,transparent_0%_50%)] bg-[length:16px_16px] rounded-lg overflow-hidden">
+        <div className="relative w-full h-80 bg-muted rounded-lg overflow-hidden">
           <Cropper
             image={imageSrc}
             crop={crop}
