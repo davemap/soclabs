@@ -38,7 +38,7 @@ const typeColors: Record<string, { bg: string; border: string; text: string }> =
   processor: { bg: "bg-blue-50 dark:bg-blue-500/10", border: "border-blue-200 dark:border-blue-500/30", text: "text-blue-600 dark:text-blue-400" },
   dma: { bg: "bg-violet-50 dark:bg-violet-500/10", border: "border-violet-200 dark:border-violet-500/30", text: "text-violet-600 dark:text-violet-400" },
   debug: { bg: "bg-slate-100 dark:bg-slate-500/10", border: "border-slate-300 dark:border-slate-500/30", text: "text-slate-600 dark:text-slate-400" },
-  interconnect: { bg: "bg-indigo-50 dark:bg-indigo-500/10", border: "border-indigo-200 dark:border-indigo-500/30", text: "text-indigo-600 dark:text-indigo-400" },
+  interconnect: { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", text: "text-sky-600 dark:text-sky-400" },
   memory: { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", text: "text-emerald-600 dark:text-emerald-400" },
   peripheral: { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", text: "text-amber-600 dark:text-amber-400" },
   interface: { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", text: "text-rose-600 dark:text-rose-400" },
@@ -100,7 +100,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
 
   const BusArrow = () => (
     <div className="flex flex-col items-center py-1">
-      <svg width="16" height="28" viewBox="0 0 16 28" className="text-indigo-300 dark:text-indigo-500/60">
+      <svg width="16" height="28" viewBox="0 0 16 28" className="text-sky-300 dark:text-sky-500/60">
         <line x1="8" y1="0" x2="8" y2="28" stroke="currentColor" strokeWidth="2" />
         <polygon points="4,6 8,0 12,6" fill="currentColor" />
         <polygon points="4,22 8,28 12,22" fill="currentColor" />
@@ -320,7 +320,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   onClick={() => handleClick(apbBusBlock)}
                   className={`
                     w-full h-7 rounded-md border-2 mb-3 flex items-center justify-center
-                    bg-white dark:bg-card border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400
+                    bg-white dark:bg-card border-sky-200 dark:border-sky-500/30 text-sky-600 dark:text-sky-400
                     ${selectedBlock?.name === "APB Bus" ? "ring-2 ring-current shadow-lg" : ""}
                     hover:shadow-md transition-all duration-200
                   `}
@@ -332,7 +332,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   {peripherals.map((b) => (
                     <div key={b.name} className="flex flex-col items-center">
                       <div className="flex flex-col items-center mb-1">
-                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-indigo-300 dark:text-indigo-500/60">
+                        <svg width="12" height="16" viewBox="0 0 12 16" className="text-sky-300 dark:text-sky-500/60">
                           <line x1="6" y1="0" x2="6" y2="16" stroke="currentColor" strokeWidth="1.5" />
                           <polygon points="3,4 6,0 9,4" fill="currentColor" />
                           <polygon points="3,12 6,16 9,12" fill="currentColor" />
