@@ -145,15 +145,12 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 }) => {
   const s = getNodeStyle(node, depth);
   const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-  const hatchStyle = getHatchStyle(s, depth, isDark, true);
-
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
       <button
         type="button"
         onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
         onDoubleClick={e => { e.stopPropagation(); onZoom(); }}
-        style={hatchStyle}
         className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group cursor-pointer ${
           square ? "h-full flex flex-col" : ""
         } ${
