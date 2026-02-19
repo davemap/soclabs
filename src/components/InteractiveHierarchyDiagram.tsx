@@ -94,13 +94,15 @@ const techIdStyles: Record<string, { bg: string; border: string; label: string; 
 /** Get style for a node: prefer techId-based color, fall back to neutral */
 const getNodeStyle = (node: HierarchyNode, depth: number) => {
   if (node.techId && techIdStyles[node.techId]) return techIdStyles[node.techId];
-  // Neutral fallback for structural groupings
-  return { bg: "", border: "border-gray-300 dark:border-gray-600", label: "text-gray-600 dark:text-gray-400", hatchRgb: undefined as string | undefined };
+  // Neutral fallback for structural groupings – solid grey
+  return { bg: "bg-gray-100 dark:bg-gray-700/30", border: "border-gray-300 dark:border-gray-600", label: "text-gray-600 dark:text-gray-400", hatchRgb: undefined as string | undefined };
 };
 
 /** Build inline style for hatched background on group containers */
 const getHatchStyle = (style: ReturnType<typeof getNodeStyle>, depth: number, isDark: boolean, isGroup: boolean): React.CSSProperties => {
   if (!isGroup) return {};
+  // Groups without a techId (e.g. SoC System) get a solid grey background, no hatching
+  if (!style.hatchRgb) return {};
   const density = layerHatchDensity[Math.min(depth, layerHatchDensity.length - 1)];
   return {
     backgroundImage: makeHatchBg(density.opacity, density.spacing, isDark, style.hatchRgb),
