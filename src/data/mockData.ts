@@ -48,7 +48,7 @@ export const referenceDesigns = [
       ] },
     ],
     moduleHierarchy: [
-      { name: "Chip Pads", type: "group", description: "The outermost physical layer of the chip — the I/O pad ring that connects the silicon die to the package pins. Each pad includes ESD protection, level shifting, and configurable drive strength.", children: [
+      { name: "nanosoc_chip_pads", type: "group", description: "The outermost physical layer of the chip — the I/O pad ring that connects the silicon die to the package pins. Each pad includes ESD protection, level shifting, and configurable drive strength.", children: [
         { name: "VDD", type: "module", description: "Core power supply pad (1.2 V / 1.8 V). Multiple VDD pads reduce IR drop across the die." },
         { name: "GPIO[0]", type: "module", description: "General-purpose I/O pad with configurable pull-up/pull-down and Schmitt-trigger input.", techId: "standard-peripherals" },
         { name: "GPIO[1]", type: "module", description: "General-purpose I/O pad with configurable drive strength and slew rate control.", techId: "standard-peripherals" },
