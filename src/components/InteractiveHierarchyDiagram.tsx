@@ -72,8 +72,11 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
 
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
-      <div
-        className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group ${
+      <button
+        type="button"
+        onClick={e => { e.stopPropagation(); onSelect?.(node); }}
+        onDoubleClick={e => { e.stopPropagation(); onZoom(); }}
+        className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group cursor-pointer ${
           square ? "h-full flex flex-col" : ""
         } ${
           node.userDesigned ? "!border-dashed !border-rose-400" : ""
@@ -86,22 +89,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
             {node.userDesigned && (
               <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
             )}
-            <div className="ml-auto flex items-center gap-2">
-              {node.description && (
-                <button
-                  onClick={e => { e.stopPropagation(); onSelect?.(node); }}
-                  className="p-1 rounded-md hover:bg-muted"
-                >
-                  <Info className={`h-3.5 w-3.5 ${isSelected ? "text-primary" : "text-muted-foreground/40"}`} />
-                </button>
-              )}
-              <button
-                onClick={e => { e.stopPropagation(); onZoom(); }}
-                className="p-1 rounded-md hover:bg-muted cursor-zoom-in"
-              >
-                <ZoomIn className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
-              </button>
-            </div>
+            <ZoomIn className="h-4 w-4 ml-auto text-muted-foreground/40 group-hover:text-primary transition-colors" />
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {node.children?.slice(0, 6).map(child => {
@@ -118,7 +106,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
             )}
           </div>
         </div>
-      </div>
+      </button>
     </div>
   );
 };
@@ -255,6 +243,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
           <div className="p-1 md:p-2">
             <div
               onClick={e => { e.stopPropagation(); onSelectChip(chipNode); }}
+              onDoubleClick={e => { e.stopPropagation(); onZoomChip(); }}
               className={`w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center transition-all group cursor-pointer ${
                 isChipSelected ? "ring-2 ring-offset-2 ring-sky-400 shadow-lg" : ""
               }`}
@@ -270,12 +259,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
                   </span>
                 ))}
               </div>
-              <div
-                onClick={e => { e.stopPropagation(); onZoomChip(); }}
-                className="mt-2 p-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-800/40 cursor-zoom-in"
-              >
-                <ZoomIn className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-              </div>
+              <ZoomIn className="mt-2 h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
             </div>
           </div>
 
