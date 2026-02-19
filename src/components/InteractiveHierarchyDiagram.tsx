@@ -88,15 +88,17 @@ const LeafBlock = ({ node, depth }: { node: HierarchyNode; depth: number }) => {
 };
 
 /* ── Compact preview for a zoomable group ── */
-const GroupPreview = ({ node, depth, onZoom }: { node: HierarchyNode; depth: number; onZoom: () => void }) => {
+const GroupPreview = ({ node, depth, onZoom, square = false }: { node: HierarchyNode; depth: number; onZoom: () => void; square?: boolean }) => {
   const [showInfo, setShowInfo] = useState(false);
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
 
   return (
-    <div className="relative">
+    <div className={`relative ${square ? "h-full" : ""}`}>
       <button
         onClick={onZoom}
         className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg hover:scale-[1.01] group cursor-zoom-in ${
+          square ? "h-full flex flex-col" : ""
+        } ${
           node.userDesigned ? "!border-dashed !border-rose-400" : ""
         }`}
       >
@@ -180,7 +182,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate }: {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
-      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
+      className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 aspect-square max-w-[600px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
       <div className="flex items-center gap-1 mb-4 flex-wrap">
@@ -231,16 +233,16 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate }: {
         )}
       </AnimatePresence>
 
-      {/* Children */}
-      <div className="grid gap-3 mt-4" style={{
-        gridTemplateColumns: `repeat(auto-fill, minmax(${(node.children?.length || 0) <= 3 ? "200px" : "160px"}, 1fr))`
+      {/* Children - fill remaining space */}
+      <div className="flex-1 grid gap-3 mt-4 auto-rows-fr" style={{
+        gridTemplateColumns: `repeat(auto-fill, minmax(${(node.children?.length || 0) <= 3 ? "200px" : "140px"}, 1fr))`
       }}>
         {node.children?.map(child => {
           const hasChildren = child.children && child.children.length > 0;
           if (hasChildren) {
             return (
-              <div key={child.name} className="col-span-full md:col-span-1">
-                <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} />
+              <div key={child.name}>
+                <GroupPreview node={child} depth={depth + 1} onZoom={() => onZoom(child)} square />
               </div>
             );
           }
@@ -273,9 +275,9 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
   const left = pads.slice(topCount + rightCount + bottomCount);
 
   return (
-    <div className="relative rounded-2xl border-[3px] border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-800/50 p-1 md:p-1.5 aspect-square max-w-[600px] mx-auto">
+    <div className="relative rounded-2xl border-[3px] border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-800/50 max-w-[600px] mx-auto overflow-hidden">
       {/* Outer label */}
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600">
+      <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-0.5 rounded-b-lg bg-slate-200 dark:bg-slate-700 border border-t-0 border-slate-300 dark:border-slate-600">
         <div className="flex items-center gap-1.5">
           <CircuitBoard className="h-3 w-3 text-slate-500 dark:text-slate-400" />
           <span className="font-display font-bold text-[11px] text-slate-600 dark:text-slate-300 uppercase tracking-wider">{padNode.name}</span>
@@ -289,63 +291,62 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
 
       <AnimatePresence>
         {showPadInfo && padNode.description && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mt-3 mx-2 mb-1">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mx-2 mt-7 mb-0">
             <div className="text-xs text-muted-foreground bg-background/80 border border-border/30 px-3 py-2 rounded-lg">{padNode.description}</div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Grid layout: pad ring surrounding the chip */}
-      <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] h-full gap-0 mt-2">
-        {/* Top-left corner */}
-        <div />
-        {/* Top pads */}
-        <div className="flex justify-around items-end px-1 pb-1">
-          {top.map(p => <PadSquare key={p.name} pad={p} />)}
-        </div>
-        {/* Top-right corner */}
-        <div />
+      {/* Grid: pad ring surrounding the chip, square via padding trick */}
+      <div className="relative w-full" style={{ paddingBottom: "100%" }}>
+        <div className="absolute inset-0 grid grid-cols-[auto_1fr_auto] grid-rows-[auto_1fr_auto] p-1 md:p-1.5">
+          {/* Top-left corner */}
+          <div />
+          {/* Top pads */}
+          <div className="flex justify-around items-end px-1 pb-1 pt-4">
+            {top.map(p => <PadSquare key={p.name} pad={p} />)}
+          </div>
+          {/* Top-right corner */}
+          <div />
 
-        {/* Left pads */}
-        <div className="flex flex-col justify-around items-end py-1 pr-1">
-          {left.map(p => <PadSquare key={p.name} pad={p} />)}
-        </div>
+          {/* Left pads */}
+          <div className="flex flex-col justify-around items-end py-1 pr-1">
+            {left.map(p => <PadSquare key={p.name} pad={p} />)}
+          </div>
 
-        {/* Center: the chip - fills the entire inner area */}
-        <div className="p-1.5 md:p-2">
-          <div
-            onClick={onZoomChip}
-            className="w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center cursor-zoom-in hover:shadow-lg hover:scale-[1.01] transition-all group"
-          >
-            <Layers className="h-5 w-5 text-sky-700 dark:text-sky-300 mb-1" />
-            <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
-            <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
-              {chipNode.children?.slice(0, 4).map(child => {
-                const isGroup = child.children && child.children.length > 0;
-                return (
+          {/* Center: the chip */}
+          <div className="p-1 md:p-2">
+            <div
+              onClick={onZoomChip}
+              className="w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center cursor-zoom-in hover:shadow-lg hover:scale-[1.01] transition-all group"
+            >
+              <Layers className="h-5 w-5 text-sky-700 dark:text-sky-300 mb-1" />
+              <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
+              <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
+                {chipNode.children?.slice(0, 4).map(child => (
                   <span key={child.name} className="text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-violet-300 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium">
                     {child.name}
                   </span>
-                );
-              })}
+                ))}
+              </div>
+              <ZoomIn className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary mt-2 transition-colors" />
             </div>
-            <ZoomIn className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary mt-2 transition-colors" />
           </div>
-        </div>
 
-        {/* Right pads */}
-        <div className="flex flex-col justify-around items-start py-1 pl-1">
-          {right.map(p => <PadSquare key={p.name} pad={p} />)}
-        </div>
+          {/* Right pads */}
+          <div className="flex flex-col justify-around items-start py-1 pl-1">
+            {right.map(p => <PadSquare key={p.name} pad={p} />)}
+          </div>
 
-        {/* Bottom-left corner */}
-        <div />
-        {/* Bottom pads */}
-        <div className="flex justify-around items-start px-1 pt-1">
-          {bottom.map(p => <PadSquare key={p.name} pad={p} />)}
+          {/* Bottom-left corner */}
+          <div />
+          {/* Bottom pads */}
+          <div className="flex justify-around items-start px-1 pt-1">
+            {bottom.map(p => <PadSquare key={p.name} pad={p} />)}
+          </div>
+          {/* Bottom-right corner */}
+          <div />
         </div>
-        {/* Bottom-right corner */}
-        <div />
       </div>
     </div>
   );
