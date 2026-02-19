@@ -199,14 +199,15 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
 };
 
 /* ── Pad ring: realistic chip layout ── */
-const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelected }: {
+const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelected, onSelectPad, isPadSelected }: {
   padNode: HierarchyNode;
   chipNode: HierarchyNode;
   onZoomChip: () => void;
   onSelectChip: (node: HierarchyNode) => void;
   isChipSelected: boolean;
+  onSelectPad: (node: HierarchyNode) => void;
+  isPadSelected: boolean;
 }) => {
-  const [showPadInfo, setShowPadInfo] = useState(false);
   const pads = padNode.children || [];
 
   // Distribute pads evenly across 4 sides
@@ -222,27 +223,20 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
   const left = pads.slice(topCount + rightCount + bottomCount);
 
   return (
-    <div className="relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] mx-auto overflow-hidden">
+    <button
+      type="button"
+      onClick={() => onSelectPad(padNode)}
+      className={`relative rounded-2xl border-[3px] border-amber-400 dark:border-amber-500 bg-amber-50/60 dark:bg-amber-950/30 max-w-[600px] mx-auto overflow-hidden w-full text-left transition-all hover:shadow-md ${
+        isPadSelected ? "ring-2 ring-offset-2 ring-amber-400 shadow-lg" : ""
+      }`}
+    >
       {/* Outer label */}
       <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 px-3 py-0.5 rounded-b-lg bg-amber-200 dark:bg-amber-800 border border-t-0 border-amber-300 dark:border-amber-600">
         <div className="flex items-center gap-1.5">
           <CircuitBoard className="h-3 w-3 text-amber-600 dark:text-amber-400" />
           <span className="font-display font-bold text-[11px] text-amber-700 dark:text-amber-300 uppercase tracking-wider">{padNode.name}</span>
-          {padNode.description && (
-            <button onClick={() => setShowPadInfo(v => !v)} className="p-0.5 rounded hover:bg-muted">
-              <Info className={`h-3 w-3 ${showPadInfo ? "text-primary" : "text-muted-foreground/40"}`} />
-            </button>
-          )}
         </div>
       </div>
-
-      <AnimatePresence>
-        {showPadInfo && padNode.description && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mx-2 mt-7 mb-0">
-            <div className="text-xs text-muted-foreground bg-background/80 border border-border/30 px-3 py-2 rounded-lg">{padNode.description}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Grid: pad ring surrounding the chip, square via padding trick */}
       <div className="relative w-full" style={{ paddingBottom: "100%" }}>
@@ -257,17 +251,18 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
             {left.map(p => <PadSquare key={p.name} pad={p} />)}
           </div>
 
-          {/* Center: the chip - clickable for info, zoom icon for drill-in */}
+          {/* Center: the chip */}
           <div className="p-1 md:p-2">
             <div
-              className={`w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center transition-all group ${
+              onClick={e => { e.stopPropagation(); onSelectChip(chipNode); }}
+              className={`w-full h-full rounded-xl border-2 border-sky-300 dark:border-sky-600 bg-sky-50 dark:bg-sky-900/30 flex flex-col items-center justify-center transition-all group cursor-pointer ${
                 isChipSelected ? "ring-2 ring-offset-2 ring-sky-400 shadow-lg" : ""
               }`}
             >
-              <button onClick={() => onSelectChip(chipNode)} className="flex flex-col items-center">
+              <div className="flex flex-col items-center">
                 <Layers className="h-5 w-5 text-sky-700 dark:text-sky-300 mb-1" />
                 <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
-              </button>
+              </div>
               <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
                 {chipNode.children?.slice(0, 4).map(child => (
                   <span key={child.name} className="text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-violet-300 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium">
@@ -275,9 +270,12 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
                   </span>
                 ))}
               </div>
-              <button onClick={onZoomChip} className="mt-2 p-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-800/40 cursor-zoom-in">
+              <div
+                onClick={e => { e.stopPropagation(); onZoomChip(); }}
+                className="mt-2 p-1 rounded-md hover:bg-sky-100 dark:hover:bg-sky-800/40 cursor-zoom-in"
+              >
                 <ZoomIn className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-              </button>
+              </div>
             </div>
           </div>
 
@@ -292,7 +290,7 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
           <div />
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -445,7 +443,7 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
           })}
         </div>
       ) : (
-        <ChipPadRing padNode={padNode} chipNode={chipNode} onZoomChip={() => zoomInto(chipNode)} onSelectChip={handleSelect} isChipSelected={selectedNode?.name === chipNode.name} />
+        <ChipPadRing padNode={padNode} chipNode={chipNode} onZoomChip={() => zoomInto(chipNode)} onSelectChip={handleSelect} isChipSelected={selectedNode?.name === chipNode.name} onSelectPad={handleSelect} isPadSelected={selectedNode?.name === padNode.name} />
       )}
 
       {/* Bottom description panel */}
