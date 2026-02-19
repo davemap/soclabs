@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2, Tag, GitBranch, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { referenceDesigns, communityProjects, technologies } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 
 const blockTypeIcon: Record<string, React.ReactNode> = {
   processor: <Cpu className="h-4 w-4" />,
@@ -30,6 +32,20 @@ const DesignDetail = () => {
   const { id } = useParams<{ id: string }>();
   const design = referenceDesigns.find((d) => d.id === id);
 
+  const [dbProjects, setDbProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!design) return;
+    const fetchProjects = async () => {
+      const { data } = await supabase
+        .from("projects")
+        .select("*")
+        .ilike("reference_soc", design.name);
+      setDbProjects(data || []);
+    };
+    fetchProjects();
+  }, [design?.name]);
+
   if (!design) {
     return (
       <Layout>
@@ -43,7 +59,7 @@ const DesignDetail = () => {
     );
   }
 
-  const relatedProjects = communityProjects.filter(
+  const mockProjects = communityProjects.filter(
     (p) => p.referenceSoc.toLowerCase() === design.name.toLowerCase()
   );
 
@@ -198,9 +214,34 @@ const DesignDetail = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
                 <h2 className="text-2xl font-display font-bold mb-4">Community Projects</h2>
                 <p className="text-muted-foreground mb-6">Projects built on top of the {design.name} platform by community members.</p>
-                {relatedProjects.length > 0 ? (
+                {(mockProjects.length > 0 || dbProjects.length > 0) ? (
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {relatedProjects.map((project) => (
+                    {dbProjects.map((project) => (
+                      <Link to={`/projects/${project.id}`} key={project.id}>
+                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
+                          <CardContent className="p-5">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge
+                                variant="outline"
+                                className={`text-xs ${
+                                  project.status === "Completed"
+                                    ? "border-green-500/30 text-green-400"
+                                    : project.status === "In Progress"
+                                    ? "border-primary/30 text-primary"
+                                    : "border-border text-muted-foreground"
+                                }`}
+                              >
+                                {project.status}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">{project.target_technology || project.reference_soc}</Badge>
+                            </div>
+                            <h3 className="font-display font-semibold mb-1">{project.title}</h3>
+                            <p className="text-sm text-muted-foreground line-clamp-2">{project.description}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                    {mockProjects.map((project) => (
                       <Link to={`/projects/${project.id}`} key={project.id}>
                         <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
                           <CardContent className="p-5">
