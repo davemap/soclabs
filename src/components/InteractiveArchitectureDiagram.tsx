@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp, Box } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +13,7 @@ interface Block {
   techId?: string;
   gateCount?: string;
   configOptions?: string[];
+  subBlocks?: Block[];
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -27,6 +28,7 @@ const blockTypeIcon: Record<string, React.ReactNode> = {
   peripheral: <Radio className="h-6 w-6" />,
   controller: <Cpu className="h-6 w-6" />,
   interface: <Plug className="h-6 w-6" />,
+  subsystem: <Box className="h-6 w-6" />,
 };
 
 const typeColors: Record<string, { bg: string; border: string; text: string }> = {
@@ -36,6 +38,7 @@ const typeColors: Record<string, { bg: string; border: string; text: string }> =
   memory: { bg: "bg-emerald-50 dark:bg-emerald-500/10", border: "border-emerald-200 dark:border-emerald-500/30", text: "text-emerald-600 dark:text-emerald-400" },
   peripheral: { bg: "bg-amber-50 dark:bg-amber-500/10", border: "border-amber-200 dark:border-amber-500/30", text: "text-amber-600 dark:text-amber-400" },
   interface: { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", text: "text-rose-600 dark:text-rose-400" },
+  subsystem: { bg: "bg-sky-50 dark:bg-sky-500/10", border: "border-sky-200 dark:border-sky-500/30", text: "text-sky-600 dark:text-sky-400" },
 };
 
 const defaultColor = { bg: "bg-muted", border: "border-border", text: "text-foreground" };
@@ -50,15 +53,17 @@ const apbBusBlock: Block = {
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
+  const [subsystemExpanded, setSubsystemExpanded] = useState<string | null>(null);
 
   const processors = blocks.filter((b) => b.type === "processor");
   const controllers = blocks.filter((b) => b.type === "controller");
+  const subsystems = blocks.filter((b) => b.type === "subsystem");
   const interconnects = blocks.filter((b) => b.type === "interconnect");
   const memories = blocks.filter((b) => b.type === "memory");
   const peripherals = blocks.filter((b) => b.type === "peripheral");
   const interfaces = blocks.filter((b) => b.type === "interface");
 
-  const masters = [...processors, ...controllers];
+  const masters = [...subsystems, ...processors, ...controllers];
   const expansionBlocks = interfaces.filter((b) => b.name.toLowerCase().includes("expansion"));
   const nonPeripheralSlaves = [...memories, ...interfaces.filter((b) => !b.name.toLowerCase().includes("expansion"))];
   const busName = interconnects[0]?.name || "System Bus";
@@ -120,11 +125,56 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
         <div className="flex justify-center gap-5 mb-1">
           {masters.map((b) => (
             <div key={b.name} className="flex flex-col items-center">
-              <BlockNode block={b} className="w-32 h-24 px-3" />
+              {b.type === "subsystem" ? (
+                <button
+                  onClick={() => setSubsystemExpanded((prev) => (prev === b.name ? null : b.name))}
+                  className={`
+                    flex flex-col items-center justify-center gap-1 rounded-xl border-2
+                    bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
+                    ${subsystemExpanded === b.name ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
+                    cursor-pointer hover:scale-[1.02] hover:shadow-md
+                    transition-all duration-200 w-32 h-24 px-3
+                  `}
+                >
+                  <Box className="h-6 w-6" />
+                  <span className="font-display font-bold text-xs text-center leading-tight">{b.name}</span>
+                  <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                    {b.subBlocks?.length || 0} blocks {subsystemExpanded === b.name ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  </span>
+                </button>
+              ) : (
+                <BlockNode block={b} className="w-32 h-24 px-3" />
+              )}
               <BusArrow />
             </div>
           ))}
         </div>
+
+        {/* Expanded subsystem region */}
+        <AnimatePresence>
+          {subsystems.map((sub) =>
+            subsystemExpanded === sub.name && sub.subBlocks ? (
+              <motion.div
+                key={sub.name}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden mb-2"
+              >
+                <div className="rounded-xl border-2 border-dashed border-sky-300 dark:border-sky-500/30 bg-sky-50/50 dark:bg-sky-500/5 p-3">
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    {sub.subBlocks.map((sb) => (
+                      <div key={sb.name} className="flex flex-col items-center">
+                        <BlockNode block={sb} className="w-24 h-16 px-1.5" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ) : null
+          )}
+        </AnimatePresence>
 
         {/* Bus bar */}
         <button
