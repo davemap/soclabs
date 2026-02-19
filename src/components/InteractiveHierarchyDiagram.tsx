@@ -40,13 +40,20 @@ interface InteractiveHierarchyDiagramProps {
 }
 
 const layerStyles = [
-  { bg: "bg-gray-100/80 dark:bg-gray-800/50", border: "border-gray-300 dark:border-gray-600", label: "text-gray-700 dark:text-gray-300" },
-  { bg: "bg-gray-50 dark:bg-gray-800/30", border: "border-gray-250 dark:border-gray-600/70", label: "text-gray-600 dark:text-gray-400" },
-  { bg: "bg-gray-100/50 dark:bg-gray-700/25", border: "border-gray-200 dark:border-gray-600/50", label: "text-gray-500 dark:text-gray-400" },
-  { bg: "bg-gray-50/60 dark:bg-gray-700/15", border: "border-gray-200/80 dark:border-gray-500/40", label: "text-gray-500 dark:text-gray-500" },
-  { bg: "bg-white/80 dark:bg-gray-700/10", border: "border-gray-200/60 dark:border-gray-500/30", label: "text-gray-400 dark:text-gray-500" },
-  { bg: "bg-white/60 dark:bg-gray-600/10", border: "border-gray-150 dark:border-gray-500/20", label: "text-gray-400 dark:text-gray-500" },
+  { bg: "", border: "border-gray-300 dark:border-gray-600", label: "text-gray-700 dark:text-gray-300", hatchOpacity: 0.12, hatchSpacing: 6 },
+  { bg: "", border: "border-gray-300/80 dark:border-gray-600/70", label: "text-gray-600 dark:text-gray-400", hatchOpacity: 0.09, hatchSpacing: 8 },
+  { bg: "", border: "border-gray-200 dark:border-gray-600/50", label: "text-gray-500 dark:text-gray-400", hatchOpacity: 0.07, hatchSpacing: 10 },
+  { bg: "", border: "border-gray-200/80 dark:border-gray-500/40", label: "text-gray-500 dark:text-gray-500", hatchOpacity: 0.05, hatchSpacing: 12 },
+  { bg: "", border: "border-gray-200/60 dark:border-gray-500/30", label: "text-gray-400 dark:text-gray-500", hatchOpacity: 0.04, hatchSpacing: 14 },
+  { bg: "", border: "border-gray-200/50 dark:border-gray-500/20", label: "text-gray-400 dark:text-gray-500", hatchOpacity: 0.03, hatchSpacing: 16 },
 ];
+
+/* Generate a repeating diagonal-line SVG data URI for hatched backgrounds */
+const makeHatchBg = (opacity: number, spacing: number, isDark: boolean) => {
+  const color = isDark ? `rgba(255,255,255,${opacity})` : `rgba(0,0,0,${opacity})`;
+  const svg = `<svg width="${spacing}" height="${spacing}" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="${spacing}" x2="${spacing}" y2="0" stroke="${color}" stroke-width="1"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
 
 /* ── techId → color mapping aligned with architecture diagram typeColors ── */
 const techIdStyles: Record<string, { bg: string; border: string; label: string }> = {
@@ -81,10 +88,17 @@ const techIdStyles: Record<string, { bg: string; border: string; label: string }
   "system-integration": { bg: "bg-rose-50 dark:bg-rose-500/10", border: "border-rose-200 dark:border-rose-500/30", label: "text-rose-600 dark:text-rose-400" },
 };
 
-/** Get style for a node: prefer techId-based color, fall back to depth-based */
+/** Get style for a node: prefer techId-based color, fall back to depth-based hatched */
 const getNodeStyle = (node: HierarchyNode, depth: number) => {
-  if (node.techId && techIdStyles[node.techId]) return techIdStyles[node.techId];
-  return layerStyles[Math.min(depth, layerStyles.length - 1)];
+  if (node.techId && techIdStyles[node.techId]) return { ...techIdStyles[node.techId], hatchOpacity: 0, hatchSpacing: 0 };
+  const ls = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  return { ...ls, label: ls.label };
+};
+
+/** Build inline style for hatched background (only for non-techId nodes) */
+const getHatchStyle = (style: ReturnType<typeof getNodeStyle>, isDark: boolean): React.CSSProperties => {
+  if (!('hatchOpacity' in style) || !(style as any).hatchOpacity) return {};
+  return { backgroundImage: makeHatchBg((style as any).hatchOpacity, (style as any).hatchSpacing, isDark), backgroundRepeat: "repeat" };
 };
 
 /* ── Info Panel (removed floating version - now using bottom panel) ── */
@@ -123,6 +137,8 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
   isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void;
 }) => {
   const s = getNodeStyle(node, depth);
+  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  const hatchStyle = getHatchStyle(s, isDark);
 
   return (
     <div className={`relative ${square ? "h-full" : ""}`}>
@@ -130,6 +146,7 @@ const GroupPreview = ({ node, depth, onZoom, square = false, isSelected, onSelec
         type="button"
         onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
         onDoubleClick={e => { e.stopPropagation(); onZoom(); }}
+        style={hatchStyle}
         className={`rounded-xl border-2 ${s.border} ${s.bg} w-full text-left transition-all duration-200 hover:shadow-lg group cursor-pointer ${
           square ? "h-full flex flex-col" : ""
         } ${
@@ -179,6 +196,8 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
   designName: string;
 }) => {
   const s = getNodeStyle(node, depth);
+  const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+  const hatchStyle = getHatchStyle(s, isDark);
   const children = node.children || [];
   const totalPages = Math.ceil(children.length / ITEMS_PER_PAGE);
 
@@ -205,6 +224,7 @@ const ZoomedView = ({ node, depth, onZoom, breadcrumb, onNavigate, selectedNode,
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
       transition={{ duration: 0.2 }}
+      style={hatchStyle}
       className={`rounded-xl border-2 ${s.border} ${s.bg} p-4 md:p-5 max-w-[600px] min-h-[320px] mx-auto flex flex-col ${node.userDesigned ? "!border-dashed !border-rose-400" : ""}`}
     >
       {/* Breadcrumb bar */}
