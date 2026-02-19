@@ -269,11 +269,14 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip, onSelectChip, isChipSelect
                 <span className="font-display font-bold text-sm md:text-base text-sky-700 dark:text-sky-300">{chipNode.name}</span>
               </div>
               <div className="mt-2 flex flex-wrap justify-center gap-1.5 px-3">
-                {chipNode.children?.slice(0, 4).map(child => (
-                  <span key={child.name} className="text-[10px] md:text-xs px-2 py-0.5 rounded-md border border-violet-300 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium">
-                    {child.name}
-                  </span>
-                ))}
+                {chipNode.children?.slice(0, 4).map(child => {
+                  const cs = layerStyles[Math.min(2, layerStyles.length - 1)];
+                  return (
+                    <span key={child.name} className={`text-[10px] md:text-xs px-2 py-0.5 rounded-md border ${cs.border} ${cs.bg} ${cs.label} font-medium`}>
+                      {child.name}
+                    </span>
+                  );
+                })}
               </div>
               <ZoomIn className="mt-2 h-4 w-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
             </div>
@@ -395,7 +398,7 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
 
   const currentZoomed = navStack.length > 0 ? navStack[navStack.length - 1] : null;
   // Depth offset: if padNode exists, the pad ring is depth 0, so zoomed nodes start at depth 1
-  const currentDepth = padNode ? navStack.length + 1 : navStack.length;
+  const currentDepth = padNode ? navStack.length : Math.max(navStack.length - 1, 0);
 
   return (
     <div className="rounded-2xl border border-border/60 bg-white dark:bg-card p-5 md:p-8">
