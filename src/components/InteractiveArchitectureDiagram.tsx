@@ -107,11 +107,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
       {/* Block diagram */}
       <div className="max-w-[700px] mx-auto py-4">
 
-        {/* Title */}
-        <div className="text-center mb-8">
-          <h3 className="text-sm font-display font-bold text-muted-foreground uppercase tracking-widest">{designName} System Architecture</h3>
-        </div>
-
         {/* Masters row */}
         <div className="flex justify-center gap-5 mb-1">
           {masters.map((b) => (
