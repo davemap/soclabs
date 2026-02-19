@@ -1,9 +1,28 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft, Microchip, ArrowRight } from "lucide-react";
+import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft, Microchip, ArrowRight, Cpu, MemoryStick, Network, Bug, Timer, Shield, Zap, Radio, HardDrive, Clock, RotateCcw, Pin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+/* ── Icon mapping for leaf nodes based on name/type ── */
+const getNodeIcon = (node: { name: string; type: string }) => {
+  const n = node.name.toLowerCase();
+  if (n.includes("cortex") || n.includes("cpu")) return Cpu;
+  if (n.includes("instruction memory") || n.includes("data memory") || n.includes("boot rom") || n.includes("sram")) return MemoryStick;
+  if (n.includes("address decoder") || n.includes("default slave") || n.includes("ahb") || n.includes("apb") || n.includes("bridge") || n.includes("interconnect")) return Network;
+  if (n.includes("debug") || n.includes("swd")) return Bug;
+  if (n.includes("timer")) return Timer;
+  if (n.includes("watchdog")) return Shield;
+  if (n.includes("dma")) return Zap;
+  if (n.includes("uart")) return Radio;
+  if (n.includes("gpio")) return Pin;
+  if (n.includes("accelerator")) return Microchip;
+  if (n.includes("clock") || n.includes("clk")) return Clock;
+  if (n.includes("reset")) return RotateCcw;
+  if (n.includes("vdd") || n.includes("vss")) return Zap;
+  return Box;
+};
 
 export interface HierarchyNode {
   name: string;
@@ -42,6 +61,7 @@ const PadSquare = ({ pad }: { pad: HierarchyNode }) => (
 /* ── Leaf block ── */
 const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode; depth: number; isSelected?: boolean; onSelect?: (node: HierarchyNode, depth: number) => void }) => {
   const s = layerStyles[Math.min(depth, layerStyles.length - 1)];
+  const NodeIcon = getNodeIcon(node);
   return (
     <button
       onClick={e => { e.stopPropagation(); onSelect?.(node, depth); }}
@@ -50,7 +70,7 @@ const LeafBlock = ({ node, depth, isSelected, onSelect }: { node: HierarchyNode;
       } ${isSelected ? "ring-2 ring-offset-2 ring-current shadow-lg scale-[1.03]" : ""}`}
     >
       <div className="flex items-center gap-2">
-        <Box className={`h-3.5 w-3.5 ${s.label} shrink-0`} />
+        <NodeIcon className={`h-3.5 w-3.5 ${s.label} shrink-0`} />
         <span className={`text-xs md:text-sm font-semibold ${s.label}`}>{node.name}</span>
         {node.userDesigned && (
           <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full leading-none">USER IP</span>
