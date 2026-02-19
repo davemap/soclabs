@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight, Microchip, Settings2, X, ExternalLink as ExternalLinkIcon, ChevronDown, ChevronUp, Box, Bug, ArrowLeftRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -62,11 +62,46 @@ const ahbBusBlock: Block = {
 };
 
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
-  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [peripheralsExpanded, setPeripheralsExpanded] = useState(false);
-  const [subsystemExpanded, setSubsystemExpanded] = useState<string | null>(null);
+  // Restore state from sessionStorage
+  const stateKey = `arch-state-${designName}`;
+  const restoreState = () => {
+    try {
+      const saved = sessionStorage.getItem(stateKey);
+      if (!saved) return null;
+      return JSON.parse(saved) as { selectedName: string | null; peripheralsExpanded: boolean; subsystemExpanded: string | null };
+    } catch { return null; }
+  };
+
+  const initial = restoreState();
+
+  // Find a block by name across all blocks and their subBlocks
+  const findBlock = (name: string): Block | null => {
+    for (const b of blocks) {
+      if (b.name === name) return b;
+      if (b.subBlocks) {
+        const found = b.subBlocks.find(sb => sb.name === name);
+        if (found) return found;
+      }
+    }
+    if (name === "APB Bus") return apbBusBlock;
+    if (name === "AHB Lite") return ahbBusBlock;
+    return null;
+  };
+
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(initial?.selectedName ? findBlock(initial.selectedName) : null);
+  const [peripheralsExpanded, setPeripheralsExpanded] = useState(initial?.peripheralsExpanded ?? false);
+  const [subsystemExpanded, setSubsystemExpanded] = useState<string | null>(initial?.subsystemExpanded ?? null);
   const diagramRef = useRef<HTMLDivElement>(null);
   const subsystemBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Persist state to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem(stateKey, JSON.stringify({
+      selectedName: selectedBlock?.name ?? null,
+      peripheralsExpanded,
+      subsystemExpanded,
+    }));
+  }, [selectedBlock, peripheralsExpanded, subsystemExpanded, stateKey]);
   const processors = blocks.filter((b) => b.type === "processor");
   const dmaControllers = blocks.filter((b) => b.type === "dma");
   const debugControllers = blocks.filter((b) => b.type === "debug");
