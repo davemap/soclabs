@@ -1,7 +1,8 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ExternalLink, ArrowLeft, MemoryStick, Radio, Layers, Plug, CheckCircle2, Tag, GitBranch, BookOpen } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen } from "lucide-react";
+import InteractiveArchitectureDiagram from "@/components/InteractiveArchitectureDiagram";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,23 +12,6 @@ import CommunityProjectsCarousel from "@/components/CommunityProjectsCarousel";
 import TechToolsCarousel from "@/components/TechToolsCarousel";
 import { supabase } from "@/integrations/supabase/client";
 
-const blockTypeIcon: Record<string, React.ReactNode> = {
-  processor: <Cpu className="h-4 w-4" />,
-  interconnect: <Layers className="h-4 w-4" />,
-  memory: <MemoryStick className="h-4 w-4" />,
-  peripheral: <Radio className="h-4 w-4" />,
-  controller: <Cpu className="h-4 w-4" />,
-  interface: <Plug className="h-4 w-4" />,
-};
-
-const blockTypeColor: Record<string, string> = {
-  processor: "bg-primary/20 text-primary border-primary/30",
-  interconnect: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
-  memory: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  peripheral: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  controller: "bg-violet-500/20 text-violet-400 border-violet-500/30",
-  interface: "bg-rose-500/20 text-rose-400 border-rose-500/30",
-};
 
 const DesignDetail = () => {
   const navigate = useNavigate();
@@ -148,20 +132,11 @@ const DesignDetail = () => {
                 </div>
               </motion.div>
 
-              {/* Block Diagram */}
+              {/* Interactive Architecture Diagram */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <h2 className="text-2xl font-display font-bold mb-4">System Blocks</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {design.blockDiagram.map((block) => (
-                    <div
-                      key={block.name}
-                      className={`flex items-center gap-2.5 p-3 rounded-lg border ${blockTypeColor[block.type] || "bg-muted text-foreground border-border"}`}
-                    >
-                      {blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}
-                      <span className="text-sm font-medium">{block.name}</span>
-                    </div>
-                  ))}
-                </div>
+                <h2 className="text-2xl font-display font-bold mb-4">System Architecture</h2>
+                <p className="text-muted-foreground text-sm mb-6">Click on any component to learn more about the technology.</p>
+                <InteractiveArchitectureDiagram blocks={design.blockDiagram} designName={design.name} />
               </motion.div>
 
               {/* Features & Use Cases */}
