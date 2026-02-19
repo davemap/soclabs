@@ -726,60 +726,6 @@ const ProjectDetail = () => {
             </div>
 
 
-            {/* Project Image */}
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.17 }} className="mb-4">
-              {editMode && isOwner ? (
-                <div>
-                  <input
-                    ref={imageInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageSelect}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => imageInputRef.current?.click()}
-                    disabled={uploadingImage}
-                    className="w-full rounded-xl border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 bg-card transition-colors overflow-hidden group"
-                  >
-                    {(dbProject as any).image_url ? (
-                      <div className="relative">
-                        <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white">
-                          <Upload className="h-5 w-5" />
-                          <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Change Image"}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
-                        <ImageIcon className="h-10 w-10 mb-2 opacity-40" />
-                        <span className="text-sm font-medium">{uploadingImage ? "Uploading..." : "Click to add a project image"}</span>
-                      </div>
-                    )}
-                  </button>
-                  {cropImageSrc && (
-                    <ProjectImageCropDialog
-                      open={cropDialogOpen}
-                      imageSrc={cropImageSrc}
-                      onClose={() => { setCropDialogOpen(false); setCropImageSrc(null); }}
-                      onCropComplete={handleCroppedImage}
-                      saving={uploadingImage}
-                    />
-                  )}
-                </div>
-              ) : (dbProject as any).image_url ? (
-                <div className="rounded-xl overflow-hidden">
-                  <img src={(dbProject as any).image_url} alt="Project" className="w-full h-[32rem] object-cover" />
-                </div>
-              ) : (
-                <div className="rounded-xl border bg-card overflow-hidden">
-                  <div className="flex items-center justify-center py-16 text-muted-foreground">
-                    <ImageIcon className="h-10 w-10 opacity-20" />
-                  </div>
-                </div>
-              )}
-            </motion.div>
 
             {/* DB Content sections display / inline edit */}
             {editMode && isOwner ? (
