@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight } from "lucide-react";
+import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export interface HierarchyNode {
@@ -280,11 +280,13 @@ const ChipPadRing = ({ padNode, chipNode, onZoomChip }: {
   const [showPadInfo, setShowPadInfo] = useState(false);
   const pads = padNode.children || [];
 
-  // Distribute pads to 4 sides more evenly
+  // Distribute pads evenly across 4 sides
   const total = pads.length;
-  const topCount = Math.ceil(total * 0.25);
-  const rightCount = Math.ceil(total * 0.25);
-  const bottomCount = Math.ceil(total * 0.25);
+  const perSide = Math.floor(total / 4);
+  const remainder = total % 4;
+  const topCount = perSide + (remainder > 0 ? 1 : 0);
+  const rightCount = perSide + (remainder > 1 ? 1 : 0);
+  const bottomCount = perSide + (remainder > 2 ? 1 : 0);
   const top = pads.slice(0, topCount);
   const right = pads.slice(topCount, topCount + rightCount);
   const bottom = pads.slice(topCount + rightCount, topCount + rightCount + bottomCount);
@@ -381,13 +383,6 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
   if (currentZoomed) {
     return (
       <div>
-        {/* Zoom-out hint bar */}
-        <button
-          onClick={() => navigateTo(navStack.length - 2)}
-          className="mb-3 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-dashed border-muted-foreground/20 text-muted-foreground text-xs hover:bg-muted/50 hover:border-primary/30 hover:text-primary transition-all cursor-zoom-out"
-        >
-          <span>← Zoom out to {navStack.length > 1 ? navStack[navStack.length - 2].name : "chip overview"}</span>
-        </button>
         <AnimatePresence mode="wait">
           <ZoomedView
             key={currentZoomed.name}
@@ -398,6 +393,25 @@ const InteractiveHierarchyDiagram = ({ hierarchy, designName }: InteractiveHiera
             onNavigate={navigateTo}
           />
         </AnimatePresence>
+        {/* Bottom zoom-out buttons */}
+        <div className="flex items-center gap-2 mt-3">
+          <button
+            onClick={() => navigateTo(navStack.length - 2)}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-primary/20 bg-primary/5 text-primary text-sm font-semibold hover:bg-primary/10 hover:border-primary/40 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {navStack.length > 1 ? navStack[navStack.length - 2].name : "Chip Overview"}
+          </button>
+          {navStack.length > 1 && (
+            <button
+              onClick={() => navigateTo(-1)}
+              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 border-muted-foreground/15 text-muted-foreground text-sm font-medium hover:bg-muted/50 hover:border-muted-foreground/30 transition-all"
+            >
+              <CircuitBoard className="h-4 w-4" />
+              Top Level
+            </button>
+          )}
+        </div>
       </div>
     );
   }
