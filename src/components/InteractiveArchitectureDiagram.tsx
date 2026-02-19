@@ -140,17 +140,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   return (
     <div className="rounded-2xl border border-border/60 bg-white dark:bg-card p-5 md:p-8">
       {/* Legend */}
-      <div className="flex flex-wrap gap-4 mb-6 pb-4 border-b border-border/30">
-        {Object.entries(typeColors).map(([type, c]) => {
-          if (!blocks.some((b) => b.type === type)) return null;
-          return (
-            <div key={type} className="flex items-center gap-2">
-              <div className={`w-3.5 h-3.5 rounded ${c.bg} border-2 ${c.border}`} />
-              <span className="text-sm text-muted-foreground">{type === "dma" ? "DMA" : type.charAt(0).toUpperCase() + type.slice(1)}</span>
-            </div>
-          );
-        })}
-      </div>
+      <p className="text-sm text-muted-foreground mb-6 pb-4 border-b border-border/30">Click on any component to learn more about the technology.</p>
 
       {/* Block diagram */}
       <div className="max-w-[750px] mx-auto py-4 relative" ref={diagramRef}>
