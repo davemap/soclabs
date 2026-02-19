@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight as ArrowRightIcon, ArrowUpDown } from "lucide-react";
+import { Cpu, MemoryStick, Radio, Layers, Plug, ArrowRight as ArrowRightIcon, ArrowUpDown, Bug, ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { technologies } from "@/data/mockData";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Block {
   name: string;
   type: string;
+  external?: boolean;
 }
 
 interface InteractiveArchitectureDiagramProps {
@@ -89,6 +90,7 @@ const blockToTechId: Record<string, string> = {
   "DMA Controller": "amba-interconnect",
   "Extension Port": "hw-acceleration",
   "Accelerator Slot": "hw-acceleration",
+  "Debug Controller": "standard-peripherals",
 };
 
 const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchitectureDiagramProps) => {
@@ -128,6 +130,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
               className={`
                 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 
                 ${style.bg} ${style.border} ${style.text}
+                ${block.external ? "ring-2 ring-orange-400/40 ring-offset-1 ring-offset-transparent" : ""}
                 ${isClickable ? `cursor-pointer ${style.hoverBorder} hover:-translate-y-0.5` : "cursor-default"}
                 transition-all duration-300 group min-w-0
                 ${className}
@@ -135,6 +138,11 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             >
               <span className="shrink-0">{blockTypeIcon[block.type] || <Cpu className="h-4 w-4" />}</span>
               <span className="font-display font-semibold text-xs text-center leading-tight">{block.name}</span>
+              {block.external && (
+                <span className="flex items-center gap-0.5 text-[10px] text-orange-400 font-medium mt-0.5">
+                  <ExternalLinkIcon className="h-2.5 w-2.5" /> External
+                </span>
+              )}
               {isClickable && (
                 <ArrowRightIcon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
               )}
@@ -180,6 +188,12 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
             </div>
           );
         })}
+        {blocks.some((b) => b.external) && (
+          <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border/40">
+            <div className="w-2.5 h-2.5 rounded-full bg-orange-400/20 border border-orange-400/60 ring-1 ring-orange-400/40" />
+            <span className="text-xs text-muted-foreground">External I/O</span>
+          </div>
+        )}
       </div>
 
       <div className="min-w-[600px]">
