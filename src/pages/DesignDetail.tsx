@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { referenceDesigns, communityProjects, technologies } from "@/data/mockData";
 import CommunityProjectsCarousel from "@/components/CommunityProjectsCarousel";
+import TechToolsCarousel from "@/components/TechToolsCarousel";
 import { supabase } from "@/integrations/supabase/client";
 
 const blockTypeIcon: Record<string, React.ReactNode> = {
@@ -192,22 +193,7 @@ const DesignDetail = () => {
               {/* Related Technologies */}
               {relatedTechs.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                  <h2 className="text-2xl font-display font-bold mb-4">Technologies & Tools</h2>
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    {relatedTechs.map((tech) => (
-                      <Link to={`/technologies/${tech.id}`} key={tech.name}>
-                        <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40">
-                          <CardContent className="p-5">
-                            <div className="flex items-center justify-between mb-1">
-                              <h3 className="font-display font-semibold">{tech.name}</h3>
-                              <Badge variant="outline" className="text-xs">{(tech as any).group} · {tech.category}</Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{tech.description}</p>
-                          </CardContent>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
+                  <TechToolsCarousel techs={relatedTechs} />
                 </motion.div>
               )}
 

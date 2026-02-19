@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 4;
 
 type TechFilter = "All" | "FPGA" | "ASIC";
 
@@ -90,7 +90,7 @@ const CommunityProjectsCarousel = ({ design, mockProjects, dbProjects }: Communi
 
       {filtered.length > 0 ? (
         <>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 gap-4">
             {visible.map((project) => (
               <Link to={`/projects/${project.id}`} key={`${project.source}-${project.id}`} className="group">
                 <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/40 h-full">
