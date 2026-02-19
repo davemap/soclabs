@@ -76,9 +76,17 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
   const busName = interconnects[0]?.name || "System Bus";
 
   const handleClick = (block: Block) => {
+    const isSubBlockOfExpanded = subsystems.some(sub =>
+      subsystemExpanded === sub.name && sub.subBlocks?.some(sb => sb.name === block.name)
+    );
+    const isInternalBus = block.name === "AHB Lite" && subsystemExpanded;
+
     setSelectedBlock((prev) => (prev?.name === block.name ? null : block));
-    setPeripheralsExpanded(false);
-    setSubsystemExpanded(null);
+
+    if (!isSubBlockOfExpanded && !isInternalBus) {
+      setPeripheralsExpanded(false);
+      setSubsystemExpanded(null);
+    }
   };
 
   const BusArrow = () => (
@@ -164,8 +172,8 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     <span className="font-display font-bold text-[11px] tracking-wide">AHB Lite</span>
                   </button>
                 </div>
-                {/* Connector line from expanded region to subsystem button */}
-                <div className="flex justify-center">
+                {/* Connector line from expanded region to subsystem button — aligned to the subsystem's position */}
+                <div className="flex justify-center" style={{ marginLeft: masters.length > 1 ? `${(masters.indexOf(sub) - (masters.length - 1) / 2) * 148}px` : undefined }}>
                   <svg width="2" height="16" className="text-sky-300 dark:text-sky-500/60">
                     <line x1="1" y1="0" x2="1" y2="16" stroke="currentColor" strokeWidth="2" strokeDasharray="4 2" />
                   </svg>
