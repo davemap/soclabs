@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft, Microchip, ArrowRight, Cpu, MemoryStick, Network, Bug, Timer, Shield, Zap, Radio, HardDrive, Clock, RotateCcw, Pin } from "lucide-react";
+import { Info, ExternalLink, X, Box, CircuitBoard, Layers, ZoomIn, ChevronRight, ArrowLeft, Microchip, ArrowRight, Cpu, MemoryStick, Network, Bug, Timer, Shield, Zap, Radio, HardDrive, Clock, RotateCcw, Pin, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
