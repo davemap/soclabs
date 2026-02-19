@@ -158,19 +158,6 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                       </div>
                     ))}
                   </div>
-                  {/* AHB Bus bar inside subsystem */}
-                  <button
-                    onClick={() => handleClick(ahbBusBlock)}
-                    className={`
-                      w-full h-7 rounded-md border-2 flex items-center justify-center
-                      bg-white dark:bg-card border-sky-300 dark:border-sky-500/30 text-sky-600 dark:text-sky-400
-                      ${selectedBlock?.name === "AHB Lite" ? "ring-2 ring-current shadow-lg" : ""}
-                      hover:shadow-md transition-all duration-200
-                    `}
-                  >
-                    <Layers className="h-3.5 w-3.5 mr-1.5" />
-                    <span className="font-display font-bold text-[11px] tracking-wide">AHB Lite</span>
-                  </button>
                 </div>
                 {/* Connector line from expanded region to subsystem button — aligned to the subsystem's position */}
                 <div className="flex justify-center" style={{ marginLeft: masters.length > 1 ? `${(masters.indexOf(sub) - (masters.length - 1) / 2) * 148}px` : undefined }}>
