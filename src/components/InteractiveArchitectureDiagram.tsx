@@ -252,7 +252,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                     bg-white dark:bg-card ${typeColors.subsystem.border} ${typeColors.subsystem.text}
                     ${subsystemExpanded === b.name ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
                     cursor-pointer hover:scale-[1.02] hover:shadow-md
-                    transition-all duration-200 w-28 h-20 px-2
+                    transition-all duration-200 w-32 h-24 px-3
                   `}
                 >
                   <Box className="h-6 w-6" />
@@ -262,7 +262,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   </span>
                 </button>
               ) : (
-                <BlockNode block={b} className="w-28 h-20 px-2" />
+                <BlockNode block={b} className="w-32 h-24 px-3" />
               )}
             </div>
           ))}
@@ -282,7 +282,7 @@ const InteractiveArchitectureDiagram = ({ blocks, designName }: InteractiveArchi
                   bg-white dark:bg-card ${typeColors.peripheral.border} ${typeColors.peripheral.text}
                   ${peripheralsExpanded ? "ring-2 ring-current shadow-lg" : "shadow-sm"}
                   cursor-pointer hover:scale-[1.02] hover:shadow-md
-                  transition-all duration-200 w-28 h-20 px-2
+                  transition-all duration-200 w-32 h-24 px-3
                 `}
               >
                 <Radio className="h-6 w-6" />
