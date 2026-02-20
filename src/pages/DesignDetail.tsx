@@ -85,6 +85,7 @@ const DesignDetail = () => {
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
   const [provenDialogOpen, setProvenDialogOpen] = useState(false);
   const [provenDetailEntry, setProvenDetailEntry] = useState<any | null>(null);
+  const [provenValidationIdx, setProvenValidationIdx] = useState(0);
   const [provenType, setProvenType] = useState<"FPGA" | "ASIC">("FPGA");
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
@@ -252,15 +253,18 @@ const DesignDetail = () => {
                                     key={p.details}
                                     type="button"
                                     className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5 w-full text-left hover:bg-sky-500/10 transition-colors cursor-pointer"
-                                    onClick={() => setProvenDetailEntry(p)}
+                                    onClick={() => { setProvenDetailEntry(p); setProvenValidationIdx(0); }}
                                   >
                                     <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                                    <div className="flex flex-col">
+                                    <div className="flex flex-col flex-1">
                                       <span className="text-xs font-medium text-foreground/80">{p.details}</span>
                                       {(p as any).board && (
                                         <span className="text-[11px] font-semibold text-sky-400">{(p as any).board}</span>
                                       )}
                                     </div>
+                                    {(p as any).validations?.length > 0 && (
+                                      <span className="text-[10px] text-muted-foreground shrink-0">{(p as any).validations.length} validation{(p as any).validations.length > 1 ? "s" : ""}</span>
+                                    )}
                                   </button>
                                 ))}
                               </div>
@@ -289,11 +293,14 @@ const DesignDetail = () => {
                                   <button
                                     key={p.details}
                                     type="button"
-                                    className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2 w-full text-left hover:bg-violet-500/10 transition-colors cursor-pointer"
-                                    onClick={() => setProvenDetailEntry(p)}
+                                    className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2.5 w-full text-left hover:bg-violet-500/10 transition-colors cursor-pointer"
+                                    onClick={() => { setProvenDetailEntry(p); setProvenValidationIdx(0); }}
                                   >
                                     <Cpu className="h-3.5 w-3.5 text-violet-400 shrink-0" />
-                                    <span className="text-xs text-muted-foreground">{p.details}</span>
+                                    <span className="text-xs text-muted-foreground flex-1">{p.details}</span>
+                                    {(p as any).validations?.length > 0 && (
+                                      <span className="text-[10px] text-muted-foreground shrink-0">{(p as any).validations.length} validation{(p as any).validations.length > 1 ? "s" : ""}</span>
+                                    )}
                                   </button>
                                 ))}
                               </div>
@@ -731,14 +738,13 @@ const DesignDetail = () => {
       </Dialog>
 
       {/* Proven entry detail dialog */}
-      <Dialog open={!!provenDetailEntry} onOpenChange={(open) => { if (!open) setProvenDetailEntry(null); }}>
+      <Dialog open={!!provenDetailEntry} onOpenChange={(open) => { if (!open) { setProvenDetailEntry(null); setProvenValidationIdx(0); } }}>
         <DialogContent className="sm:max-w-md">
           {provenDetailEntry && (() => {
-            const allProven = design?.provenIn || [];
-            const sameTypeEntries = allProven.filter(p => p.type === provenDetailEntry.type);
-            const currentIdx = sameTypeEntries.findIndex(p => p.details === provenDetailEntry.details);
-            const hasPrev = currentIdx > 0;
-            const hasNext = currentIdx < sameTypeEntries.length - 1;
+            const validations = provenDetailEntry.validations || [];
+            const currentVal = validations[provenValidationIdx] || {};
+            const hasPrev = provenValidationIdx > 0;
+            const hasNext = provenValidationIdx < validations.length - 1;
             return (
               <>
                 <DialogHeader>
@@ -749,11 +755,6 @@ const DesignDetail = () => {
                       <Cpu className="h-5 w-5 text-violet-400" />
                     )}
                     {provenDetailEntry.type === "FPGA" ? "FPGA Implementation" : "ASIC Fabrication"}
-                    {sameTypeEntries.length > 1 && (
-                      <span className="text-xs text-muted-foreground font-normal ml-auto">
-                        {currentIdx + 1} / {sameTypeEntries.length}
-                      </span>
-                    )}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-2">
@@ -772,58 +773,65 @@ const DesignDetail = () => {
                       </div>
                     )}
                   </div>
-                  <div className="space-y-3">
-                    {provenDetailEntry.submitter && (
-                      <div className="flex items-center gap-3">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Submitted by</p>
-                          <p className="text-sm font-medium text-foreground">{provenDetailEntry.submitter}</p>
+                  {validations.length > 0 && (
+                    <div className="space-y-3">
+                      {validations.length > 1 && (
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-medium text-muted-foreground">Validation {provenValidationIdx + 1} of {validations.length}</p>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-7 w-7"
+                              disabled={!hasPrev}
+                              onClick={() => setProvenValidationIdx(i => i - 1)}
+                            >
+                              <ChevronLeft className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-7 w-7"
+                              disabled={!hasNext}
+                              onClick={() => setProvenValidationIdx(i => i + 1)}
+                            >
+                              <ChevronRight className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {provenDetailEntry.date && (
-                      <div className="flex items-center gap-3">
-                        <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Date verified</p>
-                          <p className="text-sm font-medium text-foreground">{new Date(provenDetailEntry.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+                      )}
+                      {currentVal.submitter && (
+                        <div className="flex items-center gap-3">
+                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Submitted by</p>
+                            <p className="text-sm font-medium text-foreground">{currentVal.submitter}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {provenDetailEntry.projectTitle && (
-                      <div className="flex items-center gap-3">
-                        <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <div>
-                          <p className="text-xs text-muted-foreground">Associated project</p>
-                          <p className="text-sm font-medium text-primary">{provenDetailEntry.projectTitle}</p>
+                      )}
+                      {currentVal.date && (
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Date verified</p>
+                            <p className="text-sm font-medium text-foreground">{new Date(currentVal.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                      {currentVal.projectTitle && (
+                        <div className="flex items-center gap-3">
+                          <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">Associated project</p>
+                            <p className="text-sm font-medium text-primary">{currentVal.projectTitle}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-                <DialogFooter className="flex-row justify-between sm:justify-between">
-                  <div className="flex gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      disabled={!hasPrev}
-                      onClick={() => setProvenDetailEntry(sameTypeEntries[currentIdx - 1])}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      disabled={!hasNext}
-                      onClick={() => setProvenDetailEntry(sameTypeEntries[currentIdx + 1])}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Button variant="ghost" onClick={() => setProvenDetailEntry(null)}>Close</Button>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => { setProvenDetailEntry(null); setProvenValidationIdx(0); }}>Close</Button>
                 </DialogFooter>
               </>
             );

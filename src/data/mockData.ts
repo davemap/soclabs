@@ -107,8 +107,13 @@ export const referenceDesigns = [
     version: "1.2.0",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)", board: "Digilent Arty A7-35T", submitter: "Dr. Sarah Chen", date: "2024-03-15", projectTitle: "NanoSoC FPGA Validation", projectId: "nanosoc-fpga-val" },
-      { type: "FPGA", details: "Intel Cyclone V (5CSEBA6U23I7)", board: "Terasic DE10-Nano", submitter: "Prof. James Okonkwo", date: "2024-06-22", projectTitle: "Cyclone V Accelerator Study", projectId: "cyclone-v-accel" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)", board: "Digilent Arty A7-35T", validations: [
+        { submitter: "Dr. Sarah Chen", date: "2024-03-15", projectTitle: "NanoSoC FPGA Validation", projectId: "nanosoc-fpga-val" },
+        { submitter: "Alex Rivera", date: "2024-08-02", projectTitle: "Arty A7 Accelerator Test", projectId: "arty-accel-test" },
+      ]},
+      { type: "FPGA", details: "Intel Cyclone V (5CSEBA6U23I7)", board: "Terasic DE10-Nano", validations: [
+        { submitter: "Prof. James Okonkwo", date: "2024-06-22", projectTitle: "Cyclone V Accelerator Study", projectId: "cyclone-v-accel" },
+      ]},
     ],
     integrationTime: "2–4 weeks",
     relativeGateCount: "~15K",
@@ -162,8 +167,15 @@ export const referenceDesigns = [
     version: "2.0.1",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", submitter: "Dr. Maria Lopez", date: "2024-01-10", projectTitle: "MilliSoC FPGA Proto", projectId: "millisoc-fpga-proto" },
-      { type: "ASIC", details: "TSMC 65nm (via Europractice)", submitter: "Prof. Kenji Tanaka", date: "2023-11-28", projectTitle: "65nm Tapeout Run", projectId: "65nm-tapeout" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", validations: [
+        { submitter: "Dr. Maria Lopez", date: "2024-01-10", projectTitle: "MilliSoC FPGA Proto", projectId: "millisoc-fpga-proto" },
+        { submitter: "Dr. Raj Patel", date: "2024-05-18", projectTitle: "Nexys IoT Integration", projectId: "nexys-iot" },
+        { submitter: "Lisa Müller", date: "2024-09-03", projectTitle: "M3 Peripheral Validation", projectId: "m3-periph-val" },
+      ]},
+      { type: "ASIC", details: "TSMC 65nm (via Europractice)", validations: [
+        { submitter: "Prof. Kenji Tanaka", date: "2023-11-28", projectTitle: "65nm Tapeout Run", projectId: "65nm-tapeout" },
+        { submitter: "Dr. Anna Petrov", date: "2024-04-12", projectTitle: "65nm Low-Power Study", projectId: "65nm-low-power" },
+      ]},
     ],
     integrationTime: "4–8 weeks",
     relativeGateCount: "~85K",
@@ -217,8 +229,13 @@ export const referenceDesigns = [
     version: "0.9.0-beta",
     branch: "develop",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", submitter: "Dr. Anil Sharma", date: "2025-01-05", projectTitle: "MegaSoC FPGA Bring-up", projectId: "megasoc-fpga" },
-      { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)", submitter: "Prof. Emily Wright", date: "2024-09-14", projectTitle: "16nm Advanced Tapeout", projectId: "16nm-tapeout" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", validations: [
+        { submitter: "Dr. Anil Sharma", date: "2025-01-05", projectTitle: "MegaSoC FPGA Bring-up", projectId: "megasoc-fpga" },
+      ]},
+      { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)", validations: [
+        { submitter: "Prof. Emily Wright", date: "2024-09-14", projectTitle: "16nm Advanced Tapeout", projectId: "16nm-tapeout" },
+        { submitter: "Dr. Wei Zhang", date: "2025-02-01", projectTitle: "16nm ML Accelerator", projectId: "16nm-ml-accel" },
+      ]},
     ],
     integrationTime: "8–16 weeks",
     relativeGateCount: "~350K",
