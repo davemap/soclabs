@@ -1,8 +1,9 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap } from "lucide-react";
-import { useDesignFlow } from "@/hooks/useDesignFlow";
+import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
+import { cn } from "@/lib/utils";
 import InteractiveArchitectureDiagram from "@/components/InteractiveArchitectureDiagram";
 import InteractiveHierarchyDiagram from "@/components/InteractiveHierarchyDiagram";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,9 @@ import { supabase } from "@/integrations/supabase/client";
 const DesignDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { setFlow, setSelectedSocId } = useDesignFlow();
+  const { flow, setFlow, setSelectedSocId } = useDesignFlow();
   const design = referenceDesigns.find((d) => d.id === id);
+  const lastClickRef = useRef<{ flow: DesignFlow; time: number } | null>(null);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
@@ -222,35 +224,39 @@ const DesignDetail = () => {
                     <h2 className="text-2xl font-display font-bold">Learn with {design.name}</h2>
                   </div>
                   <p className="text-muted-foreground text-sm mb-6">
-                    Follow the Learning Hub curriculum with {design.name} as your reference design. Choose your target flow to get started.
+                    Select a design flow, or double-click to jump straight into the Learning Hub.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      size="lg"
-                      className="rounded-xl gap-2 flex-1"
-                      variant="outline"
-                      onClick={() => {
-                        setFlow("FPGA");
-                        setSelectedSocId(design.id);
-                        navigate("/learn");
-                      }}
-                    >
-                      <CircuitBoard className="h-5 w-5" />
-                      FPGA Flow
-                    </Button>
-                    <Button
-                      size="lg"
-                      className="rounded-xl gap-2 flex-1"
-                      variant="outline"
-                      onClick={() => {
-                        setFlow("ASIC");
-                        setSelectedSocId(design.id);
-                        navigate("/learn");
-                      }}
-                    >
-                      <Cpu className="h-5 w-5" />
-                      ASIC Flow
-                    </Button>
+                  <div className="flex justify-center">
+                    <div className="inline-flex items-center rounded-2xl border-2 border-border/60 bg-card gap-1 p-1.5">
+                      {(["FPGA", "ASIC"] as const).map((f) => (
+                        <button
+                          key={f}
+                          onClick={() => {
+                            const now = Date.now();
+                            if (lastClickRef.current?.flow === f && now - lastClickRef.current.time < 400) {
+                              setFlow(f);
+                              setSelectedSocId(design.id);
+                              navigate("/learn");
+                              lastClickRef.current = null;
+                              return;
+                            }
+                            lastClickRef.current = { flow: f, time: now };
+                            setFlow(f);
+                          }}
+                          className={cn(
+                            "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-display font-bold transition-all duration-200",
+                            flow === f
+                              ? f === "FPGA"
+                                ? "bg-sky-500/15 text-sky-600 dark:text-sky-400 shadow-md ring-1 ring-sky-500/20"
+                                : "bg-violet-500/15 text-violet-600 dark:text-violet-400 shadow-md ring-1 ring-violet-500/20"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          )}
+                        >
+                          {f === "FPGA" ? <CircuitBoard className="h-5 w-5" /> : <Cpu className="h-5 w-5" />}
+                          {f} Flow
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </motion.div>
