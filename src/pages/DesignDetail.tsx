@@ -206,7 +206,10 @@ const DesignDetail = () => {
                               {fpgaEntries.map((p) => (
                                 <div key={p.details} className="flex items-center gap-2 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2">
                                   <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                                  <span className="text-xs text-muted-foreground">{p.details}</span>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs text-muted-foreground">{p.details}</span>
+                                    {(p as any).board && <span className="text-[11px] text-sky-400/70">{(p as any).board}</span>}
+                                  </div>
                                 </div>
                               ))}
                             </div>
