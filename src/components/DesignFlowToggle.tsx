@@ -70,16 +70,24 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
         >
           <Layers className={isCompact ? "h-3.5 w-3.5" : "h-4 w-4"} />
           <span className="hidden sm:inline">{selectedSoc ? selectedSoc.name : "Ref SoC"}</span>
-          <ChevronRight className={cn(
-            "transition-transform duration-200",
-            isCompact ? "h-3 w-3" : "h-3.5 w-3.5",
-            socOpen && "rotate-90"
-          )} />
+          {selectedSocId && (
+            <X
+              className={cn(isCompact ? "h-3 w-3" : "h-3.5 w-3.5", "opacity-60 hover:opacity-100")}
+              onClick={(e) => { e.stopPropagation(); setSelectedSocId(null); }}
+            />
+          )}
+          {!selectedSocId && (
+            <ChevronRight className={cn(
+              "transition-transform duration-200",
+              isCompact ? "h-3 w-3" : "h-3.5 w-3.5",
+              socOpen && "rotate-90"
+            )} />
+          )}
         </button>
 
         {/* Expandable SoC selector */}
         <AnimatePresence>
-          {socOpen && (
+          {socOpen && !selectedSocId && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: "auto", opacity: 1 }}
@@ -89,17 +97,20 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
             >
               <div className="flex items-center gap-1.5 pl-1">
                 <Select
-                  value={selectedSocId ?? "generic"}
-                  onValueChange={(v) => setSelectedSocId(v === "generic" ? null : v)}
+                  value={selectedSocId ?? "none"}
+                  onValueChange={(v) => {
+                    setSelectedSocId(v === "none" ? null : v);
+                    setSocOpen(false);
+                  }}
                 >
                   <SelectTrigger className={cn(
                     "border-none bg-muted/30 font-display shadow-none",
                     isCompact ? "w-[120px] h-7 text-xs" : "w-[150px] h-9 text-sm"
                   )}>
-                    <SelectValue placeholder="Generic" />
+                    <SelectValue placeholder="Select SoC" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="generic">Generic</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {referenceDesigns.map((soc) => (
                       <SelectItem key={soc.id} value={soc.id}>
                         {soc.name}
@@ -107,15 +118,6 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                     ))}
                   </SelectContent>
                 </Select>
-                {selectedSocId && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setSelectedSocId(null); }}
-                    className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                    title="Clear selection"
-                  >
-                    <X className={isCompact ? "h-3 w-3" : "h-3.5 w-3.5"} />
-                  </button>
-                )}
               </div>
             </motion.div>
           )}
