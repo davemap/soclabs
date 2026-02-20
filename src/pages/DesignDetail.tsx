@@ -1,9 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap } from "lucide-react";
-import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
+import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
+import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
+import { learningPhases } from "@/data/mockData";
 import InteractiveArchitectureDiagram from "@/components/InteractiveArchitectureDiagram";
 import InteractiveHierarchyDiagram from "@/components/InteractiveHierarchyDiagram";
 import { Button } from "@/components/ui/button";
@@ -258,6 +260,33 @@ const DesignDetail = () => {
                       ))}
                     </div>
                   </div>
+                  {/* Phase stepper bar */}
+                  {(() => {
+                    const phases = filterPhasesForFlow(learningPhases, flow);
+                    return (
+                      <div className="mt-6">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 relative">
+                            <div className="flex items-center justify-between relative">
+                              <div className="absolute top-5 h-0.5 bg-border" style={{ left: 20, right: 20 }} />
+                              {phases.map((phase, i) => (
+                                <PhaseStepperIcon
+                                  key={phase.id}
+                                  phase={phase}
+                                  index={i}
+                                  activeIndex={-1}
+                                  onSelect={() => {
+                                    setSelectedSocId(design.id);
+                                    navigate(`/learn?phase=${i}`);
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </motion.div>
 
