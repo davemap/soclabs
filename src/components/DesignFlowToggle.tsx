@@ -6,9 +6,9 @@ import { referenceDesigns } from "@/data/mockData";
 import { AnimatePresence, motion } from "framer-motion";
 
 const socColors: Record<string, { bg: string; text: string; ring: string; hover: string }> = {
-  nanosoc:  { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400", ring: "ring-emerald-500/20", hover: "hover:bg-emerald-500/10" },
-  millisoc: { bg: "bg-amber-500/15",   text: "text-amber-600 dark:text-amber-400",     ring: "ring-amber-500/20",   hover: "hover:bg-amber-500/10" },
-  megasoc:  { bg: "bg-rose-500/15",    text: "text-rose-600 dark:text-rose-400",       ring: "ring-rose-500/20",    hover: "hover:bg-rose-500/10" },
+  nanosoc:  { bg: "bg-amber-400/15", text: "text-amber-500 dark:text-amber-300", ring: "ring-amber-400/20", hover: "hover:bg-muted/60" },
+  millisoc: { bg: "bg-orange-500/15", text: "text-orange-600 dark:text-orange-400", ring: "ring-orange-500/20", hover: "hover:bg-muted/60" },
+  megasoc:  { bg: "bg-orange-700/15", text: "text-orange-700 dark:text-orange-500", ring: "ring-orange-700/20", hover: "hover:bg-muted/60" },
 };
 
 interface DesignFlowToggleProps {
@@ -124,8 +124,7 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                       isCompact
                         ? "px-2.5 py-1.5 rounded-lg text-xs"
                         : "px-4 py-2.5 rounded-xl text-sm",
-                      socColors[soc.id]?.text ?? "text-muted-foreground",
-                      socColors[soc.id]?.hover ?? "hover:bg-muted/60"
+                      "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     )}
                   >
                     {soc.name}
