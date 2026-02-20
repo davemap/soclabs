@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { Cpu, CircuitBoard, Layers, ChevronRight, X } from "lucide-react";
@@ -17,9 +18,11 @@ interface DesignFlowToggleProps {
 }
 
 export default function DesignFlowToggle({ className, size = "default" }: DesignFlowToggleProps) {
+  const navigate = useNavigate();
   const { flow, setFlow, selectedSocId, setSelectedSocId } = useDesignFlow();
   const [socOpen, setSocOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const socClickRef = useRef<number>(0);
 
   const isCompact = size === "compact";
   const selectedSoc = selectedSocId ? referenceDesigns.find(d => d.id === selectedSocId) : null;
@@ -78,7 +81,19 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
 
           {/* Reference SoC toggle button */}
           <button
-            onClick={() => setSocOpen(!socOpen)}
+            onClick={() => {
+              if (selectedSocId) {
+                const now = Date.now();
+                if (now - socClickRef.current < 400) {
+                  navigate(`/designs/${selectedSocId}`);
+                  socClickRef.current = 0;
+                  return;
+                }
+                socClickRef.current = now;
+              } else {
+                setSocOpen(!socOpen);
+              }
+            }}
             className={cn(
               "flex items-center gap-1.5 font-display font-bold transition-all duration-200",
               isCompact ? "px-3 py-1.5 rounded-lg text-xs" : "px-4 py-2.5 rounded-xl text-sm",
