@@ -76,7 +76,7 @@ export default function ProjectMilestoneOverlay({ referenceSocId, phaseId }: Pro
     );
 
   return (
-    <div className="mt-6 rounded-2xl border border-border/60 bg-card/50 overflow-hidden">
+    <div className="rounded-2xl border border-primary/30 bg-card shadow-md overflow-hidden">
       {/* Collapsible header */}
       <button
         onClick={() => setSectionOpen(!sectionOpen)}
