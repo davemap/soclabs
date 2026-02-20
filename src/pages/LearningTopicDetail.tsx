@@ -166,7 +166,7 @@ const LearningTopicDetail = () => {
           <div className="max-w-6xl mx-auto flex gap-8">
             <div className="flex-1 min-w-0">
               {/* Design flow toggle centred above stepper */}
-              <DesignFlowToggle size="compact" className="mb-3" />
+              <DesignFlowToggle className="mb-3" />
 
               {/* Phase stepper + arrows - centred over content column */}
               <div className="max-w-2xl mx-auto mb-10">
