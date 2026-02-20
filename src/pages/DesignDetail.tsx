@@ -172,8 +172,26 @@ const DesignDetail = () => {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <Badge variant="secondary">{design.processor}</Badge>
-                  <Badge variant="secondary">{design.busArchitecture}</Badge>
+                  {(() => {
+                    const processorTech = technologies.find(t => t.name === design.processor);
+                    return processorTech ? (
+                      <Link to={`/technologies/${processorTech.id}`}>
+                        <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">{design.processor}</Badge>
+                      </Link>
+                    ) : (
+                      <Badge variant="secondary">{design.processor}</Badge>
+                    );
+                  })()}
+                  {(() => {
+                    const busTech = technologies.find(t => t.name === design.busArchitecture);
+                    return busTech ? (
+                      <Link to={`/technologies/${busTech.id}`}>
+                        <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80 transition-colors">{design.busArchitecture}</Badge>
+                      </Link>
+                    ) : (
+                      <Badge variant="secondary">{design.busArchitecture}</Badge>
+                    );
+                  })()}
                   {design.targetTechnology.map((t) => (
                     <Badge key={t} variant="outline">{t}</Badge>
                   ))}
