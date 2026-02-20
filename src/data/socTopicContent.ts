@@ -4,6 +4,13 @@
  * Each entry describes how that particular reference SoC handles the topic.
  */
 
+export interface SocToolReference {
+  /** Technology ID matching the technologies array in mockData */
+  toolId: string;
+  /** How this tool was used in the context of this specific SoC and topic */
+  usage: string;
+}
+
 export interface SocTopicEntry {
   title: string;
   /** Markdown-friendly plain text describing how this SoC handles the topic */
@@ -12,6 +19,8 @@ export interface SocTopicEntry {
   keyFiles?: string[];
   /** Optional tips specific to this SoC */
   tips?: string[];
+  /** Tools/technologies used for this task in this SoC */
+  tools?: SocToolReference[];
 }
 
 const entries: Record<string, SocTopicEntry> = {
@@ -33,6 +42,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Keep your accelerator's AHB interface as simple as possible to minimise integration risk.",
       "Use the existing DMA request lines (EXP_DRQ) rather than adding new bus masters.",
     ],
+    tools: [
+      { toolId: "arm-cortex-m0", usage: "Cortex-M0 is the primary CPU in nanoSoC's CPU Subsystem, providing the single bus master for instruction fetch and data access." },
+      { toolId: "amba-interconnect", usage: "AHB-Lite interconnect ties all five subsystems together with clean master-slave interfaces at each partition boundary." },
+      { toolId: "pl230-dma", usage: "PL230 µDMA controllers sit in the DMA Subsystem, handling autonomous data transfers to/from the Expansion Subsystem." },
+    ],
   },
   "millisoc::system-partitioning": {
     title: "System Partitioning in milliSoC",
@@ -49,6 +63,11 @@ const entries: Record<string, SocTopicEntry> = {
       "If your accelerator needs high bandwidth, request a dedicated port on the bus matrix rather than sharing the peripheral bus.",
       "Dual-bank SRAM allows double-buffering: let DMA fill one bank while the CPU processes the other.",
     ],
+    tools: [
+      { toolId: "arm-cortex-m3", usage: "Cortex-M3 is the primary processor with MPU and bus matrix master port, enabling more complex firmware and memory protection." },
+      { toolId: "amba-interconnect", usage: "Multi-layer AHB bus matrix allows concurrent CPU and DMA transactions across different slave ports." },
+      { toolId: "dma-350", usage: "DMA-350 (or DMA-230) provides 8-channel DMA capability for high-throughput data movement between subsystems." },
+    ],
   },
   "megasoc::system-partitioning": {
     title: "System Partitioning in megaSoC",
@@ -64,6 +83,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Start with the non-coherent AHB slave path unless your accelerator truly needs cache-coherent access.",
       "Use the DMA-350 AXI-Stream interfaces for high-bandwidth data movement to/from your accelerator.",
       "The A53's GIC (Generic Interrupt Controller) supports up to 64 shared peripheral interrupts — plan your accelerator's interrupt lines early.",
+    ],
+    tools: [
+      { toolId: "arm-cortex-a53", usage: "Cortex-A53 application processor at the centre of megaSoC, providing high-performance compute with L1/L2 cache hierarchy." },
+      { toolId: "axi", usage: "AXI fabric connects all major subsystems, with optional ACE coherency port for accelerators needing cache-coherent access." },
+      { toolId: "dma-350", usage: "16-channel DMA-350 with AXI-Stream support enables high-bandwidth data movement between DDR, accelerators, and I/O." },
     ],
   },
 
@@ -82,6 +106,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Use the REMAP register during development to switch between boot ROM and SRAM execution.",
       "The default arbiter gives CPU highest priority — override if your DMA needs guaranteed bandwidth.",
     ],
+    tools: [
+      { toolId: "ahb-lite", usage: "AHB-Lite is the primary bus protocol — a single-master variant used for the Cortex-M0's instruction and data bus." },
+      { toolId: "apb", usage: "APB bridge connects low-speed peripherals (timers, UART, GPIO) to reduce loading on the main AHB bus." },
+      { toolId: "amba-interconnect", usage: "The bus matrix provides arbitration between 3 masters and 8 slave regions with configurable priority." },
+    ],
   },
   "millisoc::bus-architecture": {
     title: "Bus Architecture in milliSoC",
@@ -94,6 +123,10 @@ const entries: Record<string, SocTopicEntry> = {
     tips: [
       "Place performance-critical slaves on separate bus matrix ports to enable concurrent access.",
       "The bridge to APB adds one cycle of latency — don't put time-critical peripherals behind it.",
+    ],
+    tools: [
+      { toolId: "ahb", usage: "Multi-layer AHB bus matrix enables concurrent CPU and DMA transactions across different slave ports." },
+      { toolId: "apb", usage: "APB subsystem sits behind an AHB-to-APB bridge for low-speed peripheral access." },
     ],
   },
   "megasoc::bus-architecture": {
@@ -109,6 +142,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Set QoS priorities carefully — an aggressive DMA can starve the CPU of memory bandwidth.",
       "Use AXI burst transfers (INCR/WRAP) for bulk data to maximise fabric throughput.",
       "The ACE port requires implementing snoop response logic — only use it if you truly need coherency.",
+    ],
+    tools: [
+      { toolId: "axi", usage: "High-performance AXI interconnect fabric (NIC-400 topology) supporting out-of-order completion and 256-bit data paths." },
+      { toolId: "ahb", usage: "AXI-to-AHB downgrade bridge connects mid-speed subsystems to the high-performance fabric." },
+      { toolId: "apb", usage: "Two-stage protocol conversion (AXI→AHB→APB) keeps low-speed peripherals off the main fabric." },
     ],
   },
 
@@ -127,6 +165,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Keep register offsets aligned to 4-byte boundaries for clean AHB access.",
       "Memory is very limited — instruction memory defaults to 16KB. Optimise firmware size using Arm DS-5 compiler.",
     ],
+    tools: [
+      { toolId: "arm-cortex-m0", usage: "The Cortex-M0's fixed memory map convention defines the address space partitioning for all nanoSoC peripherals and memories." },
+      { toolId: "memory-controllers", usage: "Address decoder implements the memory map with configurable REMAP support for boot ROM/SRAM switching." },
+    ],
   },
   "millisoc::memory-map": {
     title: "Memory Map in milliSoC",
@@ -140,6 +182,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Use the Flash accelerator to minimise wait states when executing from Flash.",
       "Split DMA buffers across SRAM banks to enable CPU and DMA parallel access.",
     ],
+    tools: [
+      { toolId: "arm-cortex-m3", usage: "Cortex-M3's MPU defines memory region attributes and access permissions across the extended address space." },
+      { toolId: "memory-controllers", usage: "Flash controller with ECC and dual-bank SRAM controller manage the expanded memory subsystem." },
+    ],
   },
   "megasoc::memory-map": {
     title: "Memory Map in megaSoC",
@@ -152,6 +198,10 @@ const entries: Record<string, SocTopicEntry> = {
     tips: [
       "Ensure your accelerator's register window doesn't conflict with the reserved peripheral region.",
       "Use the dedicated DMA buffer region for zero-copy data sharing between CPU and accelerator.",
+    ],
+    tools: [
+      { toolId: "axi", usage: "AXI fabric routes transactions to the correct memory region based on the 4GB address map configuration." },
+      { toolId: "memory-controllers", usage: "DDR controller manages the 2GB external memory region with address translation and QoS support." },
     ],
   },
 
@@ -169,6 +219,12 @@ const entries: Record<string, SocTopicEntry> = {
       "The Corstone-101 package includes everything except the processor core — make sure you download both.",
       "Set ARM_IP_LIBRARY_PATH in your .bashrc to point to the unpacked IP directory.",
     ],
+    tools: [
+      { toolId: "arm-cortex-m0", usage: "Cortex-M0 processor obtained via ARM DesignStart/Academic Access — the primary CPU IP in nanoSoC." },
+      { toolId: "pl230-dma", usage: "PL230 µDMA controller from the Corstone-101 package, providing basic 2-channel DMA capability." },
+      { toolId: "dma-350", usage: "DMA-350 is an optional higher-capability alternative to PL230, offering more channels and programmability." },
+      { toolId: "standard-peripherals", usage: "Corstone-101 bundles UART, timers, GPIO, and debug peripherals with integration-ready AHB/APB wrappers." },
+    ],
   },
   "millisoc::ip-selection": {
     title: "IP Selection in milliSoC",
@@ -181,6 +237,12 @@ const entries: Record<string, SocTopicEntry> = {
     tips: [
       "CoreSight ETM trace requires an additional license agreement — plan this early.",
       "The PL022 SPI controller supports DMA — connect DMA request lines for high-throughput data transfers.",
+    ],
+    tools: [
+      { toolId: "arm-cortex-m3", usage: "Cortex-M3 processor via ARM Academic Access — brings hardware multiply/divide and Thumb-2 ISA." },
+      { toolId: "dma-350", usage: "DMA-230 or DMA-350 provides multi-channel DMA; DMA-350 adds programmable command lists." },
+      { toolId: "spi-protocol", usage: "PL022 SPI controller handles quad-SPI flash and peripheral communication with DMA support." },
+      { toolId: "standard-peripherals", usage: "Corstone-201 package provides PL011 UART, GPIO, timers, and watchdog with APB interfaces." },
     ],
   },
   "megasoc::ip-selection": {
@@ -195,6 +257,12 @@ const entries: Record<string, SocTopicEntry> = {
       "The A53 license is more restrictive than M-class — verify your institution's agreement covers it.",
       "Plan for a software stack: you'll need a bootloader and potentially a Linux BSP.",
       "The DDR controller IP may require a separate Synopsys license — check early.",
+    ],
+    tools: [
+      { toolId: "arm-cortex-a53", usage: "Cortex-A53 application processor — requires comprehensive ARM Academic Access license and MMU-aware software." },
+      { toolId: "axi", usage: "NIC-400 AXI interconnect provides the high-performance fabric connecting all major subsystems." },
+      { toolId: "dma-350", usage: "DMA-350 with AXI-Stream support enables high-bandwidth streaming between accelerators and memory." },
+      { toolId: "standard-peripherals", usage: "PL011 UART and PL022 SPI from the Corstone package provide standard peripheral I/O." },
     ],
   },
 
@@ -212,6 +280,10 @@ const entries: Record<string, SocTopicEntry> = {
       "The watchdog reset is the last line of defence — always enable it in production firmware.",
       "For ASIC, add clock gating on peripheral clocks to further reduce power during idle.",
     ],
+    tools: [
+      { toolId: "fpga-boards", usage: "FPGA board oscillator provides the external clock input directly — no PLL needed for nanoSoC." },
+      { toolId: "verilator-linting", usage: "Verilator lint checks catch clock gating and reset synchronisation issues in the clock/reset controller." },
+    ],
   },
   "millisoc::power-clocking": {
     title: "Power & Clocking in milliSoC",
@@ -224,6 +296,9 @@ const entries: Record<string, SocTopicEntry> = {
     tips: [
       "Configure PCLK divider based on your peripheral timing requirements — most APB peripherals work at 25 MHz.",
       "Enable per-peripheral clock gating early in RTL to avoid adding it during timing closure.",
+    ],
+    tools: [
+      { toolId: "design-compiler-genus", usage: "Genus inserts clock gating cells automatically during synthesis using the per-peripheral clock enable registers." },
     ],
   },
   "megasoc::power-clocking": {
@@ -239,6 +314,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Plan CDC crossings carefully — every AXI-to-APB path goes through a synchroniser bridge.",
       "If your accelerator runs in its own clock domain, you must add CDC synchronisers at the AXI interface.",
       "Test power island switching early — retention logic bugs are notoriously hard to debug in silicon.",
+    ],
+    tools: [
+      { toolId: "innovus-icc2", usage: "Innovus handles power island implementation, retention cell insertion, and multi-voltage physical design." },
+      { toolId: "design-compiler-genus", usage: "Genus performs DVFS-aware synthesis with multi-corner multi-mode timing analysis across voltage/frequency points." },
     ],
   },
 
@@ -257,6 +336,9 @@ const entries: Record<string, SocTopicEntry> = {
       "Use the accelerator_subsystem.v template as a coding style reference for your own modules.",
       "Run `verilator --lint-only` on your files to catch coding issues before integration.",
     ],
+    tools: [
+      { toolId: "verilator-linting", usage: "Verilator's `--lint-only` mode enforces the two-process coding style and catches latches, width mismatches, and unused signals." },
+    ],
   },
   "nanosoc::interface-protocols": {
     title: "Interface Protocols in nanoSoC",
@@ -270,6 +352,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Always respond with HREADYOUT=1 unless you genuinely need wait states — unnecessary wait states kill performance.",
       "Use EXP_DRQ to trigger DMA transfers rather than polling from firmware.",
       "Test your AHB interface with the nanoSoC AMBA protocol checker (included in the testbench).",
+    ],
+    tools: [
+      { toolId: "ahb-lite", usage: "AHB-Lite slave interface is the primary integration point — your accelerator must implement HSEL, HADDR, HTRANS, HWRITE, HWDATA, HRDATA, and HREADYOUT." },
+      { toolId: "pl230-dma", usage: "PL230 DMA uses the EXP_DRQ lines for autonomous data transfers triggered by your accelerator." },
+      { toolId: "uart-protocol", usage: "Debug UART provides STDOUT capture during simulation and silicon validation of interface behaviour." },
     ],
   },
 
@@ -290,6 +377,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Add your test name to software_list.txt so it's included in regression runs.",
       "Use `expram_l.hex` and `expram_h.hex` to preload test vectors into expansion memory.",
     ],
+    tools: [
+      { toolId: "uvm-cocotb", usage: "While nanoSoC uses firmware-driven verification rather than UVM, the simulation infrastructure supports cocotb for Python-based test control." },
+      { toolId: "verilator-linting", usage: "Verilator compiles the RTL for fast simulation and provides lint checking as part of the testbench build." },
+    ],
   },
   "nanosoc::regression-ci": {
     title: "Regression & CI in nanoSoC",
@@ -304,6 +395,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Use Icarus Verilog for quick smoke tests during development — it's free and fast.",
       "Set up your own GitLab CI runner if you have simulator licenses available.",
       "Keep test execution time short by minimising loop counts in firmware — use DMA for bulk data.",
+    ],
+    tools: [
+      { toolId: "uvm-cocotb", usage: "Regression scripts orchestrate multiple simulation runs across Icarus Verilog (smoke tests) and VCS (full regression)." },
+      { toolId: "verilator-linting", usage: "Verilator provides fast compilation checks as a pre-simulation gate in the CI pipeline." },
     ],
   },
 
@@ -321,6 +416,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Start with the provided constraint files — don't write from scratch.",
       "For FPGA, target 50 MHz initially. Most nanoSoC designs close timing easily at this speed.",
       "Add false paths for any test/scan-mode signals to avoid over-constraining.",
+    ],
+    tools: [
+      { toolId: "vivado-quartus", usage: "Vivado reads the .xdc constraint file to define clock, I/O timing, and false paths for FPGA synthesis." },
+      { toolId: "design-compiler-genus", usage: "Genus uses the .sdc constraint file with additional clock uncertainty and wire load models for ASIC synthesis." },
     ],
   },
 
@@ -340,6 +439,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Add ACCELERATOR=yes to include your custom IP in the build.",
       "Check utilisation reports after synthesis — nanoSoC alone uses ~15% of a Z2's LUTs.",
     ],
+    tools: [
+      { toolId: "vivado-quartus", usage: "Vivado v2025 runs synthesis with `synth_design -flatten_hierarchy rebuilt` and maps memories to BRAM via inference." },
+      { toolId: "design-compiler-genus", usage: "Genus/Fusion Compiler targets TSMC 65nm with automatic clock gating insertion and memory compiler integration." },
+      { toolId: "fpga-boards", usage: "Supported FPGA targets include Pynq Z2, ZCU104, Kria KV260/KR260, and MPS3 — selected via the Makefile." },
+    ],
   },
 
   // ─── TAPEOUT PHASE ────────────────────────────────────────────────────
@@ -358,6 +462,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Run DRC incrementally during physical design, not just at the end.",
       "Keep a DRC waiver log for any foundry-approved rule waivers.",
     ],
+    tools: [
+      { toolId: "signoff-tools", usage: "Cadence Assura or Mentor Calibre run DRC/LVS/ERC checks against the TSMC 65nm design rule deck." },
+      { toolId: "innovus-icc2", usage: "Innovus generates the final GDSII layout that is checked by the signoff tools." },
+    ],
   },
   "nanosoc::shuttle-submission": {
     title: "Shuttle Submission for nanoSoC",
@@ -371,6 +479,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Start the Europractice application process early — institutional sign-up can take months.",
       "Keep your accelerator area under 0.5mm² to stay within a 1mm × 1mm die frame.",
       "Order QFP48 packaging — it's the cheapest option and sufficient for most academic designs.",
+    ],
+    tools: [
+      { toolId: "shuttle-services", usage: "Europractice provides multi-project wafer (MPW) shuttle runs on TSMC 65nm with ~4 submission windows per year." },
+      { toolId: "signoff-tools", usage: "Final DRC/LVS clean reports are required as part of the Europractice submission package." },
     ],
   },
 
@@ -389,6 +501,11 @@ const entries: Record<string, SocTopicEntry> = {
       "Start at 10 MHz and increase clock frequency gradually to find the maximum operating frequency.",
       "Keep a detailed lab notebook — silicon bugs are much harder to debug without records.",
     ],
+    tools: [
+      { toolId: "debug-test-tools", usage: "CMSIS-DAP debug probe establishes SWD connection for memory read/write and CPU control during bring-up." },
+      { toolId: "fpga-boards", usage: "FPGA prototype boards provide a reference platform for validating bring-up procedures before silicon arrives." },
+      { toolId: "uart-protocol", usage: "ADP debug interface via UART provides an alternative bring-up path when SWD is unavailable." },
+    ],
   },
   "nanosoc::functional-test": {
     title: "Functional Testing of nanoSoC",
@@ -403,6 +520,10 @@ const entries: Record<string, SocTopicEntry> = {
       "Run ALL simulation tests on silicon, not just a subset — bugs can hide in unexpected places.",
       "Log all test results with chip ID, voltage, temperature, and clock frequency.",
       "If a test fails on silicon but passes in simulation, check for timing-related issues first.",
+    ],
+    tools: [
+      { toolId: "debug-test-tools", usage: "SWD debug probe loads test firmware and controls CPU execution for each test in the silicon validation suite." },
+      { toolId: "uart-protocol", usage: "Debug UART captures STDOUT output from test firmware for comparison against simulation golden references." },
     ],
   },
 };
