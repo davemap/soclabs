@@ -87,6 +87,7 @@ const DesignDetail = () => {
   const [provenType, setProvenType] = useState<"FPGA" | "ASIC">("FPGA");
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
+  const [provenBoard, setProvenBoard] = useState("");
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
     return saved === "hierarchy" ? "hierarchy" : "architecture";
@@ -189,7 +190,11 @@ const DesignDetail = () => {
                           <Plus className="h-3.5 w-3.5" /> I've proven this
                         </Button>
                       </div>
-                      <div className="space-y-2">
+                      <div className={cn(
+                        fpgaEntries.length > 0 && asicEntries.length > 0
+                          ? "grid sm:grid-cols-2 gap-2"
+                          : "space-y-2"
+                      )}>
                         {fpgaEntries.length > 0 && (
                           <details className="group rounded-xl border border-sky-500/30 bg-sky-500/5 overflow-hidden">
                             <summary className="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
@@ -204,11 +209,13 @@ const DesignDetail = () => {
                             </summary>
                             <div className="px-4 pb-4 pt-1 space-y-2">
                               {fpgaEntries.map((p) => (
-                                <div key={p.details} className="flex items-center gap-2 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2">
+                                <div key={p.details} className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5">
                                   <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
                                   <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground">{p.details}</span>
-                                    {(p as any).board && <span className="text-[11px] text-sky-400/70">{(p as any).board}</span>}
+                                    <span className="text-xs font-medium text-foreground/80">{p.details}</span>
+                                    {(p as any).board && (
+                                      <span className="text-[11px] font-semibold text-sky-400">{(p as any).board}</span>
+                                    )}
                                   </div>
                                 </div>
                               ))}
@@ -608,6 +615,17 @@ const DesignDetail = () => {
                 onChange={(e) => setProvenPlatform(e.target.value)}
               />
             </div>
+            {provenType === "FPGA" && (
+              <div className="space-y-2">
+                <Label htmlFor="proven-board">Development Board</Label>
+                <Input
+                  id="proven-board"
+                  placeholder="e.g. Digilent Arty A7-35T"
+                  value={provenBoard}
+                  onChange={(e) => setProvenBoard(e.target.value)}
+                />
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="proven-details">Details</Label>
               <Textarea
@@ -629,6 +647,7 @@ const DesignDetail = () => {
                 setProvenDialogOpen(false);
                 setProvenPlatform("");
                 setProvenDetails("");
+                setProvenBoard("");
                 setProvenType("FPGA");
               }}
             >
