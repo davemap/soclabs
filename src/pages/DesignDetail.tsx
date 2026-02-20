@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component } from "lucide-react";
 import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
@@ -322,6 +322,15 @@ const DesignDetail = () => {
                           <div className="flex-1 relative">
                             <div className="flex items-center justify-between relative">
                               <div className="absolute top-5 h-0.5 bg-border" style={{ left: 20, right: 20 }} />
+                              {selectedPhaseIndex !== null && selectedPhaseIndex > 0 && (
+                                <div
+                                  className="absolute top-5 h-0.5 bg-primary transition-all duration-500"
+                                  style={{
+                                    left: 20,
+                                    width: `calc(${(selectedPhaseIndex / (phases.length - 1)) * 100}%)`,
+                                  }}
+                                />
+                              )}
                               {phases.map((phase, i) => (
                                 <PhaseStepperIcon
                                   key={phase.id}
@@ -404,16 +413,28 @@ const DesignDetail = () => {
                                               {task.summary}
                                             </p>
                                             {taskTools.length > 0 && (
-                                              <div className="flex flex-wrap gap-1.5 mt-2">
-                                                {taskTools.map((tool) => (
-                                                  <span
-                                                    key={tool.id}
-                                                    className="inline-flex items-center gap-1 rounded-md bg-primary/[0.06] px-2 py-0.5 text-[10px] font-medium text-primary/70"
-                                                  >
-                                                    <Wrench className="h-2.5 w-2.5" />
-                                                    {tool.name}
-                                                  </span>
-                                                ))}
+                                              <div className="flex flex-wrap gap-1.5 mt-2.5">
+                                                {taskTools.map((tool) => {
+                                                  const isEdaTool = tool.group === "EDA Tooling";
+                                                  return (
+                                                    <span
+                                                      key={tool.id}
+                                                      className={cn(
+                                                        "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold",
+                                                        isEdaTool
+                                                          ? "bg-sky-500/10 text-sky-600 dark:text-sky-400 ring-1 ring-sky-500/20"
+                                                          : "bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20"
+                                                      )}
+                                                    >
+                                                      {isEdaTool ? (
+                                                        <Wrench className="h-2.5 w-2.5" />
+                                                      ) : (
+                                                        <Component className="h-2.5 w-2.5" />
+                                                      )}
+                                                      {tool.name}
+                                                    </span>
+                                                  );
+                                                })}
                                               </div>
                                             )}
                                           </div>
