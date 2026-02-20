@@ -1,7 +1,8 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap } from "lucide-react";
+import { useDesignFlow } from "@/hooks/useDesignFlow";
 import InteractiveArchitectureDiagram from "@/components/InteractiveArchitectureDiagram";
 import InteractiveHierarchyDiagram from "@/components/InteractiveHierarchyDiagram";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 const DesignDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { setFlow, setSelectedSocId } = useDesignFlow();
   const design = referenceDesigns.find((d) => d.id === id);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
@@ -209,6 +211,47 @@ const DesignDetail = () => {
                   ) : design.moduleHierarchy ? (
                     <InteractiveHierarchyDiagram hierarchy={design.moduleHierarchy} designName={design.name} />
                   ) : null}
+                </div>
+              </motion.div>
+
+              {/* Learn with this SoC */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <div className="rounded-2xl border border-border/60 bg-card p-5 md:p-8">
+                  <div className="flex items-center gap-2 mb-2">
+                    <GraduationCap className="h-5 w-5 text-primary" />
+                    <h2 className="text-2xl font-display font-bold">Learn with {design.name}</h2>
+                  </div>
+                  <p className="text-muted-foreground text-sm mb-6">
+                    Follow the Learning Hub curriculum with {design.name} as your reference design. Choose your target flow to get started.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button
+                      size="lg"
+                      className="rounded-xl gap-2 flex-1"
+                      variant="outline"
+                      onClick={() => {
+                        setFlow("FPGA");
+                        setSelectedSocId(design.id);
+                        navigate("/learn");
+                      }}
+                    >
+                      <CircuitBoard className="h-5 w-5" />
+                      FPGA Flow
+                    </Button>
+                    <Button
+                      size="lg"
+                      className="rounded-xl gap-2 flex-1"
+                      variant="outline"
+                      onClick={() => {
+                        setFlow("ASIC");
+                        setSelectedSocId(design.id);
+                        navigate("/learn");
+                      }}
+                    >
+                      <Cpu className="h-5 w-5" />
+                      ASIC Flow
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
 
