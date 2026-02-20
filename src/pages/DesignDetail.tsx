@@ -328,8 +328,13 @@ const DesignDetail = () => {
                                   phase={phase}
                                   index={i}
                                   activeIndex={selectedPhaseIndex ?? -1}
+                                  noTooltip
                                   onSelect={(idx) => {
                                     setSelectedPhaseIndex((prev) => (prev === idx ? null : idx));
+                                  }}
+                                  onDoubleClick={(idx) => {
+                                    setSelectedSocId(design.id);
+                                    navigate(`/learn?phase=${idx}`);
                                   }}
                                 />
                               ))}
