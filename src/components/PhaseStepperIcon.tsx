@@ -16,6 +16,10 @@ interface PhaseStepperIconProps {
   currentTopicId?: string;
   /** If provided, clicking selects the phase instead of navigating */
   onSelect?: (index: number) => void;
+  /** If provided, double-clicking triggers this callback */
+  onDoubleClick?: (index: number) => void;
+  /** Hide the hover tooltip dropdown */
+  noTooltip?: boolean;
 }
 
 const PhaseStepperIcon = ({
@@ -25,9 +29,12 @@ const PhaseStepperIcon = ({
   currentPhaseId,
   currentTopicId,
   onSelect,
+  onDoubleClick,
+  noTooltip,
 }: PhaseStepperIconProps) => {
   const [open, setOpen] = useState(false);
   const timeout = useRef<ReturnType<typeof setTimeout>>();
+  const dblClickRef = useRef<number>(0);
   const Icon = iconMap[phase.icon] || Cpu;
   const nonOverviewTopics = phase.topics.filter((t) => !t.id.endsWith("-overview"));
 
@@ -62,12 +69,23 @@ const PhaseStepperIcon = ({
   return (
     <div
       className="relative z-10 flex flex-col items-center gap-2"
-      onMouseEnter={show}
-      onMouseLeave={hide}
+      onMouseEnter={noTooltip ? undefined : show}
+      onMouseLeave={noTooltip ? undefined : hide}
     >
       {onSelect ? (
         <button
-          onClick={() => onSelect(index)}
+          onClick={() => {
+            if (onDoubleClick) {
+              const now = Date.now();
+              if (now - dblClickRef.current < 400) {
+                onDoubleClick(index);
+                dblClickRef.current = 0;
+                return;
+              }
+              dblClickRef.current = now;
+            }
+            onSelect(index);
+          }}
           className={cn(
             "flex flex-col items-center gap-2",
             index === activeIndex ? "text-primary" : "text-muted-foreground"
