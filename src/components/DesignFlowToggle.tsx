@@ -3,7 +3,6 @@ import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { Cpu, CircuitBoard, Layers, ChevronRight, X } from "lucide-react";
 import { referenceDesigns } from "@/data/mockData";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface DesignFlowToggleProps {
@@ -95,29 +94,26 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
               transition={{ duration: 0.2 }}
               className="overflow-hidden flex items-center"
             >
-              <div className="flex items-center gap-1.5 pl-1">
-                <Select
-                  value={selectedSocId ?? "none"}
-                  onValueChange={(v) => {
-                    setSelectedSocId(v === "none" ? null : v);
-                    setSocOpen(false);
-                  }}
-                >
-                  <SelectTrigger className={cn(
-                    "border-none bg-muted/30 font-display shadow-none",
-                    isCompact ? "w-[120px] h-7 text-xs" : "w-[150px] h-9 text-sm"
-                  )}>
-                    <SelectValue placeholder="Select SoC" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {referenceDesigns.map((soc) => (
-                      <SelectItem key={soc.id} value={soc.id}>
-                        {soc.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col gap-0.5 pl-1 pr-1">
+                {referenceDesigns.map((soc) => (
+                  <button
+                    key={soc.id}
+                    onClick={() => {
+                      setSelectedSocId(soc.id);
+                      setSocOpen(false);
+                    }}
+                    className={cn(
+                      "flex items-center gap-2 font-display font-semibold transition-all duration-150 whitespace-nowrap",
+                      isCompact
+                        ? "px-2.5 py-1 rounded-md text-xs"
+                        : "px-3 py-1.5 rounded-lg text-sm",
+                      "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                    )}
+                  >
+                    <Cpu className={isCompact ? "h-3 w-3" : "h-3.5 w-3.5"} />
+                    {soc.name}
+                  </button>
+                ))}
               </div>
             </motion.div>
           )}
