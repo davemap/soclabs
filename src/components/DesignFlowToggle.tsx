@@ -5,6 +5,12 @@ import { Cpu, CircuitBoard, Layers, ChevronRight, X } from "lucide-react";
 import { referenceDesigns } from "@/data/mockData";
 import { AnimatePresence, motion } from "framer-motion";
 
+const socColors: Record<string, { bg: string; text: string; ring: string; hover: string }> = {
+  nanosoc:  { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400", ring: "ring-emerald-500/20", hover: "hover:bg-emerald-500/10" },
+  millisoc: { bg: "bg-amber-500/15",   text: "text-amber-600 dark:text-amber-400",     ring: "ring-amber-500/20",   hover: "hover:bg-amber-500/10" },
+  megasoc:  { bg: "bg-rose-500/15",    text: "text-rose-600 dark:text-rose-400",       ring: "ring-rose-500/20",    hover: "hover:bg-rose-500/10" },
+};
+
 interface DesignFlowToggleProps {
   className?: string;
   size?: "default" | "compact";
@@ -64,9 +70,14 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
             className={cn(
               "flex items-center gap-1.5 font-display font-bold transition-all duration-200",
               isCompact ? "px-3 py-1.5 rounded-lg text-xs" : "px-4 py-2.5 rounded-xl text-sm",
-              selectedSocId
-                ? "bg-primary/10 text-primary shadow-md ring-1 ring-primary/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            selectedSocId
+              ? cn(
+                  socColors[selectedSocId]?.bg ?? "bg-primary/10",
+                  socColors[selectedSocId]?.text ?? "text-primary",
+                  "shadow-md ring-1",
+                  socColors[selectedSocId]?.ring ?? "ring-primary/20"
+                )
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
             )}
           >
             <Layers className={isCompact ? "h-3.5 w-3.5" : "h-4 w-4"} />
@@ -109,14 +120,14 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                       setSocOpen(false);
                     }}
                     className={cn(
-                      "flex items-center gap-2 font-display font-semibold transition-all duration-150 whitespace-nowrap",
+                      "font-display font-semibold transition-all duration-150 whitespace-nowrap text-left",
                       isCompact
                         ? "px-2.5 py-1.5 rounded-lg text-xs"
                         : "px-4 py-2.5 rounded-xl text-sm",
-                      "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                      socColors[soc.id]?.text ?? "text-muted-foreground",
+                      socColors[soc.id]?.hover ?? "hover:bg-muted/60"
                     )}
                   >
-                    <Cpu className={isCompact ? "h-3 w-3" : "h-3.5 w-3.5"} />
                     {soc.name}
                   </button>
                 ))}
