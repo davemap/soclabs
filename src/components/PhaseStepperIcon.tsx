@@ -70,7 +70,7 @@ const PhaseStepperIcon = ({
           onClick={() => onSelect(index)}
           className={cn(
             "flex flex-col items-center gap-2",
-            index <= activeIndex ? "text-primary" : "text-muted-foreground"
+            index === activeIndex ? "text-primary" : "text-muted-foreground"
           )}
         >
           {iconContent}
