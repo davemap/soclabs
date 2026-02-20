@@ -226,13 +226,6 @@ const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; i
                   })}
                 </div>
 
-                {/* Reference SoC project milestones overlay */}
-                {selectedSocId && (
-                  <ProjectMilestoneOverlay
-                    referenceSocId={selectedSocId}
-                    phaseId={phase.id}
-                  />
-                )}
               </div>
             </motion.div>
           )}
@@ -331,8 +324,16 @@ const LearningHub = () => {
           </ScrollReveal>
 
           {/* Active phase with topic tree */}
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto space-y-6">
             <PhaseSection phase={phases[clampedActive]} index={clampedActive} selectedSocId={selectedSocId} />
+
+            {/* Community project milestones as standalone card */}
+            {selectedSocId && (
+              <ProjectMilestoneOverlay
+                referenceSocId={selectedSocId}
+                phaseId={phases[clampedActive].id}
+              />
+            )}
           </div>
         </div>
       </section>
