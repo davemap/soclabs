@@ -394,10 +394,15 @@ const DesignDetail = () => {
                                       const toolIds = topicToolMap[task.id] || [];
                                       const taskTools = technologies.filter((t) => toolIds.includes(t.id));
                                       return (
-                                        <Link
+                                        <div
                                           key={task.id}
-                                          to={`/learn/${selectedPhase.id}/${task.id}`}
-                                          className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/80 p-3.5 transition-all hover:border-primary/30 hover:shadow-sm group block"
+                                          onClick={() => {
+                                            setSelectedSocId(design.id);
+                                            const tech = design.targetTechnology?.[0];
+                                            if (tech === "ASIC" || tech === "FPGA") setFlow(tech);
+                                            navigate(`/learn/${selectedPhase.id}/${task.id}`);
+                                          }}
+                                          className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/80 p-3.5 transition-all hover:border-primary/30 hover:shadow-sm group block cursor-pointer"
                                         >
                                           <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs font-display font-bold shrink-0 mt-0.5">
                                             {taskIdx + 1}
@@ -440,7 +445,7 @@ const DesignDetail = () => {
                                               </div>
                                             )}
                                           </div>
-                                        </Link>
+                                        </div>
                                       );
                                     })}
                                   </div>
