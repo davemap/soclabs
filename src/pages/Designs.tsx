@@ -94,7 +94,7 @@ const Designs = () => {
                           {design.provenIn && design.provenIn.length > 0 && (
                             <div className="flex flex-wrap gap-2 mb-5">
                               {design.provenIn.map((p) => (
-                                <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-amber-500/50 text-amber-400" : "border-emerald-500/50 text-emerald-400"}`}>
+                                <Badge key={p.details} variant="outline" className={`text-xs gap-1 ${p.type === "ASIC" ? "border-violet-500/50 text-violet-400" : "border-sky-500/50 text-sky-400"}`}>
                                   <CheckCircle2 className="h-3 w-3" />
                                   {p.type}: {p.details}
                                 </Badge>
