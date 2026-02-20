@@ -345,6 +345,7 @@ const DesignDetail = () => {
                                   }}
                                   onDoubleClick={(idx) => {
                                     setSelectedSocId(design.id);
+                                    setFlow(flow);
                                     navigate(`/learn?phase=${phases[idx].id}`);
                                   }}
                                 />
@@ -377,6 +378,7 @@ const DesignDetail = () => {
                                     className="rounded-lg shrink-0"
                                     onClick={() => {
                                       setSelectedSocId(design.id);
+                                      setFlow(flow);
                                       navigate(`/learn?phase=${phases[selectedPhaseIndex!].id}`);
                                     }}
                                   >
@@ -398,8 +400,7 @@ const DesignDetail = () => {
                                           key={task.id}
                                           onClick={() => {
                                             setSelectedSocId(design.id);
-                                            const tech = design.targetTechnology?.[0];
-                                            if (tech === "ASIC" || tech === "FPGA") setFlow(tech);
+                                            setFlow(flow);
                                             navigate(`/learn/${selectedPhase.id}/${task.id}`);
                                           }}
                                           className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/80 p-3.5 transition-all hover:border-primary/30 hover:shadow-sm group block cursor-pointer"
