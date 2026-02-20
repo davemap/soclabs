@@ -106,11 +106,11 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
               animate={{ width: "auto", opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+              className="overflow-hidden -ml-3"
             >
               <div className={cn(
-                "flex flex-col gap-0.5 border-2 border-border/60 border-l-0 bg-card shadow-lg",
-                isCompact ? "p-1 rounded-r-xl" : "p-1.5 rounded-r-2xl"
+                "flex flex-col gap-0.5 border-2 border-border/60 bg-card shadow-lg",
+                isCompact ? "p-1 pl-4 rounded-r-xl rounded-l-lg" : "p-1.5 pl-5 rounded-r-2xl rounded-l-xl"
               )}>
                 {referenceDesigns.map((soc) => (
                   <button
