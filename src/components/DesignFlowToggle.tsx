@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { Cpu, CircuitBoard, Layers, ChevronRight, X } from "lucide-react";
@@ -19,13 +19,25 @@ interface DesignFlowToggleProps {
 export default function DesignFlowToggle({ className, size = "default" }: DesignFlowToggleProps) {
   const { flow, setFlow, selectedSocId, setSelectedSocId } = useDesignFlow();
   const [socOpen, setSocOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isCompact = size === "compact";
   const selectedSoc = selectedSocId ? referenceDesigns.find(d => d.id === selectedSocId) : null;
 
+  useEffect(() => {
+    if (!socOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setSocOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [socOpen]);
+
   return (
     <div className={cn("flex justify-center", className)}>
-      <div className="relative inline-flex items-center">
+      <div ref={containerRef} className="relative inline-flex items-center gap-2">
         {/* Main bar */}
         <div className={cn(
           "inline-flex items-center rounded-2xl border-2 border-border/60 bg-card gap-1 shadow-sm",
@@ -106,11 +118,11 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
               animate={{ width: "auto", opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden -ml-3"
+              className="overflow-hidden"
             >
               <div className={cn(
                 "flex flex-col gap-0.5 border-2 border-border/60 bg-card shadow-lg",
-                isCompact ? "p-1 pl-4 rounded-r-xl rounded-l-lg" : "p-1.5 pl-5 rounded-r-2xl rounded-l-xl"
+                isCompact ? "p-1 rounded-xl" : "p-1.5 rounded-2xl"
               )}>
                 {referenceDesigns.map((soc) => (
                   <button
@@ -120,7 +132,7 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                       setSocOpen(false);
                     }}
                     className={cn(
-                      "font-display font-semibold transition-all duration-150 whitespace-nowrap text-left",
+                      "font-display font-semibold transition-all duration-150 whitespace-nowrap text-center",
                       isCompact
                         ? "px-2.5 py-1.5 rounded-lg text-xs"
                         : "px-4 py-2.5 rounded-xl text-sm",
