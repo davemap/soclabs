@@ -733,67 +733,101 @@ const DesignDetail = () => {
       {/* Proven entry detail dialog */}
       <Dialog open={!!provenDetailEntry} onOpenChange={(open) => { if (!open) setProvenDetailEntry(null); }}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-display flex items-center gap-2">
-              {provenDetailEntry?.type === "FPGA" ? (
-                <CircuitBoard className="h-5 w-5 text-sky-400" />
-              ) : (
-                <Cpu className="h-5 w-5 text-violet-400" />
-              )}
-              {provenDetailEntry?.type === "FPGA" ? "FPGA Implementation" : "ASIC Fabrication"}
-            </DialogTitle>
-          </DialogHeader>
-          {provenDetailEntry && (
-            <div className="space-y-4 py-2">
-              <div className={cn(
-                "rounded-xl p-4 space-y-3",
-                provenDetailEntry.type === "FPGA" ? "bg-sky-500/5 border border-sky-500/20" : "bg-violet-500/5 border border-violet-500/20"
-              )}>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-0.5">{provenDetailEntry.type === "FPGA" ? "Device" : "Process Node"}</p>
-                  <p className="text-sm font-semibold text-foreground">{provenDetailEntry.details}</p>
+          {provenDetailEntry && (() => {
+            const allProven = design?.provenIn || [];
+            const sameTypeEntries = allProven.filter(p => p.type === provenDetailEntry.type);
+            const currentIdx = sameTypeEntries.findIndex(p => p.details === provenDetailEntry.details);
+            const hasPrev = currentIdx > 0;
+            const hasNext = currentIdx < sameTypeEntries.length - 1;
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="font-display flex items-center gap-2">
+                    {provenDetailEntry.type === "FPGA" ? (
+                      <CircuitBoard className="h-5 w-5 text-sky-400" />
+                    ) : (
+                      <Cpu className="h-5 w-5 text-violet-400" />
+                    )}
+                    {provenDetailEntry.type === "FPGA" ? "FPGA Implementation" : "ASIC Fabrication"}
+                    {sameTypeEntries.length > 1 && (
+                      <span className="text-xs text-muted-foreground font-normal ml-auto">
+                        {currentIdx + 1} / {sameTypeEntries.length}
+                      </span>
+                    )}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-2">
+                  <div className={cn(
+                    "rounded-xl p-4 space-y-3",
+                    provenDetailEntry.type === "FPGA" ? "bg-sky-500/5 border border-sky-500/20" : "bg-violet-500/5 border border-violet-500/20"
+                  )}>
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-0.5">{provenDetailEntry.type === "FPGA" ? "Device" : "Process Node"}</p>
+                      <p className="text-sm font-semibold text-foreground">{provenDetailEntry.details}</p>
+                    </div>
+                    {provenDetailEntry.board && (
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-0.5">Development Board</p>
+                        <p className="text-sm font-semibold text-sky-400">{provenDetailEntry.board}</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {provenDetailEntry.submitter && (
+                      <div className="flex items-center gap-3">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Submitted by</p>
+                          <p className="text-sm font-medium text-foreground">{provenDetailEntry.submitter}</p>
+                        </div>
+                      </div>
+                    )}
+                    {provenDetailEntry.date && (
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Date verified</p>
+                          <p className="text-sm font-medium text-foreground">{new Date(provenDetailEntry.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+                        </div>
+                      </div>
+                    )}
+                    {provenDetailEntry.projectTitle && (
+                      <div className="flex items-center gap-3">
+                        <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">Associated project</p>
+                          <p className="text-sm font-medium text-primary">{provenDetailEntry.projectTitle}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {provenDetailEntry.board && (
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-0.5">Development Board</p>
-                    <p className="text-sm font-semibold text-sky-400">{provenDetailEntry.board}</p>
+                <DialogFooter className="flex-row justify-between sm:justify-between">
+                  <div className="flex gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      disabled={!hasPrev}
+                      onClick={() => setProvenDetailEntry(sameTypeEntries[currentIdx - 1])}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      disabled={!hasNext}
+                      onClick={() => setProvenDetailEntry(sameTypeEntries[currentIdx + 1])}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </div>
-                )}
-              </div>
-              <div className="space-y-3">
-                {provenDetailEntry.submitter && (
-                  <div className="flex items-center gap-3">
-                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Submitted by</p>
-                      <p className="text-sm font-medium text-foreground">{provenDetailEntry.submitter}</p>
-                    </div>
-                  </div>
-                )}
-                {provenDetailEntry.date && (
-                  <div className="flex items-center gap-3">
-                    <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Date verified</p>
-                      <p className="text-sm font-medium text-foreground">{new Date(provenDetailEntry.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
-                    </div>
-                  </div>
-                )}
-                {provenDetailEntry.projectTitle && (
-                  <div className="flex items-center gap-3">
-                    <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Associated project</p>
-                      <p className="text-sm font-medium text-primary">{provenDetailEntry.projectTitle}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setProvenDetailEntry(null)}>Close</Button>
-          </DialogFooter>
+                  <Button variant="ghost" onClick={() => setProvenDetailEntry(null)}>Close</Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </Layout>
