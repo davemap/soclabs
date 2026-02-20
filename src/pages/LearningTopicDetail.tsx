@@ -12,7 +12,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useDesignFlow, filterPhasesForFlow, asicOnlyPhases } from "@/hooks/useDesignFlow";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
 import { getSocTopicContent, getAvailableSocTopics } from "@/data/socTopicContent";
-import { referenceDesigns } from "@/data/mockData";
+import { referenceDesigns, technologies } from "@/data/mockData";
+import { Wrench } from "lucide-react";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -404,7 +405,7 @@ const LearningTopicDetail = () => {
                     )}
 
                     {socContent.tips && socContent.tips.length > 0 && (
-                      <div>
+                      <div className="mb-5">
                         <h4 className="text-xs font-display font-semibold text-foreground/70 uppercase tracking-wider mb-2">
                           Tips for {socDesign.name}
                         </h4>
@@ -418,6 +419,46 @@ const LearningTopicDetail = () => {
                         </ul>
                       </div>
                     )}
+
+                    {socContent.tools && socContent.tools.length > 0 && (() => {
+                      const resolvedTools = socContent.tools
+                        .map((ref) => {
+                          const tech = technologies.find((t) => t.id === ref.toolId);
+                          return tech ? { ...ref, tech } : null;
+                        })
+                        .filter(Boolean) as Array<{ toolId: string; usage: string; tech: typeof technologies[number] }>;
+                      if (resolvedTools.length === 0) return null;
+                      return (
+                        <div>
+                          <h4 className="text-xs font-display font-semibold text-foreground/70 uppercase tracking-wider mb-2.5">
+                            <div className="flex items-center gap-1.5">
+                              <Wrench className="h-3.5 w-3.5" />
+                              Tools Used
+                            </div>
+                          </h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {resolvedTools.map(({ toolId, usage, tech }) => (
+                              <Link
+                                key={toolId}
+                                to={`/technologies/${toolId}`}
+                                className="group flex flex-col gap-1.5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] hover:border-emerald-500/40 hover:bg-emerald-500/[0.08] p-3 transition-all"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Wrench className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                                  <span className="text-xs font-display font-semibold text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                                    {tech.name}
+                                  </span>
+                                  <ArrowRight className="h-3 w-3 text-emerald-500/40 group-hover:text-emerald-400 ml-auto shrink-0 transition-colors" />
+                                </div>
+                                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                  {usage}
+                                </p>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </motion.div>
               )}
