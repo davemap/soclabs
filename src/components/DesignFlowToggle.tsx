@@ -98,39 +98,37 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
           </button>
         </div>
 
-        {/* SoC options – slides out to the right */}
+        {/* SoC popover dropdown */}
         <AnimatePresence>
           {socOpen && !selectedSocId && (
             <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden -ml-3"
+              initial={{ opacity: 0, y: 4, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 4, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className={cn(
+                "absolute right-0 top-full mt-2 z-50 border border-border bg-popover rounded-xl shadow-lg",
+                isCompact ? "p-1 min-w-[120px]" : "p-1.5 min-w-[160px]"
+              )}
             >
-              <div className={cn(
-                "flex flex-col gap-0.5 border-2 border-border/60 bg-card shadow-lg",
-                isCompact ? "p-1 pl-4 rounded-r-xl rounded-l-lg" : "p-1.5 pl-5 rounded-r-2xl rounded-l-xl"
-              )}>
-                {referenceDesigns.map((soc) => (
-                  <button
-                    key={soc.id}
-                    onClick={() => {
-                      setSelectedSocId(soc.id);
-                      setSocOpen(false);
-                    }}
-                    className={cn(
-                      "font-display font-semibold transition-all duration-150 whitespace-nowrap text-left",
-                      isCompact
-                        ? "px-2.5 py-1.5 rounded-lg text-xs"
-                        : "px-4 py-2.5 rounded-xl text-sm",
-                      "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                    )}
-                  >
-                    {soc.name}
-                  </button>
-                ))}
-              </div>
+              {referenceDesigns.map((soc) => (
+                <button
+                  key={soc.id}
+                  onClick={() => {
+                    setSelectedSocId(soc.id);
+                    setSocOpen(false);
+                  }}
+                  className={cn(
+                    "w-full font-display font-semibold transition-all duration-150 whitespace-nowrap text-left",
+                    isCompact
+                      ? "px-2.5 py-1.5 rounded-lg text-xs"
+                      : "px-4 py-2.5 rounded-lg text-sm",
+                    "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  )}
+                >
+                  {soc.name}
+                </button>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>
