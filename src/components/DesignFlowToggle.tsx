@@ -6,9 +6,9 @@ import { referenceDesigns } from "@/data/mockData";
 import { AnimatePresence, motion } from "framer-motion";
 
 const socColors: Record<string, { bg: string; text: string; ring: string; hover: string }> = {
-  nanosoc:  { bg: "bg-amber-400/15", text: "text-amber-500 dark:text-amber-300", ring: "ring-amber-400/20", hover: "hover:bg-muted/60" },
-  millisoc: { bg: "bg-orange-500/15", text: "text-orange-600 dark:text-orange-400", ring: "ring-orange-500/20", hover: "hover:bg-muted/60" },
-  megasoc:  { bg: "bg-orange-700/15", text: "text-orange-700 dark:text-orange-500", ring: "ring-orange-700/20", hover: "hover:bg-muted/60" },
+  nanosoc:  { bg: "bg-emerald-400/15", text: "text-emerald-500 dark:text-emerald-300", ring: "ring-emerald-400/20", hover: "hover:bg-muted/60" },
+  millisoc: { bg: "bg-green-500/15",   text: "text-green-600 dark:text-green-400",     ring: "ring-green-500/20",   hover: "hover:bg-muted/60" },
+  megasoc:  { bg: "bg-teal-600/15",    text: "text-teal-700 dark:text-teal-400",       ring: "ring-teal-600/20",    hover: "hover:bg-muted/60" },
 };
 
 interface DesignFlowToggleProps {
@@ -98,19 +98,19 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
           </button>
         </div>
 
-        {/* SoC options – drops down below the bar */}
+        {/* SoC options – slides out to the right */}
         <AnimatePresence>
           {socOpen && !selectedSocId && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="absolute right-0 top-full mt-1 z-50 overflow-hidden"
+              className="overflow-hidden"
             >
               <div className={cn(
-                "flex flex-col gap-0.5 border-2 border-border/60 bg-card shadow-lg",
-                isCompact ? "p-1 rounded-xl" : "p-1.5 rounded-2xl"
+                "flex flex-col gap-0.5 border-2 border-border/60 border-l-0 bg-card shadow-lg",
+                isCompact ? "p-1 rounded-r-xl" : "p-1.5 rounded-r-2xl"
               )}>
                 {referenceDesigns.map((soc) => (
                   <button
