@@ -11,7 +11,7 @@ import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDesignFlow, filterPhasesForFlow, asicOnlyPhases } from "@/hooks/useDesignFlow";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
-import { getSocTopicContent } from "@/data/socTopicContent";
+import { getSocTopicContent, getAvailableSocTopics } from "@/data/socTopicContent";
 import { referenceDesigns } from "@/data/mockData";
 
 const effortColors = [
@@ -110,6 +110,7 @@ const LearningTopicDetail = () => {
     if (!selectedSocId) return null;
     return referenceDesigns.find((d) => d.id === selectedSocId) ?? null;
   }, [selectedSocId]);
+  const availableTopics = useMemo(() => selectedSocId ? new Set(getAvailableSocTopics(selectedSocId)) : null, [selectedSocId]);
 
   const phase = phases.find((p) => p.id === phaseId);
   const topicIndex = phase?.topics.findIndex((t) => t.id === topicId) ?? -1;
@@ -487,11 +488,18 @@ const LearningTopicDetail = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {phase.topics
                       .filter((t) => !t.id.endsWith("-overview"))
-                      .map((t, i) => (
+                      .map((t, i) => {
+                        const hasContent = !availableTopics || availableTopics.has(t.id);
+                        return (
                         <Link
                           key={t.id}
-                          to={`/learn/${phase.id}/${t.id}`}
-                          className="group relative rounded-xl border border-border/40 bg-card/50 p-4 hover:border-primary/40 hover:bg-primary/5 transition-all"
+                          to={hasContent ? `/learn/${phase.id}/${t.id}` : "#"}
+                          className={cn(
+                            "group relative rounded-xl border border-border/40 bg-card/50 p-4 transition-all",
+                            hasContent
+                              ? "hover:border-primary/40 hover:bg-primary/5"
+                              : "opacity-40 pointer-events-none"
+                          )}
                         >
                           <div className="flex items-start gap-3">
                             <span className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-bold font-display shrink-0">
@@ -508,7 +516,8 @@ const LearningTopicDetail = () => {
                             <ArrowRight className="h-4 w-4 text-muted-foreground/30 group-hover:text-primary shrink-0 mt-0.5 transition-colors" />
                           </div>
                         </Link>
-                      ))}
+                        );
+                      })}
                   </div>
                 </motion.div>
               )}
@@ -523,15 +532,20 @@ const LearningTopicDetail = () => {
                   {phase.title} Topics
                 </h3>
               <div className="relative pl-3 border-l-2 border-primary/20 space-y-0.5">
-                  {phase.topics.map((t, i) => (
+                  {phase.topics.map((t, i) => {
+                    const isOverview = t.id.endsWith("-overview");
+                    const hasContent = !availableTopics || isOverview || availableTopics.has(t.id);
+                    return (
                     <Link
                       key={t.id}
-                      to={`/learn/${phase.id}/${t.id}`}
+                      to={hasContent ? `/learn/${phase.id}/${t.id}` : "#"}
                       className={cn(
                         "relative flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs transition-all",
-                        t.id === topicId
-                          ? "bg-primary/10 text-primary font-semibold"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                        !hasContent
+                          ? "opacity-40 pointer-events-none"
+                          : t.id === topicId
+                            ? "bg-primary/10 text-primary font-semibold"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
                     >
                       <div className={cn(
@@ -543,11 +557,12 @@ const LearningTopicDetail = () => {
                       <div className="absolute -left-3 top-1/2 w-3 h-px bg-primary/20" />
                       <span className="w-4 text-muted-foreground/60 shrink-0">{i + 1}.</span>
                       <span className="leading-tight flex-1">{t.title}</span>
-                      {!t.id.endsWith("-overview") && (
+                      {!isOverview && (
                         <MiniRatingBar effort={t.effort} uncertainty={t.uncertainty} />
                       )}
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Prev / Next buttons */}

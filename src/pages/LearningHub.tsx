@@ -10,6 +10,7 @@ import { learningPhases, LearningPhase } from "@/data/mockData";
 import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { useDesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
+import { getAvailableSocTopics } from "@/data/socTopicContent";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
 import ProjectMilestoneOverlay from "@/components/ProjectMilestoneOverlay";
 
@@ -72,6 +73,7 @@ const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?:
 const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; index: number; selectedSocId: string | null }) => {
   const [expanded, setExpanded] = useState(true);
   const Icon = iconMap[phase.icon] || Cpu;
+  const availableTopics = useMemo(() => selectedSocId ? new Set(getAvailableSocTopics(selectedSocId)) : null, [selectedSocId]);
 
   const realTopics = phase.topics.filter((t) => !t.id.endsWith("-overview"));
   const effortValues = realTopics.map((t) => {
@@ -181,6 +183,7 @@ const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; i
                   {phase.topics.map((topic, i) => {
                     const ratings = projectTopicRatings[topic.id] || [];
                     const isOverview = topic.id.endsWith("-overview");
+                    const hasContent = !availableTopics || isOverview || availableTopics.has(topic.id);
                     const avgEffortFromProjects = ratings.length > 0
                       ? Math.round((ratings.reduce((s, r) => s + r.effort, 0) / ratings.length) * 10) / 10
                       : topic.effort;
@@ -192,7 +195,12 @@ const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; i
                       <Link
                         key={topic.id}
                         to={`/learn/${phase.id}/${topic.id}`}
-                        className="group flex items-start gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/5 transition-all relative"
+                        className={cn(
+                          "group flex items-start gap-3 px-3 py-2.5 rounded-lg transition-all relative",
+                          hasContent
+                            ? "hover:bg-primary/5"
+                            : "opacity-40 pointer-events-none"
+                        )}
                       >
                         {/* Branch connector */}
                         <div className="absolute -left-[calc(1rem+1px)] top-1/2 w-4 h-px bg-primary/20" />
