@@ -107,8 +107,8 @@ export const referenceDesigns = [
     version: "1.2.0",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)" },
-      { type: "FPGA", details: "Intel Cyclone V" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)", board: "Digilent Arty A7-35T" },
+      { type: "FPGA", details: "Intel Cyclone V (5CSEBA6U23I7)", board: "Terasic DE10-Nano" },
     ],
     integrationTime: "2–4 weeks",
     relativeGateCount: "~15K",
@@ -162,7 +162,7 @@ export const referenceDesigns = [
     version: "2.0.1",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T" },
       { type: "ASIC", details: "TSMC 65nm (via Europractice)" },
     ],
     integrationTime: "4–8 weeks",
@@ -217,7 +217,7 @@ export const referenceDesigns = [
     version: "0.9.0-beta",
     branch: "develop",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T" },
       { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)" },
     ],
     integrationTime: "8–16 weeks",
