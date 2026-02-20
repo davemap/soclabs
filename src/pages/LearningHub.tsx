@@ -11,6 +11,8 @@ import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { useDesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
+import ReferenceSocSelector from "@/components/ReferenceSocSelector";
+import ProjectMilestoneOverlay from "@/components/ProjectMilestoneOverlay";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -68,7 +70,7 @@ const MiniRatingBar = ({ effort, uncertainty }: { effort?: number; uncertainty?:
   );
 };
 
-const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number }) => {
+const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; index: number; selectedSocId: string | null }) => {
   const [expanded, setExpanded] = useState(true);
   const Icon = iconMap[phase.icon] || Cpu;
 
@@ -216,6 +218,14 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
                     );
                   })}
                 </div>
+
+                {/* Reference SoC project milestones overlay */}
+                {selectedSocId && (
+                  <ProjectMilestoneOverlay
+                    referenceSocId={selectedSocId}
+                    phaseId={phase.id}
+                  />
+                )}
               </div>
             </motion.div>
           )}
@@ -228,6 +238,7 @@ const PhaseSection = ({ phase, index }: { phase: LearningPhase; index: number })
 const LearningHub = () => {
   const [searchParams] = useSearchParams();
   const { flow } = useDesignFlow();
+  const [selectedSocId, setSelectedSocId] = useState<string | null>(null);
   const phases = useMemo(() => filterPhasesForFlow(learningPhases, flow), [flow]);
   const phaseParam = searchParams.get("phase");
   const initialIndex = phaseParam ? phases.findIndex((p) => p.id === phaseParam) : 0;
@@ -256,6 +267,7 @@ const LearningHub = () => {
               A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
             <DesignFlowToggle className="mt-2" />
+            <ReferenceSocSelector value={selectedSocId} onChange={setSelectedSocId} className="mt-4 justify-center" />
           </motion.div>
 
           {/* Progress stepper */}
@@ -315,7 +327,7 @@ const LearningHub = () => {
 
           {/* Active phase with topic tree */}
           <div className="max-w-3xl mx-auto">
-            <PhaseSection phase={phases[clampedActive]} index={clampedActive} />
+            <PhaseSection phase={phases[clampedActive]} index={clampedActive} selectedSocId={selectedSocId} />
           </div>
         </div>
       </section>
