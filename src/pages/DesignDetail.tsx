@@ -655,25 +655,25 @@ const DesignDetail = () => {
                     <h3 className="text-xs font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Last Proven
                     </h3>
-                    <div className="text-[11px] space-y-2">
+                    <div className="text-xs space-y-2">
                       <div>
-                        <p className="text-muted-foreground text-[10px]">{latest.type === "FPGA" ? "Device" : "Process"}</p>
+                        <p className="text-muted-foreground text-[11px]">{latest.type === "FPGA" ? "Device" : "Process"}</p>
                         <p className="font-medium text-foreground/80">{latest.details}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-[10px]">By</p>
+                        <p className="text-muted-foreground text-[11px]">By</p>
                         <Link to={`/members/${latest.submitter?.toLowerCase().replace(/[\s.]+/g, "-")}`} className="font-medium text-primary hover:underline">
                           {latest.submitter}
                         </Link>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-[10px]">Date</p>
+                        <p className="text-muted-foreground text-[11px]">Date</p>
                         <p className="font-medium text-foreground/80">{new Date(latest.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
                       </div>
                       {latest.projectTitle && (
                         <div>
-                          <p className="text-muted-foreground text-[10px]">Project</p>
-                          <Link to={`/projects/${latest.projectId}`} className="font-medium text-primary hover:underline text-[11px]">
+                          <p className="text-muted-foreground text-[11px]">Project</p>
+                          <Link to={`/projects/${latest.projectId}`} className="font-medium text-primary hover:underline">
                             {latest.projectTitle}
                           </Link>
                         </div>
