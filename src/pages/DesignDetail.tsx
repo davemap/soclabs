@@ -643,6 +643,41 @@ const DesignDetail = () => {
                   </Link>
                 </Button>
               </div>
+              {/* Last Proven */}
+              {design.provenIn && design.provenIn.length > 0 && (() => {
+                const allValidations = design.provenIn.flatMap((p: any) =>
+                  (p.validations || []).map((v: any) => ({ ...v, type: p.type, details: p.details, board: p.board }))
+                );
+                if (allValidations.length === 0) return null;
+                const latest = allValidations.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                return (
+                  <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2.5">
+                    <h3 className="text-xs font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Last Proven
+                    </h3>
+                    <div className="text-xs space-y-1.5">
+                      <div>
+                        <p className="text-muted-foreground text-[10px]">{latest.type === "FPGA" ? "Device" : "Process"}</p>
+                        <p className="font-medium text-foreground/80">{latest.details}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-[10px]">By</p>
+                        <p className="font-medium text-foreground/80">{latest.submitter}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-[10px]">Date</p>
+                        <p className="font-medium text-foreground/80">{new Date(latest.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+                      </div>
+                      {latest.projectTitle && (
+                        <div>
+                          <p className="text-muted-foreground text-[10px]">Project</p>
+                          <p className="font-medium text-primary text-[11px]">{latest.projectTitle}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </aside>
           </div>
         </div>
