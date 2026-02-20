@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component } from "lucide-react";
 import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
+import { getAvailableSocTopics } from "@/data/socTopicContent";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
 import { learningPhases } from "@/data/mockData";
@@ -311,9 +312,10 @@ const DesignDetail = () => {
                   {/* Phase stepper bar */}
                   {(() => {
                     const phases = filterPhasesForFlow(learningPhases, flow);
-                     const selectedPhase = selectedPhaseIndex !== null ? phases[selectedPhaseIndex] : null;
+                    const availableTopics = id ? new Set(getAvailableSocTopics(id)) : new Set<string>();
+                    const selectedPhase = selectedPhaseIndex !== null ? phases[selectedPhaseIndex] : null;
                     const phaseTasks = selectedPhase
-                      ? selectedPhase.topics.filter((t) => !t.id.endsWith("-overview"))
+                      ? selectedPhase.topics.filter((t) => !t.id.endsWith("-overview") && availableTopics.has(t.id))
                       : [];
 
                     return (
@@ -343,7 +345,7 @@ const DesignDetail = () => {
                                   }}
                                   onDoubleClick={(idx) => {
                                     setSelectedSocId(design.id);
-                                    navigate(`/learn?phase=${idx}`);
+                                    navigate(`/learn?phase=${phases[idx].id}`);
                                   }}
                                 />
                               ))}
@@ -375,7 +377,7 @@ const DesignDetail = () => {
                                     className="rounded-lg shrink-0"
                                     onClick={() => {
                                       setSelectedSocId(design.id);
-                                      navigate(`/learn?phase=${selectedPhaseIndex}`);
+                                      navigate(`/learn?phase=${phases[selectedPhaseIndex!].id}`);
                                     }}
                                   >
                                     Open in Hub <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
