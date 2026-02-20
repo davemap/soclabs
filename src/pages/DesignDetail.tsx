@@ -353,12 +353,12 @@ const DesignDetail = () => {
                               transition={{ duration: 0.25, ease: "easeInOut" }}
                               className="overflow-hidden"
                             >
-                              <div className="mt-4 space-y-3">
-                                {/* Phase header card */}
-                                <div className="rounded-xl border border-border/60 bg-muted/30 p-4 flex items-center justify-between gap-4">
+                              <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/[0.03] overflow-hidden">
+                                {/* Phase header */}
+                                <div className="px-5 py-4 border-b border-primary/10 flex items-center justify-between gap-4">
                                   <div>
-                                    <h3 className="text-lg font-display font-bold">{selectedPhase.title}</h3>
-                                    <p className="text-sm text-muted-foreground mt-0.5">{selectedPhase.description}</p>
+                                    <h3 className="text-lg font-display font-bold text-foreground">{selectedPhase.title}</h3>
+                                    <p className="text-sm text-muted-foreground/80 mt-0.5 leading-relaxed">{selectedPhase.description}</p>
                                   </div>
                                   <Button
                                     size="sm"
@@ -373,51 +373,54 @@ const DesignDetail = () => {
                                   </Button>
                                 </div>
 
-                                {/* Task cards */}
-                                <div className="grid gap-2">
-                                  {phaseTasks.map((task) => {
-                                    const toolIds = topicToolMap[task.id] || [];
-                                    const taskTools = technologies.filter((t) => toolIds.includes(t.id));
-                                    return (
-                                      <Link
-                                        key={task.id}
-                                        to={`/learn/${selectedPhase.id}/${task.id}`}
-                                        className="rounded-xl border border-border/60 bg-card p-4 transition-colors hover:border-primary/30 hover:bg-muted/20 group block"
-                                      >
-                                        <div className="flex items-start justify-between gap-3">
-                                          <div className="min-w-0">
-                                            <div className="flex items-center gap-2">
-                                              <ArrowRight className="h-3.5 w-3.5 text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity -ml-0.5" />
-                                              <span className="font-display font-semibold text-sm">{task.title}</span>
+                                {/* Tasks list */}
+                                <div className="px-5 py-4">
+                                  <h4 className="text-[11px] font-display font-semibold text-muted-foreground/70 uppercase tracking-wider mb-3">
+                                    Tasks in this phase
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {phaseTasks.map((task, taskIdx) => {
+                                      const toolIds = topicToolMap[task.id] || [];
+                                      const taskTools = technologies.filter((t) => toolIds.includes(t.id));
+                                      return (
+                                        <Link
+                                          key={task.id}
+                                          to={`/learn/${selectedPhase.id}/${task.id}`}
+                                          className="flex items-start gap-3 rounded-xl border border-border/40 bg-card/80 p-3.5 transition-all hover:border-primary/30 hover:shadow-sm group block"
+                                        >
+                                          <div className="flex items-center justify-center w-6 h-6 rounded-lg bg-primary/10 text-primary text-xs font-display font-bold shrink-0 mt-0.5">
+                                            {taskIdx + 1}
+                                          </div>
+                                          <div className="min-w-0 flex-1">
+                                            <div className="flex items-center justify-between gap-2">
+                                              <span className="font-display font-semibold text-sm text-foreground/90 group-hover:text-primary transition-colors">{task.title}</span>
+                                              {task.effort && (
+                                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-border/40 text-muted-foreground/60 shrink-0">
+                                                  Effort {task.effort}/5
+                                                </Badge>
+                                              )}
                                             </div>
-                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 pl-5">
+                                            <p className="text-xs text-muted-foreground/70 mt-1 line-clamp-1 leading-relaxed">
                                               {task.summary}
                                             </p>
+                                            {taskTools.length > 0 && (
+                                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                                {taskTools.map((tool) => (
+                                                  <span
+                                                    key={tool.id}
+                                                    className="inline-flex items-center gap-1 rounded-md bg-primary/[0.06] px-2 py-0.5 text-[10px] font-medium text-primary/70"
+                                                  >
+                                                    <Wrench className="h-2.5 w-2.5" />
+                                                    {tool.name}
+                                                  </span>
+                                                ))}
+                                              </div>
+                                            )}
                                           </div>
-                                          {task.effort && (
-                                            <div className="flex items-center gap-2 shrink-0">
-                                              <Badge variant="outline" className="text-[10px] px-1.5 py-0.5">
-                                                Effort {task.effort}/5
-                                              </Badge>
-                                            </div>
-                                          )}
-                                        </div>
-                                        {taskTools.length > 0 && (
-                                          <div className="flex flex-wrap gap-1.5 mt-3 pl-5">
-                                            {taskTools.map((tool) => (
-                                              <span
-                                                key={tool.id}
-                                                className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-                                              >
-                                                <Wrench className="h-2.5 w-2.5" />
-                                                {tool.name}
-                                              </span>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </Link>
-                                    );
-                                  })}
+                                        </Link>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               </div>
                             </motion.div>
