@@ -651,8 +651,8 @@ const DesignDetail = () => {
                 if (allValidations.length === 0) return null;
                 const latest = allValidations.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                 return (
-                  <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-2.5">
-                    <h3 className="text-xs font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className="mt-3 rounded-xl border border-border/60 bg-card p-4 space-y-2.5 shadow-sm">
+                    <h3 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="h-3.5 w-3.5" /> Last Proven
                     </h3>
                     <div className="text-xs space-y-1.5">
@@ -662,7 +662,9 @@ const DesignDetail = () => {
                       </div>
                       <div>
                         <p className="text-muted-foreground text-[10px]">By</p>
-                        <p className="font-medium text-foreground/80">{latest.submitter}</p>
+                        <Link to={`/members/${latest.submitter?.toLowerCase().replace(/[\s.]+/g, "-")}`} className="font-medium text-primary hover:underline">
+                          {latest.submitter}
+                        </Link>
                       </div>
                       <div>
                         <p className="text-muted-foreground text-[10px]">Date</p>
@@ -671,7 +673,9 @@ const DesignDetail = () => {
                       {latest.projectTitle && (
                         <div>
                           <p className="text-muted-foreground text-[10px]">Project</p>
-                          <p className="font-medium text-primary text-[11px]">{latest.projectTitle}</p>
+                          <Link to={`/projects/${latest.projectId}`} className="font-medium text-primary hover:underline text-[11px]">
+                            {latest.projectTitle}
+                          </Link>
                         </div>
                       )}
                     </div>
