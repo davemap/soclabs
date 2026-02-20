@@ -11,7 +11,6 @@ import { PhaseStepperIcon, iconMap } from "@/components/PhaseStepperIcon";
 import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { useDesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
-import ReferenceSocSelector from "@/components/ReferenceSocSelector";
 import ProjectMilestoneOverlay from "@/components/ProjectMilestoneOverlay";
 
 const effortColors = [
@@ -237,8 +236,7 @@ const PhaseSection = ({ phase, index, selectedSocId }: { phase: LearningPhase; i
 
 const LearningHub = () => {
   const [searchParams] = useSearchParams();
-  const { flow } = useDesignFlow();
-  const [selectedSocId, setSelectedSocId] = useState<string | null>(null);
+  const { flow, selectedSocId } = useDesignFlow();
   const phases = useMemo(() => filterPhasesForFlow(learningPhases, flow), [flow]);
   const phaseParam = searchParams.get("phase");
   const initialIndex = phaseParam ? phases.findIndex((p) => p.id === phaseParam) : 0;
@@ -267,7 +265,6 @@ const LearningHub = () => {
               A comprehensive guide through every phase of digital hardware design — from architecture to silicon validation.
             </p>
             <DesignFlowToggle className="mt-2" />
-            <ReferenceSocSelector value={selectedSocId} onChange={setSelectedSocId} className="mt-4 justify-center" />
           </motion.div>
 
           {/* Progress stepper */}
