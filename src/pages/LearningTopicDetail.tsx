@@ -142,9 +142,14 @@ const LearningTopicDetail = () => {
   const prevPhase = phaseIndex > 0 ? phases[phaseIndex - 1] : null;
   const nextPhase = phaseIndex < phases.length - 1 ? phases[phaseIndex + 1] : null;
 
-  // Build prev/next across all filtered phases and topics
+  // Build prev/next across all filtered phases and topics, skipping greyed-out ones
   const allTopics = phases.flatMap((p) =>
-    p.topics.map((t) => ({ phaseId: p.id, topicId: t.id, title: t.title, phaseTitle: p.shortTitle }))
+    p.topics
+      .filter((t) => {
+        const isOverview = t.id.endsWith("-overview");
+        return !availableTopics || isOverview || availableTopics.has(t.id);
+      })
+      .map((t) => ({ phaseId: p.id, topicId: t.id, title: t.title, phaseTitle: p.shortTitle }))
   );
   const globalIndex = allTopics.findIndex((t) => t.phaseId === phaseId && t.topicId === topicId);
   const rawPrev = globalIndex > 0 ? allTopics[globalIndex - 1] : null;
