@@ -5,11 +5,15 @@ export type DesignFlow = "ASIC" | "FPGA";
 interface DesignFlowContextType {
   flow: DesignFlow;
   setFlow: (flow: DesignFlow) => void;
+  selectedSocId: string | null;
+  setSelectedSocId: (id: string | null) => void;
 }
 
 const DesignFlowContext = createContext<DesignFlowContextType>({
   flow: "ASIC",
   setFlow: () => {},
+  selectedSocId: null,
+  setSelectedSocId: () => {},
 });
 
 export function DesignFlowProvider({ children }: { children: ReactNode }) {
@@ -18,13 +22,26 @@ export function DesignFlowProvider({ children }: { children: ReactNode }) {
     return stored === "FPGA" ? "FPGA" : "ASIC";
   });
 
+  const [selectedSocId, setSelectedSocIdState] = useState<string | null>(() => {
+    return localStorage.getItem("learning-reference-soc") || null;
+  });
+
   const setFlow = (f: DesignFlow) => {
     setFlowState(f);
     localStorage.setItem("learning-design-flow", f);
   };
 
+  const setSelectedSocId = (id: string | null) => {
+    setSelectedSocIdState(id);
+    if (id) {
+      localStorage.setItem("learning-reference-soc", id);
+    } else {
+      localStorage.removeItem("learning-reference-soc");
+    }
+  };
+
   return (
-    <DesignFlowContext.Provider value={{ flow, setFlow }}>
+    <DesignFlowContext.Provider value={{ flow, setFlow, selectedSocId, setSelectedSocId }}>
       {children}
     </DesignFlowContext.Provider>
   );
