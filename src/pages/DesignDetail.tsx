@@ -661,7 +661,7 @@ const DesignDetail = () => {
                     <h3 className="text-sm font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4" /> Last Proven
                     </h3>
-                    {hasFPGA && hasASIC && (
+                    {(hasFPGA || hasASIC) && (
                       <div className="flex rounded-lg overflow-hidden border border-border/60">
                         <button
                           onClick={() => setProvenToggle("FPGA")}
