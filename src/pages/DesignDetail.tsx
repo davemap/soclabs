@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench } from "lucide-react";
 import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { PhaseStepperIcon } from "@/components/PhaseStepperIcon";
@@ -13,6 +13,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import { referenceDesigns, communityProjects, technologies } from "@/data/mockData";
+
+const phaseToolCategoryMap: Record<string, string[]> = {
+  architecture: ["Processors", "DMA Controllers", "System Interconnects", "Bus Protocols", "Peripherals", "Memory Controllers"],
+  rtl: ["RTL Design", "Serial Protocols"],
+  verification: ["Verification"],
+  synthesis: ["Synthesis"],
+  "physical-design": ["Physical Design"],
+  tapeout: ["Tapeout", "Shuttle Services"],
+  "silicon-validation": ["Silicon Validation", "FPGA Boards"],
+};
 import CommunityProjectsCarousel from "@/components/CommunityProjectsCarousel";
 import TechToolsCarousel from "@/components/TechToolsCarousel";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +36,7 @@ const DesignDetail = () => {
   const lastClickRef = useRef<{ flow: DesignFlow; time: number } | null>(null);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
+  const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
     return saved === "hierarchy" ? "hierarchy" : "architecture";
@@ -263,6 +274,17 @@ const DesignDetail = () => {
                   {/* Phase stepper bar */}
                   {(() => {
                     const phases = filterPhasesForFlow(learningPhases, flow);
+                    const selectedPhase = selectedPhaseIndex !== null ? phases[selectedPhaseIndex] : null;
+                    const phaseTools = selectedPhase
+                      ? technologies.filter((t) => {
+                          const cats = phaseToolCategoryMap[selectedPhase.id] || [];
+                          return cats.includes(t.category);
+                        })
+                      : [];
+                    const phaseTasks = selectedPhase
+                      ? selectedPhase.topics.filter((t) => !t.id.endsWith("-overview"))
+                      : [];
+
                     return (
                       <div className="mt-6">
                         <div className="flex items-center gap-2">
@@ -274,16 +296,93 @@ const DesignDetail = () => {
                                   key={phase.id}
                                   phase={phase}
                                   index={i}
-                                  activeIndex={-1}
-                                  onSelect={() => {
-                                    setSelectedSocId(design.id);
-                                    navigate(`/learn?phase=${i}`);
+                                  activeIndex={selectedPhaseIndex ?? -1}
+                                  onSelect={(idx) => {
+                                    setSelectedPhaseIndex((prev) => (prev === idx ? null : idx));
                                   }}
                                 />
                               ))}
                             </div>
                           </div>
                         </div>
+
+                        {/* Expandable phase detail */}
+                        <AnimatePresence>
+                          {selectedPhase && (
+                            <motion.div
+                              key={selectedPhase.id}
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.25, ease: "easeInOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="mt-4 rounded-xl border border-border/60 bg-muted/30 p-5 space-y-5">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <h3 className="text-lg font-display font-bold">{selectedPhase.title}</h3>
+                                    <p className="text-sm text-muted-foreground mt-0.5">{selectedPhase.description}</p>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="rounded-lg shrink-0"
+                                    onClick={() => {
+                                      setSelectedSocId(design.id);
+                                      navigate(`/learn?phase=${selectedPhaseIndex}`);
+                                    }}
+                                  >
+                                    Open in Hub <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                                  </Button>
+                                </div>
+
+                                {/* Tasks */}
+                                <div>
+                                  <h4 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                    Tasks ({phaseTasks.length})
+                                  </h4>
+                                  <div className="grid gap-1.5">
+                                    {phaseTasks.map((task) => (
+                                      <Link
+                                        key={task.id}
+                                        to={`/learn/${selectedPhase.id}/${task.id}`}
+                                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-muted/60 group"
+                                      >
+                                        <ArrowRight className="h-3 w-3 text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <span className="font-medium">{task.title}</span>
+                                        <span className="text-xs text-muted-foreground ml-auto hidden sm:block truncate max-w-[200px]">
+                                          {task.summary}
+                                        </span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Tools */}
+                                {phaseTools.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                      <span className="inline-flex items-center gap-1.5">
+                                        <Wrench className="h-3 w-3" /> Tools & Technologies ({phaseTools.length})
+                                      </span>
+                                    </h4>
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {phaseTools.map((tool) => (
+                                        <Link
+                                          key={tool.id}
+                                          to={`/technologies/${tool.id}`}
+                                          className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-background px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60 hover:border-primary/30"
+                                        >
+                                          {tool.name}
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     );
                   })()}
