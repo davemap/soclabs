@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component, ChevronDown, Plus, Send } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component, ChevronDown, Plus, Send, User, Calendar, FolderOpen } from "lucide-react";
 import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import { getAvailableSocTopics } from "@/data/socTopicContent";
 import { cn } from "@/lib/utils";
@@ -84,10 +84,13 @@ const DesignDetail = () => {
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
   const [provenDialogOpen, setProvenDialogOpen] = useState(false);
+  const [provenDetailEntry, setProvenDetailEntry] = useState<any | null>(null);
   const [provenType, setProvenType] = useState<"FPGA" | "ASIC">("FPGA");
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
   const [provenBoard, setProvenBoard] = useState("");
+  const [provenProjectId, setProvenProjectId] = useState("");
+  const [userProjects, setUserProjects] = useState<any[]>([]);
   const [openProvenSections, setOpenProvenSections] = useState<Set<string>>(new Set());
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
@@ -109,6 +112,18 @@ const DesignDetail = () => {
     };
     fetchProjects();
   }, [design?.name]);
+
+  useEffect(() => {
+    if (!user) { setUserProjects([]); return; }
+    const fetchUserProjects = async () => {
+      const { data } = await supabase
+        .from("projects")
+        .select("id, title")
+        .eq("user_id", user.id);
+      setUserProjects(data || []);
+    };
+    fetchUserProjects();
+  }, [user?.id]);
 
   if (!design) {
     return (
@@ -215,7 +230,12 @@ const DesignDetail = () => {
                             {openProvenSections.has("fpga") && (
                               <div className="px-4 pb-4 pt-1 space-y-2">
                                 {fpgaEntries.map((p) => (
-                                  <div key={p.details} className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5">
+                                  <button
+                                    key={p.details}
+                                    type="button"
+                                    className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5 w-full text-left hover:bg-sky-500/10 transition-colors cursor-pointer"
+                                    onClick={() => setProvenDetailEntry(p)}
+                                  >
                                     <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
                                     <div className="flex flex-col">
                                       <span className="text-xs font-medium text-foreground/80">{p.details}</span>
@@ -223,7 +243,7 @@ const DesignDetail = () => {
                                         <span className="text-[11px] font-semibold text-sky-400">{(p as any).board}</span>
                                       )}
                                     </div>
-                                  </div>
+                                  </button>
                                 ))}
                               </div>
                             )}
@@ -248,10 +268,15 @@ const DesignDetail = () => {
                             {openProvenSections.has("asic") && (
                               <div className="px-4 pb-4 pt-1 space-y-2">
                                 {asicEntries.map((p) => (
-                                  <div key={p.details} className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2">
+                                  <button
+                                    key={p.details}
+                                    type="button"
+                                    className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2 w-full text-left hover:bg-violet-500/10 transition-colors cursor-pointer"
+                                    onClick={() => setProvenDetailEntry(p)}
+                                  >
                                     <Cpu className="h-3.5 w-3.5 text-violet-400 shrink-0" />
                                     <span className="text-xs text-muted-foreground">{p.details}</span>
-                                  </div>
+                                  </button>
                                 ))}
                               </div>
                             )}
@@ -639,6 +664,22 @@ const DesignDetail = () => {
                 />
               </div>
             )}
+            {userProjects.length > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="proven-project">Associated Project (optional)</Label>
+                <Select value={provenProjectId} onValueChange={setProvenProjectId}>
+                  <SelectTrigger id="proven-project">
+                    <SelectValue placeholder="Select a project..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No project</SelectItem>
+                    {userProjects.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="proven-details">Details</Label>
               <Textarea
@@ -661,11 +702,79 @@ const DesignDetail = () => {
                 setProvenPlatform("");
                 setProvenDetails("");
                 setProvenBoard("");
+                setProvenProjectId("");
                 setProvenType("FPGA");
               }}
             >
               <Send className="h-3.5 w-3.5" /> Submit
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Proven entry detail dialog */}
+      <Dialog open={!!provenDetailEntry} onOpenChange={(open) => { if (!open) setProvenDetailEntry(null); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              {provenDetailEntry?.type === "FPGA" ? (
+                <CircuitBoard className="h-5 w-5 text-sky-400" />
+              ) : (
+                <Cpu className="h-5 w-5 text-violet-400" />
+              )}
+              {provenDetailEntry?.type === "FPGA" ? "FPGA Implementation" : "ASIC Fabrication"}
+            </DialogTitle>
+          </DialogHeader>
+          {provenDetailEntry && (
+            <div className="space-y-4 py-2">
+              <div className={cn(
+                "rounded-xl p-4 space-y-3",
+                provenDetailEntry.type === "FPGA" ? "bg-sky-500/5 border border-sky-500/20" : "bg-violet-500/5 border border-violet-500/20"
+              )}>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">{provenDetailEntry.type === "FPGA" ? "Device" : "Process Node"}</p>
+                  <p className="text-sm font-semibold text-foreground">{provenDetailEntry.details}</p>
+                </div>
+                {provenDetailEntry.board && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-0.5">Development Board</p>
+                    <p className="text-sm font-semibold text-sky-400">{provenDetailEntry.board}</p>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-3">
+                {provenDetailEntry.submitter && (
+                  <div className="flex items-center gap-3">
+                    <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Submitted by</p>
+                      <p className="text-sm font-medium text-foreground">{provenDetailEntry.submitter}</p>
+                    </div>
+                  </div>
+                )}
+                {provenDetailEntry.date && (
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Date verified</p>
+                      <p className="text-sm font-medium text-foreground">{new Date(provenDetailEntry.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+                    </div>
+                  </div>
+                )}
+                {provenDetailEntry.projectTitle && (
+                  <div className="flex items-center gap-3">
+                    <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Associated project</p>
+                      <p className="text-sm font-medium text-primary">{provenDetailEntry.projectTitle}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setProvenDetailEntry(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -107,8 +107,8 @@ export const referenceDesigns = [
     version: "1.2.0",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)", board: "Digilent Arty A7-35T" },
-      { type: "FPGA", details: "Intel Cyclone V (5CSEBA6U23I7)", board: "Terasic DE10-Nano" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A35T)", board: "Digilent Arty A7-35T", submitter: "Dr. Sarah Chen", date: "2024-03-15", projectTitle: "NanoSoC FPGA Validation", projectId: "nanosoc-fpga-val" },
+      { type: "FPGA", details: "Intel Cyclone V (5CSEBA6U23I7)", board: "Terasic DE10-Nano", submitter: "Prof. James Okonkwo", date: "2024-06-22", projectTitle: "Cyclone V Accelerator Study", projectId: "cyclone-v-accel" },
     ],
     integrationTime: "2–4 weeks",
     relativeGateCount: "~15K",
@@ -162,8 +162,8 @@ export const referenceDesigns = [
     version: "2.0.1",
     branch: "main",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T" },
-      { type: "ASIC", details: "TSMC 65nm (via Europractice)" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", submitter: "Dr. Maria Lopez", date: "2024-01-10", projectTitle: "MilliSoC FPGA Proto", projectId: "millisoc-fpga-proto" },
+      { type: "ASIC", details: "TSMC 65nm (via Europractice)", submitter: "Prof. Kenji Tanaka", date: "2023-11-28", projectTitle: "65nm Tapeout Run", projectId: "65nm-tapeout" },
     ],
     integrationTime: "4–8 weeks",
     relativeGateCount: "~85K",
@@ -217,8 +217,8 @@ export const referenceDesigns = [
     version: "0.9.0-beta",
     branch: "develop",
     provenIn: [
-      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T" },
-      { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)" },
+      { type: "FPGA", details: "Xilinx Artix-7 (XC7A100T)", board: "Digilent Nexys A7-100T", submitter: "Dr. Anil Sharma", date: "2025-01-05", projectTitle: "MegaSoC FPGA Bring-up", projectId: "megasoc-fpga" },
+      { type: "ASIC", details: "TSMC 16nm finFET (via Europractice)", submitter: "Prof. Emily Wright", date: "2024-09-14", projectTitle: "16nm Advanced Tapeout", projectId: "16nm-tapeout" },
     ],
     integrationTime: "8–16 weeks",
     relativeGateCount: "~350K",
