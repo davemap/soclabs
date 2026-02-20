@@ -661,17 +661,18 @@ const DesignDetail = () => {
                     <h3 className="text-sm font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4" /> Last Proven
                     </h3>
-                    <div className="flex rounded-lg overflow-hidden border border-border/60">
+                    <div className="inline-flex items-center rounded-xl border-2 border-border/60 bg-card p-1 gap-1">
                       {hasFPGA && (
                         <button
                           onClick={() => setProvenToggle("FPGA")}
                           className={cn(
-                            "flex-1 text-xs font-semibold py-1.5 transition-colors",
+                            "flex items-center gap-1.5 font-display font-bold px-3 py-1.5 rounded-lg text-xs transition-all duration-200",
                             (provenToggle || defaultType) === "FPGA"
-                              ? "bg-sky-500 text-white"
-                              : "bg-card text-muted-foreground hover:bg-muted/40"
+                              ? "bg-sky-500/15 text-sky-600 dark:text-sky-400 shadow-md ring-1 ring-sky-500/20"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                           )}
                         >
+                          <CircuitBoard className="h-3.5 w-3.5" />
                           FPGA
                         </button>
                       )}
@@ -679,12 +680,13 @@ const DesignDetail = () => {
                         <button
                           onClick={() => setProvenToggle("ASIC")}
                           className={cn(
-                            "flex-1 text-xs font-semibold py-1.5 transition-colors",
+                            "flex items-center gap-1.5 font-display font-bold px-3 py-1.5 rounded-lg text-xs transition-all duration-200",
                             (provenToggle || defaultType) === "ASIC"
-                              ? "bg-violet-500 text-white"
-                              : "bg-card text-muted-foreground hover:bg-muted/40"
+                              ? "bg-violet-500/15 text-violet-600 dark:text-violet-400 shadow-md ring-1 ring-violet-500/20"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                           )}
                         >
+                          <Cpu className="h-3.5 w-3.5" />
                           ASIC
                         </button>
                       )}
