@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDesignFlow, DesignFlow } from "@/hooks/useDesignFlow";
 import { cn } from "@/lib/utils";
 import { Cpu, CircuitBoard, Layers, ChevronRight, X } from "lucide-react";
@@ -19,6 +19,22 @@ interface DesignFlowToggleProps {
 export default function DesignFlowToggle({ className, size = "default" }: DesignFlowToggleProps) {
   const { flow, setFlow, selectedSocId, setSelectedSocId } = useDesignFlow();
   const [socOpen, setSocOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!socOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        popoverRef.current && !popoverRef.current.contains(e.target as Node) &&
+        toggleRef.current && !toggleRef.current.contains(e.target as Node)
+      ) {
+        setSocOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [socOpen]);
 
   const isCompact = size === "compact";
   const selectedSoc = selectedSocId ? referenceDesigns.find(d => d.id === selectedSocId) : null;
@@ -66,6 +82,7 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
 
           {/* Reference SoC toggle button */}
           <button
+            ref={toggleRef}
             onClick={() => setSocOpen(!socOpen)}
             className={cn(
               "flex items-center gap-1.5 font-display font-bold transition-all duration-200",
@@ -102,6 +119,7 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
         <AnimatePresence>
           {socOpen && !selectedSocId && (
             <motion.div
+              ref={popoverRef}
               initial={{ opacity: 0, y: 4, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 4, scale: 0.95 }}
@@ -119,7 +137,7 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                     setSocOpen(false);
                   }}
                   className={cn(
-                    "w-full font-display font-semibold transition-all duration-150 whitespace-nowrap text-left",
+                    "w-full font-display font-semibold transition-all duration-150 whitespace-nowrap text-center",
                     isCompact
                       ? "px-2.5 py-1.5 rounded-lg text-xs"
                       : "px-4 py-2.5 rounded-lg text-sm",
