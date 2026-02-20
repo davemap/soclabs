@@ -85,7 +85,8 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
               if (selectedSocId) {
                 const now = Date.now();
                 if (now - socClickRef.current < 400) {
-                  navigate(`/designs/${selectedSocId}`);
+                  // Use native navigation so browser scrolls to hash
+                  window.location.href = `/designs/${selectedSocId}#learn-with`;
                   socClickRef.current = 0;
                   return;
                 }

@@ -321,8 +321,8 @@ const DesignDetail = () => {
               </motion.div>
 
               {/* Learn with this SoC */}
-              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-                <div className="rounded-2xl border border-border/60 bg-card p-5 md:p-8">
+              <motion.div id="learn-with" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                <div className="rounded-2xl border border-border/60 bg-card p-5 md:p-8 scroll-mt-24">
                   <div className="flex items-center gap-2 mb-2">
                     <GraduationCap className="h-5 w-5 text-primary" />
                     <h2 className="text-2xl font-display font-bold">Learn with {design.name}</h2>
