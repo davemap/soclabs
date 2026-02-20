@@ -88,6 +88,7 @@ const DesignDetail = () => {
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
   const [provenBoard, setProvenBoard] = useState("");
+  const [openProvenSection, setOpenProvenSection] = useState<"fpga" | "asic" | null>(null);
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
     return saved === "hierarchy" ? "hierarchy" : "architecture";
@@ -196,8 +197,12 @@ const DesignDetail = () => {
                           : "space-y-2"
                       )}>
                         {fpgaEntries.length > 0 && (
-                          <details className="group rounded-xl border border-sky-500/30 bg-sky-500/5 overflow-hidden">
-                            <summary className="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+                          <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 overflow-hidden">
+                            <button
+                              type="button"
+                              className="flex items-center gap-3 p-4 cursor-pointer select-none w-full text-left"
+                              onClick={() => setOpenProvenSection(openProvenSection === "fpga" ? null : "fpga")}
+                            >
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-sky-500/15 text-sky-400 shrink-0">
                                 FPGA
                               </div>
@@ -205,26 +210,32 @@ const DesignDetail = () => {
                                 <p className="text-sm font-semibold text-sky-400">FPGA Implementation</p>
                                 <p className="text-xs text-muted-foreground">{fpgaEntries.length} platform{fpgaEntries.length > 1 ? "s" : ""} verified</p>
                               </div>
-                              <ChevronDown className="h-4 w-4 text-sky-400 transition-transform group-open:rotate-180" />
-                            </summary>
-                            <div className="px-4 pb-4 pt-1 space-y-2">
-                              {fpgaEntries.map((p) => (
-                                <div key={p.details} className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5">
-                                  <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                                  <div className="flex flex-col">
-                                    <span className="text-xs font-medium text-foreground/80">{p.details}</span>
-                                    {(p as any).board && (
-                                      <span className="text-[11px] font-semibold text-sky-400">{(p as any).board}</span>
-                                    )}
+                              <ChevronDown className={cn("h-4 w-4 text-sky-400 transition-transform", openProvenSection === "fpga" && "rotate-180")} />
+                            </button>
+                            {openProvenSection === "fpga" && (
+                              <div className="px-4 pb-4 pt-1 space-y-2">
+                                {fpgaEntries.map((p) => (
+                                  <div key={p.details} className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5">
+                                    <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                                    <div className="flex flex-col">
+                                      <span className="text-xs font-medium text-foreground/80">{p.details}</span>
+                                      {(p as any).board && (
+                                        <span className="text-[11px] font-semibold text-sky-400">{(p as any).board}</span>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
-                          </details>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         )}
                         {asicEntries.length > 0 && (
-                          <details className="group rounded-xl border border-violet-500/30 bg-violet-500/5 overflow-hidden">
-                            <summary className="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+                          <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 overflow-hidden">
+                            <button
+                              type="button"
+                              className="flex items-center gap-3 p-4 cursor-pointer select-none w-full text-left"
+                              onClick={() => setOpenProvenSection(openProvenSection === "asic" ? null : "asic")}
+                            >
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-violet-500/15 text-violet-400 shrink-0">
                                 ASIC
                               </div>
@@ -232,17 +243,19 @@ const DesignDetail = () => {
                                 <p className="text-sm font-semibold text-violet-400">ASIC Fabrication</p>
                                 <p className="text-xs text-muted-foreground">{asicEntries.length} tapeout{asicEntries.length > 1 ? "s" : ""} verified</p>
                               </div>
-                              <ChevronDown className="h-4 w-4 text-violet-400 transition-transform group-open:rotate-180" />
-                            </summary>
-                            <div className="px-4 pb-4 pt-1 space-y-2">
-                              {asicEntries.map((p) => (
-                                <div key={p.details} className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2">
-                                  <Cpu className="h-3.5 w-3.5 text-violet-400 shrink-0" />
-                                  <span className="text-xs text-muted-foreground">{p.details}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </details>
+                              <ChevronDown className={cn("h-4 w-4 text-violet-400 transition-transform", openProvenSection === "asic" && "rotate-180")} />
+                            </button>
+                            {openProvenSection === "asic" && (
+                              <div className="px-4 pb-4 pt-1 space-y-2">
+                                {asicEntries.map((p) => (
+                                  <div key={p.details} className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2">
+                                    <Cpu className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                                    <span className="text-xs text-muted-foreground">{p.details}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
