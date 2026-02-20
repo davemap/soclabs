@@ -23,6 +23,43 @@ const phaseToolCategoryMap: Record<string, string[]> = {
   tapeout: ["Tapeout", "Shuttle Services"],
   "silicon-validation": ["Silicon Validation", "FPGA Boards"],
 };
+
+// Map individual topic IDs to relevant technology IDs
+const topicToolMap: Record<string, string[]> = {
+  "system-partitioning": ["arm-cortex-m0", "arm-cortex-m3"],
+  "bus-architecture": ["amba-interconnect", "ahb-lite", "ahb", "apb", "axi"],
+  "memory-map": ["memory-controllers"],
+  "ip-selection": ["arm-cortex-m0", "arm-cortex-m3", "pl230-dma", "dma-350", "standard-peripherals"],
+  "power-clocking": [],
+  "coding-style": ["verilator-linting"],
+  "fsm-design": ["verilator-linting"],
+  "interface-protocols": ["ahb-lite", "ahb", "apb", "axi", "uart-protocol", "spi-protocol"],
+  "parameterisation": ["verilator-linting"],
+  "dft-insertion": [],
+  "testbench-architecture": ["uvm-cocotb"],
+  "constrained-random": ["uvm-cocotb"],
+  "functional-coverage": ["uvm-cocotb"],
+  "formal-verification": ["uvm-cocotb"],
+  "regression-ci": ["uvm-cocotb"],
+  constraints: ["vivado-quartus", "yosys", "design-compiler-genus"],
+  "synthesis-strategies": ["vivado-quartus", "yosys", "design-compiler-genus"],
+  "timing-closure": ["vivado-quartus", "design-compiler-genus"],
+  "lint-cdc-checks": ["verilator-linting"],
+  floorplanning: ["openroad", "innovus-icc2"],
+  placement: ["openroad", "innovus-icc2"],
+  "clock-tree": ["openroad", "innovus-icc2"],
+  routing: ["openroad", "innovus-icc2"],
+  "power-analysis": ["openroad", "innovus-icc2"],
+  "signoff-checks": ["signoff-tools"],
+  "timing-signoff": ["signoff-tools"],
+  "shuttle-submission": ["shuttle-services"],
+  packaging: [],
+  "bring-up": ["debug-test-tools", "fpga-boards"],
+  "functional-test": ["debug-test-tools"],
+  characterisation: ["debug-test-tools"],
+  "debug-techniques": ["debug-test-tools"],
+  documentation: [],
+};
 import CommunityProjectsCarousel from "@/components/CommunityProjectsCarousel";
 import TechToolsCarousel from "@/components/TechToolsCarousel";
 import { supabase } from "@/integrations/supabase/client";
@@ -274,13 +311,7 @@ const DesignDetail = () => {
                   {/* Phase stepper bar */}
                   {(() => {
                     const phases = filterPhasesForFlow(learningPhases, flow);
-                    const selectedPhase = selectedPhaseIndex !== null ? phases[selectedPhaseIndex] : null;
-                    const phaseTools = selectedPhase
-                      ? technologies.filter((t) => {
-                          const cats = phaseToolCategoryMap[selectedPhase.id] || [];
-                          return cats.includes(t.category);
-                        })
-                      : [];
+                     const selectedPhase = selectedPhaseIndex !== null ? phases[selectedPhaseIndex] : null;
                     const phaseTasks = selectedPhase
                       ? selectedPhase.topics.filter((t) => !t.id.endsWith("-overview"))
                       : [];
@@ -317,8 +348,9 @@ const DesignDetail = () => {
                               transition={{ duration: 0.25, ease: "easeInOut" }}
                               className="overflow-hidden"
                             >
-                              <div className="mt-4 rounded-xl border border-border/60 bg-muted/30 p-5 space-y-5">
-                                <div className="flex items-center justify-between">
+                              <div className="mt-4 space-y-3">
+                                {/* Phase header card */}
+                                <div className="rounded-xl border border-border/60 bg-muted/30 p-4 flex items-center justify-between gap-4">
                                   <div>
                                     <h3 className="text-lg font-display font-bold">{selectedPhase.title}</h3>
                                     <p className="text-sm text-muted-foreground mt-0.5">{selectedPhase.description}</p>
@@ -336,49 +368,52 @@ const DesignDetail = () => {
                                   </Button>
                                 </div>
 
-                                {/* Tasks */}
-                                <div>
-                                  <h4 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                    Tasks ({phaseTasks.length})
-                                  </h4>
-                                  <div className="grid gap-1.5">
-                                    {phaseTasks.map((task) => (
+                                {/* Task cards */}
+                                <div className="grid gap-2">
+                                  {phaseTasks.map((task) => {
+                                    const toolIds = topicToolMap[task.id] || [];
+                                    const taskTools = technologies.filter((t) => toolIds.includes(t.id));
+                                    return (
                                       <Link
                                         key={task.id}
                                         to={`/learn/${selectedPhase.id}/${task.id}`}
-                                        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-muted/60 group"
+                                        className="rounded-xl border border-border/60 bg-card p-4 transition-colors hover:border-primary/30 hover:bg-muted/20 group block"
                                       >
-                                        <ArrowRight className="h-3 w-3 text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <span className="font-medium">{task.title}</span>
-                                        <span className="text-xs text-muted-foreground ml-auto hidden sm:block truncate max-w-[200px]">
-                                          {task.summary}
-                                        </span>
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div className="min-w-0">
+                                            <div className="flex items-center gap-2">
+                                              <ArrowRight className="h-3.5 w-3.5 text-primary shrink-0 opacity-0 group-hover:opacity-100 transition-opacity -ml-0.5" />
+                                              <span className="font-display font-semibold text-sm">{task.title}</span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2 pl-5">
+                                              {task.summary}
+                                            </p>
+                                          </div>
+                                          {task.effort && (
+                                            <div className="flex items-center gap-2 shrink-0">
+                                              <Badge variant="outline" className="text-[10px] px-1.5 py-0.5">
+                                                Effort {task.effort}/5
+                                              </Badge>
+                                            </div>
+                                          )}
+                                        </div>
+                                        {taskTools.length > 0 && (
+                                          <div className="flex flex-wrap gap-1.5 mt-3 pl-5">
+                                            {taskTools.map((tool) => (
+                                              <span
+                                                key={tool.id}
+                                                className="inline-flex items-center gap-1 rounded-md border border-border/50 bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                                              >
+                                                <Wrench className="h-2.5 w-2.5" />
+                                                {tool.name}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
                                       </Link>
-                                    ))}
-                                  </div>
+                                    );
+                                  })}
                                 </div>
-
-                                {/* Tools */}
-                                {phaseTools.length > 0 && (
-                                  <div>
-                                    <h4 className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                                      <span className="inline-flex items-center gap-1.5">
-                                        <Wrench className="h-3 w-3" /> Tools & Technologies ({phaseTools.length})
-                                      </span>
-                                    </h4>
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {phaseTools.map((tool) => (
-                                        <Link
-                                          key={tool.id}
-                                          to={`/technologies/${tool.id}`}
-                                          className="inline-flex items-center gap-1.5 rounded-lg border border-border/60 bg-background px-2.5 py-1.5 text-xs font-medium transition-colors hover:bg-muted/60 hover:border-primary/30"
-                                        >
-                                          {tool.name}
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             </motion.div>
                           )}
