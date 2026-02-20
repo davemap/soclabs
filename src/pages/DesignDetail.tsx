@@ -87,6 +87,7 @@ const DesignDetail = () => {
   const [provenDetailEntry, setProvenDetailEntry] = useState<any | null>(null);
   const [provenValidationIdx, setProvenValidationIdx] = useState(0);
   const [provenType, setProvenType] = useState<"FPGA" | "ASIC">("FPGA");
+  const [provenToggle, setProvenToggle] = useState<"FPGA" | "ASIC" | null>(null);
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
   const [provenBoard, setProvenBoard] = useState("");
@@ -649,12 +650,43 @@ const DesignDetail = () => {
                   (p.validations || []).map((v: any) => ({ ...v, type: p.type, details: p.details, board: p.board }))
                 );
                 if (allValidations.length === 0) return null;
-                const latest = allValidations.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                const hasFPGA = allValidations.some((v: any) => v.type === "FPGA");
+                const hasASIC = allValidations.some((v: any) => v.type === "ASIC");
+                const defaultType = hasFPGA ? "FPGA" : "ASIC";
+                const filtered = allValidations.filter((v: any) => v.type === (provenToggle || defaultType));
+                const latest = filtered.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                if (!latest) return null;
                 return (
                   <div className="mt-3 rounded-xl border border-border/60 bg-card p-4 space-y-2.5 shadow-sm">
                     <h3 className="text-sm font-display font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4" /> Last Proven
                     </h3>
+                    {hasFPGA && hasASIC && (
+                      <div className="flex rounded-lg overflow-hidden border border-border/60">
+                        <button
+                          onClick={() => setProvenToggle("FPGA")}
+                          className={cn(
+                            "flex-1 text-xs font-semibold py-1.5 transition-colors",
+                            (provenToggle || defaultType) === "FPGA"
+                              ? "bg-sky-500 text-white"
+                              : "bg-card text-muted-foreground hover:bg-muted/40"
+                          )}
+                        >
+                          FPGA
+                        </button>
+                        <button
+                          onClick={() => setProvenToggle("ASIC")}
+                          className={cn(
+                            "flex-1 text-xs font-semibold py-1.5 transition-colors",
+                            (provenToggle || defaultType) === "ASIC"
+                              ? "bg-violet-500 text-white"
+                              : "bg-card text-muted-foreground hover:bg-muted/40"
+                          )}
+                        >
+                          ASIC
+                        </button>
+                      </div>
+                    )}
                     <div className="text-sm space-y-2.5">
                       <div>
                         <p className="text-muted-foreground text-xs">{latest.type === "FPGA" ? "Device" : "Process"}</p>
