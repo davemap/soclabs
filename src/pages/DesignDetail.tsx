@@ -88,7 +88,7 @@ const DesignDetail = () => {
   const [provenPlatform, setProvenPlatform] = useState("");
   const [provenDetails, setProvenDetails] = useState("");
   const [provenBoard, setProvenBoard] = useState("");
-  const [openProvenSection, setOpenProvenSection] = useState<"fpga" | "asic" | null>(null);
+  const [openProvenSections, setOpenProvenSections] = useState<Set<string>>(new Set());
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
     return saved === "hierarchy" ? "hierarchy" : "architecture";
@@ -201,7 +201,7 @@ const DesignDetail = () => {
                             <button
                               type="button"
                               className="flex items-center gap-3 p-4 cursor-pointer select-none w-full text-left"
-                              onClick={() => setOpenProvenSection(openProvenSection === "fpga" ? null : "fpga")}
+                              onClick={() => setOpenProvenSections(prev => { const next = new Set(prev); next.has("fpga") ? next.delete("fpga") : next.add("fpga"); return next; })}
                             >
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-sky-500/15 text-sky-400 shrink-0">
                                 FPGA
@@ -210,9 +210,9 @@ const DesignDetail = () => {
                                 <p className="text-sm font-semibold text-sky-400">FPGA Implementation</p>
                                 <p className="text-xs text-muted-foreground">{fpgaEntries.length} platform{fpgaEntries.length > 1 ? "s" : ""} verified</p>
                               </div>
-                              <ChevronDown className={cn("h-4 w-4 text-sky-400 transition-transform", openProvenSection === "fpga" && "rotate-180")} />
+                              <ChevronDown className={cn("h-4 w-4 text-sky-400 transition-transform", openProvenSections.has("fpga") && "rotate-180")} />
                             </button>
-                            {openProvenSection === "fpga" && (
+                            {openProvenSections.has("fpga") && (
                               <div className="px-4 pb-4 pt-1 space-y-2">
                                 {fpgaEntries.map((p) => (
                                   <div key={p.details} className="flex items-center gap-2.5 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2.5">
@@ -234,7 +234,7 @@ const DesignDetail = () => {
                             <button
                               type="button"
                               className="flex items-center gap-3 p-4 cursor-pointer select-none w-full text-left"
-                              onClick={() => setOpenProvenSection(openProvenSection === "asic" ? null : "asic")}
+                              onClick={() => setOpenProvenSections(prev => { const next = new Set(prev); next.has("asic") ? next.delete("asic") : next.add("asic"); return next; })}
                             >
                               <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-violet-500/15 text-violet-400 shrink-0">
                                 ASIC
@@ -243,9 +243,9 @@ const DesignDetail = () => {
                                 <p className="text-sm font-semibold text-violet-400">ASIC Fabrication</p>
                                 <p className="text-xs text-muted-foreground">{asicEntries.length} tapeout{asicEntries.length > 1 ? "s" : ""} verified</p>
                               </div>
-                              <ChevronDown className={cn("h-4 w-4 text-violet-400 transition-transform", openProvenSection === "asic" && "rotate-180")} />
+                              <ChevronDown className={cn("h-4 w-4 text-violet-400 transition-transform", openProvenSections.has("asic") && "rotate-180")} />
                             </button>
-                            {openProvenSection === "asic" && (
+                            {openProvenSections.has("asic") && (
                               <div className="px-4 pb-4 pt-1 space-y-2">
                                 {asicEntries.map((p) => (
                                   <div key={p.details} className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2">
