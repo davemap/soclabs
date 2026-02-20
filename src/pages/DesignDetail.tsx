@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component } from "lucide-react";
+import { Cpu, ArrowRight, Github, ArrowLeft, CheckCircle2, Tag, GitBranch, BookOpen, Layers, FolderTree, CircuitBoard, GraduationCap, ChevronLeft, ChevronRight, Wrench, Component, ChevronDown, Plus, Send } from "lucide-react";
 import { useDesignFlow, DesignFlow, filterPhasesForFlow } from "@/hooks/useDesignFlow";
 import { getAvailableSocTopics } from "@/data/socTopicContent";
 import { cn } from "@/lib/utils";
@@ -12,8 +12,15 @@ import InteractiveHierarchyDiagram from "@/components/InteractiveHierarchyDiagra
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import Layout from "@/components/Layout";
 import { referenceDesigns, communityProjects, technologies } from "@/data/mockData";
+import { useAuth } from "@/hooks/useAuth";
 
 const phaseToolCategoryMap: Record<string, string[]> = {
   architecture: ["Processors", "DMA Controllers", "System Interconnects", "Bus Protocols", "Peripherals", "Memory Controllers"],
@@ -70,11 +77,16 @@ const DesignDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { flow, setFlow, setSelectedSocId } = useDesignFlow();
+  const { user } = useAuth();
   const design = referenceDesigns.find((d) => d.id === id);
   const lastClickRef = useRef<{ flow: DesignFlow; time: number } | null>(null);
 
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [selectedPhaseIndex, setSelectedPhaseIndex] = useState<number | null>(null);
+  const [provenDialogOpen, setProvenDialogOpen] = useState(false);
+  const [provenType, setProvenType] = useState<"FPGA" | "ASIC">("FPGA");
+  const [provenPlatform, setProvenPlatform] = useState("");
+  const [provenDetails, setProvenDetails] = useState("");
   const [diagramView, setDiagramView] = useState<"architecture" | "hierarchy">(() => {
     const saved = sessionStorage.getItem(`diagram-view-${id}`);
     return saved === "hierarchy" ? "hierarchy" : "architecture";
@@ -149,42 +161,83 @@ const DesignDetail = () => {
                     <Badge key={t} variant="outline">{t}</Badge>
                   ))}
                 </div>
-                {design.provenIn && design.provenIn.length > 0 && (
-                  <div className="mt-6 rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="p-2 rounded-lg bg-emerald-500/15">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                      </div>
-                      <h3 className="text-lg font-display font-bold text-emerald-400">Silicon Proven</h3>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      {design.provenIn.map((p) => (
-                        <div
-                          key={p.details}
-                          className={`flex items-center gap-3 rounded-xl border p-4 ${
-                            p.type === "ASIC"
-                              ? "border-violet-500/30 bg-violet-500/5"
-                              : "border-sky-500/30 bg-sky-500/5"
-                          }`}
-                        >
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold ${
-                            p.type === "ASIC"
-                              ? "bg-violet-500/15 text-violet-400"
-                              : "bg-sky-500/15 text-sky-400"
-                          }`}>
-                            {p.type}
+                {design.provenIn && design.provenIn.length > 0 && (() => {
+                  const asicEntries = design.provenIn.filter(p => p.type === "ASIC");
+                  const fpgaEntries = design.provenIn.filter(p => p.type === "FPGA");
+                  return (
+                    <div className="mt-6 rounded-2xl border-2 border-emerald-500/30 bg-emerald-500/5 p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-lg bg-emerald-500/15">
+                            <CheckCircle2 className="h-5 w-5 text-emerald-400" />
                           </div>
-                          <div>
-                            <p className={`text-sm font-semibold ${
-                              p.type === "ASIC" ? "text-violet-400" : "text-sky-400"
-                            }`}>{p.type} Fabrication</p>
-                            <p className="text-xs text-muted-foreground">{p.details}</p>
-                          </div>
+                          <h3 className="text-lg font-display font-bold text-emerald-400">Silicon Proven</h3>
                         </div>
-                      ))}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300 gap-1.5"
+                          onClick={() => {
+                            if (!user) {
+                              toast.error("Please sign in to submit a proof", { description: "You need to be signed in so we can contact you." });
+                              navigate("/auth");
+                              return;
+                            }
+                            setProvenDialogOpen(true);
+                          }}
+                        >
+                          <Plus className="h-3.5 w-3.5" /> I've proven this
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {fpgaEntries.length > 0 && (
+                          <details className="group rounded-xl border border-sky-500/30 bg-sky-500/5 overflow-hidden">
+                            <summary className="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-sky-500/15 text-sky-400 shrink-0">
+                                FPGA
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-semibold text-sky-400">FPGA Implementation</p>
+                                <p className="text-xs text-muted-foreground">{fpgaEntries.length} platform{fpgaEntries.length > 1 ? "s" : ""} verified</p>
+                              </div>
+                              <ChevronDown className="h-4 w-4 text-sky-400 transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="px-4 pb-4 pt-1 space-y-2">
+                              {fpgaEntries.map((p) => (
+                                <div key={p.details} className="flex items-center gap-2 rounded-lg bg-sky-500/5 border border-sky-500/15 px-3 py-2">
+                                  <CircuitBoard className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+                                  <span className="text-xs text-muted-foreground">{p.details}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                        {asicEntries.length > 0 && (
+                          <details className="group rounded-xl border border-violet-500/30 bg-violet-500/5 overflow-hidden">
+                            <summary className="flex items-center gap-3 p-4 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden">
+                              <div className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-display font-bold bg-violet-500/15 text-violet-400 shrink-0">
+                                ASIC
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-semibold text-violet-400">ASIC Fabrication</p>
+                                <p className="text-xs text-muted-foreground">{asicEntries.length} tapeout{asicEntries.length > 1 ? "s" : ""} verified</p>
+                              </div>
+                              <ChevronDown className="h-4 w-4 text-violet-400 transition-transform group-open:rotate-180" />
+                            </summary>
+                            <div className="px-4 pb-4 pt-1 space-y-2">
+                              {asicEntries.map((p) => (
+                                <div key={p.details} className="flex items-center gap-2 rounded-lg bg-violet-500/5 border border-violet-500/15 px-3 py-2">
+                                  <Cpu className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                                  <span className="text-xs text-muted-foreground">{p.details}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
               </motion.div>
 
               <div className="max-w-4xl space-y-12">
@@ -521,6 +574,66 @@ const DesignDetail = () => {
           </div>
         </div>
       </section>
+      {/* Proven submission dialog */}
+      <Dialog open={provenDialogOpen} onOpenChange={setProvenDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Submit Silicon Proof</DialogTitle>
+            <DialogDescription>
+              Tell us how you've proven {design?.name}. We'll review your submission and contact you to verify.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="proven-type">Technology</Label>
+              <Select value={provenType} onValueChange={(v) => setProvenType(v as "FPGA" | "ASIC")}>
+                <SelectTrigger id="proven-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FPGA">FPGA Implementation</SelectItem>
+                  <SelectItem value="ASIC">ASIC Fabrication</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="proven-platform">Platform / Process</Label>
+              <Input
+                id="proven-platform"
+                placeholder={provenType === "FPGA" ? "e.g. Xilinx Artix-7 (XC7A35T)" : "e.g. TSMC 65nm (via Europractice)"}
+                value={provenPlatform}
+                onChange={(e) => setProvenPlatform(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="proven-details">Details</Label>
+              <Textarea
+                id="proven-details"
+                placeholder="Describe your implementation — what modifications were made, any issues encountered, performance results, etc."
+                rows={4}
+                value={provenDetails}
+                onChange={(e) => setProvenDetails(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setProvenDialogOpen(false)}>Cancel</Button>
+            <Button
+              className="gap-1.5"
+              disabled={!provenPlatform.trim()}
+              onClick={() => {
+                toast.success("Proof submitted!", { description: "We'll review your submission and get in touch." });
+                setProvenDialogOpen(false);
+                setProvenPlatform("");
+                setProvenDetails("");
+                setProvenType("FPGA");
+              }}
+            >
+              <Send className="h-3.5 w-3.5" /> Submit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
