@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle, Users } from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowRight, BookOpen, Cpu, Flame, HelpCircle, Users, CheckCircle2 } from "lucide-react";
 import { learningPhases } from "@/data/mockData";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import { projectTopicRatings } from "@/data/projectTopicRatings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useDesignFlow, filterPhasesForFlow, asicOnlyPhases } from "@/hooks/useDesignFlow";
 import DesignFlowToggle from "@/components/DesignFlowToggle";
+import { getSocTopicContent } from "@/data/socTopicContent";
+import { referenceDesigns } from "@/data/mockData";
 
 const effortColors = [
   "bg-emerald-500", "bg-lime-500", "bg-amber-500", "bg-orange-500", "bg-red-500",
@@ -98,8 +100,16 @@ const weightedAvg = (values: number[]): number => {
 const LearningTopicDetail = () => {
   const navigate = useNavigate();
   const { phaseId, topicId } = useParams();
-  const { flow } = useDesignFlow();
+  const { flow, selectedSocId } = useDesignFlow();
   const phases = useMemo(() => filterPhasesForFlow(learningPhases, flow), [flow]);
+  const socContent = useMemo(() => {
+    if (!selectedSocId || !topicId) return null;
+    return getSocTopicContent(selectedSocId, topicId);
+  }, [selectedSocId, topicId]);
+  const socDesign = useMemo(() => {
+    if (!selectedSocId) return null;
+    return referenceDesigns.find((d) => d.id === selectedSocId) ?? null;
+  }, [selectedSocId]);
 
   const phase = phases.find((p) => p.id === phaseId);
   const topicIndex = phase?.topics.findIndex((t) => t.id === topicId) ?? -1;
@@ -346,6 +356,65 @@ const LearningTopicDetail = () => {
                   {topic.content}
                 </div>
               </motion.div>
+
+              {/* SoC-specific content — shown when a reference SoC is selected */}
+              {socContent && socDesign && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="mb-12"
+                >
+                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/[0.03] p-6 md:p-8">
+                    <div className="flex items-center gap-2.5 mb-4">
+                      <div className="p-1.5 rounded-lg bg-emerald-500/15">
+                        <Cpu className="h-4 w-4 text-emerald-500" />
+                      </div>
+                      <h3 className="text-base font-display font-bold text-emerald-400">
+                        {socContent.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line mb-5">
+                      {socContent.content}
+                    </p>
+
+                    {socContent.keyFiles && socContent.keyFiles.length > 0 && (
+                      <div className="mb-5">
+                        <h4 className="text-xs font-display font-semibold text-foreground/70 uppercase tracking-wider mb-2">
+                          Key Files
+                        </h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {socContent.keyFiles.map((f) => (
+                            <code
+                              key={f}
+                              className="text-[11px] px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-mono"
+                            >
+                              {f}
+                            </code>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {socContent.tips && socContent.tips.length > 0 && (
+                      <div>
+                        <h4 className="text-xs font-display font-semibold text-foreground/70 uppercase tracking-wider mb-2">
+                          Tips for {socDesign.name}
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {socContent.tips.map((tip, i) => (
+                            <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                              {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Project completions — non-overview topics only */}
               {!topic.id.endsWith("-overview") && (() => {
