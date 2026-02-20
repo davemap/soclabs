@@ -87,19 +87,19 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
           </button>
         </div>
 
-        {/* SoC options – slides out from the right side */}
+        {/* SoC options – drops down below the bar */}
         <AnimatePresence>
           {socOpen && !selectedSocId && (
             <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="overflow-hidden"
+              className="absolute right-0 top-full mt-1 z-50 overflow-hidden"
             >
               <div className={cn(
-                "flex items-center gap-1 border-2 border-border/60 border-l-0 bg-card shadow-sm",
-                isCompact ? "p-1 rounded-r-xl" : "p-1.5 rounded-r-2xl"
+                "flex flex-col gap-0.5 border-2 border-border/60 bg-card shadow-lg",
+                isCompact ? "p-1 rounded-xl" : "p-1.5 rounded-2xl"
               )}>
                 {referenceDesigns.map((soc) => (
                   <button
@@ -109,10 +109,10 @@ export default function DesignFlowToggle({ className, size = "default" }: Design
                       setSocOpen(false);
                     }}
                     className={cn(
-                      "flex items-center gap-1.5 font-display font-semibold transition-all duration-150 whitespace-nowrap",
+                      "flex items-center gap-2 font-display font-semibold transition-all duration-150 whitespace-nowrap",
                       isCompact
                         ? "px-2.5 py-1.5 rounded-lg text-xs"
-                        : "px-3.5 py-2 rounded-xl text-sm",
+                        : "px-4 py-2.5 rounded-xl text-sm",
                       "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                     )}
                   >
