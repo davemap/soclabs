@@ -48,14 +48,17 @@ const PhaseStepperIcon = ({
   }, []);
 
   const iconContent = (
-    <div className="relative w-10 h-10 rounded-xl">
+    <div className={cn(
+      "relative w-10 h-10 rounded-xl transition-transform duration-200",
+      index === activeIndex && "scale-125"
+    )}>
       {/* Opaque background layer to block the track line */}
       <div className="absolute inset-0 rounded-xl bg-background" />
       <div
         className={cn(
           "relative w-full h-full rounded-xl flex items-center justify-center border-2 transition-all",
           index === activeIndex
-            ? "border-primary bg-primary/15 shadow-md shadow-primary/20"
+            ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/30"
             : index < activeIndex
             ? "border-primary bg-primary/10"
             : "border-border"
@@ -92,7 +95,10 @@ const PhaseStepperIcon = ({
           )}
         >
           {iconContent}
-          <span className="text-xs font-display font-medium hidden sm:block">{phase.shortTitle}</span>
+          <span className={cn(
+            "text-xs font-display font-medium hidden sm:block transition-all",
+            index === activeIndex && "font-bold"
+          )}>{phase.shortTitle}</span>
         </button>
       ) : (
         <Link
