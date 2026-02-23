@@ -304,7 +304,10 @@ const ProjectDetail = () => {
   const hasUnpublishedChanges = useMemo(() => {
     if (!dbProject) return false;
     if (!dbProject.published_at) return true; // never published
-    return new Date(dbProject.updated_at) > new Date(dbProject.published_at);
+    // Allow 2s tolerance for DB trigger timing on the publish update itself
+    const updatedMs = new Date(dbProject.updated_at).getTime();
+    const publishedMs = new Date(dbProject.published_at).getTime();
+    return updatedMs - publishedMs > 2000;
   }, [dbProject]);
 
   const handlePublish = async () => {
@@ -339,12 +342,14 @@ const ProjectDetail = () => {
     const { error } = await supabase.from("projects").update({
       published_at: now,
       published_data: snapshot,
+      updated_at: now,
     } as any).eq("id", dbProject.id);
 
     if (error) toast.error("Failed to publish");
     else {
       toast.success("Project published!");
-      setDbProject((prev: any) => prev ? { ...prev, published_at: now, published_data: snapshot } : prev);
+      // Refetch from DB to get authoritative timestamps
+      await refreshDbProject();
 
       // Commit snapshot to GitLab in the background
       supabase.functions.invoke("commit-to-gitlab", {
