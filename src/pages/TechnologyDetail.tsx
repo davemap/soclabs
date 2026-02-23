@@ -100,9 +100,17 @@ const TechnologyDetail = () => {
   const linkedSlugs = linkedInterests.map((i) => i.slug);
 
   // Find members interested in this technology
-  const interestedMembers = communityMembers.filter((m) =>
-    m.interests?.some((slug: string) => linkedSlugs.includes(slug))
-  );
+  const interestedMembers = communityMembers
+    .filter((m) => m.interests?.some((slug: string) => linkedSlugs.includes(slug)))
+    .sort((a, b) => {
+      // Members with matching expertise come first
+      const expertiseStrings = linkedInterests.flatMap((i) => i.relatedMemberExpertise);
+      const aHasExpertise = a.expertise.some((e) => expertiseStrings.includes(e));
+      const bHasExpertise = b.expertise.some((e) => expertiseStrings.includes(e));
+      if (aHasExpertise && !bHasExpertise) return -1;
+      if (!aHasExpertise && bHasExpertise) return 1;
+      return 0;
+    });
 
   // Find reference SoCs that list this technology
   const relatedDesigns = referenceDesigns.filter(
@@ -271,7 +279,7 @@ const TechnologyDetail = () => {
                     className="flex items-center gap-2 mb-6"
                   >
                     <Users className={cn("h-5 w-5", accentColor)} />
-                    <h2 className="text-2xl font-display font-bold">People Interested</h2>
+                    <h2 className="text-2xl font-display font-bold">Interested People</h2>
                     <span className="text-sm text-muted-foreground ml-1">({interestedMembers.length})</span>
                   </motion.div>
 
@@ -301,11 +309,20 @@ const TechnologyDetail = () => {
                                 </div>
                                 <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
                                 <div className="flex flex-wrap gap-1 mb-3">
-                                  {member.expertise.map((e) => (
-                                    <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
-                                      {e}
-                                    </span>
-                                  ))}
+                                  {member.expertise.map((e) => {
+                                    const expertiseStrings = linkedInterests.flatMap((i) => i.relatedMemberExpertise);
+                                    const isExpert = expertiseStrings.includes(e);
+                                    return (
+                                      <span key={e} className={cn(
+                                        "text-xs px-2 py-0.5 rounded-full font-medium",
+                                        isExpert
+                                          ? cn("ring-1 ring-offset-1 ring-offset-background", bgColor, accentColor, `ring-current`)
+                                          : "bg-secondary text-secondary-foreground"
+                                      )}>
+                                        {isExpert && "★ "}{e}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                                 <div className="flex flex-wrap gap-1">
                                   {member.projects.map((p) => (
