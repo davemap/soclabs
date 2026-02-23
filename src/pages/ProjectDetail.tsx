@@ -310,12 +310,40 @@ const ProjectDetail = () => {
     if (!dbProject) return;
     setPublishing(true);
     const now = new Date().toISOString();
-    const { error } = await supabase.from("projects").update({ published_at: now } as any).eq("id", dbProject.id);
+
+    // Fetch latest content & milestones for the snapshot
+    const { data: contentData } = await supabase.from("project_content").select("*").eq("project_id", dbProject.id).order("sort_order");
+    const { data: milestoneData } = await supabase.from("project_milestones").select("*").eq("project_id", dbProject.id).order("sort_order");
+    const { data: phaseData } = await supabase.from("project_phase_completions").select("*").eq("project_id", dbProject.id);
+
+    const snapshot = {
+      title: dbProject.title,
+      description: dbProject.description,
+      status: dbProject.status,
+      target_technology: dbProject.target_technology,
+      fpga_family: dbProject.fpga_family,
+      asic_process: dbProject.asic_process,
+      timeframe: dbProject.timeframe,
+      github_url: dbProject.github_url,
+      docs_url: dbProject.docs_url,
+      image_url: dbProject.image_url,
+      interests: dbProject.interests,
+      technologies: dbProject.technologies,
+      organisations: dbProject.organisations,
+      content: contentData || [],
+      milestones: milestoneData || [],
+      phase_completions: phaseData || [],
+    };
+
+    const { error } = await supabase.from("projects").update({
+      published_at: now,
+      published_data: snapshot,
+    } as any).eq("id", dbProject.id);
+
     if (error) toast.error("Failed to publish");
     else {
       toast.success("Project published!");
-      // Update local state immediately so indicator clears
-      setDbProject((prev: any) => prev ? { ...prev, published_at: now } : prev);
+      setDbProject((prev: any) => prev ? { ...prev, published_at: now, published_data: snapshot } : prev);
     }
     setPublishing(false);
   };
@@ -637,14 +665,33 @@ const ProjectDetail = () => {
     const dbRefSoc = referenceDesigns.find((d) => d.id === dbProject.reference_soc);
     const isOwner = user?.id === dbProject.user_id;
 
+    // For non-owners, show published snapshot if available
+    const pub = (!isOwner && dbProject.published_data) ? dbProject.published_data : null;
+    const viewTitle = pub?.title ?? dbProject.title;
+    const viewDesc = pub?.description ?? dbProject.description;
+    const viewStatus = pub?.status ?? dbProject.status;
+    const viewTech = pub?.target_technology ?? dbProject.target_technology;
+    const viewFpga = pub?.fpga_family ?? dbProject.fpga_family;
+    const viewAsic = pub?.asic_process ?? dbProject.asic_process;
+    const viewTimeframe = pub?.timeframe ?? dbProject.timeframe;
+    const viewGithub = pub?.github_url ?? dbProject.github_url;
+    const viewDocs = pub?.docs_url ?? dbProject.docs_url;
+    const viewImage = pub?.image_url ?? dbProject.image_url;
+    const viewInterests = pub?.interests ?? dbProject.interests;
+    const viewOrganisations = pub?.organisations ?? dbProject.organisations;
+    const viewContent = pub?.content ?? dbContent;
+    const viewMilestones = pub?.milestones ?? dbMilestones;
+    const viewPhaseCompletions = pub?.phase_completions ?? dbPhaseCompletions;
+
     // Compute milestone progress for tracker — always show all phases, default to 0%
     const defaultPhases = ["architecture", "rtl", "verification", "synthesis", "physical-design", "tapeout", "silicon-validation"];
     const milestonePhaseProgress: Record<string, number> = {};
     defaultPhases.forEach((phase) => { milestonePhaseProgress[phase] = 0; });
-    if (dbMilestones.length > 0) {
-      const phases = [...new Set(dbMilestones.map((m: any) => m.phase))];
-      phases.forEach((phase) => {
-        const phaseTasks = dbMilestones.filter((m: any) => m.phase === phase);
+    const milestonesForProgress: any[] = isOwner ? dbMilestones : viewMilestones;
+    if (milestonesForProgress.length > 0) {
+      const phases: string[] = [...new Set(milestonesForProgress.map((m: any) => m.phase as string))];
+      phases.forEach((phase: string) => {
+        const phaseTasks = milestonesForProgress.filter((m: any) => m.phase === phase);
         const done = phaseTasks.filter((m: any) => m.done).length;
         milestonePhaseProgress[phase] = Math.round((done / phaseTasks.length) * 100);
       });
@@ -700,14 +747,27 @@ const ProjectDetail = () => {
               </div>
             </motion.div>
 
+            {/* Draft banner for owner when not in edit mode */}
+            {isOwner && !editMode && hasUnpublishedChanges && (
+              <div className="mb-4 rounded-xl border border-amber-500/30 bg-amber-500/5 px-5 py-3 flex items-center gap-3">
+                <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+                <p className="text-sm text-muted-foreground flex-1">
+                  You have unpublished changes. Visitors see your last published version.
+                </p>
+                <Button size="sm" variant="outline" className="rounded-full shrink-0" onClick={() => setEditMode(true)}>
+                  Edit & Publish
+                </Button>
+              </div>
+            )}
+
             <div className="flex gap-8">
               <div className="flex-1 min-w-0">
 
             <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <Badge variant="outline" className={statusColor(dbProject.status)}>{dbProject.status}</Badge>
+                <Badge variant="outline" className={statusColor(viewStatus)}>{viewStatus}</Badge>
                 {dbRefSoc && <Badge variant="outline">{dbRefSoc.name}</Badge>}
-                {dbProject.target_technology && <Badge variant="outline">{dbProject.target_technology}</Badge>}
+                {viewTech && <Badge variant="outline">{viewTech}</Badge>}
               </div>
 
               {editMode && isOwner ? (
@@ -723,7 +783,7 @@ const ProjectDetail = () => {
                   </Button>
                 </div>
               ) : (
-                <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{dbProject.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">{viewTitle}</h1>
               )}
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
@@ -739,9 +799,9 @@ const ProjectDetail = () => {
                 </span>
               </div>
 
-              {dbProject.interests?.length > 0 && (
+              {viewInterests?.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                  {dbProject.interests.map((tag: string) => (
+                  {viewInterests.map((tag: string) => (
                     <span key={tag} className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
                       <Tag className="h-2.5 w-2.5" />{tag}
                     </span>
@@ -764,8 +824,8 @@ const ProjectDetail = () => {
                     </Button>
                   </div>
                 </div>
-              ) : dbProject.description ? (
-                <p className="text-lg text-muted-foreground leading-relaxed mb-1">{dbProject.description}</p>
+              ) : viewDesc ? (
+                <p className="text-lg text-muted-foreground leading-relaxed mb-1">{viewDesc}</p>
               ) : null}
 
               <div className="flex flex-wrap gap-3 mt-2">
@@ -786,9 +846,9 @@ const ProjectDetail = () => {
             <div className="mb-2">
               <MilestoneTracker
                 phaseProgress={milestonePhaseProgress}
-                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                milestones={milestonesForProgress.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
                 onPhaseClick={handlePhaseClick}
-                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                technology={(isOwner ? dbProject.target_technology : viewTech)?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
                 isFloating={false}
                 isSticky={false}
               />
@@ -801,11 +861,11 @@ const ProjectDetail = () => {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-4">
                 <ProjectContentManager projectId={dbProject.id} onSave={refreshContent} />
               </motion.div>
-            ) : dbContent.length > 0 ? (
+            ) : viewContent.length > 0 ? (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-4">
                 <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
-                  {dbContent.map((section: any) => (
-                    <div key={section.id} className="mb-8">
+                  {viewContent.map((section: any, idx: number) => (
+                    <div key={section.id || idx} className="mb-8">
                       {section.title && <h2>{section.title}</h2>}
                       <ReactMarkdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{section.body}</ReactMarkdown>
                     </div>
@@ -837,19 +897,19 @@ const ProjectDetail = () => {
             {/* DB Milestones display / inline edit */}
             <div id="project-milestones">
               <ProjectMilestones
-                milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, effort: m.effort_rating, uncertainty: m.uncertainty_rating, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
+                milestones={(isOwner ? dbMilestones : viewMilestones).map((m: any) => ({ phase: m.phase, task: m.task, done: m.done, effort: m.effort_rating, uncertainty: m.uncertainty_rating, blurb: m.blurb, startDate: m.start_date, projectedEndDate: m.projected_end_date, completedDate: m.completed_date, assigneeId: m.assignee_id, learningTopicIds: m.learning_topic_ids }))}
                 expandPhase={expandPhase}
                 expandTaskIndex={expandTaskIndex}
-                phaseCompletions={dbPhaseCompletions.map((pc: any) => ({ phase: pc.phase, completed_date: pc.completed_date, effort_rating: pc.effort_rating, uncertainty_rating: pc.uncertainty_rating }))}
-                technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                phaseCompletions={(isOwner ? dbPhaseCompletions : viewPhaseCompletions).map((pc: any) => ({ phase: pc.phase, completed_date: pc.completed_date, effort_rating: pc.effort_rating, uncertainty_rating: pc.uncertainty_rating }))}
+                technology={(isOwner ? dbProject.target_technology : viewTech)?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
                 trackerSlot={
                   !editMode
                     ? (togglePhase: (phase: string) => void) => (
                         <MilestoneTracker
                           phaseProgress={milestonePhaseProgress}
-                          milestones={dbMilestones.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
+                          milestones={milestonesForProgress.map((m: any) => ({ phase: m.phase, task: m.task, done: m.done }))}
                           onPhaseClick={(phase) => togglePhase(phase)}
-                          technology={dbProject.target_technology?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
+                          technology={(isOwner ? dbProject.target_technology : viewTech)?.toLowerCase().includes("fpga") ? "FPGA" : "ASIC"}
                           isFloating={false}
                           isSticky={false}
                           compact
@@ -972,7 +1032,11 @@ const ProjectDetail = () => {
               const dbOrgs = (dbProject.organisations || [])
                 .map((orgId: string) => partners.find((p) => p.id === orgId))
                 .filter(Boolean);
-              if (dbOrgs.length === 0 && !editMode) return null;
+              const viewOrgs = (viewOrganisations || [])
+                .map((orgId: string) => partners.find((p) => p.id === orgId))
+                .filter(Boolean);
+              const displayOrgs = isOwner ? dbOrgs : viewOrgs;
+              if (displayOrgs.length === 0 && !editMode) return null;
               return (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mt-6">
                   <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
@@ -1194,21 +1258,21 @@ const ProjectDetail = () => {
                       projectId={dbProject.id}
                       onSaved={refreshDbProject}
                     />
-                  ) : (dbProject.github_url || dbProject.docs_url) ? (
+                  ) : (viewGithub || viewDocs) ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Resources</h4>
                       <div className="flex flex-col gap-2">
-                        {dbProject.github_url && (
+                        {viewGithub && (
                           <Button asChild size="sm" className="w-full rounded-lg">
-                            <a href={dbProject.github_url} target="_blank" rel="noopener noreferrer">
+                            <a href={viewGithub} target="_blank" rel="noopener noreferrer">
                               <Github className="h-4 w-4 mr-2" /> Repository
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </a>
                           </Button>
                         )}
-                        {dbProject.docs_url && (
+                        {viewDocs && (
                           <Button asChild size="sm" variant="outline" className="w-full rounded-lg">
-                            <a href={dbProject.docs_url} target="_blank" rel="noopener noreferrer">
+                            <a href={viewDocs} target="_blank" rel="noopener noreferrer">
                               <BookOpen className="h-4 w-4 mr-2" /> Documentation
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </a>
@@ -1253,16 +1317,16 @@ const ProjectDetail = () => {
                         <Save className="h-3.5 w-3.5 mr-1" /> {savingTech ? "Saving..." : "Save"}
                       </Button>
                     </div>
-                  ) : dbProject.target_technology ? (
+                  ) : viewTech ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Technology</h4>
                       <div className="flex items-center gap-2">
                         <CircuitBoard className="h-4 w-4 text-primary shrink-0" />
-                        <span className="text-sm font-medium">{dbProject.target_technology}</span>
+                        <span className="text-sm font-medium">{viewTech}</span>
                       </div>
-                      {(dbProject.fpga_family || dbProject.asic_process) && (
+                      {(viewFpga || viewAsic) && (
                         <p className="text-xs text-muted-foreground mt-1 ml-6">
-                          {dbProject.fpga_family || dbProject.asic_process}
+                          {viewFpga || viewAsic}
                         </p>
                       )}
                     </div>
@@ -1282,12 +1346,12 @@ const ProjectDetail = () => {
                         <Save className="h-3.5 w-3.5 mr-1" /> {savingTime ? "Saving..." : "Save"}
                       </Button>
                     </div>
-                  ) : dbProject.timeframe ? (
+                  ) : viewTimeframe ? (
                     <div className="rounded-xl border bg-card p-4 shadow-sm">
                       <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Timeline</h4>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-primary shrink-0" />
-                        <span className="text-sm font-medium">{dbProject.timeframe}</span>
+                        <span className="text-sm font-medium">{viewTimeframe}</span>
                       </div>
                     </div>
                   ) : null}
