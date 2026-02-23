@@ -33,6 +33,7 @@ import { useUserInterests } from "@/hooks/useUserInterests";
 import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 import AvatarCropDialog from "@/components/AvatarCropDialog";
 import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
+import DragToDeleteDialog from "@/components/DragToDeleteDialog";
 import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 import { useUserRoles } from "@/hooks/useUserRoles";
 
@@ -49,11 +50,33 @@ interface ProfileData {
 
 // Interests & expertise picker
 const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: ProfileData | null; onExpertiseUpdate: (next: string[]) => void }) => {
-  const { registeredSlugs, loading, toggleInterest } = useUserInterests();
+  const { toast } = useToast();
+  const { registeredSlugs, loading, toggleInterest, refetch } = useUserInterests();
   const registered = interests.filter((i) => registeredSlugs.has(i.slug));
   const expertise = profile?.expertise || [];
   const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+  const [showRemoveAll, setShowRemoveAll] = useState(false);
+  const [removingAll, setRemovingAll] = useState(false);
 
+  const handleRemoveAll = async () => {
+    setRemovingAll(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from("user_interests" as any).delete().eq("user_id", user.id);
+      // Clear expertise too since interests are gone
+      if (profile?.user_id) {
+        await supabase.from("profiles").update({ expertise: [] }).eq("user_id", profile.user_id);
+        onExpertiseUpdate([]);
+      }
+      await refetch();
+      toast({ title: "All interests removed" });
+    } catch (err: any) {
+      toast({ title: "Failed to remove interests", description: err.message, variant: "destructive" });
+    }
+    setRemovingAll(false);
+    setShowRemoveAll(false);
+  };
   // Build page IDs for unread tracking (both technology and interest pages)
   const pageIds = useMemo(() => {
     return registered.map((i) => {
@@ -92,7 +115,14 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
               </span>
             )}
           </div>
-          <span className="text-xs text-muted-foreground">{registered.length} registered</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{registered.length} registered</span>
+            {registered.length > 1 && (
+              <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive h-7 px-2" onClick={() => setShowRemoveAll(true)}>
+                <Trash2 className="h-3 w-3 mr-1" /> Remove All
+              </Button>
+            )}
+          </div>
         </div>
         <p className="text-sm text-muted-foreground mb-3">
           Register your interests on the{" "}
@@ -173,6 +203,14 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
         </div>
       )}
     </div>
+      <DragToDeleteDialog
+        open={showRemoveAll}
+        onOpenChange={setShowRemoveAll}
+        onConfirm={handleRemoveAll}
+        title="Remove All Interests"
+        description={`This will remove all ${registered.length} registered interests and clear your expertise selections. You can re-register at any time.`}
+        deleting={removingAll}
+      />
       <DeregisterConfirmDialog
         open={!!confirmSlug}
         interestName={interests.find((i) => i.slug === confirmSlug)?.name}
