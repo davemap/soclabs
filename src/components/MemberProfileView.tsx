@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, MapPin, Building2, FolderOpen,
-  ExternalLink, Calendar, User, Pencil, X, Save, Loader2, Star,
+  ExternalLink, Calendar, User, Pencil, X, Save, Loader2, Star, Linkedin,
 } from "lucide-react";
 import { interests as allInterests } from "@/data/interests";
 import { Button } from "@/components/ui/button";
@@ -228,6 +228,21 @@ const MemberProfileView = ({ profile, userProjects, isOwnProfile, onProfileUpdat
             >
               <ExternalLink className="h-3 w-3" />
               ORCID: {profile.orcid}
+            </a>
+          </div>
+        )}
+
+        {/* LinkedIn */}
+        {profile.linkedin_url && (
+          <div className="mb-4">
+            <a
+              href={profile.linkedin_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
+            >
+              <Linkedin className="h-3 w-3" />
+              LinkedIn
             </a>
           </div>
         )}

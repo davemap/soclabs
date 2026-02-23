@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Building2, FolderOpen, ArrowRight } from "lucide-react";
+import { ArrowLeft, MapPin, Building2, FolderOpen, ArrowRight, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -190,6 +190,20 @@ const MockMemberPage = ({ member }: { member: any }) => {
             </div>
 
             <p className="text-muted-foreground leading-relaxed mb-4">{member.bio}</p>
+
+            {member.linkedin && (
+              <div className="mb-4">
+                <a
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-all"
+                >
+                  <Linkedin className="h-3 w-3" />
+                  LinkedIn
+                </a>
+              </div>
+            )}
 
             {memberOrgs.length > 0 && (
               <div className="flex flex-wrap gap-2">

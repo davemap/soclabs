@@ -213,6 +213,7 @@ export type Database = {
           full_name: string | null
           hide_location: boolean | null
           id: string
+          linkedin_url: string | null
           location: string | null
           orcid: string | null
           organisations: string[] | null
@@ -228,6 +229,7 @@ export type Database = {
           full_name?: string | null
           hide_location?: boolean | null
           id?: string
+          linkedin_url?: string | null
           location?: string | null
           orcid?: string | null
           organisations?: string[] | null
@@ -243,6 +245,7 @@ export type Database = {
           full_name?: string | null
           hide_location?: boolean | null
           id?: string
+          linkedin_url?: string | null
           location?: string | null
           orcid?: string | null
           organisations?: string[] | null

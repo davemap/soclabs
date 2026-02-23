@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Camera, ExternalLink, Plus, Eye, Building2, Settings, Search, UserPlus,
-  MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign, MessageSquare,
+  MoreHorizontal, Trash2, LogOut, UserCog, Crown, Clock, X, Save, Loader2, AtSign, MessageSquare, Linkedin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -167,6 +167,63 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
             })}
           </div>
         </div>
+      )}
+    </div>
+  );
+};
+
+const LinkedInSection = ({ profile, userId, onUpdate }: { profile: any; userId?: string; onUpdate: (url: string) => void }) => {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(profile?.linkedin_url || "");
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+
+  const handleSave = async () => {
+    if (!userId) return;
+    setSaving(true);
+    try {
+      const url = value.trim() || null;
+      const { error } = await supabase.from("profiles").update({ linkedin_url: url } as any).eq("user_id", userId);
+      if (error) throw error;
+      onUpdate(url || "");
+      setEditing(false);
+      toast({ title: "LinkedIn updated!" });
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 flex items-center gap-2">
+      <Linkedin className="h-4 w-4 text-muted-foreground shrink-0" />
+      {editing ? (
+        <div className="flex items-center gap-2 flex-1">
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="https://linkedin.com/in/your-profile"
+            className="h-8 text-sm flex-1"
+          />
+          <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setValue(profile?.linkedin_url || ""); }} disabled={saving}>
+            <X className="h-3.5 w-3.5" />
+          </Button>
+          <Button size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+          </Button>
+        </div>
+      ) : profile?.linkedin_url ? (
+        <div className="flex items-center gap-2">
+          <a href={profile.linkedin_url} target="_blank" rel="noreferrer" className="text-sm text-primary hover:underline">
+            LinkedIn
+          </a>
+          <button onClick={() => setEditing(true)} className="text-xs text-muted-foreground hover:text-foreground">(edit)</button>
+        </div>
+      ) : (
+        <button onClick={() => setEditing(true)} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          Add LinkedIn URL
+        </button>
       )}
     </div>
   );
@@ -547,6 +604,9 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* LinkedIn URL */}
+            <LinkedInSection profile={profile} userId={user?.id} onUpdate={(url) => setProfile((prev) => prev ? { ...prev, linkedin_url: url } : prev)} />
 
             <Separator className="my-8" />
 
