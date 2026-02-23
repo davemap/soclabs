@@ -119,9 +119,13 @@ const Technologies = () => {
   const { registeredSlugs, toggleInterest } = useUserInterests();
 
   // Map tech names to interest slugs for persistence
+  // First check interests with technologyName, then fall back to tech.id
   const techNameToSlug = useMemo(() => {
     const map: Record<string, string> = {};
+    // Map from interest technologyName → interest slug
     allInterests.forEach((i) => { if (i.technologyName) map[i.technologyName] = i.slug; });
+    // For any technology not covered, use its id as the slug
+    technologies.forEach((t) => { if (!map[t.name]) map[t.name] = t.id; });
     return map;
   }, []);
 

@@ -98,7 +98,10 @@ const TechnologyDetail = () => {
 
   // Find interest slugs linked to this technology
   const linkedInterests = interests.filter((i) => i.technologyName === tech.name);
-  const linkedSlugs = linkedInterests.map((i) => i.slug);
+  // Use the interest slug if available, otherwise fall back to the tech id
+  const linkedSlugs = linkedInterests.length > 0
+    ? linkedInterests.map((i) => i.slug)
+    : [tech.id];
 
   // Find members interested in this technology
   const interestedMembers = communityMembers
