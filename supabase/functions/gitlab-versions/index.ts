@@ -21,13 +21,14 @@ serve(async (req) => {
     const GITLAB_HOST = Deno.env.get("GITLAB_HOST") || "git.soton.ac.uk";
     const GITLAB_API = `https://${GITLAB_HOST}/api/v4/projects/${encodeURIComponent(GITLAB_PROJECT_ID)}`;
 
-    const { action, projectId, projectTitle, commitSha } = await req.json();
+    const { action, projectId, projectTitle, commitSha, entityType } = await req.json();
 
     // Build folder path (must match commit-to-gitlab logic)
     const slug = projectTitle
       ? projectTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
       : projectId;
-    const folder = `projects/${slug}-${projectId.slice(0, 8)}`;
+    const folderPrefix = entityType === "articles" ? "articles" : "projects";
+    const folder = `${folderPrefix}/${slug}-${projectId.slice(0, 8)}`;
 
     if (action === "list") {
       // List commits that touched this project's folder

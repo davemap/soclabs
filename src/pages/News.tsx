@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, PenLine, Filter, X } from "lucide-react";
+import { Calendar, PenLine, Filter, X, Plus } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,9 @@ import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { newsArticles, allNewsTags, type NewsTag, newsImages } from "@/data/newsData";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { supabase } from "@/integrations/supabase/client";
 
 // Import images
 import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
@@ -52,9 +55,35 @@ const tagCategories = [
 ];
 
 const News = () => {
+  const { user } = useAuth();
+  const { hasRole } = useUserRoles();
+  const canWrite = hasRole("news_writer") || hasRole("admin");
   const [selectedTags, setSelectedTags] = useState<NewsTag[]>([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [dbArticles, setDbArticles] = useState<any[]>([]);
+
+  // Fetch published DB articles
+  useEffect(() => {
+    supabase
+      .from("news_articles" as any)
+      .select("*")
+      .eq("status", "Published")
+      .order("published_at", { ascending: false })
+      .then(({ data }) => setDbArticles(data || []));
+  }, []);
+
+  // Fetch author profiles for DB articles
+  const [authorProfiles, setAuthorProfiles] = useState<Record<string, any>>({});
+  useEffect(() => {
+    if (dbArticles.length === 0) return;
+    const userIds = [...new Set(dbArticles.map((a: any) => a.user_id))];
+    supabase.from("profiles").select("user_id, full_name, username").in("user_id", userIds).then(({ data }) => {
+      const map: Record<string, any> = {};
+      (data || []).forEach((p: any) => { map[p.user_id] = p; });
+      setAuthorProfiles(map);
+    });
+  }, [dbArticles]);
 
   const toggleTag = (tag: NewsTag) => {
     setSelectedTags((prev) =>
@@ -63,14 +92,32 @@ const News = () => {
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
-  const sorted = [...newsArticles].sort(
+  // Combine static + DB articles
+  const allArticles = [
+    ...dbArticles.map((a: any) => {
+      const profile = authorProfiles[a.user_id];
+      return {
+        id: `db-${a.id}`,
+        title: a.title,
+        summary: a.summary || "",
+        author: profile?.full_name || profile?.username || "Community Member",
+        date: a.published_at || a.created_at,
+        tags: a.tags || [],
+        isDb: true,
+        dbId: a.id,
+      };
+    }),
+    ...newsArticles.map((a) => ({ ...a, isDb: false })),
+  ];
+
+  const sorted = [...allArticles].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
   const filtered =
     selectedTags.length === 0
       ? sorted
-      : sorted.filter((a) => a.tags.some((t) => selectedTags.includes(t)));
+      : sorted.filter((a) => a.tags.some((t: string) => selectedTags.includes(t as NewsTag)));
 
   const visible = filtered.slice(0, visibleCount);
 
@@ -86,11 +133,20 @@ const News = () => {
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-8">
               The latest from the SoC Labs community — research milestones, events, competitions, and more.
             </p>
-            <Button asChild size="lg" className="rounded-full px-8">
-              <Link to="/news/submit">
-                <PenLine className="mr-2 h-4 w-4" /> Submit an Article
-              </Link>
-            </Button>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Button asChild size="lg" className="rounded-full px-8" variant="outline">
+                <Link to="/news/submit">
+                  <PenLine className="mr-2 h-4 w-4" /> Submit an Article
+                </Link>
+              </Button>
+              {canWrite && (
+                <Button asChild size="lg" className="rounded-full px-8">
+                  <Link to="/news/create">
+                    <Plus className="mr-2 h-4 w-4" /> Add Article
+                  </Link>
+                </Button>
+              )}
+            </div>
           </motion.div>
         </div>
       </section>

@@ -22,6 +22,8 @@ import MemberDetail from "./pages/MemberDetail";
 import News from "./pages/News";
 import NewsDetail from "./pages/NewsDetail";
 import SubmitNews from "./pages/SubmitNews";
+import CreateArticle from "./pages/CreateArticle";
+import ArticleEdit from "./pages/ArticleEdit";
 import StartProject from "./pages/StartProject";
 import About from "./pages/About";
 import Interests from "./pages/Interests";
@@ -59,6 +61,9 @@ const App = () => (
           <Route path="/community/:id" element={<MemberDetail />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/submit" element={<SubmitNews />} />
+          <Route path="/news/create" element={<CreateArticle />} />
+          <Route path="/news/edit/:id" element={<ArticleEdit />} />
+          <Route path="/news/db-:id" element={<NewsDetail />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/research" element={<Interests />} />
           <Route path="/interests" element={<Interests />} />
