@@ -12,6 +12,7 @@ import { technologies, learningPhases } from "@/data/mockData";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Sparkles, ArrowRight, Cpu, Wrench, Server, ChevronDown, Lightbulb, Plus, Send, X, Search, MessageSquare, Cable as CableIcon, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 import { toast } from "sonner";
 import { FileText, Code, CheckCircle, CircuitBoard, Zap, FlaskConical, MemoryStick, Gauge, Radio, Microchip, Cable, HardDrive, Rocket } from "lucide-react";
 
@@ -134,10 +135,17 @@ const Technologies = () => {
       .map((i) => i.technologyName!);
   }, [registeredSlugs, techNameToSlug]);
 
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+
   const toggleTech = useCallback((name: string) => {
     const slug = techNameToSlug[name];
-    if (slug) toggleInterest(slug);
-  }, [techNameToSlug, toggleInterest]);
+    if (!slug) return;
+    if (registeredSlugs.has(slug)) {
+      setConfirmSlug(slug);
+    } else {
+      toggleInterest(slug);
+    }
+  }, [techNameToSlug, toggleInterest, registeredSlugs]);
 
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(groups.map(g => g.key)));
   const [collapsedSubcats, setCollapsedSubcats] = useState<Set<string>>(new Set());
@@ -612,6 +620,12 @@ const Technologies = () => {
           </div>
         </div>
       </section>
+      <DeregisterConfirmDialog
+        open={!!confirmSlug}
+        interestName={allInterests.find((i) => i.slug === confirmSlug)?.name}
+        onConfirm={() => { toggleInterest(confirmSlug!); setConfirmSlug(null); }}
+        onCancel={() => setConfirmSlug(null)}
+      />
     </Layout>
   );
 };

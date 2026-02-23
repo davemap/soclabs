@@ -32,6 +32,7 @@ import { interests } from "@/data/interests";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 import AvatarCropDialog from "@/components/AvatarCropDialog";
+import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 
 interface ProfileData {
@@ -50,6 +51,7 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
   const { registeredSlugs, loading, toggleInterest } = useUserInterests();
   const registered = interests.filter((i) => registeredSlugs.has(i.slug));
   const expertise = profile?.expertise || [];
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
 
   // Build page IDs for unread tracking (both technology and interest pages)
   const pageIds = useMemo(() => {
@@ -75,6 +77,7 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
   const totalUnread = Object.values(unreadCounts).reduce((sum, n) => sum + n, 0);
 
   return (
+    <>
     <div className="mb-8 space-y-6">
       {/* Registered Interests */}
       <div>
@@ -105,7 +108,7 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
               return (
                 <button
                   key={interest.slug}
-                  onClick={() => toggleInterest(interest.slug)}
+                  onClick={() => setConfirmSlug(interest.slug)}
                   className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground border border-primary font-medium hover:bg-primary/80 transition-colors group"
                 >
                   {interest.name}
@@ -169,6 +172,13 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
         </div>
       )}
     </div>
+      <DeregisterConfirmDialog
+        open={!!confirmSlug}
+        interestName={interests.find((i) => i.slug === confirmSlug)?.name}
+        onConfirm={() => { toggleInterest(confirmSlug!); setConfirmSlug(null); }}
+        onCancel={() => setConfirmSlug(null)}
+      />
+    </>
   );
 };
 

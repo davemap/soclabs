@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import { interests as allInterests, Interest } from "@/data/interests";
+import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
 import { useAuth } from "@/hooks/useAuth";
@@ -73,9 +74,15 @@ const Interests = () => {
   const pageIds = useMemo(() => interests.map((i) => `interest-${i.slug}`), []);
   const { unreadCounts } = useUnreadDiscussions(pageIds);
 
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+
   const toggleInterest = (slug: string) => {
     if (!user) { navigate("/auth"); return; }
-    dbToggle(slug);
+    if (isRegistered(slug)) {
+      setConfirmSlug(slug);
+    } else {
+      dbToggle(slug);
+    }
   };
 
   const toggleGroup = (key: string) => {
@@ -482,6 +489,12 @@ const Interests = () => {
           </div>
         </div>
       </section>
+      <DeregisterConfirmDialog
+        open={!!confirmSlug}
+        interestName={allInterests.find((i) => i.slug === confirmSlug)?.name}
+        onConfirm={() => { dbToggle(confirmSlug!); setConfirmSlug(null); }}
+        onCancel={() => setConfirmSlug(null)}
+      />
     </Layout>
   );
 };
