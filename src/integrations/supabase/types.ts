@@ -451,6 +451,7 @@ export type Database = {
           interests: string[] | null
           invited_members: string[] | null
           organisations: string[] | null
+          published_at: string | null
           reference_soc: string
           status: string
           target_technology: string | null
@@ -473,6 +474,7 @@ export type Database = {
           interests?: string[] | null
           invited_members?: string[] | null
           organisations?: string[] | null
+          published_at?: string | null
           reference_soc: string
           status?: string
           target_technology?: string | null
@@ -495,6 +497,7 @@ export type Database = {
           interests?: string[] | null
           invited_members?: string[] | null
           organisations?: string[] | null
+          published_at?: string | null
           reference_soc?: string
           status?: string
           target_technology?: string | null
