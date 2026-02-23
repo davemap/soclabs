@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import CommentsThreads from "@/components/CommentsThreads";
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { technologies, referenceDesigns, communityProjects, communityMembers } from "@/data/mockData";
 import { interests } from "@/data/interests";
 import { cn } from "@/lib/utils";
+import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 
 // Map subcategory → colors aligned with architecture/hierarchy diagram typeColors
 const subcategoryBorderColors: Record<string, string> = {
@@ -380,13 +381,23 @@ const SidebarPanel = ({ tech, linkedSlug, accentColor, borderColor }: {
 }) => {
   const { isRegistered, toggleInterest } = useUserInterests();
   const registered = isRegistered(linkedSlug);
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+
+  const handleToggle = () => {
+    if (registered) {
+      setConfirmSlug(linkedSlug);
+    } else {
+      toggleInterest(linkedSlug);
+    }
+  };
 
   return (
+    <>
     <aside className="hidden lg:block w-56 shrink-0 sticky top-24 space-y-3">
       {/* Register Interest */}
       <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
         <button
-          onClick={() => toggleInterest(linkedSlug)}
+          onClick={handleToggle}
           className={cn(
             "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-display font-semibold transition-all duration-200",
             registered
@@ -438,6 +449,13 @@ const SidebarPanel = ({ tech, linkedSlug, accentColor, borderColor }: {
         </Button>
       </div>
     </aside>
+    <DeregisterConfirmDialog
+      open={!!confirmSlug}
+      interestName={tech.name}
+      onConfirm={() => { toggleInterest(confirmSlug!); setConfirmSlug(null); }}
+      onCancel={() => setConfirmSlug(null)}
+    />
+    </>
   );
 };
 

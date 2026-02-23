@@ -10,6 +10,7 @@ import { interests } from "@/data/interests";
 import { communityMembers, communityProjects, technologies } from "@/data/mockData";
 import CommentsThreads from "@/components/CommentsThreads";
 import { cn } from "@/lib/utils";
+import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 
 const categoryColor: Record<string, string> = {
   Technologies: "bg-primary/10 text-primary",
@@ -278,13 +279,23 @@ const InterestSidebar = ({ interest, linkedTechnology }: {
 }) => {
   const { isRegistered, toggleInterest } = useUserInterests();
   const registered = isRegistered(interest.slug);
+  const [confirmSlug, setConfirmSlug] = useState<string | null>(null);
+
+  const handleToggle = () => {
+    if (registered) {
+      setConfirmSlug(interest.slug);
+    } else {
+      toggleInterest(interest.slug);
+    }
+  };
 
   return (
+    <>
     <aside className="hidden lg:block w-56 shrink-0 sticky top-24 space-y-3">
       {/* Register Interest */}
       <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
         <button
-          onClick={() => toggleInterest(interest.slug)}
+          onClick={handleToggle}
           className={cn(
             "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-display font-semibold transition-all duration-200",
             registered
@@ -331,6 +342,13 @@ const InterestSidebar = ({ interest, linkedTechnology }: {
         </Button>
       </div>
     </aside>
+    <DeregisterConfirmDialog
+      open={!!confirmSlug}
+      interestName={interest.name}
+      onConfirm={() => { toggleInterest(confirmSlug!); setConfirmSlug(null); }}
+      onCancel={() => setConfirmSlug(null)}
+    />
+    </>
   );
 };
 
