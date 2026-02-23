@@ -452,6 +452,7 @@ export type Database = {
           invited_members: string[] | null
           organisations: string[] | null
           published_at: string | null
+          published_data: Json | null
           reference_soc: string
           status: string
           target_technology: string | null
@@ -475,6 +476,7 @@ export type Database = {
           invited_members?: string[] | null
           organisations?: string[] | null
           published_at?: string | null
+          published_data?: Json | null
           reference_soc: string
           status?: string
           target_technology?: string | null
@@ -498,6 +500,7 @@ export type Database = {
           invited_members?: string[] | null
           organisations?: string[] | null
           published_at?: string | null
+          published_data?: Json | null
           reference_soc?: string
           status?: string
           target_technology?: string | null
