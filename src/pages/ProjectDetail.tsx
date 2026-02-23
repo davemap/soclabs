@@ -309,9 +309,14 @@ const ProjectDetail = () => {
   const handlePublish = async () => {
     if (!dbProject) return;
     setPublishing(true);
-    const { error } = await supabase.from("projects").update({ published_at: new Date().toISOString() }).eq("id", dbProject.id);
+    const now = new Date().toISOString();
+    const { error } = await supabase.from("projects").update({ published_at: now } as any).eq("id", dbProject.id);
     if (error) toast.error("Failed to publish");
-    else { toast.success("Project published!"); refreshDbProject(); }
+    else {
+      toast.success("Project published!");
+      // Update local state immediately so indicator clears
+      setDbProject((prev: any) => prev ? { ...prev, published_at: now } : prev);
+    }
     setPublishing(false);
   };
 
