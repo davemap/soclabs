@@ -35,9 +35,15 @@ const InterestDetail = () => {
     );
   }
 
-  const relatedMembers = communityMembers.filter((m) =>
-    m.expertise.some((e) => interest.relatedMemberExpertise.includes(e))
-  );
+  const relatedMembers = communityMembers
+    .filter((m) =>
+      m.expertise.some((e) => interest.relatedMemberExpertise.includes(e))
+    )
+    .sort((a, b) => {
+      const aExpertCount = a.expertise.filter((e) => interest.relatedMemberExpertise.includes(e)).length;
+      const bExpertCount = b.expertise.filter((e) => interest.relatedMemberExpertise.includes(e)).length;
+      return bExpertCount - aExpertCount;
+    });
 
   const relatedProjects = communityProjects.filter((p) =>
     p.tags.some((t) => interest.relatedProjectTags.includes(t))
@@ -119,7 +125,7 @@ const InterestDetail = () => {
                     className="flex items-center gap-2 mb-6"
                   >
                     <Users className="h-5 w-5 text-primary" />
-                    <h2 className="text-2xl font-display font-bold">People</h2>
+                    <h2 className="text-2xl font-display font-bold">Interested People</h2>
                     <span className="text-sm text-muted-foreground ml-1">({relatedMembers.length})</span>
                   </motion.div>
 
@@ -149,11 +155,19 @@ const InterestDetail = () => {
                                 </div>
                                 <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
                                 <div className="flex flex-wrap gap-1 mb-3">
-                                  {member.expertise.map((e) => (
-                                    <span key={e} className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-medium">
-                                      {e}
-                                    </span>
-                                  ))}
+                                  {member.expertise.map((e) => {
+                                    const isExpert = interest.relatedMemberExpertise.includes(e);
+                                    return (
+                                      <span key={e} className={cn(
+                                        "text-xs px-2 py-0.5 rounded-full font-medium",
+                                        isExpert
+                                          ? "bg-primary/10 text-primary ring-1 ring-primary/30 ring-offset-1 ring-offset-background"
+                                          : "bg-secondary text-secondary-foreground"
+                                      )}>
+                                        {isExpert && "★ "}{e}
+                                      </span>
+                                    );
+                                  })}
                                 </div>
                                 <div className="flex flex-wrap gap-1">
                                   {member.projects.map((p) => (
