@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.commit-to-gitlab]
 verify_jwt = false
+
+[functions.gitlab-versions]
+verify_jwt = false
