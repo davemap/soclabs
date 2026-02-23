@@ -28,7 +28,8 @@ serve(async (req) => {
       throw new Error("GITLAB_REPO_ID secret is not configured. Set it to the GitLab project ID or URL-encoded path.");
     }
 
-    const GITLAB_API = `https://gitlab.com/api/v4/projects/${encodeURIComponent(GITLAB_PROJECT_ID)}`;
+    const GITLAB_HOST = Deno.env.get("GITLAB_HOST") || "git.soton.ac.uk";
+    const GITLAB_API = `https://${GITLAB_HOST}/api/v4/projects/${encodeURIComponent(GITLAB_PROJECT_ID)}`;
     console.log("DEBUG: GITLAB_API =", GITLAB_API);
     console.log("DEBUG: Token length =", GITLAB_TOKEN?.length, "Token prefix =", GITLAB_TOKEN?.substring(0, 6));
     const branch = "main";
