@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X, Mail, Globe, CircleDot, AlertCircle } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X, Mail, Globe, CircleDot, AlertCircle, History as HistoryIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ import ProjectMilestonesManager from "@/components/project-manage/ProjectMilesto
 
 import ProjectJoinRequestsManager from "@/components/project-manage/ProjectJoinRequestsManager";
 import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsManager";
+import ProjectVersionHistory from "@/components/project-manage/ProjectVersionHistory";
 import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
 import CompleteTaskDialog from "@/components/project-manage/CompleteTaskDialog";
 import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
@@ -1150,7 +1151,21 @@ const ProjectDetail = () => {
               </motion.div>
             )}
 
-            {/* Danger Zone - Delete */}
+            {/* Version History - Rollback */}
+            {isOwner && editMode && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6">
+                <h2 className="text-xl font-display font-bold mb-4 flex items-center gap-2">
+                  <HistoryIcon className="h-5 w-5 text-primary" /> Version History
+                </h2>
+                <ProjectVersionHistory
+                  projectId={dbProject.id}
+                  projectTitle={dbProject.title}
+                  onRollback={() => { refreshDbProject(); refreshContent(); }}
+                />
+              </motion.div>
+            )}
+
+
             {isOwner && editMode && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 mb-10">
                 <div className="rounded-xl border-2 border-destructive/20 bg-destructive/5 p-6">
