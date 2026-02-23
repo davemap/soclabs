@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X, Mail } from "lucide-react";
+import { ArrowLeft, Github, Calendar, ExternalLink, Tag, User, Cpu, Building2, Users, BookOpen, Settings, FileText, ListChecks, UserPlus, CircuitBoard, Save, Plus, Trash2, ImageIcon, Upload, X, Mail, Globe, CircleDot, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ import ProjectSettingsManager from "@/components/project-manage/ProjectSettingsM
 import AddMilestoneTaskDialog from "@/components/project-manage/AddMilestoneTaskDialog";
 import CompleteTaskDialog from "@/components/project-manage/CompleteTaskDialog";
 import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
+import DragToDeleteDialog from "@/components/DragToDeleteDialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -218,6 +219,13 @@ const ProjectDetail = () => {
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
 
+  // Delete project state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  // Publish state
+  const [publishing, setPublishing] = useState(false);
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -290,6 +298,36 @@ const ProjectDetail = () => {
       editTimeframeSteps[editTimeIdx[0]]?.label !== (dbProject.timeframe || "")
     );
   }, [dbProject, editMode, editTitle, editDesc, editTech, editFpga, editAsic, editTimeIdx]);
+
+  // Check for unpublished changes (updated_at > published_at)
+  const hasUnpublishedChanges = useMemo(() => {
+    if (!dbProject) return false;
+    if (!dbProject.published_at) return true; // never published
+    return new Date(dbProject.updated_at) > new Date(dbProject.published_at);
+  }, [dbProject]);
+
+  const handlePublish = async () => {
+    if (!dbProject) return;
+    setPublishing(true);
+    const { error } = await supabase.from("projects").update({ published_at: new Date().toISOString() }).eq("id", dbProject.id);
+    if (error) toast.error("Failed to publish");
+    else { toast.success("Project published!"); refreshDbProject(); }
+    setPublishing(false);
+  };
+
+  const handleDeleteProject = async () => {
+    if (!dbProject) return;
+    setDeleting(true);
+    // Delete related data first
+    await supabase.from("project_content").delete().eq("project_id", dbProject.id);
+    await supabase.from("project_milestones").delete().eq("project_id", dbProject.id);
+    await supabase.from("project_phase_completions").delete().eq("project_id", dbProject.id);
+    await supabase.from("project_join_requests").delete().eq("project_id", dbProject.id);
+    const { error } = await supabase.from("projects").delete().eq("id", dbProject.id);
+    if (error) { toast.error("Failed to delete project"); setDeleting(false); return; }
+    toast.success("Project deleted");
+    navigate("/projects");
+  };
 
   // Warn on browser close / refresh
   useEffect(() => {
@@ -618,17 +656,43 @@ const ProjectDetail = () => {
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
-              {isOwner && (
-                <Button
-                  variant={editMode ? "default" : "outline"}
-                  size="sm"
-                  className="rounded-full"
-                  onClick={handleToggleEditMode}
-                >
-                  <Settings className="h-4 w-4 mr-1.5" />
-                  {editMode ? "Done Editing" : "Edit This Page"}
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {/* Status indicators */}
+                {isOwner && editMode && hasUnsavedChanges && (
+                  <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] gap-1">
+                    <CircleDot className="h-3 w-3" /> Unsaved changes
+                  </Badge>
+                )}
+                {isOwner && hasUnpublishedChanges && !hasUnsavedChanges && (
+                  <Badge variant="outline" className="border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] gap-1">
+                    <AlertCircle className="h-3 w-3" /> Unpublished
+                  </Badge>
+                )}
+                {/* Publish button */}
+                {isOwner && editMode && hasUnpublishedChanges && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
+                    onClick={handlePublish}
+                    disabled={publishing || hasUnsavedChanges}
+                  >
+                    <Globe className="h-3.5 w-3.5 mr-1.5" />
+                    {publishing ? "Publishing..." : "Publish Changes"}
+                  </Button>
+                )}
+                {isOwner && (
+                  <Button
+                    variant={editMode ? "default" : "outline"}
+                    size="sm"
+                    className="rounded-full"
+                    onClick={handleToggleEditMode}
+                  >
+                    <Settings className="h-4 w-4 mr-1.5" />
+                    {editMode ? "Done Editing" : "Edit This Page"}
+                  </Button>
+                )}
+              </div>
             </motion.div>
 
             <div className="flex gap-8">
@@ -1006,6 +1070,34 @@ const ProjectDetail = () => {
                   <Settings className="h-5 w-5 text-primary" /> Project Settings
                 </h2>
                 <ProjectSettingsManager project={dbProject} onUpdate={refreshDbProject} />
+              </motion.div>
+            )}
+
+            {/* Danger Zone - Delete */}
+            {isOwner && editMode && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-2 mb-10">
+                <div className="rounded-xl border-2 border-destructive/20 bg-destructive/5 p-6">
+                  <h2 className="text-lg font-display font-bold mb-2 text-destructive flex items-center gap-2">
+                    <Trash2 className="h-5 w-5" /> Danger Zone
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Permanently delete this project and all its data. This cannot be undone.
+                  </p>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="rounded-full"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1.5" /> Delete Project
+                  </Button>
+                </div>
+                <DragToDeleteDialog
+                  open={deleteDialogOpen}
+                  onOpenChange={setDeleteDialogOpen}
+                  onConfirm={handleDeleteProject}
+                  deleting={deleting}
+                />
               </motion.div>
             )}
 
