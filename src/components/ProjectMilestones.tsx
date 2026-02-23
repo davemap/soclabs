@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, CheckCircle2, Circle, ListChecks, AlertTriangle, Calendar, User, ChevronsDownUp, BookOpen, Plus, Trash2, Save, CheckCheck, Pencil, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -367,14 +367,17 @@ const ProjectMilestones = ({ milestones, expandPhase, expandTaskIndex, expandTop
                 </span>
               </button>
                 {learningPhase && !editMode && (
-                  <Link
-                    to={`/learn/${learningPhase.id}/${learningPhase.topics[0].id}`}
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem("learning-reference-soc");
+                      window.location.href = `/learn/${learningPhase.id}/${learningPhase.topics[0].id}`;
+                    }}
                     className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary hover:bg-muted/30 rounded-md transition-colors"
                     title={`Learn about ${label}`}
                   >
                     <BookOpen className="h-3.5 w-3.5" />
                     <span className="hidden sm:inline">Learn</span>
-                  </Link>
+                  </button>
                 )}
                 {editMode && isOwner && onCompletePhase && !phaseIsCompleted && (
                   <Button
