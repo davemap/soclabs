@@ -344,6 +344,14 @@ const ProjectDetail = () => {
     else {
       toast.success("Project published!");
       setDbProject((prev: any) => prev ? { ...prev, published_at: now, published_data: snapshot } : prev);
+
+      // Commit snapshot to GitLab in the background
+      supabase.functions.invoke("commit-to-gitlab", {
+        body: { projectId: dbProject.id, projectTitle: dbProject.title, snapshot },
+      }).then(({ error: gitErr }) => {
+        if (gitErr) console.error("GitLab commit failed:", gitErr);
+        else toast.success("Revision committed to GitLab");
+      });
     }
     setPublishing(false);
   };
