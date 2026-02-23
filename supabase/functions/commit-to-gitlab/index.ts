@@ -17,7 +17,7 @@ serve(async (req) => {
       throw new Error("GITLAB_ACCESS_TOKEN is not configured");
     }
 
-    const { projectId, projectTitle, snapshot } = await req.json();
+    const { projectId, projectTitle, snapshot, entityType } = await req.json();
     if (!projectId || !snapshot) {
       throw new Error("Missing projectId or snapshot");
     }
@@ -37,7 +37,8 @@ serve(async (req) => {
     const slug = projectTitle
       ? projectTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
       : projectId;
-    const folder = `projects/${slug}-${projectId.slice(0, 8)}`;
+    const folderPrefix = entityType === "articles" ? "articles" : "projects";
+    const folder = `${folderPrefix}/${slug}-${projectId.slice(0, 8)}`;
 
     // Build Markdown representation of the page
     const md = buildMarkdown(snapshot, timestamp);

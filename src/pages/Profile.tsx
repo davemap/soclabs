@@ -34,6 +34,7 @@ import CreateOrganisationDialog from "@/components/CreateOrganisationDialog";
 import AvatarCropDialog from "@/components/AvatarCropDialog";
 import DeregisterConfirmDialog from "@/components/DeregisterConfirmDialog";
 import { useUnreadDiscussions } from "@/hooks/useUnreadDiscussions";
+import { useUserRoles } from "@/hooks/useUserRoles";
 
 interface ProfileData {
   id: string;
@@ -179,6 +180,58 @@ const RegisteredInterestsSection = ({ profile, onExpertiseUpdate }: { profile: P
         onCancel={() => setConfirmSlug(null)}
       />
     </>
+  );
+};
+
+const NewsWriterSection = ({ userId }: { userId?: string }) => {
+  const { hasRole, loading } = useUserRoles();
+  const isWriter = hasRole("news_writer") || hasRole("admin");
+  const [articles, setArticles] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from("news_articles" as any).select("id, title, status, updated_at").eq("user_id", userId).order("updated_at", { ascending: false }).then(({ data }) => setArticles(data || []));
+  }, [userId]);
+
+  if (loading) return null;
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">My Articles</h3>
+          {isWriter && <Badge variant="outline" className="text-[10px]">News Writer</Badge>}
+        </div>
+        {isWriter && (
+          <Button size="sm" className="rounded-full" asChild>
+            <Link to="/news/create"><Plus className="h-3.5 w-3.5 mr-1" /> New Article</Link>
+          </Button>
+        )}
+      </div>
+      {!isWriter ? (
+        <p className="text-sm text-muted-foreground">You don't have the News Writer role. Contact an admin to get access.</p>
+      ) : articles.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border p-6 text-center">
+          <p className="text-sm text-muted-foreground">No articles yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {articles.map((a: any) => (
+            <Link key={a.id} to={`/news/edit/${a.id}`}>
+              <Card className="hover:shadow-md transition-all border-border/60">
+                <CardContent className="py-3 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">{a.title}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(a.updated_at).toLocaleDateString()}</p>
+                  </div>
+                  <Badge variant="outline" className="text-xs">{a.status}</Badge>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -629,6 +682,11 @@ const Profile = () => {
                 if (!error) setProfile((prev) => prev ? { ...prev, expertise: next } : prev);
               }}
             />
+
+            <Separator className="my-8" />
+
+            {/* News Writer Section */}
+            <NewsWriterSection userId={user?.id} />
 
             <Separator className="my-8" />
 
