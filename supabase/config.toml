@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.invite-collaborator]
 verify_jwt = false
+
+[functions.commit-to-gitlab]
+verify_jwt = false
