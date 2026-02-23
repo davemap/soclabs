@@ -2575,6 +2575,7 @@ export const communityMembers = [
     expertise: ["Machine Learning", "FPGA Design"],
     bio: "Dr. Chen leads the Embedded Intelligence Lab at Imperial College, where her research focuses on deploying neural network models onto resource-constrained hardware. She has published over 30 papers on hardware-software co-design for edge AI and is a key contributor to the NanoSoC ML accelerator project.",
     interests: ["ml-accelerators", "fpga-design", "arm-cortex-m0"],
+    linkedin: "https://linkedin.com/in/sarah-chen",
     url: "#",
   },
   {
@@ -2588,6 +2589,7 @@ export const communityMembers = [
     expertise: ["Cryptography", "ASIC Design"],
     bio: "Professor Okonkwo is a leading researcher in hardware security, specialising in lightweight cryptographic implementations for IoT devices. His group at UCT has taped out multiple ASIC designs through Europractice shuttle services and actively mentors students across Southern Africa.",
     interests: ["cryptography-security", "asic-tapeout", "arm-cortex-m3"],
+    linkedin: "https://linkedin.com/in/james-okonkwo",
     url: "#",
   },
   {
@@ -2601,6 +2603,7 @@ export const communityMembers = [
     expertise: ["DSP", "Signal Processing"],
     bio: "Maria is a doctoral researcher at ETH Zürich working on reconfigurable signal processing architectures. Her DSP filter bank project demonstrates how custom hardware can dramatically improve the throughput and energy efficiency of multi-channel sensor data processing.",
     interests: ["dsp-signal-processing", "fpga-design", "fpga-prototyping"],
+    linkedin: "https://linkedin.com/in/maria-gonzalez",
     url: "#",
   },
   {
@@ -2614,6 +2617,7 @@ export const communityMembers = [
     expertise: ["Processor Design", "Verification"],
     bio: "Dr. Tanaka researches heterogeneous multi-ISA architectures at the University of Tokyo. His current project integrates a RISC-V core alongside the ARM Cortex-M0 in the NanoSoC, exploring new paradigms for workload partitioning in embedded systems.",
     interests: ["risc-v", "arm-cortex-m0", "formal-verification", "systemverilog"],
+    linkedin: "https://linkedin.com/in/kenji-tanaka",
     url: "#",
   },
   {
@@ -2627,6 +2631,7 @@ export const communityMembers = [
     expertise: ["Low Power Design", "Analog"],
     bio: "Professor Watson directs the Energy-Efficient Circuits group at MIT. Her research spans digital and mixed-signal power management techniques, with a focus on adaptive DVFS controllers that can dramatically reduce energy consumption in always-on IoT devices.",
     interests: ["low-power-design", "asic-tapeout", "arm-cortex-m3"],
+    linkedin: "https://linkedin.com/in/emily-watson",
     url: "#",
   },
   {
@@ -2640,6 +2645,7 @@ export const communityMembers = [
     expertise: ["SoC Integration", "Bus Architecture"],
     bio: "Dr. Patel is an expert in on-chip communication architectures and SoC integration methodologies. At IIT Bombay, he leads a team developing high-performance bus interconnects and communication interfaces for the milliSoC platform.",
     interests: ["arm-cortex-m3", "asic-tapeout", "community-projects"],
+    linkedin: "https://linkedin.com/in/raj-patel",
     url: "#",
   },
   {
@@ -2653,6 +2659,7 @@ export const communityMembers = [
     expertise: ["Functional Safety", "Automotive"],
     bio: "Dr. Müller's research at TU Munich focuses on safety-critical hardware design for automotive applications. She is developing a certified safety controller based on the milliSoC, targeting ISO 26262 compliance for autonomous vehicle subsystems.",
     interests: ["arm-cortex-m3", "formal-verification", "asic-tapeout"],
+    linkedin: "https://linkedin.com/in/anna-muller",
     url: "#",
   },
 ];

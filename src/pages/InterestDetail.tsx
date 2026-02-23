@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useUserInterests } from "@/hooks/useUserInterests";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, FolderOpen, Tag, ExternalLink, Wrench, Check, Plus, ArrowRight, BookOpen } from "lucide-react";
+import { ArrowLeft, Users, FolderOpen, Tag, ExternalLink, Wrench, Check, Plus, ArrowRight, BookOpen, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
@@ -148,10 +148,15 @@ const InterestDetail = () => {
                                       {member.name.split(" ").map((n) => n[0]).join("")}
                                     </span>
                                   </div>
-                                  <div className="min-w-0">
+                                   <div className="min-w-0 flex-1">
                                     <h3 className="font-display font-bold text-sm truncate group-hover:text-primary transition-colors">{member.name}</h3>
                                     <p className="text-xs text-muted-foreground truncate">{member.institution}</p>
                                   </div>
+                                  {member.linkedin && (
+                                    <a href={member.linkedin} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="shrink-0 text-muted-foreground hover:text-primary transition-colors">
+                                      <Linkedin className="h-4 w-4" />
+                                    </a>
+                                  )}
                                 </div>
                                 <p className="text-xs text-muted-foreground mb-3">{member.location}</p>
                                 <div className="flex flex-wrap gap-1 mb-3">
