@@ -29,6 +29,8 @@ serve(async (req) => {
     }
 
     const GITLAB_API = `https://gitlab.com/api/v4/projects/${encodeURIComponent(GITLAB_PROJECT_ID)}`;
+    console.log("DEBUG: GITLAB_API =", GITLAB_API);
+    console.log("DEBUG: Token length =", GITLAB_TOKEN?.length, "Token prefix =", GITLAB_TOKEN?.substring(0, 6));
     const branch = "main";
     const timestamp = new Date().toISOString();
     const slug = projectTitle
