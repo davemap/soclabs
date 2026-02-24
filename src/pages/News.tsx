@@ -142,18 +142,6 @@ const News = () => {
               <PenLine className="h-5 w-5" />
             </div>
           </Link>
-          {canWrite && (
-            <Link to="/news/create" className="group flex items-center gap-0 no-underline">
-              <div className="overflow-hidden max-w-0 group-hover:max-w-[200px] transition-all duration-300 ease-out">
-                <span className="whitespace-nowrap bg-primary text-primary-foreground text-sm font-medium px-4 py-3 rounded-l-full inline-block">
-                  Add Article
-                </span>
-              </div>
-              <div className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 flex items-center justify-center text-primary-foreground shrink-0">
-                <Plus className="h-5 w-5" />
-              </div>
-            </Link>
-          )}
         </motion.div>
       )}
 
