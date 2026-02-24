@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Plus, Trash2, GripVertical, Save, Bold, Underline, Heading1, Heading2, Heading3,
-  ImageIcon, Loader2, Sigma,
+  ImageIcon, Loader2, Sigma, Check,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,6 +16,7 @@ interface ContentSection {
   title: string;
   body: string;
   sort_order: number;
+  _dirty?: boolean;
 }
 
 function ToolbarButton({ icon: Icon, label, onClick, disabled }: { icon: React.ElementType; label: string; onClick: () => void; disabled?: boolean }) {
@@ -54,7 +55,7 @@ function insertAtCursor(textarea: HTMLTextAreaElement, insert: string, updateFn:
 export default function ArticleContentManager({ articleId, onSave }: { articleId: string; onSave?: () => void }) {
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [savingSectionIndex, setSavingSectionIndex] = useState<number | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [uploadingImage, setUploadingImage] = useState<number | null>(null);
@@ -69,16 +70,16 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
       .order("sort_order")
       .then(({ data }) => {
         if (data && data.length > 0) {
-          setSections(data.map((d: any) => ({ id: d.id, title: d.title, body: d.body, sort_order: d.sort_order })));
+          setSections(data.map((d: any) => ({ id: d.id, title: d.title, body: d.body, sort_order: d.sort_order, _dirty: false })));
         }
         setLoading(false);
       });
   }, [articleId]);
 
-  const addSection = () => setSections((prev) => [...prev, { title: "", body: "", sort_order: prev.length }]);
+  const addSection = () => setSections((prev) => [...prev, { title: "", body: "", sort_order: prev.length, _dirty: true }]);
 
   const updateSection = (index: number, field: "title" | "body", value: string) => {
-    setSections((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
+    setSections((prev) => prev.map((s, i) => (i === index ? { ...s, [field]: value, _dirty: true } : s)));
   };
 
   const removeSection = async (index: number) => {
@@ -86,6 +87,7 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
     if (section.id) await supabase.from("news_article_content" as any).delete().eq("id", section.id);
     setSections((prev) => prev.filter((_, i) => i !== index));
     toast.success("Section removed");
+    onSave?.();
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => { setDragIndex(index); e.dataTransfer.effectAllowed = "move"; };
@@ -97,7 +99,7 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
       const updated = [...prev];
       const [moved] = updated.splice(dragIndex, 1);
       updated.splice(dropIndex, 0, moved);
-      return updated.map((s, i) => ({ ...s, sort_order: i }));
+      return updated.map((s, i) => ({ ...s, sort_order: i, _dirty: true }));
     });
     setDragIndex(null); setDragOverIndex(null);
   };
@@ -121,23 +123,32 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
     finally { setUploadingImage(null); }
   }, [articleId, sections]);
 
-  const saveAll = async () => {
-    setSaving(true);
+  const saveSection = async (index: number) => {
+    setSavingSectionIndex(index);
     try {
-      for (let i = 0; i < sections.length; i++) {
-        const s = sections[i];
-        if (s.id) {
-          await supabase.from("news_article_content" as any).update({ title: s.title, body: s.body, sort_order: i } as any).eq("id", s.id);
-        } else {
-          const { data } = await supabase.from("news_article_content" as any).insert({ article_id: articleId, title: s.title, body: s.body, sort_order: i } as any).select().single();
-          if (data) sections[i] = { ...s, id: (data as any).id, sort_order: i };
+      const s = sections[index];
+      if (s.id) {
+        await supabase.from("news_article_content" as any).update({ title: s.title, body: s.body, sort_order: index } as any).eq("id", s.id);
+      } else {
+        const { data } = await supabase.from("news_article_content" as any).insert({ article_id: articleId, title: s.title, body: s.body, sort_order: index } as any).select().single();
+        if (data) {
+          setSections((prev) => prev.map((sec, i) => (i === index ? { ...sec, id: (data as any).id, _dirty: false } : sec)));
+          setSavingSectionIndex(null);
+          onSave?.();
+          return;
         }
       }
-      setSections([...sections]);
-      toast.success("Content saved");
+      setSections((prev) => prev.map((sec, i) => (i === index ? { ...sec, _dirty: false } : sec)));
       onSave?.();
-    } catch { toast.error("Failed to save content"); }
-    setSaving(false);
+    } catch { toast.error("Failed to save section"); }
+    setSavingSectionIndex(null);
+  };
+
+  const saveAll = async () => {
+    for (let i = 0; i < sections.length; i++) {
+      if (sections[i]._dirty) await saveSection(i);
+    }
+    toast.success("All sections saved");
   };
 
   if (loading) return <p className="text-sm text-muted-foreground">Loading content...</p>;
@@ -146,10 +157,7 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-display font-bold">Content Sections</h3>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={addSection}><Plus className="h-4 w-4 mr-1" /> Add Section</Button>
-          <Button size="sm" onClick={saveAll} disabled={saving}><Save className="h-4 w-4 mr-1" /> {saving ? "Saving..." : "Save All"}</Button>
-        </div>
+        <Button variant="outline" size="sm" onClick={addSection}><Plus className="h-4 w-4 mr-1" /> Add Section</Button>
       </div>
 
       {sections.length === 0 && (
@@ -162,7 +170,7 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
           onDragOver={(e) => handleDragOver(e, i)}
           onDrop={(e) => handleDrop(e, i)}
           onDragEnd={handleDragEnd}
-          className={`transition-all duration-200 ${dragIndex === i ? "opacity-40 scale-[0.98]" : ""} ${dragOverIndex === i && dragIndex !== i ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background" : ""}`}
+          className={`transition-all duration-200 ${dragIndex === i ? "opacity-40 scale-[0.98]" : ""} ${dragOverIndex === i && dragIndex !== i ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background" : ""} ${section._dirty ? "border-amber-500/40" : ""}`}
         >
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center gap-2">
@@ -170,6 +178,21 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
                 <GripVertical className="h-4 w-4 text-muted-foreground shrink-0" />
               </div>
               <Input placeholder="Section title" value={section.title} onChange={(e) => updateSection(i, "title", e.target.value)} className="flex-1" />
+              <Button
+                variant={section._dirty ? "default" : "outline"}
+                size="sm"
+                onClick={() => saveSection(i)}
+                disabled={savingSectionIndex === i}
+                className="shrink-0"
+              >
+                {savingSectionIndex === i ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : section._dirty ? (
+                  <><Save className="h-3.5 w-3.5 mr-1" /> Save</>
+                ) : (
+                  <><Check className="h-3.5 w-3.5 mr-1" /> Saved</>
+                )}
+              </Button>
               <Button variant="ghost" size="icon" onClick={() => removeSection(i)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
             </div>
 
@@ -195,11 +218,14 @@ export default function ArticleContentManager({ articleId, onSave }: { articleId
               onChange={(e) => updateSection(i, "body", e.target.value)}
               rows={8}
               className="font-mono text-sm"
-              onKeyDown={(e) => { if (e.ctrlKey && e.key === "b") { e.preventDefault(); const ta = textareaRefs.current[i]; if (ta) wrapSelection(ta, "**", "**", (v) => updateSection(i, "body", v)); } }}
+              onKeyDown={(e) => {
+                if (e.ctrlKey && e.key === "b") { e.preventDefault(); const ta = textareaRefs.current[i]; if (ta) wrapSelection(ta, "**", "**", (v) => updateSection(i, "body", v)); }
+                if (e.ctrlKey && e.key === "s") { e.preventDefault(); saveSection(i); }
+              }}
               onDrop={(e) => { const file = e.dataTransfer.files?.[0]; if (file && file.type.startsWith("image/")) { e.preventDefault(); handleImageUpload(i, file); } }}
               onDragOver={(e) => { if (e.dataTransfer.types.includes("Files")) e.preventDefault(); }}
             />
-            <p className="text-[10px] text-muted-foreground">Supports Markdown, LaTeX ($..$ inline, $$..$$ block), and image uploads.</p>
+            <p className="text-[10px] text-muted-foreground">Supports Markdown, LaTeX ($..$ inline, $$..$$ block), and image uploads. Ctrl+S to save section.</p>
           </CardContent>
         </Card>
       ))}

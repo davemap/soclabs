@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Globe, Pencil, Loader2, Trash2, X, Tag, AlertCircle, History as HistoryIcon } from "lucide-react";
+import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, History as HistoryIcon, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { allNewsTags } from "@/data/newsData";
 import { toast } from "sonner";
-import ReactMarkdown from "react-markdown";
-import remarkMath from "remark-math";
-import remarkGfm from "remark-gfm";
-import rehypeKatex from "rehype-katex";
-import "katex/dist/katex.min.css";
 
 const ArticleEdit = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +31,7 @@ const ArticleEdit = () => {
   const [editSummary, setEditSummary] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
   const [savingMeta, setSavingMeta] = useState(false);
+  const [metaDirty, setMetaDirty] = useState(false);
 
   const fetchArticle = useCallback(async () => {
     if (!id) return;
@@ -45,6 +41,7 @@ const ArticleEdit = () => {
       setEditTitle((data as any).title);
       setEditSummary((data as any).summary || "");
       setEditTags((data as any).tags || []);
+      setMetaDirty(false);
     }
     setLoading(false);
   }, [id]);
@@ -70,7 +67,7 @@ const ArticleEdit = () => {
       tags: editTags,
     } as any).eq("id", (article as any).id);
     if (error) toast.error("Failed to save");
-    else { toast.success("Details updated"); await fetchArticle(); }
+    else { toast.success("Details saved"); setMetaDirty(false); await fetchArticle(); }
     setSavingMeta(false);
   };
 
@@ -105,7 +102,6 @@ const ArticleEdit = () => {
       toast.success("Article published!");
       await fetchArticle();
 
-      // Commit to GitLab in the background
       supabase.functions.invoke("commit-to-gitlab", {
         body: {
           projectId: (article as any).id,
@@ -121,6 +117,15 @@ const ArticleEdit = () => {
     setPublishing(false);
   };
 
+  const handleDoneEditing = async () => {
+    // Save meta if dirty
+    if (metaDirty) {
+      await saveMeta();
+    }
+    toast.success("Draft saved");
+    navigate(`/news/db-${(article as any).id}`);
+  };
+
   const handleDelete = async () => {
     if (!article) return;
     setDeleting(true);
@@ -133,6 +138,7 @@ const ArticleEdit = () => {
 
   const toggleTag = (tag: string) => {
     setEditTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]);
+    setMetaDirty(true);
   };
 
   if (loading) return <Layout><div className="py-32 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto" /></div></Layout>;
@@ -141,14 +147,12 @@ const ArticleEdit = () => {
 
   return (
     <Layout>
-      <section className="py-24">
+      <section className="py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-4xl">
-          <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-8">
-            <ArrowLeft className="h-4 w-4" /> Back
-          </button>
-
-          {/* Status bar */}
-          <div className="flex items-center justify-between flex-wrap gap-3 mb-8">
+          <div className="flex items-center justify-between mb-8">
+            <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
             <div className="flex items-center gap-2">
               <Badge variant="outline">{(article as any).status}</Badge>
               {hasUnpublishedChanges && (
@@ -157,53 +161,70 @@ const ArticleEdit = () => {
                 </Badge>
               )}
             </div>
-            <div className="flex gap-2">
-              {(article as any).status === "Published" && (
-                <Button variant="outline" size="sm" asChild>
-                  <Link to={`/news/db-${(article as any).id}`}>
-                    <Globe className="h-3.5 w-3.5 mr-1" /> View Published
-                  </Link>
-                </Button>
-              )}
-              <Button size="sm" onClick={handlePublish} disabled={publishing}>
-                {publishing ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Globe className="h-3.5 w-3.5 mr-1" />}
-                Publish
-              </Button>
-            </div>
           </div>
 
-          {/* Editable metadata */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5 mb-10">
-            <div>
-              <Label className="text-xs text-muted-foreground">Title</Label>
-              <Input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} className="text-xl font-display font-bold" />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground">Summary</Label>
-              <Textarea value={editSummary} onChange={(e) => setEditSummary(e.target.value)} rows={2} />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground mb-2 block">Tags</Label>
-              <div className="flex flex-wrap gap-1.5">
-                {allNewsTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`text-xs px-2.5 py-1 rounded-full border transition-all font-medium ${editTags.includes(tag) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/60 text-muted-foreground hover:border-primary/50"}`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={saveMeta} disabled={savingMeta}>
-              <Save className="h-3.5 w-3.5 mr-1" /> {savingMeta ? "Saving..." : "Save Details"}
-            </Button>
+          {/* Inline title editing */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+            <Input
+              value={editTitle}
+              onChange={(e) => { setEditTitle(e.target.value); setMetaDirty(true); }}
+              className="text-3xl md:text-4xl font-display font-bold border-none bg-transparent px-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
+              placeholder="Article title..."
+            />
+            <Textarea
+              value={editSummary}
+              onChange={(e) => { setEditSummary(e.target.value); setMetaDirty(true); }}
+              className="mt-2 border-none bg-transparent px-0 text-muted-foreground resize-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
+              placeholder="Brief summary..."
+              rows={2}
+            />
           </motion.div>
 
-          {/* Content Editor */}
+          {/* Tags inline */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-6">
+            <div className="flex flex-wrap gap-1.5">
+              {allNewsTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  className={`text-xs px-2.5 py-1 rounded-full border transition-all font-medium ${editTags.includes(tag) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/60 text-muted-foreground hover:border-primary/50"}`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Save meta if dirty */}
+          {metaDirty && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mb-6">
+              <Button variant="outline" size="sm" onClick={saveMeta} disabled={savingMeta}>
+                <Save className="h-3.5 w-3.5 mr-1" /> {savingMeta ? "Saving..." : "Save Details"}
+              </Button>
+            </motion.div>
+          )}
+
+          {/* Content Editor — inline sections with per-section save */}
           <div className="mb-10">
             <ArticleContentManager articleId={(article as any).id} onSave={() => fetchArticle()} />
+          </div>
+
+          {/* Action bar */}
+          <div className="flex flex-wrap items-center gap-3 mb-10 p-4 rounded-xl border border-border/60 bg-card">
+            <Button onClick={handleDoneEditing} variant="outline" className="rounded-full">
+              <CheckCircle2 className="h-4 w-4 mr-1.5" /> Done Editing
+            </Button>
+            <Button onClick={handlePublish} disabled={publishing} className="rounded-full">
+              {publishing ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Globe className="h-4 w-4 mr-1.5" />}
+              Publish
+            </Button>
+            {(article as any).status === "Published" && (
+              <Button variant="outline" size="sm" asChild className="rounded-full ml-auto">
+                <Link to={`/news/db-${(article as any).id}`}>
+                  <Globe className="h-3.5 w-3.5 mr-1" /> View Published
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Version History */}
