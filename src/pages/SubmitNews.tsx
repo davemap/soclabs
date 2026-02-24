@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
+import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import { allNewsTags, type NewsTag } from "@/data/newsData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,6 +19,10 @@ const SubmitNews = () => {
   const { user, loading: authLoading } = useAuth();
   const [selectedTags, setSelectedTags] = useState<NewsTag[]>([]);
   const [creating, setCreating] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!authLoading && !user) {
     return (
@@ -37,17 +41,42 @@ const SubmitNews = () => {
     );
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropSrc(URL.createObjectURL(file));
+  };
+
+  const handleCropComplete = (blob: Blob) => {
+    const file = new File([blob], "article-image.png", { type: "image/png" });
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(blob));
+    setCropSrc(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) return;
     setCreating(true);
     const formData = new FormData(e.currentTarget);
     const title = (formData.get("title") as string).trim();
-    const summary = (formData.get("summary") as string).trim();
+
+    let image_url: string | null = null;
+    if (imageFile) {
+      const path = `${user.id}/${Date.now()}-${imageFile.name}`;
+      const { error: uploadErr } = await supabase.storage.from("news-images").upload(path, imageFile);
+      if (uploadErr) {
+        toast({ title: "Image upload failed", description: uploadErr.message, variant: "destructive" });
+        setCreating(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(path);
+      image_url = urlData.publicUrl;
+    }
 
     const { data, error } = await supabase
       .from("news_articles" as any)
-      .insert({ user_id: user.id, title, summary, tags: selectedTags } as any)
+      .insert({ user_id: user.id, title, summary: "", tags: selectedTags, image_url } as any)
       .select()
       .single();
 
@@ -81,8 +110,21 @@ const SubmitNews = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="summary">Summary</Label>
-                <Textarea id="summary" name="summary" placeholder="A brief 1-2 sentence summary of the article…" rows={3} required />
+                <Label>Cover Image</Label>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                {imagePreview ? (
+                  <div className="relative group">
+                    <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60 aspect-video object-cover" />
+                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute top-2 right-2 bg-background/80 backdrop-blur rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full aspect-video rounded-lg border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
+                    <ImagePlus className="h-8 w-8" />
+                    <span className="text-sm font-medium">Click to upload cover image</span>
+                  </button>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -116,6 +158,12 @@ const SubmitNews = () => {
           </motion.div>
         </div>
       </section>
+      <ProjectImageCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc || ""}
+        onClose={() => setCropSrc(null)}
+        onCropComplete={handleCropComplete}
+      />
     </Layout>
   );
 };

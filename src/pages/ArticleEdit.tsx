@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, History as HistoryIcon, Settings, CircleDot } from "lucide-react";
+import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, Settings, CircleDot, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import Layout from "@/components/Layout";
+import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import ArticleContentManager from "@/components/article-manage/ArticleContentManager";
 import ArticleVersionHistory from "@/components/article-manage/ArticleVersionHistory";
 import DragToDeleteDialog from "@/components/DragToDeleteDialog";
@@ -26,14 +26,15 @@ const ArticleEdit = () => {
 
   // Editable fields
   const [editTitle, setEditTitle] = useState("");
-  const [editSummary, setEditSummary] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
   const [savingTitle, setSavingTitle] = useState(false);
-  const [savingSummary, setSavingSummary] = useState(false);
   const [titleDirty, setTitleDirty] = useState(false);
-  const [summaryDirty, setSummaryDirty] = useState(false);
   const [tagsDirty, setTagsDirty] = useState(false);
   const [savingTags, setSavingTags] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [savingImage, setSavingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchArticle = useCallback(async () => {
     if (!id) return;
@@ -41,10 +42,9 @@ const ArticleEdit = () => {
     if (data) {
       setArticle(data);
       setEditTitle((data as any).title);
-      setEditSummary((data as any).summary || "");
       setEditTags((data as any).tags || []);
+      setImageUrl((data as any).image_url || null);
       setTitleDirty(false);
-      setSummaryDirty(false);
       setTagsDirty(false);
     }
     setLoading(false);
@@ -62,7 +62,7 @@ const ArticleEdit = () => {
     return updatedMs - publishedMs > 2000;
   }, [article]);
 
-  const hasUnsavedChanges = titleDirty || summaryDirty || tagsDirty;
+  const hasUnsavedChanges = titleDirty || tagsDirty;
 
   const saveTitle = async () => {
     if (!article || !editTitle.trim()) return;
@@ -73,13 +73,34 @@ const ArticleEdit = () => {
     setSavingTitle(false);
   };
 
-  const saveSummary = async () => {
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCropSrc(URL.createObjectURL(file));
+  };
+
+  const handleCropComplete = async (blob: Blob) => {
+    if (!article || !user) return;
+    setCropSrc(null);
+    setSavingImage(true);
+    const path = `${user.id}/${Date.now()}-article-image.png`;
+    const { error: uploadErr } = await supabase.storage.from("news-images").upload(path, blob);
+    if (uploadErr) { toast.error("Upload failed"); setSavingImage(false); return; }
+    const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(path);
+    const newUrl = urlData.publicUrl;
+    const { error } = await supabase.from("news_articles" as any).update({ image_url: newUrl } as any).eq("id", (article as any).id);
+    if (error) toast.error("Failed to save image");
+    else { toast.success("Image saved"); setImageUrl(newUrl); await fetchArticle(); }
+    setSavingImage(false);
+  };
+
+  const removeImage = async () => {
     if (!article) return;
-    setSavingSummary(true);
-    const { error } = await supabase.from("news_articles" as any).update({ summary: editSummary.trim() } as any).eq("id", (article as any).id);
-    if (error) toast.error("Failed to save");
-    else { toast.success("Summary saved"); setSummaryDirty(false); await fetchArticle(); }
-    setSavingSummary(false);
+    setSavingImage(true);
+    const { error } = await supabase.from("news_articles" as any).update({ image_url: null } as any).eq("id", (article as any).id);
+    if (error) toast.error("Failed to remove image");
+    else { toast.success("Image removed"); setImageUrl(null); await fetchArticle(); }
+    setSavingImage(false);
   };
 
   const saveTags = async () => {
@@ -227,18 +248,33 @@ const ArticleEdit = () => {
               </Button>
             </div>
 
-            {/* Summary with save button */}
-            <div className="flex items-start gap-2 mb-4">
-              <Textarea
-                value={editSummary}
-                onChange={(e) => { setEditSummary(e.target.value); setSummaryDirty(true); }}
-                rows={2}
-                className="flex-1 text-lg leading-relaxed"
-                placeholder="Brief summary..."
-              />
-              <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0 mt-1" onClick={saveSummary} disabled={savingSummary || !summaryDirty}>
-                <Save className="h-3.5 w-3.5 mr-1" /> {savingSummary ? "Saving..." : "Save"}
-              </Button>
+            {/* Cover image */}
+            <div className="mb-4">
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageFileSelect} />
+              {imageUrl ? (
+                <div className="relative group">
+                  <img src={imageUrl} alt="Cover" className="w-full rounded-lg border border-border/60 aspect-video object-cover" />
+                  <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-background/80 backdrop-blur rounded-full p-1.5">
+                      <ImagePlus className="h-4 w-4" />
+                    </button>
+                    <button type="button" onClick={removeImage} className="bg-background/80 backdrop-blur rounded-full p-1.5">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {savingImage && <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-lg"><Loader2 className="h-6 w-6 animate-spin" /></div>}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full aspect-video rounded-lg border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                  disabled={savingImage}
+                >
+                  {savingImage ? <Loader2 className="h-8 w-8 animate-spin" /> : <ImagePlus className="h-8 w-8" />}
+                  <span className="text-sm font-medium">{savingImage ? "Uploading..." : "Click to upload cover image"}</span>
+                </button>
+              )}
             </div>
           </motion.header>
 
@@ -297,6 +333,14 @@ const ArticleEdit = () => {
           />
         </div>
       </article>
+
+      <ProjectImageCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc || ""}
+        onClose={() => setCropSrc(null)}
+        onCropComplete={handleCropComplete}
+        saving={savingImage}
+      />
     </Layout>
   );
 };
