@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, PenLine, Tag, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, PenLine, X, ImagePlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
+import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,8 +31,12 @@ const CreateArticle = () => {
   const [creating, setCreating] = useState(false);
 
   const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const canWrite = hasRole("news_writer") || hasRole("admin");
 
@@ -66,12 +70,43 @@ const CreateArticle = () => {
     setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setCropSrc(url);
+  };
+
+  const handleCropComplete = (blob: Blob) => {
+    const file = new File([blob], "article-image.png", { type: "image/png" });
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(blob));
+    setCropSrc(null);
+  };
+
   const handleCreate = async () => {
     if (!user || !title.trim()) return;
     setCreating(true);
+
+    let image_url: string | null = null;
+    if (imageFile) {
+      setUploadingImage(true);
+      const path = `${user.id}/${Date.now()}-${imageFile.name}`;
+      const { error: uploadErr } = await supabase.storage.from("news-images").upload(path, imageFile);
+      if (uploadErr) {
+        toast.error("Image upload failed: " + uploadErr.message);
+        setCreating(false);
+        setUploadingImage(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(path);
+      image_url = urlData.publicUrl;
+      setUploadingImage(false);
+    }
+
     const { data, error } = await supabase
       .from("news_articles" as any)
-      .insert({ user_id: user.id, title: title.trim(), summary: summary.trim(), tags } as any)
+      .insert({ user_id: user.id, title: title.trim(), summary: "", tags, image_url } as any)
       .select()
       .single();
 
@@ -119,8 +154,29 @@ const CreateArticle = () => {
                     <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Article title..." className="mt-1" />
                   </div>
                   <div>
-                    <Label>Summary</Label>
-                    <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="Brief summary for the listing card..." rows={3} className="mt-1" />
+                    <Label>Cover Image</Label>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                    {imagePreview ? (
+                      <div className="mt-2 relative group">
+                        <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60 aspect-video object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => { setImageFile(null); setImagePreview(null); }}
+                          className="absolute top-2 right-2 bg-background/80 backdrop-blur rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="mt-2 w-full aspect-video rounded-lg border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
+                      >
+                        <ImagePlus className="h-8 w-8" />
+                        <span className="text-sm font-medium">Click to upload cover image</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -145,8 +201,8 @@ const CreateArticle = () => {
 
               {step === 2 && (
                 <div className="space-y-4 rounded-xl border border-border/60 bg-card p-6">
+                  {imagePreview && <img src={imagePreview} alt="Cover" className="w-full rounded-lg aspect-video object-cover" />}
                   <h3 className="font-display font-bold text-lg">{title || "Untitled"}</h3>
-                  {summary && <p className="text-sm text-muted-foreground">{summary}</p>}
                   {tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {tags.map((t) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
@@ -168,12 +224,20 @@ const CreateArticle = () => {
               </Button>
             ) : (
               <Button onClick={handleCreate} disabled={creating || !title.trim()}>
-                <PenLine className="h-4 w-4 mr-1" /> {creating ? "Creating..." : "Create Article"}
+                {(creating || uploadingImage) ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <PenLine className="h-4 w-4 mr-1" />}
+                {uploadingImage ? "Uploading..." : creating ? "Creating..." : "Create Article"}
               </Button>
             )}
           </div>
         </div>
       </section>
+
+      <ProjectImageCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc || ""}
+        onClose={() => setCropSrc(null)}
+        onCropComplete={handleCropComplete}
+      />
     </Layout>
   );
 };
