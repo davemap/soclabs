@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,26 @@ import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
 import { allNewsTags, type NewsTag } from "@/data/newsData";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const SubmitNews = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
   const [selectedTags, setSelectedTags] = useState<NewsTag[]>([]);
+  const [creating, setCreating] = useState(false);
+
+  if (!authLoading && !user) {
+    return (
+      <Layout>
+        <div className="py-32 text-center">
+          <h1 className="text-2xl font-display font-bold mb-4">Sign in required</h1>
+          <Button onClick={() => navigate("/auth")}>Sign In</Button>
+        </div>
+      </Layout>
+    );
+  }
 
   const toggleTag = (tag: NewsTag) => {
     setSelectedTags((prev) =>
@@ -22,12 +37,27 @@ const SubmitNews = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast({
-      title: "Article Submitted",
-      description: "Thank you! Your article will be reviewed by the SoC Labs team.",
-    });
+    if (!user) return;
+    setCreating(true);
+    const formData = new FormData(e.currentTarget);
+    const title = (formData.get("title") as string).trim();
+    const summary = (formData.get("summary") as string).trim();
+
+    const { data, error } = await supabase
+      .from("news_articles" as any)
+      .insert({ user_id: user.id, title, summary, tags: selectedTags } as any)
+      .select()
+      .single();
+
+    if (error) {
+      toast({ title: "Failed to create draft", description: error.message, variant: "destructive" });
+      setCreating(false);
+      return;
+    }
+    toast({ title: "Draft created!" });
+    navigate(`/news/edit/${(data as any).id}`);
   };
 
   return (
@@ -39,36 +69,20 @@ const SubmitNews = () => {
               <ArrowLeft className="mr-1 h-4 w-4" /> Back
             </Button>
 
-            <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">Submit a News Article</h1>
+            <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">Create a Draft Article</h1>
             <p className="text-muted-foreground mb-10">
-              Share your research updates, event announcements, or community milestones with the SoC Labs community.
+              Set up the basics for your article. You'll be able to write the full content in the editor.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">Article Title</Label>
-                <Input id="title" placeholder="e.g. Our Accelerator Tapes Out on 28nm" required />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="author">Your Name</Label>
-                  <Input id="author" placeholder="Dr. Jane Smith" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="institution">Institution</Label>
-                  <Input id="institution" placeholder="University of Example" required />
-                </div>
+                <Input id="title" name="title" placeholder="e.g. Our Accelerator Tapes Out on 28nm" required />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="summary">Summary</Label>
-                <Textarea id="summary" placeholder="A brief 1-2 sentence summary of the article…" rows={3} required />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="content">Article Content (Markdown supported)</Label>
-                <Textarea id="content" placeholder="## Introduction&#10;&#10;Write your article here using Markdown…" rows={12} required />
+                <Textarea id="summary" name="summary" placeholder="A brief 1-2 sentence summary of the article…" rows={3} required />
               </div>
 
               <div className="space-y-3">
@@ -95,8 +109,8 @@ const SubmitNews = () => {
                 </div>
               </div>
 
-              <Button type="submit" size="lg" className="rounded-full px-8 w-full md:w-auto">
-                <Send className="mr-2 h-4 w-4" /> Submit Article
+              <Button type="submit" size="lg" className="rounded-full px-8 w-full md:w-auto" disabled={creating}>
+                <Send className="mr-2 h-4 w-4" /> {creating ? "Creating…" : "Create Draft"}
               </Button>
             </form>
           </motion.div>
