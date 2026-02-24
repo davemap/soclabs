@@ -30,6 +30,7 @@ const CreateArticle = () => {
   const [creating, setCreating] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -97,7 +98,7 @@ const CreateArticle = () => {
 
     const { data, error } = await supabase
       .from("news_articles" as any)
-      .insert({ user_id: user.id, title: title.trim(), summary: "", tags, image_url } as any)
+      .insert({ user_id: user.id, title: title.trim(), summary: summary.trim(), tags, image_url } as any)
       .select()
       .single();
 
@@ -143,6 +144,10 @@ const CreateArticle = () => {
                   <div>
                     <Label>Title</Label>
                     <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Article title..." className="mt-1" />
+                  </div>
+                  <div>
+                    <Label>Summary <span className="text-muted-foreground font-normal text-xs">(shown on article card)</span></Label>
+                    <Input value={summary} onChange={(e) => setSummary(e.target.value)} placeholder="A brief summary for the news listing..." className="mt-1" />
                   </div>
                   <div>
                     <Label>Cover Image</Label>
