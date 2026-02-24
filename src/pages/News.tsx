@@ -106,6 +106,7 @@ const News = () => {
         tags: a.tags || [],
         isDb: true,
         dbId: a.id,
+        image_url: a.image_url || null,
       };
     }),
     ...newsArticles.map((a) => ({ ...a, isDb: false })),
@@ -254,7 +255,7 @@ const News = () => {
                         {/* Article image */}
                         <div className="relative h-40 overflow-hidden bg-muted">
                           <img
-                            src={articleImages[article.id] || "/placeholder.svg"}
+                            src={(article as any).image_url || articleImages[article.id] || "/placeholder.svg"}
                             alt={article.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                           />
