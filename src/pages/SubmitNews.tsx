@@ -68,7 +68,7 @@ const SubmitNews = () => {
 
     const { data, error } = await supabase
       .from("news_articles" as any)
-      .insert({ user_id: user.id, title, summary: "", tags: selectedTags, image_url } as any)
+      .insert({ user_id: user.id, title, summary: ((formData.get("summary") as string) || "").trim(), tags: selectedTags, image_url } as any)
       .select()
       .single();
 
@@ -99,6 +99,11 @@ const SubmitNews = () => {
               <div className="space-y-2">
                 <Label htmlFor="title">Article Title</Label>
                 <Input id="title" name="title" placeholder="e.g. Our Accelerator Tapes Out on 28nm" required />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="summary">Summary <span className="text-muted-foreground font-normal text-xs">(shown on article card)</span></Label>
+                <Input id="summary" name="summary" placeholder="A brief summary for the news listing..." />
               </div>
 
               <div className="space-y-2">

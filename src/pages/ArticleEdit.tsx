@@ -25,9 +25,11 @@ const ArticleEdit = () => {
 
   // Editable fields
   const [editTitle, setEditTitle] = useState("");
+  const [editSummary, setEditSummary] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
   const [savingTitle, setSavingTitle] = useState(false);
   const [titleDirty, setTitleDirty] = useState(false);
+  const [summaryDirty, setSummaryDirty] = useState(false);
   const [tagsDirty, setTagsDirty] = useState(false);
   const [savingTags, setSavingTags] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -40,9 +42,11 @@ const ArticleEdit = () => {
     if (data) {
       setArticle(data);
       setEditTitle((data as any).title);
+      setEditSummary((data as any).summary || "");
       setEditTags((data as any).tags || []);
       setImageUrl((data as any).image_url || null);
       setTitleDirty(false);
+      setSummaryDirty(false);
       setTagsDirty(false);
     }
     setLoading(false);
@@ -60,14 +64,14 @@ const ArticleEdit = () => {
     return updatedMs - publishedMs > 2000;
   }, [article]);
 
-  const hasUnsavedChanges = titleDirty || tagsDirty;
+  const hasUnsavedChanges = titleDirty || summaryDirty || tagsDirty;
 
   const saveTitle = async () => {
     if (!article || !editTitle.trim()) return;
     setSavingTitle(true);
-    const { error } = await supabase.from("news_articles" as any).update({ title: editTitle.trim() } as any).eq("id", (article as any).id);
+    const { error } = await supabase.from("news_articles" as any).update({ title: editTitle.trim(), summary: editSummary.trim() } as any).eq("id", (article as any).id);
     if (error) toast.error("Failed to save");
-    else { toast.success("Title saved"); setTitleDirty(false); await fetchArticle(); }
+    else { toast.success("Saved"); setTitleDirty(false); setSummaryDirty(false); await fetchArticle(); }
     setSavingTitle(false);
   };
 
@@ -235,10 +239,19 @@ const ArticleEdit = () => {
                 className="flex-1 text-3xl md:text-4xl font-display font-bold bg-transparent border-b-2 border-primary/30 focus:border-primary outline-none py-1"
                 placeholder="Article title..."
               />
-              <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0" onClick={saveTitle} disabled={savingTitle || !titleDirty}>
+              <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0" onClick={saveTitle} disabled={savingTitle || (!titleDirty && !summaryDirty)}>
                 <Save className="h-3.5 w-3.5 mr-1" /> {savingTitle ? "Saving..." : "Save"}
               </Button>
             </div>
+
+            {/* Summary */}
+            <textarea
+              value={editSummary}
+              onChange={(e) => { setEditSummary(e.target.value); setSummaryDirty(true); }}
+              className="w-full text-sm text-muted-foreground bg-transparent border-b border-border/40 focus:border-primary/50 outline-none py-2 resize-none mb-2"
+              placeholder="Short summary for the article card (optional)..."
+              rows={2}
+            />
 
             {/* Cover image */}
             <div className="mb-4">
