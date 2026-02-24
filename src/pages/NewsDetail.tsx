@@ -160,7 +160,7 @@ const NewsDetail = () => {
                   </div>
 
                   {dbArticle.image_url && (
-                    <div className="rounded-xl overflow-hidden mb-10 bg-muted">
+                    <div className="rounded-xl overflow-hidden mb-10">
                       <img src={dbArticle.image_url} alt={dbArticle.title} className="w-full object-contain max-h-[28rem]" />
                     </div>
                   )}

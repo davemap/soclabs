@@ -244,7 +244,7 @@ const ArticleEdit = () => {
             <div className="mb-4">
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageFileSelect} />
               {imageUrl ? (
-              <div className="relative group rounded-lg overflow-hidden bg-muted">
+              <div className="relative group rounded-lg overflow-hidden">
                   <img src={imageUrl} alt="Cover" className="w-full object-contain max-h-[28rem]" />
                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-background/80 backdrop-blur rounded-full p-1.5">

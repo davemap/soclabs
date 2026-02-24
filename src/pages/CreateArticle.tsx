@@ -148,8 +148,8 @@ const CreateArticle = () => {
                     <Label>Cover Image</Label>
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
                     {imagePreview ? (
-                      <div className="mt-2 relative group">
-                        <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60" />
+                      <div className="mt-2 relative group overflow-hidden rounded-lg">
+                        <img src={imagePreview} alt="Cover preview" className="w-full object-contain max-h-[28rem] border border-border/60 rounded-lg" />
                         <button
                           type="button"
                           onClick={() => { setImageFile(null); setImagePreview(null); }}
@@ -192,7 +192,7 @@ const CreateArticle = () => {
 
               {step === 2 && (
                 <div className="space-y-4 rounded-xl border border-border/60 bg-card p-6">
-                  {imagePreview && <img src={imagePreview} alt="Cover" className="w-full rounded-lg aspect-video object-cover" />}
+                  {imagePreview && <img src={imagePreview} alt="Cover" className="w-full rounded-lg object-contain max-h-[24rem]" />}
                   <h3 className="font-display font-bold text-lg">{title || "Untitled"}</h3>
                   {tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
