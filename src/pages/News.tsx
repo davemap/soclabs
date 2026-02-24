@@ -125,7 +125,7 @@ const News = () => {
   return (
     <Layout>
       {/* Floating sidebar for logged-in users */}
-      {user && (
+      {canWrite && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
