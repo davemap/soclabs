@@ -105,8 +105,8 @@ const SubmitNews = () => {
                 <Label>Cover Image</Label>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
                 {imagePreview ? (
-                  <div className="relative group">
-                    <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60" />
+                  <div className="relative group overflow-hidden rounded-lg">
+                    <img src={imagePreview} alt="Cover preview" className="w-full object-contain max-h-[28rem] border border-border/60 rounded-lg" />
                     <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className="absolute top-2 right-2 bg-background/80 backdrop-blur rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <X className="h-4 w-4" />
                     </button>
