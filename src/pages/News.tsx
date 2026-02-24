@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { supabase } from "@/integrations/supabase/client";
 
+
 // Import images
 import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
 import imgAsicTapeout from "@/assets/news/asic-tapeout.jpg";
@@ -123,6 +124,29 @@ const News = () => {
 
   return (
     <Layout>
+      {/* Floating sidebar for logged-in users */}
+      {user && (
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2"
+        >
+          <Button asChild size="icon" className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" title="Submit an Article">
+            <Link to="/news/submit">
+              <PenLine className="h-5 w-5" />
+            </Link>
+          </Button>
+          {canWrite && (
+            <Button asChild size="icon" className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" title="Add Article">
+              <Link to="/news/create">
+                <Plus className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
+        </motion.div>
+      )}
+
       {/* Hero */}
       <section className="bg-gradient-hero mesh-dots py-14 md:py-20">
         <div className="container mx-auto px-4 text-center">
@@ -133,20 +157,6 @@ const News = () => {
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg mb-8">
               The latest from the SoC Labs community — research milestones, events, competitions, and more.
             </p>
-            <div className="flex gap-3 justify-center flex-wrap">
-              <Button asChild size="lg" className="rounded-full px-8" variant="outline">
-                <Link to="/news/submit">
-                  <PenLine className="mr-2 h-4 w-4" /> Submit an Article
-                </Link>
-              </Button>
-              {canWrite && (
-                <Button asChild size="lg" className="rounded-full px-8">
-                  <Link to="/news/create">
-                    <Plus className="mr-2 h-4 w-4" /> Add Article
-                  </Link>
-                </Button>
-              )}
-            </div>
           </motion.div>
         </div>
       </section>
