@@ -334,6 +334,7 @@ const Profile = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { hasRole } = useUserRoles();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -701,6 +702,13 @@ const Profile = () => {
                         <Settings className="h-3.5 w-3.5 mr-1.5" /> Account Settings
                       </Link>
                     </Button>
+                    {hasRole("admin") && (
+                      <Button size="sm" variant="ghost" className="rounded-full text-primary" asChild>
+                        <Link to="/admin">
+                          <Crown className="h-3.5 w-3.5 mr-1.5" /> Admin Panel
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
