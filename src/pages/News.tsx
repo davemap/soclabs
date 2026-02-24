@@ -130,7 +130,7 @@ const News = () => {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
-          className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2"
+          className="fixed right-8 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 xl:right-[calc((100vw-1280px)/2+1rem)] 2xl:right-[calc((100vw-1280px)/2+1rem)]"
         >
           <Button asChild size="icon" className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" title="Submit an Article">
             <Link to="/news/submit">
