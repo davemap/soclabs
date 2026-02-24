@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
-import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +33,6 @@ const CreateArticle = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,15 +71,8 @@ const CreateArticle = () => {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setCropSrc(url);
-  };
-
-  const handleCropComplete = (blob: Blob) => {
-    const file = new File([blob], "article-image.png", { type: "image/png" });
     setImageFile(file);
-    setImagePreview(URL.createObjectURL(blob));
-    setCropSrc(null);
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleCreate = async () => {
@@ -158,7 +149,7 @@ const CreateArticle = () => {
                     <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
                     {imagePreview ? (
                       <div className="mt-2 relative group">
-                        <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60 aspect-video object-cover" />
+                        <img src={imagePreview} alt="Cover preview" className="w-full rounded-lg border border-border/60" />
                         <button
                           type="button"
                           onClick={() => { setImageFile(null); setImagePreview(null); }}
@@ -232,12 +223,6 @@ const CreateArticle = () => {
         </div>
       </section>
 
-      <ProjectImageCropDialog
-        open={!!cropSrc}
-        imageSrc={cropSrc || ""}
-        onClose={() => setCropSrc(null)}
-        onCropComplete={handleCropComplete}
-      />
     </Layout>
   );
 };
