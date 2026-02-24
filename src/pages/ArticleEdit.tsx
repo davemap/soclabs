@@ -5,7 +5,6 @@ import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, Settings, CircleD
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
-import ProjectImageCropDialog from "@/components/ProjectImageCropDialog";
 import ArticleContentManager from "@/components/article-manage/ArticleContentManager";
 import ArticleVersionHistory from "@/components/article-manage/ArticleVersionHistory";
 import DragToDeleteDialog from "@/components/DragToDeleteDialog";
@@ -32,7 +31,6 @@ const ArticleEdit = () => {
   const [tagsDirty, setTagsDirty] = useState(false);
   const [savingTags, setSavingTags] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [savingImage, setSavingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,18 +71,12 @@ const ArticleEdit = () => {
     setSavingTitle(false);
   };
 
-  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setCropSrc(URL.createObjectURL(file));
-  };
-
-  const handleCropComplete = async (blob: Blob) => {
-    if (!article || !user) return;
-    setCropSrc(null);
+    if (!file || !article || !user) return;
     setSavingImage(true);
-    const path = `${user.id}/${Date.now()}-article-image.png`;
-    const { error: uploadErr } = await supabase.storage.from("news-images").upload(path, blob);
+    const path = `${user.id}/${Date.now()}-${file.name}`;
+    const { error: uploadErr } = await supabase.storage.from("news-images").upload(path, file);
     if (uploadErr) { toast.error("Upload failed"); setSavingImage(false); return; }
     const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(path);
     const newUrl = urlData.publicUrl;
@@ -253,7 +245,7 @@ const ArticleEdit = () => {
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageFileSelect} />
               {imageUrl ? (
                 <div className="relative group">
-                  <img src={imageUrl} alt="Cover" className="w-full rounded-lg border border-border/60 aspect-video object-cover" />
+                  <img src={imageUrl} alt="Cover" className="w-full rounded-lg border border-border/60" />
                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-background/80 backdrop-blur rounded-full p-1.5">
                       <ImagePlus className="h-4 w-4" />
@@ -334,13 +326,6 @@ const ArticleEdit = () => {
         </div>
       </article>
 
-      <ProjectImageCropDialog
-        open={!!cropSrc}
-        imageSrc={cropSrc || ""}
-        onClose={() => setCropSrc(null)}
-        onCropComplete={handleCropComplete}
-        saving={savingImage}
-      />
     </Layout>
   );
 };
