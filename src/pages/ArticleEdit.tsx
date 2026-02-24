@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, History as HistoryIcon, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Save, Globe, Loader2, Trash2, AlertCircle, History as HistoryIcon, Settings, CircleDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
 import ArticleContentManager from "@/components/article-manage/ArticleContentManager";
 import ArticleVersionHistory from "@/components/article-manage/ArticleVersionHistory";
@@ -30,8 +28,12 @@ const ArticleEdit = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editSummary, setEditSummary] = useState("");
   const [editTags, setEditTags] = useState<string[]>([]);
-  const [savingMeta, setSavingMeta] = useState(false);
-  const [metaDirty, setMetaDirty] = useState(false);
+  const [savingTitle, setSavingTitle] = useState(false);
+  const [savingSummary, setSavingSummary] = useState(false);
+  const [titleDirty, setTitleDirty] = useState(false);
+  const [summaryDirty, setSummaryDirty] = useState(false);
+  const [tagsDirty, setTagsDirty] = useState(false);
+  const [savingTags, setSavingTags] = useState(false);
 
   const fetchArticle = useCallback(async () => {
     if (!id) return;
@@ -41,7 +43,9 @@ const ArticleEdit = () => {
       setEditTitle((data as any).title);
       setEditSummary((data as any).summary || "");
       setEditTags((data as any).tags || []);
-      setMetaDirty(false);
+      setTitleDirty(false);
+      setSummaryDirty(false);
+      setTagsDirty(false);
     }
     setLoading(false);
   }, [id]);
@@ -58,17 +62,33 @@ const ArticleEdit = () => {
     return updatedMs - publishedMs > 2000;
   }, [article]);
 
-  const saveMeta = async () => {
-    if (!article) return;
-    setSavingMeta(true);
-    const { error } = await supabase.from("news_articles" as any).update({
-      title: editTitle.trim(),
-      summary: editSummary.trim(),
-      tags: editTags,
-    } as any).eq("id", (article as any).id);
+  const hasUnsavedChanges = titleDirty || summaryDirty || tagsDirty;
+
+  const saveTitle = async () => {
+    if (!article || !editTitle.trim()) return;
+    setSavingTitle(true);
+    const { error } = await supabase.from("news_articles" as any).update({ title: editTitle.trim() } as any).eq("id", (article as any).id);
     if (error) toast.error("Failed to save");
-    else { toast.success("Details saved"); setMetaDirty(false); await fetchArticle(); }
-    setSavingMeta(false);
+    else { toast.success("Title saved"); setTitleDirty(false); await fetchArticle(); }
+    setSavingTitle(false);
+  };
+
+  const saveSummary = async () => {
+    if (!article) return;
+    setSavingSummary(true);
+    const { error } = await supabase.from("news_articles" as any).update({ summary: editSummary.trim() } as any).eq("id", (article as any).id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Summary saved"); setSummaryDirty(false); await fetchArticle(); }
+    setSavingSummary(false);
+  };
+
+  const saveTags = async () => {
+    if (!article) return;
+    setSavingTags(true);
+    const { error } = await supabase.from("news_articles" as any).update({ tags: editTags } as any).eq("id", (article as any).id);
+    if (error) toast.error("Failed to save");
+    else { toast.success("Tags saved"); setTagsDirty(false); await fetchArticle(); }
+    setSavingTags(false);
   };
 
   const handlePublish = async () => {
@@ -118,10 +138,6 @@ const ArticleEdit = () => {
   };
 
   const handleDoneEditing = async () => {
-    // Save meta if dirty
-    if (metaDirty) {
-      await saveMeta();
-    }
     toast.success("Draft saved");
     navigate(`/news/db-${(article as any).id}`);
   };
@@ -138,7 +154,7 @@ const ArticleEdit = () => {
 
   const toggleTag = (tag: string) => {
     setEditTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]);
-    setMetaDirty(true);
+    setTagsDirty(true);
   };
 
   if (loading) return <Layout><div className="py-32 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto" /></div></Layout>;
@@ -147,84 +163,110 @@ const ArticleEdit = () => {
 
   return (
     <Layout>
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="flex items-center justify-between mb-8">
-            <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
+      <article className="py-24">
+        <div className="container mx-auto px-4 max-w-5xl">
+          {/* Top bar — matches project editor */}
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex items-center justify-between mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <div className="flex items-center gap-2">
-              <Badge variant="outline">{(article as any).status}</Badge>
-              {hasUnpublishedChanges && (
-                <Badge variant="outline" className="border-amber-500/40 text-amber-600">
-                  <AlertCircle className="h-3 w-3 mr-1" /> Unpublished changes
+              {/* Status indicators */}
+              {hasUnsavedChanges && (
+                <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] gap-1">
+                  <CircleDot className="h-3 w-3" /> Unsaved changes
                 </Badge>
               )}
-            </div>
-          </div>
+              {hasUnpublishedChanges && !hasUnsavedChanges && (
+                <Badge variant="outline" className="border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] gap-1">
+                  <AlertCircle className="h-3 w-3" /> Unpublished
+                </Badge>
+              )}
+              <Badge variant="outline">{(article as any).status}</Badge>
 
-          {/* Inline title editing */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <Input
-              value={editTitle}
-              onChange={(e) => { setEditTitle(e.target.value); setMetaDirty(true); }}
-              className="text-3xl md:text-4xl font-display font-bold border-none bg-transparent px-0 h-auto focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
-              placeholder="Article title..."
-            />
-            <Textarea
-              value={editSummary}
-              onChange={(e) => { setEditSummary(e.target.value); setMetaDirty(true); }}
-              className="mt-2 border-none bg-transparent px-0 text-muted-foreground resize-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
-              placeholder="Brief summary..."
-              rows={2}
-            />
-          </motion.div>
-
-          {/* Tags inline */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-6">
-            <div className="flex flex-wrap gap-1.5">
-              {allNewsTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`text-xs px-2.5 py-1 rounded-full border transition-all font-medium ${editTags.includes(tag) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/60 text-muted-foreground hover:border-primary/50"}`}
+              {/* Publish button */}
+              {hasUnpublishedChanges && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
+                  onClick={handlePublish}
+                  disabled={publishing || hasUnsavedChanges}
                 >
-                  {tag}
-                </button>
-              ))}
+                  <Globe className="h-3.5 w-3.5 mr-1.5" />
+                  {publishing ? "Publishing..." : "Publish Changes"}
+                </Button>
+              )}
+              <Button
+                variant="default"
+                size="sm"
+                className="rounded-full"
+                onClick={handleDoneEditing}
+              >
+                <Settings className="h-4 w-4 mr-1.5" />
+                Done Editing
+              </Button>
             </div>
           </motion.div>
 
-          {/* Save meta if dirty */}
-          {metaDirty && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mb-6">
-              <Button variant="outline" size="sm" onClick={saveMeta} disabled={savingMeta}>
-                <Save className="h-3.5 w-3.5 mr-1" /> {savingMeta ? "Saving..." : "Save Details"}
+          {/* Inline title editing — matches project editor style */}
+          <motion.header initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => { setEditTitle(e.target.value); setTitleDirty(true); }}
+                className="flex-1 text-3xl md:text-4xl font-display font-bold bg-transparent border-b-2 border-primary/30 focus:border-primary outline-none py-1"
+                placeholder="Article title..."
+              />
+              <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0" onClick={saveTitle} disabled={savingTitle || !titleDirty}>
+                <Save className="h-3.5 w-3.5 mr-1" /> {savingTitle ? "Saving..." : "Save"}
               </Button>
-            </motion.div>
-          )}
+            </div>
+
+            {/* Summary with save button */}
+            <div className="flex items-start gap-2 mb-4">
+              <Textarea
+                value={editSummary}
+                onChange={(e) => { setEditSummary(e.target.value); setSummaryDirty(true); }}
+                rows={2}
+                className="flex-1 text-lg leading-relaxed"
+                placeholder="Brief summary..."
+              />
+              <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0 mt-1" onClick={saveSummary} disabled={savingSummary || !summaryDirty}>
+                <Save className="h-3.5 w-3.5 mr-1" /> {savingSummary ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          </motion.header>
+
+          {/* Tags inline with save */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-8">
+            <div className="flex items-start gap-2">
+              <div className="flex flex-wrap gap-1.5 flex-1">
+                {allNewsTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => toggleTag(tag)}
+                    className={`text-xs px-2.5 py-1 rounded-full border transition-all font-medium ${editTags.includes(tag) ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/60 text-muted-foreground hover:border-primary/50"}`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+              {tagsDirty && (
+                <Button size="sm" variant="outline" className="rounded-full h-8 shrink-0" onClick={saveTags} disabled={savingTags}>
+                  <Save className="h-3.5 w-3.5 mr-1" /> {savingTags ? "Saving..." : "Save"}
+                </Button>
+              )}
+            </div>
+          </motion.div>
 
           {/* Content Editor — inline sections with per-section save */}
           <div className="mb-10">
             <ArticleContentManager articleId={(article as any).id} onSave={() => fetchArticle()} />
-          </div>
-
-          {/* Action bar */}
-          <div className="flex flex-wrap items-center gap-3 mb-10 p-4 rounded-xl border border-border/60 bg-card">
-            <Button onClick={handleDoneEditing} variant="outline" className="rounded-full">
-              <CheckCircle2 className="h-4 w-4 mr-1.5" /> Done Editing
-            </Button>
-            <Button onClick={handlePublish} disabled={publishing} className="rounded-full">
-              {publishing ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Globe className="h-4 w-4 mr-1.5" />}
-              Publish
-            </Button>
-            {(article as any).status === "Published" && (
-              <Button variant="outline" size="sm" asChild className="rounded-full ml-auto">
-                <Link to={`/news/db-${(article as any).id}`}>
-                  <Globe className="h-3.5 w-3.5 mr-1" /> View Published
-                </Link>
-              </Button>
-            )}
           </div>
 
           {/* Version History */}
@@ -254,7 +296,7 @@ const ArticleEdit = () => {
             deleting={deleting}
           />
         </div>
-      </section>
+      </article>
     </Layout>
   );
 };

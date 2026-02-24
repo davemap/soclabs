@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Calendar, User, Building2, MapPin, ExternalLink } from "lucide-react";
+import { ArrowLeft, Calendar, User, Building2, MapPin, ExternalLink, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -11,6 +11,7 @@ import { communityMembers, partners } from "@/data/mockData";
 import ReactMarkdown from "react-markdown";
 import CommentsThreads from "@/components/CommentsThreads";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 import imgFpgaWorkshop from "@/assets/news/fpga-workshop.jpg";
 import imgAsicTapeout from "@/assets/news/asic-tapeout.jpg";
@@ -33,6 +34,7 @@ const articleImages: Record<string, string> = {
 const NewsDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
 
   // Check if this is a DB article (id starts with "db-" from the listing, or route is /news/db-:id)
@@ -101,16 +103,24 @@ const NewsDetail = () => {
     const authorName = authorProfile?.full_name || "Unknown Author";
     const authorInitials = authorName.split(" ").map((n: string) => n[0]).join("").slice(0, 2);
     const publishedDate = dbArticle.published_at || dbArticle.created_at;
+    const isAuthor = user && user.id === dbArticle.user_id;
 
     return (
       <Layout>
         <article className="py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                <Button variant="ghost" size="sm" className="mb-8 -ml-2 rounded-full" onClick={() => navigate(-1)}>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex items-center justify-between mb-8">
+                <Button variant="ghost" size="sm" className="-ml-2 rounded-full" onClick={() => navigate(-1)}>
                   <ArrowLeft className="mr-1 h-4 w-4" /> Back
                 </Button>
+                {isAuthor && (
+                  <Button variant="outline" size="sm" className="rounded-full" asChild>
+                    <Link to={`/news/edit/${dbArticle.id}`}>
+                      <Settings className="h-4 w-4 mr-1.5" /> Edit This Page
+                    </Link>
+                  </Button>
+                )}
               </motion.div>
 
               <div className="flex flex-col lg:flex-row gap-10">
