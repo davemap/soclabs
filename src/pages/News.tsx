@@ -132,17 +132,27 @@ const News = () => {
           transition={{ delay: 0.3, duration: 0.4 }}
           className="fixed right-8 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 xl:right-[calc((100vw-1280px)/2+1rem)] 2xl:right-[calc((100vw-1280px)/2+1rem)]"
         >
-          <Button asChild size="icon" className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" title="Submit an Article">
-            <Link to="/news/submit">
+          <Link to="/news/submit" className="group flex items-center gap-0 no-underline">
+            <div className="overflow-hidden max-w-0 group-hover:max-w-[200px] transition-all duration-300 ease-out">
+              <span className="whitespace-nowrap bg-primary text-primary-foreground text-sm font-medium px-4 py-3 rounded-l-full inline-block">
+                Create Draft
+              </span>
+            </div>
+            <div className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 flex items-center justify-center text-primary-foreground shrink-0">
               <PenLine className="h-5 w-5" />
-            </Link>
-          </Button>
+            </div>
+          </Link>
           {canWrite && (
-            <Button asChild size="icon" className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25" title="Add Article">
-              <Link to="/news/create">
+            <Link to="/news/create" className="group flex items-center gap-0 no-underline">
+              <div className="overflow-hidden max-w-0 group-hover:max-w-[200px] transition-all duration-300 ease-out">
+                <span className="whitespace-nowrap bg-primary text-primary-foreground text-sm font-medium px-4 py-3 rounded-l-full inline-block">
+                  Add Article
+                </span>
+              </div>
+              <div className="rounded-full h-12 w-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25 flex items-center justify-center text-primary-foreground shrink-0">
                 <Plus className="h-5 w-5" />
-              </Link>
-            </Button>
+              </div>
+            </Link>
           )}
         </motion.div>
       )}
