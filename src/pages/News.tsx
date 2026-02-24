@@ -97,16 +97,17 @@ const News = () => {
   const allArticles = [
     ...dbArticles.map((a: any) => {
       const profile = authorProfiles[a.user_id];
+      const snap = a.published_data;
       return {
         id: `db-${a.id}`,
-        title: a.title,
-        summary: a.summary || "",
+        title: snap?.title || a.title,
+        summary: snap?.summary || a.summary || "",
         author: profile?.full_name || profile?.username || "Community Member",
         date: a.published_at || a.created_at,
-        tags: a.tags || [],
+        tags: snap?.tags || a.tags || [],
         isDb: true,
         dbId: a.id,
-        image_url: a.image_url || null,
+        image_url: snap?.image_url || a.image_url || null,
       };
     }),
     ...newsArticles.map((a) => ({ ...a, isDb: false })),

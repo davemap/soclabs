@@ -100,10 +100,19 @@ const NewsDetail = () => {
 
   // DB article rendering
   if (isDbArticle && dbArticle) {
+    const isAuthor = user && user.id === dbArticle.user_id;
+    const publishedData = dbArticle.published_data as any;
+
+    // Non-authors see the published snapshot; authors see live draft data
+    const useSnapshot = !isAuthor && publishedData;
+    const displayTitle = useSnapshot ? publishedData.title : dbArticle.title;
+    const displayTags = useSnapshot ? (publishedData.tags || []) : (dbArticle.tags || []);
+    const displayImageUrl = useSnapshot ? publishedData.image_url : dbArticle.image_url;
+    const displaySections = useSnapshot ? (publishedData.content || []) : dbSections;
+
     const authorName = authorProfile?.full_name || "Unknown Author";
     const authorInitials = authorName.split(" ").map((n: string) => n[0]).join("").slice(0, 2);
     const publishedDate = dbArticle.published_at || dbArticle.created_at;
-    const isAuthor = user && user.id === dbArticle.user_id;
 
     return (
       <Layout>
@@ -130,15 +139,15 @@ const NewsDetail = () => {
                   transition={{ duration: 0.5, delay: 0.05 }}
                   className="flex-1 min-w-0"
                 >
-                  {dbArticle.tags?.length > 0 && (
+                  {displayTags?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {dbArticle.tags.map((tag: string) => (
+                      {displayTags.map((tag: string) => (
                         <Badge key={tag} variant="secondary">{tag}</Badge>
                       ))}
                     </div>
                   )}
 
-                  <h1 className="text-3xl md:text-4xl font-display font-bold mb-6 leading-tight">{dbArticle.title}</h1>
+                  <h1 className="text-3xl md:text-4xl font-display font-bold mb-6 leading-tight">{displayTitle}</h1>
 
                   <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-10 pb-6 border-b border-border/50">
                     {authorProfile && (
@@ -159,19 +168,15 @@ const NewsDetail = () => {
                     </span>
                   </div>
 
-                  {dbArticle.image_url && (
+                  {displayImageUrl && (
                     <div className="rounded-xl overflow-hidden mb-10">
-                      <img src={dbArticle.image_url} alt={dbArticle.title} className="w-full object-contain max-h-[28rem]" />
+                      <img src={displayImageUrl} alt={displayTitle} className="w-full object-contain max-h-[28rem]" />
                     </div>
                   )}
 
-                  {dbArticle.summary && (
-                    <p className="text-lg text-muted-foreground mb-8 italic">{dbArticle.summary}</p>
-                  )}
-
-                  {dbSections.length > 0 ? (
+                  {displaySections.length > 0 ? (
                     <div className="space-y-8">
-                      {dbSections.map((section) => (
+                      {displaySections.map((section: any) => (
                         <div key={section.id}>
                           {section.title && (
                             <h2 className="text-2xl font-display font-bold mb-4">{section.title}</h2>
