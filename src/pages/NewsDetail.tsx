@@ -35,9 +35,9 @@ const NewsDetail = () => {
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
 
-  // Check if this is a DB article (route: /news/db-:id)
-  const isDbArticle = location.pathname.startsWith("/news/db-");
-  const dbId = id; // For /news/db-:id, the :id is already the UUID
+  // Check if this is a DB article (id starts with "db-" from the listing, or route is /news/db-:id)
+  const isDbArticle = location.pathname.startsWith("/news/db-") || (id && id.startsWith("db-"));
+  const dbId = id?.startsWith("db-") ? id.slice(3) : id;
 
   // Mock article lookup
   const mockArticle = !isDbArticle ? newsArticles.find((a) => a.id === id) : null;
