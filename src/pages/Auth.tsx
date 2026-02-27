@@ -18,16 +18,25 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const [showResend, setShowResend] = useState(false);
+  const [resending, setResending] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setShowResend(false);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message?.toLowerCase().includes("email not confirmed")) {
+          setShowResend(true);
+        }
+        throw error;
+      }
       toast({ title: "Welcome back!", description: "You've signed in successfully." });
       navigate("/");
     } catch (error: any) {
@@ -38,6 +47,24 @@ const Auth = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email) return;
+    setResending(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+      });
+      if (error) throw error;
+      toast({ title: "Verification email sent", description: "Please check your inbox and verify your email." });
+      setShowResend(false);
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -92,6 +119,22 @@ const Auth = () => {
                   />
                 </div>
               </div>
+
+              {showResend && (
+                <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+                  <p className="mb-2">Your email hasn't been verified yet.</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="w-full rounded-full"
+                    onClick={handleResendVerification}
+                    disabled={resending}
+                  >
+                    {resending ? "Sending..." : "Resend verification email"}
+                  </Button>
+                </div>
+              )}
 
               <Button type="submit" className="w-full rounded-full" disabled={loading}>
                 {loading ? "Please wait..." : "Sign In"}
