@@ -93,17 +93,17 @@ const Index = () => {
 
 
           {/* ── REFERENCE DESIGNS ─────────────────────────────── */}
-          <section id="designs" className="relative py-24 border-y border-white/5">
+          <section id="designs" className="relative py-24 border-y border-border/60">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 max-w-2xl">
-                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                   01 — Reference Designs
                 </div>
-                <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                   Start with our{" "}
-                  <span className="text-[hsl(195_85%_65%)]">proven architectures.</span>
+                  <span className="text-primary">proven architectures.</span>
                 </h2>
-                <p className="mt-4 text-slate-300/80">
+                <p className="mt-4 text-muted-foreground">
                   Fork, extend, and build your custom accelerators on top of production-tested
                   ARM Cortex-M reference SoCs.
                 </p>
@@ -113,29 +113,29 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="group block h-full">
-                      <Card className="h-full border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
+                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
                         <CardContent className="p-7">
                           <div className="mb-5 flex items-start justify-between">
                             <div>
-                              <h3 className="font-display text-xl font-bold text-white">{design.name}</h3>
-                              <p className="text-sm font-medium text-[hsl(195_75%_70%)]">{design.tagline}</p>
+                              <h3 className="font-display text-xl font-bold text-card-foreground">{design.name}</h3>
+                              <p className="text-sm font-medium text-primary">{design.tagline}</p>
                             </div>
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
-                              <Cpu className="h-5 w-5 text-[hsl(195_85%_70%)]" />
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                              <Cpu className="h-5 w-5 text-primary" />
                             </div>
                           </div>
-                          <p className="mb-5 line-clamp-3 text-sm text-slate-300/75">{design.description}</p>
+                          <p className="mb-5 line-clamp-3 text-sm text-muted-foreground">{design.description}</p>
                           <div className="mb-5 flex flex-wrap gap-2">
                             {design.features.slice(0, 3).map((f) => (
                               <span
                                 key={f}
-                                className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-200 ring-1 ring-white/10"
+                                className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground ring-1 ring-border"
                               >
                                 {f}
                               </span>
                             ))}
                           </div>
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(195_85%_70%)]">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
                             View details{" "}
                             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                           </span>
@@ -151,7 +151,7 @@ const Index = () => {
                   asChild
                   variant="outline"
                   size="lg"
-                  className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                  className="rounded-full border-border bg-card px-8 text-foreground hover:bg-muted hover:text-foreground"
                 >
                   <Link to="/designs">
                     View All Reference SoCs <ArrowRight className="ml-2 h-4 w-4" />
