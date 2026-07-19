@@ -3,10 +3,10 @@ import { useMemo } from "react";
 interface CircuitBackgroundProps {
   className?: string;
   seed?: number;
-  count?: number;
-  opacity?: number;
+  density?: number;
 }
 
+// Deterministic pseudo-random so the SSR/CSR trace layout matches.
 const mulberry32 = (a: number) => () => {
   let t = (a += 0x6d2b79f5);
   t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -14,206 +14,135 @@ const mulberry32 = (a: number) => () => {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 };
 
-const WIDTH = 1620;
-const HEIGHT = 2400;
-const MIN_LEN = 70;
-const MAX_LEN = 110;
-const EXIT_MARGIN = 20; // how far past the edge a terminal wire runs
-// Large minimum spacing between wires of the same colour (vias are shared by both colours).
-const MIN_VIA_SPACING = 360;
-
-type Color = "blue" | "green";
-type Segment = { x1: number; y1: number; x2: number; y2: number; color: Color };
-type Via = { x: number; y: number };
-
-// Blue owns horizontal (0°) + +45° diagonal.
-// Green owns vertical (90°) + -45° diagonal (135°).
-// A via is only valid where the colour AND angle both change → guaranteed
-// because the angle sets are disjoint between the two colours.
-const ANGLES: Record<Color, number[]> = {
-  blue: [0, Math.PI, Math.PI / 4, (5 * Math.PI) / 4],
-  green: [Math.PI / 2, (3 * Math.PI) / 2, (3 * Math.PI) / 4, (7 * Math.PI) / 4],
-};
-
-const CircuitBackground = ({
-  className = "",
-  seed = 17,
-  count = 10,
-  opacity = 0.9,
-}: CircuitBackgroundProps) => {
-  const { segments, vias } = useMemo(() => {
+/**
+ * A tiled circuit-trace + via pattern that lives behind the whole page.
+ * Uses orthogonal segments with 45° corners and glowing nodes to echo
+ * the SoC Labs slide-deck backdrop.
+ */
+const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBackgroundProps) => {
+  const paths = useMemo(() => {
     const rand = mulberry32(seed);
-    const segs: Segment[] = [];
-    const vs: Via[] = [];
+    const cell = 120;
+    const cols = 12;
+    const rows = 14;
+    const items: { d: string; nodes: [number, number][]; opacity: number; color: string }[] = [];
 
-    // Jittered anchors so distribution looks even but not tiled.
-    const cols = 6;
-    const rows = Math.max(6, Math.ceil(count / cols));
-    const cellW = WIDTH / cols;
-    const cellH = HEIGHT / rows;
-    const anchors: { x: number; y: number }[] = [];
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        anchors.push({
-          x: cellW * (c + 0.2 + rand() * 0.6),
-          y: cellH * (r + 0.2 + rand() * 0.6),
-        });
-      }
-    }
-    for (let i = anchors.length - 1; i > 0; i--) {
-      const j = Math.floor(rand() * (i + 1));
-      [anchors[i], anchors[j]] = [anchors[j], anchors[i]];
-    }
+    for (let i = 0; i < density; i++) {
+      const startCol = Math.floor(rand() * cols);
+      const startRow = Math.floor(rand() * rows);
+      let x = startCol * cell + cell / 2;
+      let y = startRow * cell + cell / 2;
+      const nodes: [number, number][] = [[x, y]];
+      let d = `M ${x} ${y}`;
+      const segments = 3 + Math.floor(rand() * 5);
+      let lastDir: "h" | "v" = rand() > 0.5 ? "h" : "v";
 
-    const tooClose = (x: number, y: number) =>
-      vs.some((v) => Math.hypot(v.x - x, v.y - y) < MIN_VIA_SPACING);
-
-    // Extend from (x,y) along `angle` until just past the frame.
-    const exitOffscreen = (x: number, y: number, angle: number) => {
-      const dx = Math.cos(angle);
-      const dy = Math.sin(angle);
-      const ts: number[] = [];
-      if (dx > 1e-6) ts.push((WIDTH + EXIT_MARGIN - x) / dx);
-      if (dx < -1e-6) ts.push((-EXIT_MARGIN - x) / dx);
-      if (dy > 1e-6) ts.push((HEIGHT + EXIT_MARGIN - y) / dy);
-      if (dy < -1e-6) ts.push((-EXIT_MARGIN - y) / dy);
-      const t = Math.min(...ts.filter((v) => v > 0));
-      return { x: x + dx * t, y: y + dy * t };
-    };
-
-    let placed = 0;
-    for (const anchor of anchors) {
-      if (placed >= count) break;
-      if (tooClose(anchor.x, anchor.y)) continue;
-
-      // Mostly single-via chains for lots of short wires.
-      const interiorVias = rand() > 0.82 ? 2 : 1;
-      const viaPositions: Via[] = [{ x: anchor.x, y: anchor.y }];
-
-      // Pick the colour of the FIRST internal segment (between via0 and via1
-      // if two vias; otherwise arbitrary since there is no internal segment).
-      let internalColor: Color = rand() > 0.5 ? "blue" : "green";
-      let chainOk = true;
-
-      for (let k = 1; k < interiorVias; k++) {
-        const opts = ANGLES[internalColor];
-        const angle = opts[Math.floor(rand() * opts.length)];
-        const len = MIN_LEN + rand() * (MAX_LEN - MIN_LEN);
-        const prev = viaPositions[k - 1];
-        const nx = prev.x + Math.cos(angle) * len;
-        const ny = prev.y + Math.sin(angle) * len;
-        if (
-          nx < 80 || nx > WIDTH - 80 ||
-          ny < 80 || ny > HEIGHT - 80 ||
-          tooClose(nx, ny)
-        ) {
-          chainOk = false;
-          break;
+      for (let s = 0; s < segments; s++) {
+        const goDiag = rand() > 0.55;
+        const len = (1 + Math.floor(rand() * 3)) * cell;
+        const dir = rand() > 0.5 ? 1 : -1;
+        if (lastDir === "h") {
+          const dy = dir * len;
+          if (goDiag) {
+            const step = Math.min(cell / 2, Math.abs(dy) / 2);
+            d += ` l ${dir * step} ${dir * step}`;
+            y += dir * step;
+            x += dir * step;
+          }
+          d += ` l 0 ${dy - (goDiag ? dir * (cell / 2) : 0)}`;
+          y += dy - (goDiag ? dir * (cell / 2) : 0);
+          lastDir = "v";
+        } else {
+          const dx = dir * len;
+          if (goDiag) {
+            const step = Math.min(cell / 2, Math.abs(dx) / 2);
+            d += ` l ${dir * step} ${-dir * step}`;
+            x += dir * step;
+            y += -dir * step;
+          }
+          d += ` l ${dx - (goDiag ? dir * (cell / 2) : 0)} 0`;
+          x += dx - (goDiag ? dir * (cell / 2) : 0);
+          lastDir = "h";
         }
-        viaPositions.push({ x: nx, y: ny });
-        // The next internal segment flips colour at this via.
-        internalColor = internalColor === "blue" ? "green" : "blue";
-      }
-      if (!chainOk) continue;
-
-      // Colour of the segment leaving via0 toward via1 (or a random pick if solo).
-      const firstInternalColor: Color =
-        viaPositions.length >= 2
-          ? (() => {
-              const dx = viaPositions[1].x - viaPositions[0].x;
-              const dy = viaPositions[1].y - viaPositions[0].y;
-              const ang = Math.atan2(dy, dx);
-              return ANGLES.blue.some(
-                (a) => Math.abs(Math.atan2(Math.sin(a - ang), Math.cos(a - ang))) < 0.05,
-              )
-                ? "blue"
-                : "green";
-            })()
-          : rand() > 0.5
-            ? "blue"
-            : "green";
-
-      // Terminal leaving via0: opposite colour of first internal segment.
-      const startTermColor: Color = firstInternalColor === "blue" ? "green" : "blue";
-      const startAngle =
-        ANGLES[startTermColor][Math.floor(rand() * ANGLES[startTermColor].length)];
-      const startEnd = exitOffscreen(viaPositions[0].x, viaPositions[0].y, startAngle);
-      segs.push({
-        x1: viaPositions[0].x, y1: viaPositions[0].y,
-        x2: startEnd.x, y2: startEnd.y,
-        color: startTermColor,
-      });
-
-      // Internal segments (alternate colour each via).
-      let segColor = firstInternalColor;
-      for (let k = 0; k < viaPositions.length - 1; k++) {
-        segs.push({
-          x1: viaPositions[k].x, y1: viaPositions[k].y,
-          x2: viaPositions[k + 1].x, y2: viaPositions[k + 1].y,
-          color: segColor,
-        });
-        segColor = segColor === "blue" ? "green" : "blue";
+        nodes.push([x, y]);
       }
 
-      // Colour of the terminal leaving the last via — must differ from the
-      // wire on the other side of the via so the via is a real layer change.
-      // Two-via chain: after the loop, segColor was flipped past the last internal
-      // segment, so `segColor` is already the opposite of the last internal wire → use it.
-      // Single-via chain: opposite of the start terminal.
-      const endTermColor: Color =
-        viaPositions.length >= 2
-          ? segColor
-          : startTermColor === "blue"
-            ? "green"
-            : "blue";
-      const endAngle =
-        ANGLES[endTermColor][Math.floor(rand() * ANGLES[endTermColor].length)];
-      const lastVia = viaPositions[viaPositions.length - 1];
-      const endEnd = exitOffscreen(lastVia.x, lastVia.y, endAngle);
-      segs.push({
-        x1: lastVia.x, y1: lastVia.y,
-        x2: endEnd.x, y2: endEnd.y,
-        color: endTermColor,
-      });
+      const colorRoll = rand();
+      const color =
+        colorRoll > 0.72
+          ? "hsl(82 55% 62%)" // lime accent
+          : colorRoll > 0.42
+          ? "hsl(195 78% 62%)" // cyan
+          : "hsl(210 60% 55%)"; // muted electric
 
-      vs.push(...viaPositions);
-      placed++;
+      items.push({
+        d,
+        nodes,
+        opacity: 0.18 + rand() * 0.35,
+        color,
+      });
     }
-
-    return { segments: segs, vias: vs };
-  }, [seed, count]);
-
-  const blue = "hsl(200 85% 78%)";
-  const green = "hsl(140 55% 78%)";
-  const ringStroke = "hsl(200 85% 68%)";
-  const ringFill = "hsl(200 85% 82% / 0.2)";
-  const stroke = 2.8;
+    return items;
+  }, [seed, density]);
 
   return (
     <div
       aria-hidden
       className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
-      style={{ opacity }}
     >
       <svg
         className="h-full w-full"
-        viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+        viewBox="0 0 1440 1680"
         preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {segments.map((s, i) => (
-          <line
-            key={`s${i}`}
-            x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}
-            stroke={s.color === "blue" ? blue : green}
-            strokeWidth={stroke}
-            strokeLinecap="round"
-          />
-        ))}
-        {vias.map((v, i) => (
-          <g key={`v${i}`}>
-            <circle cx={v.x} cy={v.y} r={11} fill={ringFill} />
-            <circle cx={v.x} cy={v.y} r={11} fill="none" stroke={ringStroke} strokeWidth={2.5} />
+        <defs>
+          <radialGradient id="via-lime" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(82 70% 70%)" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="hsl(82 70% 70%)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="hsl(82 70% 70%)" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="via-cyan" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(195 90% 75%)" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="hsl(195 90% 75%)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="hsl(195 90% 75%)" stopOpacity="0" />
+          </radialGradient>
+          <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.6" />
+          </filter>
+        </defs>
+
+        {paths.map((p, i) => (
+          <g key={i} style={{ opacity: p.opacity }}>
+            <path
+              d={p.d}
+              fill="none"
+              stroke={p.color}
+              strokeWidth={1}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              filter="url(#glow-soft)"
+            />
+            {p.nodes.map((n, j) => {
+              const isEnd = j === 0 || j === p.nodes.length - 1;
+              const r = isEnd ? 6 : 3;
+              const fill =
+                p.color.includes("82") ? "url(#via-lime)" : "url(#via-cyan)";
+              return (
+                <g key={j}>
+                  <circle cx={n[0]} cy={n[1]} r={r * 2.4} fill={fill} />
+                  <circle
+                    cx={n[0]}
+                    cy={n[1]}
+                    r={r}
+                    fill="none"
+                    stroke={p.color}
+                    strokeWidth={1}
+                    opacity={0.9}
+                  />
+                </g>
+              );
+            })}
           </g>
         ))}
       </svg>
