@@ -50,14 +50,6 @@ const Index = () => {
         <div className="relative z-10">
           {/* Hero */}
           <section id="hero" className="relative overflow-hidden bg-[#0b1c2b] text-white">
-            <div
-              className="absolute inset-0 opacity-[0.18] pointer-events-none"
-              style={{
-                backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(84,189,222,0.5) 46%, rgba(84,189,222,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(84,189,222,0.55) 62%, rgba(84,189,222,0.55) 62.3%, transparent 62.3%)",
-                backgroundSize: "220px 220px, 260px 260px",
-              }}
-            />
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
