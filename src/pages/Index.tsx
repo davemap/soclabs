@@ -49,7 +49,7 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* Hero */}
-          <section id="hero" className="relative overflow-hidden bg-[#0b1c2b] text-white">
+          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#e8f7fa] to-[#d4eef5] text-slate-900">
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -57,14 +57,14 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#54bdde] mb-4 uppercase">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#2a8aa8] mb-4 uppercase">
                   Reference SoCs · Verification · Silicon
                 </div>
-                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
+                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-slate-900">
                   Build Your Own{" "}
                   <span className="text-[#54bdde]">System-on-Chip</span>
                 </h1>
-                <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
@@ -196,14 +196,14 @@ const Index = () => {
           </section>
 
           {/* Project Focus */}
-          <section id="project-focus" className="relative py-24 bg-[#0b1c2b] text-white overflow-hidden border-y border-white/5">
+          <section id="project-focus" className="relative py-24 bg-gradient-to-b from-[#e8f7fa] to-[#d4eef5] text-slate-900 overflow-hidden border-y border-white/5">
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
-                <div className="text-xs font-semibold tracking-[0.2em] text-[#54bdde] mb-3 uppercase">
+                <div className="text-xs font-semibold tracking-[0.2em] text-[#2a8aa8] mb-3 uppercase">
                   Project Focus
                 </div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
-                  A community project pushing <span className="text-[#54bdde]">silicon</span> forward
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-slate-900">
+                  A community project pushing <span className="text-[#2a8aa8]">silicon</span> forward
                 </h2>
               </ScrollReveal>
 
@@ -216,25 +216,25 @@ const Index = () => {
                       to={`/projects/${project.id}`}
                       className="block max-w-5xl mx-auto group"
                     >
-                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#54bdde]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-slate-900/10 bg-white/60 hover:border-[#54bdde]/40 hover:bg-white/80 transition-all p-8 md:p-10 backdrop-blur-sm">
                         <div className="md:col-span-3">
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.tags.slice(0, 4).map((t) => (
-                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#54bdde] font-medium border border-[#54bdde]/20">
+                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#2a8aa8] font-medium border border-[#54bdde]/20">
                                 {t}
                               </span>
                             ))}
                           </div>
-                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#54bdde] transition-colors">
+                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-slate-900 group-hover:text-[#2a8aa8] transition-colors">
                             {project.title}
                           </h3>
-                          <p className="text-sm text-white/60 mb-4">
+                          <p className="text-sm text-slate-600 mb-4">
                             {project.author} · {project.institution}
                           </p>
-                          <p className="text-base text-white/75 leading-relaxed mb-6">
+                          <p className="text-base text-slate-700 leading-relaxed mb-6">
                             {project.description}
                           </p>
-                          <span className="inline-flex items-center gap-2 text-sm text-[#54bdde] font-medium">
+                          <span className="inline-flex items-center gap-2 text-sm text-[#2a8aa8] font-medium">
                             <Rocket className="h-4 w-4" /> View project
                             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </span>
@@ -246,9 +246,9 @@ const Index = () => {
                             { label: "Status", value: project.status },
                             { label: "Published", value: new Date(project.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) },
                           ].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-white/10 bg-[#0b1c2b]/60 p-4">
-                              <div className="text-[10px] uppercase tracking-wider text-white/50 mb-1">{s.label}</div>
-                              <div className="text-sm font-semibold text-white">{s.value}</div>
+                            <div key={s.label} className="rounded-xl border border-slate-900/10 bg-[#c4e8f1]/60 p-4">
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">{s.label}</div>
+                              <div className="text-sm font-semibold text-slate-900">{s.value}</div>
                             </div>
                           ))}
                         </div>
@@ -259,7 +259,7 @@ const Index = () => {
               })()}
 
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-slate-900/20 text-slate-900 hover:bg-slate-900/10 hover:text-slate-900">
                   <Link to="/projects">Browse All Projects <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
