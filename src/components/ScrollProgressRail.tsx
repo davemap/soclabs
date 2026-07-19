@@ -50,7 +50,7 @@ const ScrollProgressRail = ({ sections }: ScrollProgressRailProps) => {
         {/* Rail line */}
         <div className="absolute right-[7px] top-1 bottom-1 w-px bg-white/10" />
         <div
-          className="absolute right-[7px] top-1 w-px bg-gradient-to-b from-[hsl(82_70%_65%)] to-[hsl(195_90%_65%)] transition-[height] duration-200"
+          className="absolute right-[7px] top-1 w-px bg-gradient-to-b from-[hsl(195_85%_65%)] to-[hsl(195_90%_65%)] transition-[height] duration-200"
           style={{ height: `calc(${progress * 100}% - 4px)` }}
         />
 
@@ -66,7 +66,7 @@ const ScrollProgressRail = ({ sections }: ScrollProgressRailProps) => {
               <span
                 className={`font-mono text-[10px] uppercase tracking-[0.2em] transition-all duration-300 ${
                   active
-                    ? "text-[hsl(82_70%_70%)] opacity-100 translate-x-0"
+                    ? "text-[hsl(195_85%_70%)] opacity-100 translate-x-0"
                     : "text-white/40 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
                 }`}
               >
@@ -76,14 +76,14 @@ const ScrollProgressRail = ({ sections }: ScrollProgressRailProps) => {
                 <span
                   className={`absolute inline-flex h-full w-full rounded-full transition-all duration-300 ${
                     active
-                      ? "bg-[hsl(82_70%_65%)]/20 scale-100"
+                      ? "bg-[hsl(195_85%_65%)]/20 scale-100"
                       : "bg-transparent scale-0"
                   }`}
                 />
                 <span
                   className={`relative h-2 w-2 rounded-full border transition-all duration-300 ${
                     active
-                      ? "border-[hsl(82_70%_65%)] bg-[hsl(82_70%_65%)] shadow-[0_0_10px_hsl(82_70%_65%/0.8)]"
+                      ? "border-[hsl(195_85%_65%)] bg-[hsl(195_85%_65%)] shadow-[0_0_10px_hsl(82_70%_65%/0.8)]"
                       : "border-white/40 bg-transparent group-hover:border-white/80"
                   }`}
                 />

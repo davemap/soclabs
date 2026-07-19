@@ -84,7 +84,7 @@ const Index = () => {
                   <Button
                     asChild
                     size="lg"
-                    className="rounded-full bg-[hsl(82_65%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(82_70%_65%)]"
+                    className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
                   >
                     <Link to="/projects">
                       Explore Projects <ArrowRight className="ml-2 h-4 w-4" />
@@ -115,8 +115,8 @@ const Index = () => {
                     height={1200}
                     className="h-full w-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[hsl(212_50%_6%)]/70 via-transparent to-[hsl(82_60%_50%)]/10 mix-blend-multiply" />
-                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-[hsl(82_70%_65%)]/15" />
+                  <div className="absolute inset-0 bg-gradient-to-tr from-[hsl(212_50%_6%)]/70 via-transparent to-[hsl(195_80%_50%)]/10 mix-blend-multiply" />
+                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-[hsl(195_85%_65%)]/15" />
                 </div>
                 <div className="absolute -bottom-6 -left-6 hidden rounded-2xl border border-white/10 bg-[hsl(212_50%_10%)]/90 px-5 py-4 backdrop-blur md:block">
                   <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[hsl(195_75%_70%)]">
@@ -132,12 +132,12 @@ const Index = () => {
           <section id="designs" className="relative py-24 border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 max-w-2xl">
-                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(82_65%_72%)]">
+                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
                   01 — Reference Designs
                 </div>
                 <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
                   Start with our{" "}
-                  <span className="text-[hsl(82_70%_65%)]">proven architectures.</span>
+                  <span className="text-[hsl(195_85%_65%)]">proven architectures.</span>
                 </h2>
                 <p className="mt-4 text-slate-300/80">
                   Fork, extend, and build your custom accelerators on top of production-tested
@@ -149,15 +149,15 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="group block h-full">
-                      <Card className="h-full border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(82_70%_65%)]/40 hover:bg-white/[0.06]">
+                      <Card className="h-full border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
                         <CardContent className="p-7">
                           <div className="mb-5 flex items-start justify-between">
                             <div>
                               <h3 className="font-display text-xl font-bold text-white">{design.name}</h3>
                               <p className="text-sm font-medium text-[hsl(195_75%_70%)]">{design.tagline}</p>
                             </div>
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(82_60%_60%)]/10 ring-1 ring-[hsl(82_60%_60%)]/30">
-                              <Cpu className="h-5 w-5 text-[hsl(82_70%_70%)]" />
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
+                              <Cpu className="h-5 w-5 text-[hsl(195_85%_70%)]" />
                             </div>
                           </div>
                           <p className="mb-5 line-clamp-3 text-sm text-slate-300/75">{design.description}</p>
@@ -171,7 +171,7 @@ const Index = () => {
                               </span>
                             ))}
                           </div>
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(82_70%_70%)]">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(195_85%_70%)]">
                             View details{" "}
                             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                           </span>
@@ -216,12 +216,12 @@ const Index = () => {
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(82_65%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
                     02 — Why Join
                   </div>
                   <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
                     A community that takes you all the way{" "}
-                    <span className="text-[hsl(82_70%_65%)]">to silicon.</span>
+                    <span className="text-[hsl(195_85%_65%)]">to silicon.</span>
                   </h2>
 
                   <div className="mt-8 space-y-6">
@@ -243,8 +243,8 @@ const Index = () => {
                       },
                     ].map((item) => (
                       <div key={item.title} className="flex items-start gap-4">
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(82_60%_60%)]/10 ring-1 ring-[hsl(82_60%_60%)]/30">
-                          <item.icon className="h-5 w-5 text-[hsl(82_70%_70%)]" />
+                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
+                          <item.icon className="h-5 w-5 text-[hsl(195_85%_70%)]" />
                         </div>
                         <div>
                           <div className="font-display text-lg font-semibold text-white">{item.title}</div>
@@ -267,7 +267,7 @@ const Index = () => {
                       { label: "Projects Built", value: communityProjects.length },
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
-                        <div className="font-display text-3xl md:text-4xl font-bold text-[hsl(82_70%_68%)]">
+                        <div className="font-display text-3xl md:text-4xl font-bold text-[hsl(195_85%_68%)]">
                           {stat.value}
                         </div>
                         <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
@@ -299,12 +299,12 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(82_65%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
                     03 — Latest News
                   </div>
                   <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
                     Milestones, events, and{" "}
-                    <span className="text-[hsl(82_70%_65%)]">research breakthroughs.</span>
+                    <span className="text-[hsl(195_85%_65%)]">research breakthroughs.</span>
                   </h2>
                 </div>
                 <Button
@@ -325,7 +325,7 @@ const Index = () => {
                   .map((article, i) => (
                     <ScrollReveal key={article.id} delay={i * 0.1}>
                       <Link to={`/news/${article.id}`} className="group block h-full">
-                        <Card className="flex h-full flex-col overflow-hidden border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(82_70%_65%)]/40 hover:bg-white/[0.06]">
+                        <Card className="flex h-full flex-col overflow-hidden border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
                           <div className="relative h-36 overflow-hidden bg-[hsl(212_50%_8%)]">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
@@ -388,14 +388,14 @@ const Index = () => {
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover opacity-40"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_8%)]/95 via-[hsl(212_50%_10%)]/85 to-[hsl(82_50%_20%)]/60" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_8%)]/95 via-[hsl(212_50%_10%)]/85 to-[hsl(195_70%_25%)]/60" />
                   <div className="relative px-8 py-16 text-center md:px-16 md:py-20">
-                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(82_65%_72%)]">
+                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
                       04 — Start Building
                     </div>
                     <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-white">
                       Ready to build your{" "}
-                      <span className="text-[hsl(82_70%_65%)]">System-on-Chip?</span>
+                      <span className="text-[hsl(195_85%_65%)]">System-on-Chip?</span>
                     </h2>
                     <p className="mx-auto mt-5 max-w-xl text-slate-200/80">
                       Define your project, pick a reference design, and start building custom
@@ -405,7 +405,7 @@ const Index = () => {
                       <Button
                         asChild
                         size="lg"
-                        className="rounded-full bg-[hsl(82_65%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(82_70%_65%)]"
+                        className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
                       >
                         <Link to="/projects/start">
                           Start a Project <ArrowRight className="ml-2 h-4 w-4" />
