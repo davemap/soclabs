@@ -49,7 +49,7 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* Hero */}
-          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900">
+          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white">
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -57,14 +57,14 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#2a8aa8] mb-4 uppercase">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#54bdde] mb-4 uppercase">
                   Reference SoCs · Verification · Silicon
                 </div>
-                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-slate-900">
+                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
                   Build Your Own{" "}
                   <span className="text-[#54bdde]">System-on-Chip</span>
                 </h1>
-                <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
