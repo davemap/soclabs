@@ -64,6 +64,13 @@ const AnimatedCounter = ({ value }: { value: number }) => {
 
 const Index = () => {
   const { user } = useAuth();
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
     <Layout>
@@ -75,8 +82,15 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* ── HERO ───────────────────────────────────────────── */}
-          <section id="hero" className="relative pt-32 pb-28 md:pt-40 md:pb-36">
-            <div className="container mx-auto flex flex-col items-center text-center gap-12 px-4">
+          <section
+            id="hero"
+            ref={heroRef}
+            className="relative pt-32 pb-28 md:pt-40 md:pb-36"
+          >
+            <motion.div
+              style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }}
+              className="container mx-auto flex flex-col items-center text-center gap-12 px-4"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
