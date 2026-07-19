@@ -343,25 +343,25 @@ const Index = () => {
           <section id="cta" className="relative py-28">
             <div className="container mx-auto px-4">
               <ScrollReveal>
-                <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/10">
+                <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
                   <img
                     src={wafer}
                     alt="Silicon wafer with SoC die array"
                     width={1408}
                     height={1008}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover opacity-40"
+                    className="absolute inset-0 h-full w-full object-cover opacity-20"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_8%)]/95 via-[hsl(212_50%_10%)]/85 to-[hsl(195_70%_25%)]/60" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-card/90 to-primary/5" />
                   <div className="relative px-8 py-16 text-center md:px-16 md:py-20">
-                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                       04 — Start Building
                     </div>
-                    <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-white">
+                    <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                       Ready to build your{" "}
-                      <span className="text-[hsl(195_85%_65%)]">System-on-Chip?</span>
+                      <span className="text-primary">System-on-Chip?</span>
                     </h2>
-                    <p className="mx-auto mt-5 max-w-xl text-slate-200/80">
+                    <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
                       Define your project, pick a reference design, and start building custom
                       silicon today.
                     </p>
@@ -369,7 +369,7 @@ const Index = () => {
                       <Button
                         asChild
                         size="lg"
-                        className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
+                        className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
                       >
                         <Link to="/projects/start">
                           Start a Project <ArrowRight className="ml-2 h-4 w-4" />
@@ -379,7 +379,7 @@ const Index = () => {
                         asChild
                         size="lg"
                         variant="outline"
-                        className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                        className="rounded-full border-border bg-background px-8 text-foreground hover:bg-muted hover:text-foreground"
                       >
                         <Link to="/learn">Explore the Learning Hub</Link>
                       </Button>
