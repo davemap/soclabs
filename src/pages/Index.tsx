@@ -60,27 +60,28 @@ const Index = () => {
         <div className="relative z-10">
           {/* ── HERO ───────────────────────────────────────────── */}
           <section id="hero" className="relative pt-32 pb-28 md:pt-40 md:pb-36">
-            <div className="container mx-auto grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] items-center gap-12 px-4">
+            <div className="container mx-auto flex flex-col items-center text-center gap-12 px-4">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
+                className="max-w-4xl"
               >
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.05]">
                   Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span>
                   <br />
-                  Integrate your <span className="text-[hsl(275_75%_72%)]">Accelerator.</span>
+                  Integrate your <span className="text-[hsl(28_95%_60%)]">Accelerator.</span>
                   <br />
-                  Test your <span className="text-[hsl(160_70%_55%)]">chip.</span>
+                  Test your <span className="text-[hsl(88_65%_65%)]">Chip.</span>
                 </h1>
 
-                <p className="mt-8 max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
+                <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, an
                   end-to-end verification flow, and a global community to create, verify,
                   and fabricate custom silicon.
                 </p>
 
-                <div className="mt-10 flex flex-wrap items-center gap-4">
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                   <Button
                     asChild
                     size="lg"
@@ -100,33 +101,9 @@ const Index = () => {
                   </Button>
                 </div>
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.9, delay: 0.2 }}
-                className="relative"
-              >
-                <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-[0_30px_80px_-20px_hsl(212_50%_4%)]">
-                  <img
-                    src={socDie}
-                    alt="Custom system-on-chip die with glowing traces"
-                    width={1600}
-                    height={1200}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-[hsl(212_50%_6%)]/70 via-transparent to-[hsl(195_80%_50%)]/10 mix-blend-multiply" />
-                  <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-[hsl(195_85%_65%)]/15" />
-                </div>
-                <div className="absolute -bottom-6 -left-6 hidden rounded-2xl border border-white/10 bg-[hsl(212_50%_10%)]/90 px-5 py-4 backdrop-blur md:block">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[hsl(195_75%_70%)]">
-                    Tapeout ready
-                  </div>
-                  <div className="mt-1 font-display text-xl font-semibold">nanoSoC · milliSoC · megaSoC</div>
-                </div>
-              </motion.div>
             </div>
           </section>
+
 
           {/* ── REFERENCE DESIGNS ─────────────────────────────── */}
           <section id="designs" className="relative py-24 border-y border-white/5">
