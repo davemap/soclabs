@@ -54,7 +54,7 @@ const Index = () => {
               className="absolute inset-0 opacity-[0.18] pointer-events-none"
               style={{
                 backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(96,165,250,0.55) 62%, rgba(96,165,250,0.55) 62.3%, transparent 62.3%)",
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(61,132,195,0.55) 62%, rgba(61,132,195,0.55) 62.3%, transparent 62.3%)",
                 backgroundSize: "220px 220px, 260px 260px",
               }}
             />
@@ -65,18 +65,18 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#60a5fa] mb-4 uppercase">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#3d84c3] mb-4 uppercase">
                   Reference SoCs · Verification · Silicon
                 </div>
                 <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
                   Build Your Own{" "}
-                  <span className="text-[#60a5fa]">System-on-Chip</span>
+                  <span className="text-[#3d84c3]">System-on-Chip</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
-                  <Button asChild size="lg" className="rounded-full px-8 text-base bg-[#60a5fa] text-[#0b1c2b] hover:bg-[#93c5fd]">
+                  <Button asChild size="lg" className="rounded-full px-8 text-base bg-[#3d84c3] text-[#0b1c2b] hover:bg-[#6bb3f0]">
                     <Link to="/projects">
                       Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -209,17 +209,17 @@ const Index = () => {
               className="absolute inset-0 opacity-[0.12] pointer-events-none"
               style={{
                 backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(96,165,250,0.55) 62%, rgba(96,165,250,0.55) 62.3%, transparent 62.3%)",
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(61,132,195,0.55) 62%, rgba(61,132,195,0.55) 62.3%, transparent 62.3%)",
                 backgroundSize: "220px 220px, 260px 260px",
               }}
             />
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
-                <div className="text-xs font-semibold tracking-[0.2em] text-[#60a5fa] mb-3 uppercase">
+                <div className="text-xs font-semibold tracking-[0.2em] text-[#3d84c3] mb-3 uppercase">
                   Project Focus
                 </div>
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
-                  A community project pushing <span className="text-[#60a5fa]">silicon</span> forward
+                  A community project pushing <span className="text-[#3d84c3]">silicon</span> forward
                 </h2>
               </ScrollReveal>
 
@@ -232,16 +232,16 @@ const Index = () => {
                       to={`/projects/${project.id}`}
                       className="block max-w-5xl mx-auto group"
                     >
-                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#60a5fa]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#3d84c3]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
                         <div className="md:col-span-3">
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.tags.slice(0, 4).map((t) => (
-                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#60a5fa]/10 text-[#60a5fa] font-medium border border-[#60a5fa]/20">
+                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#3d84c3]/10 text-[#3d84c3] font-medium border border-[#3d84c3]/20">
                                 {t}
                               </span>
                             ))}
                           </div>
-                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#60a5fa] transition-colors">
+                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#3d84c3] transition-colors">
                             {project.title}
                           </h3>
                           <p className="text-sm text-white/60 mb-4">
@@ -250,7 +250,7 @@ const Index = () => {
                           <p className="text-base text-white/75 leading-relaxed mb-6">
                             {project.description}
                           </p>
-                          <span className="inline-flex items-center gap-2 text-sm text-[#60a5fa] font-medium">
+                          <span className="inline-flex items-center gap-2 text-sm text-[#3d84c3] font-medium">
                             <Rocket className="h-4 w-4" /> View project
                             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </span>
