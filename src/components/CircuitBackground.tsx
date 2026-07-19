@@ -4,9 +4,10 @@ interface CircuitBackgroundProps {
   className?: string;
   seed?: number;
   density?: number;
+  /** HSL color for traces & vias (defaults to the site's electric blue). */
+  color?: string;
 }
 
-// Deterministic pseudo-random so the SSR/CSR trace layout matches.
 const mulberry32 = (a: number) => () => {
   let t = (a += 0x6d2b79f5);
   t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -15,23 +16,26 @@ const mulberry32 = (a: number) => () => {
 };
 
 /**
- * A tiled circuit-trace + via pattern that lives behind the whole page.
- * Uses orthogonal segments with 45° corners and glowing nodes to echo
- * the SoC Labs slide-deck backdrop.
+ * Tiled circuit-trace + via pattern that lives behind the page.
+ * Orthogonal segments with the occasional 45° bend, terminating in
+ * ringed via nodes — mirrors the SoC Labs slide-deck backdrop.
  */
-const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBackgroundProps) => {
+const CircuitBackground = ({
+  className = "",
+  seed = 11,
+  density = 34,
+  color = "hsl(var(--electric))",
+}: CircuitBackgroundProps) => {
   const paths = useMemo(() => {
     const rand = mulberry32(seed);
-    const cell = 120;
-    const cols = 12;
-    const rows = 14;
-    const items: { d: string; nodes: [number, number][]; opacity: number; color: string }[] = [];
+    const cell = 90;
+    const cols = 18;
+    const rows = 20;
+    const items: { d: string; nodes: [number, number][]; opacity: number }[] = [];
 
     for (let i = 0; i < density; i++) {
-      const startCol = Math.floor(rand() * cols);
-      const startRow = Math.floor(rand() * rows);
-      let x = startCol * cell + cell / 2;
-      let y = startRow * cell + cell / 2;
+      let x = Math.floor(rand() * cols) * cell + cell / 2;
+      let y = Math.floor(rand() * rows) * cell + cell / 2;
       const nodes: [number, number][] = [[x, y]];
       let d = `M ${x} ${y}`;
       const segments = 3 + Math.floor(rand() * 5);
@@ -46,11 +50,12 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
           if (goDiag) {
             const step = Math.min(cell / 2, Math.abs(dy) / 2);
             d += ` l ${dir * step} ${dir * step}`;
-            y += dir * step;
             x += dir * step;
+            y += dir * step;
           }
-          d += ` l 0 ${dy - (goDiag ? dir * (cell / 2) : 0)}`;
-          y += dy - (goDiag ? dir * (cell / 2) : 0);
+          const remaining = dy - (goDiag ? dir * (cell / 2) : 0);
+          d += ` l 0 ${remaining}`;
+          y += remaining;
           lastDir = "v";
         } else {
           const dx = dir * len;
@@ -60,26 +65,18 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
             x += dir * step;
             y += -dir * step;
           }
-          d += ` l ${dx - (goDiag ? dir * (cell / 2) : 0)} 0`;
-          x += dx - (goDiag ? dir * (cell / 2) : 0);
+          const remaining = dx - (goDiag ? dir * (cell / 2) : 0);
+          d += ` l ${remaining} 0`;
+          x += remaining;
           lastDir = "h";
         }
         nodes.push([x, y]);
       }
 
-      const colorRoll = rand();
-      const color =
-        colorRoll > 0.72
-          ? "hsl(82 55% 62%)" // lime accent
-          : colorRoll > 0.42
-          ? "hsl(195 78% 62%)" // cyan
-          : "hsl(210 60% 55%)"; // muted electric
-
       items.push({
         d,
         nodes,
-        opacity: 0.18 + rand() * 0.35,
-        color,
+        opacity: 0.35 + rand() * 0.45,
       });
     }
     return items;
@@ -92,54 +89,29 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
     >
       <svg
         className="h-full w-full"
-        viewBox="0 0 1440 1680"
+        viewBox="0 0 1620 1800"
         preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <radialGradient id="via-lime" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(82 70% 70%)" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="hsl(82 70% 70%)" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="hsl(82 70% 70%)" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="via-cyan" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(195 90% 75%)" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="hsl(195 90% 75%)" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="hsl(195 90% 75%)" stopOpacity="0" />
-          </radialGradient>
-          <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.6" />
-          </filter>
-        </defs>
-
         {paths.map((p, i) => (
           <g key={i} style={{ opacity: p.opacity }}>
             <path
               d={p.d}
               fill="none"
-              stroke={p.color}
-              strokeWidth={1}
+              stroke={color}
+              strokeWidth={1.1}
               strokeLinecap="round"
               strokeLinejoin="round"
-              filter="url(#glow-soft)"
             />
             {p.nodes.map((n, j) => {
               const isEnd = j === 0 || j === p.nodes.length - 1;
-              const r = isEnd ? 6 : 3;
-              const fill =
-                p.color.includes("82") ? "url(#via-lime)" : "url(#via-cyan)";
+              const r = isEnd ? 3.2 : 2.2;
               return (
                 <g key={j}>
-                  <circle cx={n[0]} cy={n[1]} r={r * 2.4} fill={fill} />
-                  <circle
-                    cx={n[0]}
-                    cy={n[1]}
-                    r={r}
-                    fill="none"
-                    stroke={p.color}
-                    strokeWidth={1}
-                    opacity={0.9}
-                  />
+                  {isEnd && (
+                    <circle cx={n[0]} cy={n[1]} r={r * 2.2} fill={color} opacity={0.12} />
+                  )}
+                  <circle cx={n[0]} cy={n[1]} r={r} fill="hsl(var(--background))" stroke={color} strokeWidth={1.1} />
                 </g>
               );
             })}
