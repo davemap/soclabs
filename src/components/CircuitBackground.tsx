@@ -185,8 +185,8 @@ const CircuitBackground = ({
   const blue = "hsl(200 85% 78%)";
   const green = "hsl(140 55% 78%)";
   const ringStroke = "hsl(200 85% 68%)";
-  const ringFill = "hsl(200 85% 82% / 0.25)";
-  const stroke = 3.5;
+  const ringFill = "hsl(200 85% 82% / 0.2)";
+  const stroke = 2.8;
 
   return (
     <div
