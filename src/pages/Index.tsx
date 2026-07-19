@@ -74,16 +74,8 @@ const Index = () => {
                     className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
                   >
                     <Link to="/projects">
-                      Explore Projects <ArrowRight className="ml-2 h-4 w-4" />
+                      Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="rounded-full border-border bg-card px-8 text-base text-foreground hover:bg-muted hover:text-foreground"
-                  >
-                    <Link to="/designs">View Reference SoCs</Link>
                   </Button>
                 </div>
               </motion.div>
