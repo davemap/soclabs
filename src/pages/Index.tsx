@@ -268,11 +268,11 @@ const Index = () => {
 
           {/* Latest News */}
 
-          <section id="news" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
+          <section id="news" className="py-24 bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
-                <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Latest News</h2>
-                <p className="text-slate-600 max-w-xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-white">Latest News</h2>
+                <p className="text-white/70 max-w-xl mx-auto">
                   Stay up to date with community milestones, events, and research breakthroughs.
                 </p>
               </ScrollReveal>
@@ -284,26 +284,26 @@ const Index = () => {
                   .map((article, i) => (
                     <ScrollReveal key={article.id} delay={i * 0.12}>
                       <Link to={`/news/${article.id}`} className="block h-full">
-                        <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 overflow-hidden">
-                          <div className="relative h-36 overflow-hidden bg-muted">
+                        <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-white/10 bg-[#0b1c2b]/40 hover:border-[#54bdde]/40 overflow-hidden text-white">
+                          <div className="relative h-36 overflow-hidden bg-[#0b1c2b]">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
                               alt={article.title}
                               className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1c2b]/80 to-transparent" />
                           </div>
                           <CardContent className="p-5 flex flex-col flex-1">
                             <div className="flex flex-wrap gap-1.5 mb-3">
                               {article.tags.slice(0, 2).map((tag) => (
-                                <Badge key={tag} variant="secondary" className="text-[10px]">
+                                <Badge key={tag} variant="secondary" className="text-[10px] bg-white/10 text-white border-white/10">
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
-                            <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
-                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
+                            <h3 className="text-lg font-display font-bold mb-2 line-clamp-2 text-white">{article.title}</h3>
+                            <p className="text-sm text-white/70 mb-4 line-clamp-3 flex-1">{article.summary}</p>
+                            <div className="flex items-center justify-between text-xs text-white/70 pt-3 border-t border-white/10">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" /> {article.author}
                               </span>
@@ -324,7 +324,7 @@ const Index = () => {
               </div>
 
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
                   <Link to="/news">View All News <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
