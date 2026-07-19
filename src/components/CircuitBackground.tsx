@@ -154,12 +154,16 @@ const CircuitBackground = ({
         segColor = segColor === "blue" ? "green" : "blue";
       }
 
-      // Last internal segment colour (before the flip we just did):
-      const lastInternalColor: Color =
+      // Colour of the terminal leaving the last via — must differ from the
+      // wire on the other side of that via so the via represents a real layer change.
+      const endTermColor: Color =
         viaPositions.length >= 2
-          ? (segColor === "blue" ? "green" : "blue")
-          : firstInternalColor;
-      const endTermColor: Color = lastInternalColor === "blue" ? "green" : "blue";
+          ? (segColor === "blue" ? "blue" : "green") === "blue"
+            ? "blue"
+            : "green"
+          : startTermColor === "blue"
+            ? "green"
+            : "blue";
       const endAngle =
         ANGLES[endTermColor][Math.floor(rand() * ANGLES[endTermColor].length)];
       const lastVia = viaPositions[viaPositions.length - 1];
