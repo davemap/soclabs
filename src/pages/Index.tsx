@@ -49,7 +49,7 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* Hero */}
-          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900">
+          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white">
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -57,14 +57,14 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#2a8aa8] mb-4 uppercase">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#54bdde] mb-4 uppercase">
                   Reference SoCs · Verification · Silicon
                 </div>
-                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-slate-900">
+                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
                   Build Your Own{" "}
                   <span className="text-[#54bdde]">System-on-Chip</span>
                 </h1>
-                <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
@@ -80,11 +80,11 @@ const Index = () => {
 
 
           {/* Reference Designs */}
-          <section id="designs" className="py-24 bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white border-y border-white/5">
+          <section id="designs" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
-                <p className="text-white/70 max-w-xl mx-auto">
+                <p className="text-slate-600 max-w-xl mx-auto">
                   Start with our proven architectures. Fork, extend, and build your custom accelerators on top.
                 </p>
               </ScrollReveal>
@@ -93,26 +93,26 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="block h-full">
-                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-white/10 bg-[#0b1c2b]/40 text-white hover:border-[#54bdde]/40 cursor-pointer">
+                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-slate-900/10 bg-white/70 text-slate-900 hover:border-[#54bdde]/40 cursor-pointer">
                         <CardContent className="p-7">
                           <div className="flex items-start justify-between mb-4">
                             <div>
-                              <h3 className="text-xl font-display font-bold text-white">{design.name}</h3>
-                              <p className="text-sm text-[#54bdde] font-medium">{design.tagline}</p>
+                              <h3 className="text-xl font-display font-bold text-slate-900">{design.name}</h3>
+                              <p className="text-sm text-[#2a8aa8] font-medium">{design.tagline}</p>
                             </div>
-                            <div className="w-11 h-11 rounded-xl bg-[#54bdde]/10 flex items-center justify-center">
-                              <Cpu className="h-5 w-5 text-[#54bdde]" />
+                            <div className="w-11 h-11 rounded-xl bg-[#54bdde]/20 flex items-center justify-center">
+                              <Cpu className="h-5 w-5 text-[#2a8aa8]" />
                             </div>
                           </div>
-                          <p className="text-sm text-white/70 mb-5 line-clamp-3">{design.description}</p>
+                          <p className="text-sm text-slate-600 mb-5 line-clamp-3">{design.description}</p>
                           <div className="flex flex-wrap gap-2 mb-5">
                             {design.features.slice(0, 3).map((f) => (
-                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#54bdde] font-medium border border-[#54bdde]/20">
+                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#2a8aa8] font-medium border border-[#54bdde]/20">
                                 {f}
                               </span>
                             ))}
                           </div>
-                          <span className="text-xs text-[#54bdde] font-medium inline-flex items-center gap-1">
+                          <span className="text-xs text-[#2a8aa8] font-medium inline-flex items-center gap-1">
                             View details <ArrowRight className="h-3 w-3" />
                           </span>
                         </CardContent>
@@ -122,7 +122,7 @@ const Index = () => {
                 ))}
               </div>
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-slate-900/20 text-slate-900 hover:bg-slate-900/10 hover:text-slate-900">
                   <Link to="/designs">View All Reference SoC's <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
@@ -130,10 +130,10 @@ const Index = () => {
           </section>
 
           {/* Why Join */}
-          <section id="why" className="relative py-24 bg-gradient-to-b from-[#b8e3ee] to-[#d4eef5] text-slate-900 border-y border-slate-900/5">
+          <section id="why" className="relative py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14 text-white">Why Join SoC Labs?</h2>
               </ScrollReveal>
               <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
                 {[
@@ -141,19 +141,19 @@ const Index = () => {
                     icon: GraduationCap,
                     title: "Learn by Building",
                     desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert community support.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                   {
                     icon: Users,
                     title: "Global Community",
                     desc: "Connect with researchers, students, and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                   {
                     icon: Globe,
                     title: "Silicon Access",
                     desc: "Access ASIC shuttle programmes and FPGA platforms to take your designs from simulation to real hardware.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                 ].map((item, i) => (
                   <ScrollReveal key={item.title} delay={i * 0.12}>
@@ -161,15 +161,15 @@ const Index = () => {
                       <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${item.color} mb-5`}>
                         <item.icon className="h-6 w-6" />
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                      <h3 className="font-display font-bold text-lg mb-2 text-white">{item.title}</h3>
+                      <p className="text-sm text-white/70 leading-relaxed">{item.desc}</p>
                     </div>
                   </ScrollReveal>
                 ))}
               </div>
 
               <ScrollReveal className="mt-16">
-                <div className="max-w-3xl mx-auto rounded-2xl border border-slate-900/10 bg-white/70 backdrop-blur-sm shadow-lg p-6">
+                <div className="max-w-3xl mx-auto rounded-2xl border border-white/10 bg-[#0b1c2b]/40 backdrop-blur-sm shadow-lg p-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[
                       { label: "Community Members", value: communityMembers.length },
@@ -179,7 +179,7 @@ const Index = () => {
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
                         <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
-                        <div className="text-xs text-slate-600 mt-1 font-medium">{stat.label}</div>
+                        <div className="text-xs text-white/70 mt-1 font-medium">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -187,7 +187,7 @@ const Index = () => {
               </ScrollReveal>
               {!user && (
                 <ScrollReveal className="text-center mt-12">
-                  <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
+                  <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base border-white/20 text-white hover:bg-white/10 hover:text-white">
                     <Link to="/about#join">Join the Community</Link>
                   </Button>
                 </ScrollReveal>
@@ -196,7 +196,7 @@ const Index = () => {
           </section>
 
           {/* Project Focus */}
-          <section id="project-focus" className="relative py-24 bg-gradient-to-b from-[#e8f7fa] to-[#d4eef5] text-slate-900 overflow-hidden border-y border-white/5">
+          <section id="project-focus" className="relative py-24 bg-gradient-to-b from-[#b8e3ee] to-[#d4eef5] text-slate-900 overflow-hidden border-y border-slate-900/5">
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
                 <div className="text-xs font-semibold tracking-[0.2em] text-[#2a8aa8] mb-3 uppercase">
@@ -216,7 +216,7 @@ const Index = () => {
                       to={`/projects/${project.id}`}
                       className="block max-w-5xl mx-auto group"
                     >
-                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-slate-900/10 bg-white/60 hover:border-[#54bdde]/40 hover:bg-white/80 transition-all p-8 md:p-10 backdrop-blur-sm">
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-slate-900/10 bg-white/70 hover:border-[#54bdde]/40 hover:bg-white/90 transition-all p-8 md:p-10 backdrop-blur-sm">
                         <div className="md:col-span-3">
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.tags.slice(0, 4).map((t) => (
@@ -246,7 +246,7 @@ const Index = () => {
                             { label: "Status", value: project.status },
                             { label: "Published", value: new Date(project.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) },
                           ].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-slate-900/10 bg-[#c4e8f1]/60 p-4">
+                            <div key={s.label} className="rounded-xl border border-slate-900/10 bg-white/70 p-4">
                               <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">{s.label}</div>
                               <div className="text-sm font-semibold text-slate-900">{s.value}</div>
                             </div>
@@ -268,11 +268,11 @@ const Index = () => {
 
           {/* Latest News */}
 
-          <section id="news" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
+          <section id="news" className="py-24 bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
-                <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Latest News</h2>
-                <p className="text-slate-600 max-w-xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-display font-bold mb-4 text-white">Latest News</h2>
+                <p className="text-white/70 max-w-xl mx-auto">
                   Stay up to date with community milestones, events, and research breakthroughs.
                 </p>
               </ScrollReveal>
@@ -284,26 +284,26 @@ const Index = () => {
                   .map((article, i) => (
                     <ScrollReveal key={article.id} delay={i * 0.12}>
                       <Link to={`/news/${article.id}`} className="block h-full">
-                        <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 overflow-hidden">
-                          <div className="relative h-36 overflow-hidden bg-muted">
+                        <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-white/10 bg-[#0b1c2b]/40 hover:border-[#54bdde]/40 overflow-hidden text-white">
+                          <div className="relative h-36 overflow-hidden bg-[#0b1c2b]">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
                               alt={article.title}
                               className="w-full h-full object-cover"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1c2b]/80 to-transparent" />
                           </div>
                           <CardContent className="p-5 flex flex-col flex-1">
                             <div className="flex flex-wrap gap-1.5 mb-3">
                               {article.tags.slice(0, 2).map((tag) => (
-                                <Badge key={tag} variant="secondary" className="text-[10px]">
+                                <Badge key={tag} variant="secondary" className="text-[10px] bg-white/10 text-white border-white/10">
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
-                            <h3 className="text-lg font-display font-bold mb-2 line-clamp-2">{article.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-1">{article.summary}</p>
-                            <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border/50">
+                            <h3 className="text-lg font-display font-bold mb-2 line-clamp-2 text-white">{article.title}</h3>
+                            <p className="text-sm text-white/70 mb-4 line-clamp-3 flex-1">{article.summary}</p>
+                            <div className="flex items-center justify-between text-xs text-white/70 pt-3 border-t border-white/10">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" /> {article.author}
                               </span>
@@ -324,7 +324,7 @@ const Index = () => {
               </div>
 
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
                   <Link to="/news">View All News <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
@@ -332,12 +332,12 @@ const Index = () => {
           </section>
 
           {/* CTA */}
-          <section id="cta" className="py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white">
+          <section id="cta" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900">
             <div className="container mx-auto px-4 text-center">
               <ScrollReveal>
-                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-white/10 bg-[#0b1c2b]/40">
-                  <h2 className="text-3xl font-display font-bold mb-4 text-white">Ready to Build Your SoC?</h2>
-                  <p className="text-white/70 mb-8 leading-relaxed">
+                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-slate-900/10 bg-white/70">
+                  <h2 className="text-3xl font-display font-bold mb-4 text-slate-900">Ready to Build Your SoC?</h2>
+                  <p className="text-slate-600 mb-8 leading-relaxed">
                     Define your project, pick a reference design, and start building custom silicon today.
                   </p>
                   <Button asChild size="lg" className="rounded-full px-8 bg-[#54bdde] text-[#0b1c2b] hover:bg-[#7dd3ea]">
