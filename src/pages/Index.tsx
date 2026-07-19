@@ -239,15 +239,20 @@ const Index = () => {
                         desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
                       },
                     ].map((item) => (
-                      <div key={item.title} className="flex items-start gap-4">
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                      <motion.div
+                        key={item.title}
+                        className="flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted/50"
+                        whileHover={{ x: 8 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30 transition-colors group-hover:bg-primary/20">
                           <item.icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
                           <div className="font-display text-lg font-semibold text-foreground">{item.title}</div>
                           <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </ScrollReveal>
