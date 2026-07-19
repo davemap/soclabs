@@ -211,8 +211,8 @@ const CircuitBackground = ({
         ))}
         {vias.map((v, i) => (
           <g key={`v${i}`}>
-            <circle cx={v.x} cy={v.y} r={14} fill={ringFill} />
-            <circle cx={v.x} cy={v.y} r={14} fill="none" stroke={ringStroke} strokeWidth={3.5} />
+            <circle cx={v.x} cy={v.y} r={11} fill={ringFill} />
+            <circle cx={v.x} cy={v.y} r={11} fill="none" stroke={ringStroke} strokeWidth={2.5} />
           </g>
         ))}
       </svg>
