@@ -130,10 +130,10 @@ const Index = () => {
           </section>
 
           {/* Why Join */}
-          <section id="why" className="relative py-24 bg-gradient-to-b from-[#b8e3ee] to-[#d4eef5] text-slate-900 border-y border-slate-900/5">
+          <section id="why" className="relative py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal>
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14 text-white">Why Join SoC Labs?</h2>
               </ScrollReveal>
               <div className="grid md:grid-cols-3 gap-10 max-w-4xl mx-auto">
                 {[
@@ -141,19 +141,19 @@ const Index = () => {
                     icon: GraduationCap,
                     title: "Learn by Building",
                     desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert community support.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                   {
                     icon: Users,
                     title: "Global Community",
                     desc: "Connect with researchers, students, and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                   {
                     icon: Globe,
                     title: "Silicon Access",
                     desc: "Access ASIC shuttle programmes and FPGA platforms to take your designs from simulation to real hardware.",
-                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
+                    color: "bg-[#54bdde]/10 text-[#54bdde]",
                   },
                 ].map((item, i) => (
                   <ScrollReveal key={item.title} delay={i * 0.12}>
@@ -161,15 +161,15 @@ const Index = () => {
                       <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${item.color} mb-5`}>
                         <item.icon className="h-6 w-6" />
                       </div>
-                      <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                      <h3 className="font-display font-bold text-lg mb-2 text-white">{item.title}</h3>
+                      <p className="text-sm text-white/70 leading-relaxed">{item.desc}</p>
                     </div>
                   </ScrollReveal>
                 ))}
               </div>
 
               <ScrollReveal className="mt-16">
-                <div className="max-w-3xl mx-auto rounded-2xl border border-slate-900/10 bg-white/70 backdrop-blur-sm shadow-lg p-6">
+                <div className="max-w-3xl mx-auto rounded-2xl border border-white/10 bg-[#0b1c2b]/40 backdrop-blur-sm shadow-lg p-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[
                       { label: "Community Members", value: communityMembers.length },
@@ -179,7 +179,7 @@ const Index = () => {
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
                         <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
-                        <div className="text-xs text-slate-600 mt-1 font-medium">{stat.label}</div>
+                        <div className="text-xs text-white/70 mt-1 font-medium">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -187,7 +187,7 @@ const Index = () => {
               </ScrollReveal>
               {!user && (
                 <ScrollReveal className="text-center mt-12">
-                  <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base">
+                  <Button asChild size="lg" variant="outline" className="rounded-full px-8 text-base border-white/20 text-white hover:bg-white/10 hover:text-white">
                     <Link to="/about#join">Join the Community</Link>
                   </Button>
                 </ScrollReveal>
