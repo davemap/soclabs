@@ -155,12 +155,13 @@ const CircuitBackground = ({
       }
 
       // Colour of the terminal leaving the last via — must differ from the
-      // wire on the other side of that via so the via represents a real layer change.
+      // wire on the other side of the via so the via is a real layer change.
+      // Two-via chain: after the loop, segColor was flipped past the last internal
+      // segment, so `segColor` is already the opposite of the last internal wire → use it.
+      // Single-via chain: opposite of the start terminal.
       const endTermColor: Color =
         viaPositions.length >= 2
-          ? (segColor === "blue" ? "blue" : "green") === "blue"
-            ? "blue"
-            : "green"
+          ? segColor
           : startTermColor === "blue"
             ? "green"
             : "blue";
