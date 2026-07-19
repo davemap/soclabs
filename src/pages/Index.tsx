@@ -259,22 +259,22 @@ const Index = () => {
           </section>
 
           {/* ── LATEST NEWS ───────────────────────────────────── */}
-          <section id="news" className="relative py-24 border-y border-white/5">
+          <section id="news" className="relative py-24 border-y border-border/60">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                     03 — Latest News
                   </div>
-                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     Milestones, events, and{" "}
-                    <span className="text-[hsl(195_85%_65%)]">research breakthroughs.</span>
+                    <span className="text-primary">research breakthroughs.</span>
                   </h2>
                 </div>
                 <Button
                   asChild
                   variant="outline"
-                  className="rounded-full border-white/20 bg-white/5 text-slate-100 hover:bg-white/10 hover:text-white"
+                  className="rounded-full border-border bg-card text-foreground hover:bg-muted hover:text-foreground"
                 >
                   <Link to="/news">
                     All news <ArrowRight className="ml-2 h-4 w-4" />
@@ -289,15 +289,15 @@ const Index = () => {
                   .map((article, i) => (
                     <ScrollReveal key={article.id} delay={i * 0.1}>
                       <Link to={`/news/${article.id}`} className="group block h-full">
-                        <Card className="flex h-full flex-col overflow-hidden border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
-                          <div className="relative h-36 overflow-hidden bg-[hsl(212_50%_8%)]">
+                        <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                          <div className="relative h-36 overflow-hidden bg-muted">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
                               alt={article.title}
                               loading="lazy"
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(212_50%_6%)]/80 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
                           </div>
                           <CardContent className="flex flex-1 flex-col p-5">
                             <div className="mb-3 flex flex-wrap gap-1.5">
@@ -305,19 +305,19 @@ const Index = () => {
                                 <Badge
                                   key={tag}
                                   variant="secondary"
-                                  className="bg-white/5 text-[10px] text-slate-200 ring-1 ring-white/10"
+                                  className="bg-muted text-[10px] text-muted-foreground ring-1 ring-border"
                                 >
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
-                            <h3 className="mb-2 line-clamp-2 font-display text-lg font-bold text-white">
+                            <h3 className="mb-2 line-clamp-2 font-display text-lg font-bold text-card-foreground">
                               {article.title}
                             </h3>
-                            <p className="mb-4 line-clamp-3 flex-1 text-sm text-slate-300/75">
+                            <p className="mb-4 line-clamp-3 flex-1 text-sm text-muted-foreground">
                               {article.summary}
                             </p>
-                            <div className="flex items-center justify-between border-t border-white/10 pt-3 text-xs text-slate-400">
+                            <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" /> {article.author}
                               </span>
