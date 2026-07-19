@@ -33,10 +33,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-electric/10 bg-[hsl(var(--nav-bg)/0.95)] backdrop-blur-xl">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-baseline gap-2 font-nav mr-6 leading-none">
-          <span className="font-bold text-lg tracking-tight text-primary-foreground lowercase">soc labs</span>
-          <span className="hidden md:inline text-[11px] text-primary-foreground/60 tracking-wide">
-            enabling innovation in system-on-chip development
-          </span>
+          <span className="font-bold text-2xl tracking-tight text-primary-foreground lowercase">soc labs</span>
         </Link>
 
         <div className="hidden lg:flex items-center gap-0.5">
