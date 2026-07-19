@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight, Cpu, Users, GraduationCap, Globe, Calendar, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,33 @@ const articleImages: Record<string, string> = {
   "dvfs-controller-results": imgDvfs,
 };
 
+const AnimatedCounter = ({ value }: { value: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [display, setDisplay] = useState(0);
+  const motionValue = useMotionValue(0);
+  const spring = useSpring(motionValue, { stiffness: 60, damping: 20 });
+  const rounded = useTransform(spring, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const unsubscribe = rounded.on("change", (v) => setDisplay(v));
+    return () => unsubscribe();
+  }, [rounded]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          motionValue.set(value);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [motionValue, value]);
+
+  return <div ref={ref}>{display}</div>;
+};
 
 const Index = () => {
   const { user } = useAuth();
@@ -55,6 +83,14 @@ const Index = () => {
                 transition={{ duration: 0.7 }}
                 className="max-w-4xl"
               >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                  className="mb-6 inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-medium tracking-wide text-primary"
+                >
+                  enabling innovation in system-on-chip development
+                </motion.div>
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
                   <span className="block">Develop your <span className="text-primary">System.</span>&nbsp;&nbsp;</span>
                   <span className="block">&nbsp; &nbsp; &nbsp;Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
@@ -68,15 +104,18 @@ const Index = () => {
                 </p>
 
                 <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
-                  >
-                    <Link to="/projects">
-                      Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
+                    >
+                      <Link to="/projects" className="group inline-flex items-center">
+                        Explore SoC Labs Projects
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </Button>
+                  </motion.div>
                 </div>
               </motion.div>
             </div>
@@ -101,7 +140,11 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="group block h-full">
-                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                      <motion.div
+                        whileHover={{ y: -6, scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:bg-background hover:shadow-lg hover:shadow-primary/10">
                         <CardContent className="p-7">
                           <div className="mb-5 flex items-start justify-between">
                             <div>
@@ -129,6 +172,7 @@ const Index = () => {
                           </span>
                         </CardContent>
                       </Card>
+                      </motion.div>
                     </Link>
                   </ScrollReveal>
                 ))}
@@ -154,7 +198,11 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <div className="grid items-center gap-12 lg:grid-cols-2">
                 <ScrollReveal direction="left">
-                  <div className="relative overflow-hidden rounded-3xl border border-border shadow-sm">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    className="relative overflow-hidden rounded-3xl border border-border shadow-sm"
+                  >
                     <img
                       src={labCommunity}
                       alt="Engineers collaborating in a hardware research lab"
@@ -164,7 +212,7 @@ const Index = () => {
                       className="h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
-                  </div>
+                  </motion.div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
@@ -191,15 +239,20 @@ const Index = () => {
                         desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
                       },
                     ].map((item) => (
-                      <div key={item.title} className="flex items-start gap-4">
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                      <motion.div
+                        key={item.title}
+                        className="flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted/50"
+                        whileHover={{ x: 8 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30 transition-colors group-hover:bg-primary/20">
                           <item.icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
                           <div className="font-display text-lg font-semibold text-foreground">{item.title}</div>
                           <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </ScrollReveal>
@@ -215,14 +268,19 @@ const Index = () => {
                       { label: "Countries", value: new Set(partners.map((p) => p.country).filter(Boolean)).size },
                       { label: "Projects Built", value: communityProjects.length },
                     ].map((stat) => (
-                      <div key={stat.label} className="text-center">
+                      <motion.div
+                        key={stat.label}
+                        className="text-center"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
                         <div className="font-display text-3xl md:text-4xl font-bold text-primary">
-                          {stat.value}
+                          <AnimatedCounter value={stat.value} />
                         </div>
                         <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {stat.label}
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
@@ -269,9 +327,14 @@ const Index = () => {
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .slice(0, 3)
                   .map((article, i) => (
-                    <ScrollReveal key={article.id} delay={i * 0.1}>
-                      <Link to={`/news/${article.id}`} className="group block h-full">
-                        <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                  <ScrollReveal key={article.id} delay={i * 0.1}>
+                    <Link to={`/news/${article.id}`} className="group block h-full">
+                      <motion.div
+                        className="h-full"
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                      <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background hover:shadow-lg hover:shadow-primary/10">
                           <div className="relative h-36 overflow-hidden bg-muted">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
@@ -314,6 +377,7 @@ const Index = () => {
                             </div>
                           </CardContent>
                         </Card>
+                        </motion.div>
                       </Link>
                     </ScrollReveal>
                   ))}
