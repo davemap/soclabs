@@ -16,10 +16,10 @@ const mulberry32 = (a: number) => () => {
 
 const WIDTH = 1620;
 const HEIGHT = 2400;
-const MIN_LEN = 90;
-const MAX_LEN = 220;
+const MIN_LEN = 70;
+const MAX_LEN = 170;
 const EXIT_MARGIN = 60; // how far past the edge a terminal wire runs
-const MIN_VIA_SPACING = 160;
+const MIN_VIA_SPACING = 110;
 
 type Color = "blue" | "green";
 type Segment = { x1: number; y1: number; x2: number; y2: number; color: Color };
@@ -37,7 +37,7 @@ const ANGLES: Record<Color, number[]> = {
 const CircuitBackground = ({
   className = "",
   seed = 17,
-  count = 18,
+  count = 44,
   opacity = 0.9,
 }: CircuitBackgroundProps) => {
   const { segments, vias } = useMemo(() => {
@@ -46,8 +46,8 @@ const CircuitBackground = ({
     const vs: Via[] = [];
 
     // Jittered anchors so distribution looks even but not tiled.
-    const cols = 4;
-    const rows = Math.max(4, Math.ceil(count / cols));
+    const cols = 6;
+    const rows = Math.max(6, Math.ceil(count / cols));
     const cellW = WIDTH / cols;
     const cellH = HEIGHT / rows;
     const anchors: { x: number; y: number }[] = [];
@@ -85,8 +85,8 @@ const CircuitBackground = ({
       if (placed >= count) break;
       if (tooClose(anchor.x, anchor.y)) continue;
 
-      // 60% single via chains (short), 40% two-via chains (still short).
-      const interiorVias = rand() > 0.6 ? 2 : 1;
+      // Mostly single-via chains for lots of short wires.
+      const interiorVias = rand() > 0.82 ? 2 : 1;
       const viaPositions: Via[] = [{ x: anchor.x, y: anchor.y }];
 
       // Pick the colour of the FIRST internal segment (between via0 and via1
@@ -154,12 +154,17 @@ const CircuitBackground = ({
         segColor = segColor === "blue" ? "green" : "blue";
       }
 
-      // Last internal segment colour (before the flip we just did):
-      const lastInternalColor: Color =
+      // Colour of the terminal leaving the last via — must differ from the
+      // wire on the other side of the via so the via is a real layer change.
+      // Two-via chain: after the loop, segColor was flipped past the last internal
+      // segment, so `segColor` is already the opposite of the last internal wire → use it.
+      // Single-via chain: opposite of the start terminal.
+      const endTermColor: Color =
         viaPositions.length >= 2
-          ? (segColor === "blue" ? "green" : "blue")
-          : firstInternalColor;
-      const endTermColor: Color = lastInternalColor === "blue" ? "green" : "blue";
+          ? segColor
+          : startTermColor === "blue"
+            ? "green"
+            : "blue";
       const endAngle =
         ANGLES[endTermColor][Math.floor(rand() * ANGLES[endTermColor].length)];
       const lastVia = viaPositions[viaPositions.length - 1];
