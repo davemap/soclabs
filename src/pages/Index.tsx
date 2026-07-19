@@ -344,9 +344,6 @@ const Index = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-card/90 to-primary/5" />
                   <div className="relative px-8 py-16 text-center md:px-16 md:py-20">
-                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
-                      04 — Start Building
-                    </div>
                     <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                       Ready to build your{" "}
                       <span className="text-primary">System-on-Chip?</span>
