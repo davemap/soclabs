@@ -66,17 +66,12 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
               >
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[hsl(82_60%_65%)]/30 bg-[hsl(82_60%_65%)]/5 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[hsl(82_65%_72%)]">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  SoC Labs · Community for Custom Silicon
-                </div>
-
-                <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.02]">
-                  Write the test once.
+                <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.05]">
+                  Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span>
                   <br />
-                  Run it from RTL simulation
+                  Integrate your <span className="text-[hsl(275_75%_72%)]">Accelerator.</span>
                   <br />
-                  <span className="text-[hsl(82_70%_65%)]">to silicon.</span>
+                  Test your <span className="text-[hsl(160_70%_55%)]">chip.</span>
                 </h1>
 
                 <p className="mt-8 max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
