@@ -37,7 +37,7 @@ const ANGLES: Record<Color, number[]> = {
 const CircuitBackground = ({
   className = "",
   seed = 17,
-  count = 18,
+  count = 44,
   opacity = 0.9,
 }: CircuitBackgroundProps) => {
   const { segments, vias } = useMemo(() => {
@@ -46,8 +46,8 @@ const CircuitBackground = ({
     const vs: Via[] = [];
 
     // Jittered anchors so distribution looks even but not tiled.
-    const cols = 4;
-    const rows = Math.max(4, Math.ceil(count / cols));
+    const cols = 6;
+    const rows = Math.max(6, Math.ceil(count / cols));
     const cellW = WIDTH / cols;
     const cellH = HEIGHT / rows;
     const anchors: { x: number; y: number }[] = [];
