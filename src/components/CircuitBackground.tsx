@@ -37,7 +37,7 @@ const ANGLES: Record<Color, number[]> = {
 const CircuitBackground = ({
   className = "",
   seed = 17,
-  count = 22,
+  count = 16,
   opacity = 0.9,
 }: CircuitBackgroundProps) => {
   const { segments, vias } = useMemo(() => {
