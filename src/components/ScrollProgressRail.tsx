@@ -83,7 +83,7 @@ const ScrollProgressRail = ({ sections }: ScrollProgressRailProps) => {
                 <span
                   className={`relative h-2 w-2 rounded-full border transition-all duration-300 ${
                     active
-                      ? "border-[hsl(195_85%_65%)] bg-[hsl(195_85%_65%)] shadow-[0_0_10px_hsl(82_70%_65%/0.8)]"
+                      ? "border-[hsl(195_85%_65%)] bg-[hsl(195_85%_65%)] shadow-[0_0_10px_hsl(195_85%_65%/0.8)]"
                       : "border-white/40 bg-transparent group-hover:border-white/80"
                   }`}
                 />
