@@ -57,12 +57,12 @@ const Index = () => {
                 className="max-w-4xl"
               >
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
-                  <span className="block">Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span></span>
-                  <span className="block">Integrate your <span className="text-[hsl(28_95%_60%)]">Accelerator.</span></span>
-                  <span className="block">Test your <span className="text-[hsl(88_65%_65%)]">Chip.</span></span>
+                  <span className="block">Develop your <span className="text-[hsl(195_85%_45%)]">System-on-Chip.</span></span>
+                  <span className="block">Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
+                  <span className="block">Test your <span className="text-[hsl(88_60%_45%)]">Chip.</span></span>
                 </h1>
 
-                <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
+                <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-muted-foreground leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, an
                   end-to-end verification flow, and a global community to create, verify,
                   and fabricate custom silicon.
@@ -72,7 +72,7 @@ const Index = () => {
                   <Button
                     asChild
                     size="lg"
-                    className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
+                    className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
                   >
                     <Link to="/projects">
                       Explore Projects <ArrowRight className="ml-2 h-4 w-4" />
@@ -82,7 +82,7 @@ const Index = () => {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="rounded-full border-white/20 bg-white/5 px-8 text-base text-slate-100 hover:bg-white/10 hover:text-white"
+                    className="rounded-full border-border bg-card px-8 text-base text-foreground hover:bg-muted hover:text-foreground"
                   >
                     <Link to="/designs">View Reference SoCs</Link>
                   </Button>
