@@ -327,9 +327,14 @@ const Index = () => {
                   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                   .slice(0, 3)
                   .map((article, i) => (
-                    <ScrollReveal key={article.id} delay={i * 0.1}>
-                      <Link to={`/news/${article.id}`} className="group block h-full">
-                        <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                  <ScrollReveal key={article.id} delay={i * 0.1}>
+                    <Link to={`/news/${article.id}`} className="group block h-full">
+                      <motion.div
+                        className="h-full"
+                        whileHover={{ y: -6 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                      <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background hover:shadow-lg hover:shadow-primary/10">
                           <div className="relative h-36 overflow-hidden bg-muted">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
