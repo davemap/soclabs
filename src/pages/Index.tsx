@@ -54,7 +54,7 @@ const Index = () => {
               className="absolute inset-0 opacity-[0.18] pointer-events-none"
               style={{
                 backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(163,230,53,0.55) 62%, rgba(163,230,53,0.55) 62.3%, transparent 62.3%)",
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(96,165,250,0.55) 62%, rgba(96,165,250,0.55) 62.3%, transparent 62.3%)",
                 backgroundSize: "220px 220px, 260px 260px",
               }}
             />
