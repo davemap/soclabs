@@ -209,17 +209,17 @@ const Index = () => {
               className="absolute inset-0 opacity-[0.12] pointer-events-none"
               style={{
                 backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(163,230,53,0.55) 62%, rgba(163,230,53,0.55) 62.3%, transparent 62.3%)",
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(96,165,250,0.55) 62%, rgba(96,165,250,0.55) 62.3%, transparent 62.3%)",
                 backgroundSize: "220px 220px, 260px 260px",
               }}
             />
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
-                <div className="text-xs font-semibold tracking-[0.2em] text-[#a3e635] mb-3 uppercase">
+                <div className="text-xs font-semibold tracking-[0.2em] text-[#60a5fa] mb-3 uppercase">
                   Project Focus
                 </div>
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
-                  A community project pushing <span className="text-[#a3e635]">silicon</span> forward
+                  A community project pushing <span className="text-[#60a5fa]">silicon</span> forward
                 </h2>
               </ScrollReveal>
 
