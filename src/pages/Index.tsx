@@ -232,16 +232,16 @@ const Index = () => {
                       to={`/projects/${project.id}`}
                       className="block max-w-5xl mx-auto group"
                     >
-                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#a3e635]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#60a5fa]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
                         <div className="md:col-span-3">
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.tags.slice(0, 4).map((t) => (
-                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#a3e635]/10 text-[#a3e635] font-medium border border-[#a3e635]/20">
+                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#60a5fa]/10 text-[#60a5fa] font-medium border border-[#60a5fa]/20">
                                 {t}
                               </span>
                             ))}
                           </div>
-                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#a3e635] transition-colors">
+                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#60a5fa] transition-colors">
                             {project.title}
                           </h3>
                           <p className="text-sm text-white/60 mb-4">
@@ -250,7 +250,7 @@ const Index = () => {
                           <p className="text-base text-white/75 leading-relaxed mb-6">
                             {project.description}
                           </p>
-                          <span className="inline-flex items-center gap-2 text-sm text-[#a3e635] font-medium">
+                          <span className="inline-flex items-center gap-2 text-sm text-[#60a5fa] font-medium">
                             <Rocket className="h-4 w-4" /> View project
                             <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </span>
