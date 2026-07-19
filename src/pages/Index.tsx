@@ -137,7 +137,11 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="group block h-full">
-                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                      <motion.div
+                        whileHover={{ y: -6, scale: 1.02 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:bg-background hover:shadow-lg hover:shadow-primary/10">
                         <CardContent className="p-7">
                           <div className="mb-5 flex items-start justify-between">
                             <div>
