@@ -46,8 +46,8 @@ const Index = () => {
       <div className="relative">
         {/* Circuit backdrop that follows through the page */}
         <div className="pointer-events-none fixed inset-0 z-0">
-          <CircuitBackground className="opacity-35" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,hsl(var(--background))_100%)]" />
+          <CircuitBackground className="opacity-30" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_65%,hsl(var(--background))_100%)]" />
         </div>
 
         <ScrollProgressRail sections={railSections} />
