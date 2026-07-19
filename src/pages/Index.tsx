@@ -40,12 +40,10 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="relative -mt-16 bg-[hsl(212_44%_10%)] text-slate-100">
-        {/* Global circuit backdrop (follows the page) */}
+      <div className="relative -mt-16 bg-background text-foreground">
+        {/* Global geometric backdrop (follows the page) */}
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(212_50%_18%)_0%,hsl(212_44%_9%)_60%,hsl(212_50%_6%)_100%)]" />
-          <CircuitBackground className="opacity-70" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(212_50%_6%)_100%)]" />
+          <LightGeometricBackground />
         </div>
 
         <div className="relative z-10">
