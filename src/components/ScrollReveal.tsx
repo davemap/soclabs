@@ -28,10 +28,11 @@ const ScrollReveal = ({
       whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{
-        duration: 0.6,
+        duration: 0.7,
         delay,
-        ease: [0.21, 0.47, 0.32, 0.98],
+        ease: [0.22, 0.61, 0.36, 1],
       }}
+      style={{ willChange: "transform, opacity" }}
       className={className}
     >
       {children}
