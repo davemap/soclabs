@@ -268,11 +268,11 @@ const Index = () => {
 
           {/* Latest News */}
 
-          <section id="news" className="py-24 bg-secondary/5 border-y border-border/50">
+          <section id="news" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Latest News</h2>
-                <p className="text-muted-foreground max-w-xl mx-auto">
+                <p className="text-slate-600 max-w-xl mx-auto">
                   Stay up to date with community milestones, events, and research breakthroughs.
                 </p>
               </ScrollReveal>
@@ -332,15 +332,15 @@ const Index = () => {
           </section>
 
           {/* CTA */}
-          <section id="cta" className="py-24">
+          <section id="cta" className="py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white">
             <div className="container mx-auto px-4 text-center">
               <ScrollReveal>
-                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
-                  <h2 className="text-3xl font-display font-bold mb-4">Ready to Build Your SoC?</h2>
-                  <p className="text-muted-foreground mb-8 leading-relaxed">
+                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-white/10 bg-[#0b1c2b]/40">
+                  <h2 className="text-3xl font-display font-bold mb-4 text-white">Ready to Build Your SoC?</h2>
+                  <p className="text-white/70 mb-8 leading-relaxed">
                     Define your project, pick a reference design, and start building custom silicon today.
                   </p>
-                  <Button asChild size="lg" className="rounded-full px-8">
+                  <Button asChild size="lg" className="rounded-full px-8 bg-[#54bdde] text-[#0b1c2b] hover:bg-[#7dd3ea]">
                     <Link to="/projects/start">
                       Start a Project <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
