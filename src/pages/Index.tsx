@@ -203,7 +203,87 @@ const Index = () => {
             </div>
           </section>
 
+          {/* Project Focus */}
+          <section id="project-focus" className="relative py-24 bg-[#0b1c2b] text-white overflow-hidden border-y border-white/5">
+            <div
+              className="absolute inset-0 opacity-[0.12] pointer-events-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(163,230,53,0.55) 62%, rgba(163,230,53,0.55) 62.3%, transparent 62.3%)",
+                backgroundSize: "220px 220px, 260px 260px",
+              }}
+            />
+            <div className="container mx-auto px-4 relative">
+              <ScrollReveal className="text-center mb-12">
+                <div className="text-xs font-semibold tracking-[0.2em] text-[#a3e635] mb-3 uppercase">
+                  Project Focus
+                </div>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-white">
+                  A community project pushing <span className="text-[#a3e635]">silicon</span> forward
+                </h2>
+              </ScrollReveal>
+
+              {(() => {
+                const project = communityProjects[0];
+                if (!project) return null;
+                return (
+                  <ScrollReveal>
+                    <Link
+                      to={`/projects/${project.id}`}
+                      className="block max-w-5xl mx-auto group"
+                    >
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-[#a3e635]/40 hover:bg-white/[0.05] transition-all p-8 md:p-10 backdrop-blur-sm">
+                        <div className="md:col-span-3">
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {project.tags.slice(0, 4).map((t) => (
+                              <span key={t} className="text-[11px] px-2.5 py-1 rounded-full bg-[#a3e635]/10 text-[#a3e635] font-medium border border-[#a3e635]/20">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                          <h3 className="text-2xl md:text-3xl font-display font-bold mb-3 text-white group-hover:text-[#a3e635] transition-colors">
+                            {project.title}
+                          </h3>
+                          <p className="text-sm text-white/60 mb-4">
+                            {project.author} · {project.institution}
+                          </p>
+                          <p className="text-base text-white/75 leading-relaxed mb-6">
+                            {project.description}
+                          </p>
+                          <span className="inline-flex items-center gap-2 text-sm text-[#a3e635] font-medium">
+                            <Rocket className="h-4 w-4" /> View project
+                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                          </span>
+                        </div>
+                        <div className="md:col-span-2 grid grid-cols-2 gap-3 content-start">
+                          {[
+                            { label: "Reference SoC", value: project.referenceSoc },
+                            { label: "Technology", value: project.technology },
+                            { label: "Status", value: project.status },
+                            { label: "Published", value: new Date(project.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) },
+                          ].map((s) => (
+                            <div key={s.label} className="rounded-xl border border-white/10 bg-[#0b1c2b]/60 p-4">
+                              <div className="text-[10px] uppercase tracking-wider text-white/50 mb-1">{s.label}</div>
+                              <div className="text-sm font-semibold text-white">{s.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Link>
+                  </ScrollReveal>
+                );
+              })()}
+
+              <ScrollReveal className="text-center mt-10">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
+                  <Link to="/projects">Browse All Projects <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                </Button>
+              </ScrollReveal>
+            </div>
+          </section>
+
           {/* Latest News */}
+
           <section id="news" className="py-24 bg-secondary/5 border-y border-border/50">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
