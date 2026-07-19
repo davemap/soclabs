@@ -17,9 +17,9 @@ const mulberry32 = (a: number) => () => {
 const WIDTH = 1620;
 const HEIGHT = 2400;
 const MIN_LEN = 70;
-const MAX_LEN = 150;
+const MAX_LEN = 130;
 const EXIT_MARGIN = 60; // how far past the edge a terminal wire runs
-const MIN_VIA_SPACING = 160;
+const MIN_VIA_SPACING = 190;
 
 type Color = "blue" | "green";
 type Segment = { x1: number; y1: number; x2: number; y2: number; color: Color };
