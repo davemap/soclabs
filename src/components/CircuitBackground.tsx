@@ -17,9 +17,9 @@ const mulberry32 = (a: number) => () => {
 const WIDTH = 1620;
 const HEIGHT = 2400;
 const MIN_LEN = 70;
-const MAX_LEN = 170;
-const EXIT_MARGIN = 60; // how far past the edge a terminal wire runs
-const MIN_VIA_SPACING = 110;
+const MAX_LEN = 110;
+const EXIT_MARGIN = 20; // how far past the edge a terminal wire runs
+const MIN_VIA_SPACING = 240;
 
 type Color = "blue" | "green";
 type Segment = { x1: number; y1: number; x2: number; y2: number; color: Color };
@@ -37,7 +37,7 @@ const ANGLES: Record<Color, number[]> = {
 const CircuitBackground = ({
   className = "",
   seed = 17,
-  count = 44,
+  count = 10,
   opacity = 0.9,
 }: CircuitBackgroundProps) => {
   const { segments, vias } = useMemo(() => {
@@ -185,8 +185,8 @@ const CircuitBackground = ({
   const blue = "hsl(200 85% 78%)";
   const green = "hsl(140 55% 78%)";
   const ringStroke = "hsl(200 85% 68%)";
-  const ringFill = "hsl(200 85% 82% / 0.35)";
-  const stroke = 5;
+  const ringFill = "hsl(200 85% 82% / 0.2)";
+  const stroke = 2.8;
 
   return (
     <div
@@ -211,8 +211,8 @@ const CircuitBackground = ({
         ))}
         {vias.map((v, i) => (
           <g key={`v${i}`}>
-            <circle cx={v.x} cy={v.y} r={14} fill={ringFill} />
-            <circle cx={v.x} cy={v.y} r={14} fill="none" stroke={ringStroke} strokeWidth={3.5} />
+            <circle cx={v.x} cy={v.y} r={11} fill={ringFill} />
+            <circle cx={v.x} cy={v.y} r={11} fill="none" stroke={ringStroke} strokeWidth={2.5} />
           </g>
         ))}
       </svg>
