@@ -34,6 +34,33 @@ const articleImages: Record<string, string> = {
   "dvfs-controller-results": imgDvfs,
 };
 
+const AnimatedCounter = ({ value }: { value: number }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [display, setDisplay] = useState(0);
+  const motionValue = useMotionValue(0);
+  const spring = useSpring(motionValue, { stiffness: 60, damping: 20 });
+  const rounded = useTransform(spring, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const unsubscribe = rounded.on("change", (v) => setDisplay(v));
+    return () => unsubscribe();
+  }, [rounded]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          motionValue.set(value);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [motionValue, value]);
+
+  return <div ref={ref}>{display}</div>;
+};
 
 const Index = () => {
   const { user } = useAuth();
