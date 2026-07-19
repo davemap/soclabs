@@ -197,14 +197,6 @@ const Index = () => {
 
           {/* Project Focus */}
           <section id="project-focus" className="relative py-24 bg-[#0b1c2b] text-white overflow-hidden border-y border-white/5">
-            <div
-              className="absolute inset-0 opacity-[0.12] pointer-events-none"
-              style={{
-                backgroundImage:
-                  "linear-gradient(115deg, transparent 46%, rgba(84,189,222,0.5) 46%, rgba(84,189,222,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(84,189,222,0.55) 62%, rgba(84,189,222,0.55) 62.3%, transparent 62.3%)",
-                backgroundSize: "220px 220px, 260px 260px",
-              }}
-            />
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
                 <div className="text-xs font-semibold tracking-[0.2em] text-[#54bdde] mb-3 uppercase">
