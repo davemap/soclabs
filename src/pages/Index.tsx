@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Cpu, Users, GraduationCap, Globe, Calendar, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -64,6 +64,13 @@ const AnimatedCounter = ({ value }: { value: number }) => {
 
 const Index = () => {
   const { user } = useAuth();
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
     <Layout>
@@ -75,22 +82,21 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* ── HERO ───────────────────────────────────────────── */}
-          <section id="hero" className="relative pt-32 pb-28 md:pt-40 md:pb-36">
-            <div className="container mx-auto flex flex-col items-center text-center gap-12 px-4">
+          <section
+            id="hero"
+            ref={heroRef}
+            className="relative pt-32 pb-28 md:pt-40 md:pb-36"
+          >
+            <motion.div
+              style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }}
+              className="container mx-auto flex flex-col items-center text-center gap-12 px-4"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
                 className="max-w-4xl"
               >
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="mb-6 inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-medium tracking-wide text-primary"
-                >
-                  enabling innovation in system-on-chip development
-                </motion.div>
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
                   <span className="block">Develop your <span className="text-primary">System.</span>&nbsp;&nbsp;</span>
                   <span className="block">&nbsp; &nbsp; &nbsp;Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
@@ -118,7 +124,7 @@ const Index = () => {
                   </motion.div>
                 </div>
               </motion.div>
-            </div>
+            </motion.div>
           </section>
 
 
@@ -220,27 +226,28 @@ const Index = () => {
                     A community that takes you all the way{" "}
                     <span className="text-primary">to silicon.</span>
                   </h2>
+                </ScrollReveal>
 
-                  <div className="mt-8 space-y-6">
-                    {[
-                      {
-                        icon: GraduationCap,
-                        title: "Learn by Building",
-                        desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert support.",
-                      },
-                      {
-                        icon: Users,
-                        title: "Global Community",
-                        desc: "Connect with researchers and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                      },
-                      {
-                        icon: Globe,
-                        title: "Silicon Access",
-                        desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
-                      },
-                    ].map((item) => (
+                <div className="mt-8 space-y-6">
+                  {[
+                    {
+                      icon: GraduationCap,
+                      title: "Learn by Building",
+                      desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert support.",
+                    },
+                    {
+                      icon: Users,
+                      title: "Global Community",
+                      desc: "Connect with researchers and engineers across 28+ countries. Share knowledge, collaborate on projects.",
+                    },
+                    {
+                      icon: Globe,
+                      title: "Silicon Access",
+                      desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
+                    },
+                  ].map((item, i) => (
+                    <ScrollReveal key={item.title} delay={i * 0.12} direction="right" distance={30}>
                       <motion.div
-                        key={item.title}
                         className="flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted/50"
                         whileHover={{ x: 8 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -253,9 +260,9 @@ const Index = () => {
                           <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
                       </motion.div>
-                    ))}
-                  </div>
-                </ScrollReveal>
+                    </ScrollReveal>
+                  ))}
+                </div>
               </div>
 
               {/* Stats bar */}
