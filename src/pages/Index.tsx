@@ -56,8 +56,8 @@ const Index = () => {
                 className="max-w-4xl"
               >
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
-                  <span className="block">Develop your <span className="text-primary">System.</span></span>
-                  <span className="block">Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
+                  <span className="block">Develop your <span className="text-primary">System.</span>&nbsp;&nbsp;</span>
+                  <span className="block">&nbsp; &nbsp; &nbsp;Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
                   <span className="block">Test your <span className="text-[hsl(88_60%_45%)]">Chip.</span></span>
                 </h1>
 
