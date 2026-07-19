@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import CircuitBackground from "@/components/CircuitBackground";
+import LightGeometricBackground from "@/components/LightGeometricBackground";
 
 import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
