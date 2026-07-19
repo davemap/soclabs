@@ -226,27 +226,28 @@ const Index = () => {
                     A community that takes you all the way{" "}
                     <span className="text-primary">to silicon.</span>
                   </h2>
+                </ScrollReveal>
 
-                  <div className="mt-8 space-y-6">
-                    {[
-                      {
-                        icon: GraduationCap,
-                        title: "Learn by Building",
-                        desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert support.",
-                      },
-                      {
-                        icon: Users,
-                        title: "Global Community",
-                        desc: "Connect with researchers and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                      },
-                      {
-                        icon: Globe,
-                        title: "Silicon Access",
-                        desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
-                      },
-                    ].map((item) => (
+                <div className="mt-8 space-y-6">
+                  {[
+                    {
+                      icon: GraduationCap,
+                      title: "Learn by Building",
+                      desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert support.",
+                    },
+                    {
+                      icon: Users,
+                      title: "Global Community",
+                      desc: "Connect with researchers and engineers across 28+ countries. Share knowledge, collaborate on projects.",
+                    },
+                    {
+                      icon: Globe,
+                      title: "Silicon Access",
+                      desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
+                    },
+                  ].map((item, i) => (
+                    <ScrollReveal key={item.title} delay={i * 0.12} direction="right" distance={30}>
                       <motion.div
-                        key={item.title}
                         className="flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted/50"
                         whileHover={{ x: 8 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -259,9 +260,9 @@ const Index = () => {
                           <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
                       </motion.div>
-                    ))}
-                  </div>
-                </ScrollReveal>
+                    </ScrollReveal>
+                  ))}
+                </div>
               </div>
 
               {/* Stats bar */}
