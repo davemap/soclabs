@@ -176,9 +176,6 @@ const Index = () => {
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
-                    02 — Why Join
-                  </div>
                   <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     A community that takes you all the way{" "}
                     <span className="text-primary">to silicon.</span>
@@ -259,9 +256,6 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
-                    03 — Latest News
-                  </div>
                   <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     Milestones, events, and{" "}
                     <span className="text-primary">research breakthroughs.</span>
