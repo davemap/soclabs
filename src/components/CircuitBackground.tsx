@@ -1,122 +1,140 @@
-import { useMemo } from "react";
-
 interface CircuitBackgroundProps {
   className?: string;
-  seed?: number;
-  density?: number;
-  /** HSL color for traces & vias (defaults to the site's electric blue). */
-  color?: string;
+  /** Tile size in px */
+  tile?: number;
+  /** Stroke width of the traces */
+  strokeWidth?: number;
+  /** Overall opacity of the pattern */
+  opacity?: number;
 }
 
-const mulberry32 = (a: number) => () => {
-  let t = (a += 0x6d2b79f5);
-  t = Math.imul(t ^ (t >>> 15), t | 1);
-  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-};
-
 /**
- * Tiled circuit-trace + via pattern that lives behind the page.
- * Orthogonal segments with the occasional 45° bend, terminating in
- * ringed via nodes — mirrors the SoC Labs slide-deck backdrop.
+ * Tessellating trace pattern:
+ *  - light-blue 45° diagonal traces (with tick marks)
+ *  - light-green vertical traces
+ *  - light-blue ring at every intersection
+ * Rendered as an SVG <pattern> so it tiles cleanly across the page.
  */
 const CircuitBackground = ({
   className = "",
-  seed = 11,
-  density = 34,
-  color = "hsl(var(--electric))",
+  tile = 220,
+  strokeWidth = 6,
+  opacity = 0.55,
 }: CircuitBackgroundProps) => {
-  const paths = useMemo(() => {
-    const rand = mulberry32(seed);
-    const cell = 90;
-    const cols = 18;
-    const rows = 20;
-    const items: { d: string; nodes: [number, number][]; opacity: number }[] = [];
+  const blue = "hsl(200 85% 72%)";
+  const green = "hsl(140 60% 75%)";
+  const tickBlue = "hsl(210 80% 55%)";
 
-    for (let i = 0; i < density; i++) {
-      let x = Math.floor(rand() * cols) * cell + cell / 2;
-      let y = Math.floor(rand() * rows) * cell + cell / 2;
-      const nodes: [number, number][] = [[x, y]];
-      let d = `M ${x} ${y}`;
-      const segments = 3 + Math.floor(rand() * 5);
-      let lastDir: "h" | "v" = rand() > 0.5 ? "h" : "v";
+  // Geometry for one tile
+  const s = tile;
+  const cx = s * 0.72; // intersection x
+  const cy = s * 0.78; // intersection y
+  const diagStartX = s * 0.08;
+  const diagStartY = s * 0.14;
+  const vertTop = s * 0.02;
+  const vertBottom = s + 2; // slight overlap so tiles connect
+  const ringR = s * 0.075;
 
-      for (let s = 0; s < segments; s++) {
-        const goDiag = rand() > 0.55;
-        const len = (1 + Math.floor(rand() * 3)) * cell;
-        const dir = rand() > 0.5 ? 1 : -1;
-        if (lastDir === "h") {
-          const dy = dir * len;
-          if (goDiag) {
-            const step = Math.min(cell / 2, Math.abs(dy) / 2);
-            d += ` l ${dir * step} ${dir * step}`;
-            x += dir * step;
-            y += dir * step;
-          }
-          const remaining = dy - (goDiag ? dir * (cell / 2) : 0);
-          d += ` l 0 ${remaining}`;
-          y += remaining;
-          lastDir = "v";
-        } else {
-          const dx = dir * len;
-          if (goDiag) {
-            const step = Math.min(cell / 2, Math.abs(dx) / 2);
-            d += ` l ${dir * step} ${-dir * step}`;
-            x += dir * step;
-            y += -dir * step;
-          }
-          const remaining = dx - (goDiag ? dir * (cell / 2) : 0);
-          d += ` l ${remaining} 0`;
-          x += remaining;
-          lastDir = "h";
-        }
-        nodes.push([x, y]);
-      }
+  // Tick marks along the diagonal
+  const dx = cx - diagStartX;
+  const dy = cy - diagStartY;
+  const len = Math.hypot(dx, dy);
+  const ux = dx / len;
+  const uy = dy / len;
+  // perpendicular unit
+  const px = -uy;
+  const py = ux;
+  const tickCount = 6;
+  const tickLen = strokeWidth * 1.6;
 
-      items.push({
-        d,
-        nodes,
-        opacity: 0.35 + rand() * 0.45,
-      });
-    }
-    return items;
-  }, [seed, density]);
+  const ticks: JSX.Element[] = [];
+  for (let i = 1; i <= tickCount; i++) {
+    const t = (i / (tickCount + 1)) * len;
+    const mx = diagStartX + ux * t;
+    const my = diagStartY + uy * t;
+    ticks.push(
+      <line
+        key={`tick-${i}`}
+        x1={mx - px * tickLen}
+        y1={my - py * tickLen}
+        x2={mx + px * tickLen}
+        y2={my + py * tickLen}
+        stroke={tickBlue}
+        strokeWidth={1.4}
+        strokeLinecap="round"
+      />,
+    );
+  }
+
+  // Cluster of ticks at the start of the diagonal
+  const startCluster: JSX.Element[] = [];
+  for (let i = 0; i < 4; i++) {
+    const off = (i - 1.5) * (strokeWidth * 0.55);
+    const mx = diagStartX + ux * off;
+    const my = diagStartY + uy * off;
+    startCluster.push(
+      <line
+        key={`start-${i}`}
+        x1={mx - px * tickLen}
+        y1={my - py * tickLen}
+        x2={mx + px * tickLen}
+        y2={my + py * tickLen}
+        stroke={tickBlue}
+        strokeWidth={1.4}
+        strokeLinecap="round"
+      />,
+    );
+  }
 
   return (
     <div
       aria-hidden
       className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+      style={{ opacity }}
     >
-      <svg
-        className="h-full w-full"
-        viewBox="0 0 1620 1800"
-        preserveAspectRatio="xMidYMid slice"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {paths.map((p, i) => (
-          <g key={i} style={{ opacity: p.opacity }}>
-            <path
-              d={p.d}
-              fill="none"
-              stroke={color}
-              strokeWidth={1.1}
+      <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern
+            id="soc-traces"
+            width={s}
+            height={s}
+            patternUnits="userSpaceOnUse"
+          >
+            {/* vertical green trace */}
+            <line
+              x1={cx}
+              y1={vertTop}
+              x2={cx}
+              y2={vertBottom}
+              stroke={green}
+              strokeWidth={strokeWidth}
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
-            {p.nodes.map((n, j) => {
-              const isEnd = j === 0 || j === p.nodes.length - 1;
-              const r = isEnd ? 3.2 : 2.2;
-              return (
-                <g key={j}>
-                  {isEnd && (
-                    <circle cx={n[0]} cy={n[1]} r={r * 2.2} fill={color} opacity={0.12} />
-                  )}
-                  <circle cx={n[0]} cy={n[1]} r={r} fill="hsl(var(--background))" stroke={color} strokeWidth={1.1} />
-                </g>
-              );
-            })}
-          </g>
-        ))}
+            {/* 45° blue diagonal trace */}
+            <line
+              x1={diagStartX}
+              y1={diagStartY}
+              x2={cx}
+              y2={cy}
+              stroke={blue}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+            />
+            {/* tick marks along diagonal */}
+            {ticks}
+            {startCluster}
+            {/* intersection ring */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={ringR}
+              fill="none"
+              stroke={blue}
+              strokeWidth={strokeWidth * 0.75}
+            />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#soc-traces)" />
       </svg>
     </div>
   );
