@@ -104,15 +104,18 @@ const Index = () => {
                 </p>
 
                 <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
-                  >
-                    <Link to="/projects">
-                      Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
+                    >
+                      <Link to="/projects" className="group inline-flex items-center">
+                        Explore SoC Labs Projects
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </Button>
+                  </motion.div>
                 </div>
               </motion.div>
             </div>
