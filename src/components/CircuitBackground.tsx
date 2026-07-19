@@ -70,7 +70,7 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
       const colorRoll = rand();
       const color =
         colorRoll > 0.72
-          ? "hsl(82 55% 62%)" // lime accent
+          ? "hsl(195 80% 62%)" // lime accent
           : colorRoll > 0.42
           ? "hsl(195 78% 62%)" // cyan
           : "hsl(210 60% 55%)"; // muted electric
@@ -98,9 +98,9 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
       >
         <defs>
           <radialGradient id="via-lime" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(82 70% 70%)" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="hsl(82 70% 70%)" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="hsl(82 70% 70%)" stopOpacity="0" />
+            <stop offset="0%" stopColor="hsl(195 85% 70%)" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="hsl(195 85% 70%)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="hsl(195 85% 70%)" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="via-cyan" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="hsl(195 90% 75%)" stopOpacity="0.9" />
