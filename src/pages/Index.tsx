@@ -65,18 +65,18 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#a3e635] mb-4 uppercase">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#60a5fa] mb-4 uppercase">
                   Reference SoCs · Verification · Silicon
                 </div>
                 <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
                   Build Your Own{" "}
-                  <span className="text-[#a3e635]">System-on-Chip</span>
+                  <span className="text-[#60a5fa]">System-on-Chip</span>
                 </h1>
                 <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
-                  <Button asChild size="lg" className="rounded-full px-8 text-base bg-[#a3e635] text-[#0b1c2b] hover:bg-[#bef264]">
+                  <Button asChild size="lg" className="rounded-full px-8 text-base bg-[#60a5fa] text-[#0b1c2b] hover:bg-[#93c5fd]">
                     <Link to="/projects">
                       Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
