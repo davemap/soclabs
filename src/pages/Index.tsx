@@ -256,14 +256,19 @@ const Index = () => {
                       { label: "Countries", value: new Set(partners.map((p) => p.country).filter(Boolean)).size },
                       { label: "Projects Built", value: communityProjects.length },
                     ].map((stat) => (
-                      <div key={stat.label} className="text-center">
+                      <motion.div
+                        key={stat.label}
+                        className="text-center"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
                         <div className="font-display text-3xl md:text-4xl font-bold text-primary">
-                          {stat.value}
+                          <AnimatedCounter value={stat.value} />
                         </div>
                         <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {stat.label}
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
