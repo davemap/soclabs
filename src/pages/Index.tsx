@@ -6,13 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import CircuitBackground from "@/components/CircuitBackground";
+import LightGeometricBackground from "@/components/LightGeometricBackground";
 
 import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
 import { useAuth } from "@/hooks/useAuth";
 
-import socDie from "@/assets/home/soc-die.jpg";
 import labCommunity from "@/assets/home/lab-community.jpg";
 import wafer from "@/assets/home/wafer.jpg";
 
@@ -40,12 +39,10 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="relative -mt-16 bg-[hsl(212_44%_10%)] text-slate-100">
-        {/* Global circuit backdrop (follows the page) */}
+      <div className="relative -mt-16 bg-background text-foreground">
+        {/* Global geometric backdrop (follows the page) */}
         <div className="pointer-events-none fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(212_50%_18%)_0%,hsl(212_44%_9%)_60%,hsl(212_50%_6%)_100%)]" />
-          <CircuitBackground className="opacity-70" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(212_50%_6%)_100%)]" />
+          <LightGeometricBackground />
         </div>
 
         <div className="relative z-10">
@@ -59,12 +56,12 @@ const Index = () => {
                 className="max-w-4xl"
               >
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
-                  <span className="block">Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span></span>
-                  <span className="block">Integrate your <span className="text-[hsl(28_95%_60%)]">Accelerator.</span></span>
-                  <span className="block">Test your <span className="text-[hsl(88_65%_65%)]">Chip.</span></span>
+                  <span className="block">Develop your <span className="text-[hsl(195_85%_45%)]">System-on-Chip.</span></span>
+                  <span className="block">Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
+                  <span className="block">Test your <span className="text-[hsl(88_60%_45%)]">Chip.</span></span>
                 </h1>
 
-                <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
+                <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-muted-foreground leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, an
                   end-to-end verification flow, and a global community to create, verify,
                   and fabricate custom silicon.
@@ -74,7 +71,7 @@ const Index = () => {
                   <Button
                     asChild
                     size="lg"
-                    className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
+                    className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
                   >
                     <Link to="/projects">
                       Explore Projects <ArrowRight className="ml-2 h-4 w-4" />
@@ -84,7 +81,7 @@ const Index = () => {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="rounded-full border-white/20 bg-white/5 px-8 text-base text-slate-100 hover:bg-white/10 hover:text-white"
+                    className="rounded-full border-border bg-card px-8 text-base text-foreground hover:bg-muted hover:text-foreground"
                   >
                     <Link to="/designs">View Reference SoCs</Link>
                   </Button>
@@ -95,17 +92,17 @@ const Index = () => {
 
 
           {/* ── REFERENCE DESIGNS ─────────────────────────────── */}
-          <section id="designs" className="relative py-24 border-y border-white/5">
+          <section id="designs" className="relative py-24 border-y border-border/60">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 max-w-2xl">
-                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                   01 — Reference Designs
                 </div>
-                <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                   Start with our{" "}
-                  <span className="text-[hsl(195_85%_65%)]">proven architectures.</span>
+                  <span className="text-primary">proven architectures.</span>
                 </h2>
-                <p className="mt-4 text-slate-300/80">
+                <p className="mt-4 text-muted-foreground">
                   Fork, extend, and build your custom accelerators on top of production-tested
                   ARM Cortex-M reference SoCs.
                 </p>
@@ -115,29 +112,29 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.1} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="group block h-full">
-                      <Card className="h-full border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
+                      <Card className="h-full border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
                         <CardContent className="p-7">
                           <div className="mb-5 flex items-start justify-between">
                             <div>
-                              <h3 className="font-display text-xl font-bold text-white">{design.name}</h3>
-                              <p className="text-sm font-medium text-[hsl(195_75%_70%)]">{design.tagline}</p>
+                              <h3 className="font-display text-xl font-bold text-card-foreground">{design.name}</h3>
+                              <p className="text-sm font-medium text-primary">{design.tagline}</p>
                             </div>
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
-                              <Cpu className="h-5 w-5 text-[hsl(195_85%_70%)]" />
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                              <Cpu className="h-5 w-5 text-primary" />
                             </div>
                           </div>
-                          <p className="mb-5 line-clamp-3 text-sm text-slate-300/75">{design.description}</p>
+                          <p className="mb-5 line-clamp-3 text-sm text-muted-foreground">{design.description}</p>
                           <div className="mb-5 flex flex-wrap gap-2">
                             {design.features.slice(0, 3).map((f) => (
                               <span
                                 key={f}
-                                className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-medium text-slate-200 ring-1 ring-white/10"
+                                className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground ring-1 ring-border"
                               >
                                 {f}
                               </span>
                             ))}
                           </div>
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(195_85%_70%)]">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-primary">
                             View details{" "}
                             <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
                           </span>
@@ -153,7 +150,7 @@ const Index = () => {
                   asChild
                   variant="outline"
                   size="lg"
-                  className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                  className="rounded-full border-border bg-card px-8 text-foreground hover:bg-muted hover:text-foreground"
                 >
                   <Link to="/designs">
                     View All Reference SoCs <ArrowRight className="ml-2 h-4 w-4" />
@@ -168,7 +165,7 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <div className="grid items-center gap-12 lg:grid-cols-2">
                 <ScrollReveal direction="left">
-                  <div className="relative overflow-hidden rounded-3xl border border-white/10">
+                  <div className="relative overflow-hidden rounded-3xl border border-border shadow-sm">
                     <img
                       src={labCommunity}
                       alt="Engineers collaborating in a hardware research lab"
@@ -177,17 +174,17 @@ const Index = () => {
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_6%)]/60 via-transparent to-[hsl(195_75%_50%)]/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
                   </div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                     02 — Why Join
                   </div>
-                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     A community that takes you all the way{" "}
-                    <span className="text-[hsl(195_85%_65%)]">to silicon.</span>
+                    <span className="text-primary">to silicon.</span>
                   </h2>
 
                   <div className="mt-8 space-y-6">
@@ -209,12 +206,12 @@ const Index = () => {
                       },
                     ].map((item) => (
                       <div key={item.title} className="flex items-start gap-4">
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
-                          <item.icon className="h-5 w-5 text-[hsl(195_85%_70%)]" />
+                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                          <item.icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <div className="font-display text-lg font-semibold text-white">{item.title}</div>
-                          <div className="mt-1 text-sm leading-relaxed text-slate-300/80">{item.desc}</div>
+                          <div className="font-display text-lg font-semibold text-foreground">{item.title}</div>
+                          <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
                       </div>
                     ))}
@@ -224,7 +221,7 @@ const Index = () => {
 
               {/* Stats bar */}
               <ScrollReveal className="mt-16">
-                <div className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+                <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-sm">
                   <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
                     {[
                       { label: "Community Members", value: communityMembers.length },
@@ -233,10 +230,10 @@ const Index = () => {
                       { label: "Projects Built", value: communityProjects.length },
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
-                        <div className="font-display text-3xl md:text-4xl font-bold text-[hsl(195_85%_68%)]">
+                        <div className="font-display text-3xl md:text-4xl font-bold text-primary">
                           {stat.value}
                         </div>
-                        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {stat.label}
                         </div>
                       </div>
@@ -251,7 +248,7 @@ const Index = () => {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                    className="rounded-full border-border bg-card px-8 text-foreground hover:bg-muted hover:text-foreground"
                   >
                     <Link to="/about#join">Join the Community</Link>
                   </Button>
@@ -261,22 +258,22 @@ const Index = () => {
           </section>
 
           {/* ── LATEST NEWS ───────────────────────────────────── */}
-          <section id="news" className="relative py-24 border-y border-white/5">
+          <section id="news" className="relative py-24 border-y border-border/60">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                     03 — Latest News
                   </div>
-                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     Milestones, events, and{" "}
-                    <span className="text-[hsl(195_85%_65%)]">research breakthroughs.</span>
+                    <span className="text-primary">research breakthroughs.</span>
                   </h2>
                 </div>
                 <Button
                   asChild
                   variant="outline"
-                  className="rounded-full border-white/20 bg-white/5 text-slate-100 hover:bg-white/10 hover:text-white"
+                  className="rounded-full border-border bg-card text-foreground hover:bg-muted hover:text-foreground"
                 >
                   <Link to="/news">
                     All news <ArrowRight className="ml-2 h-4 w-4" />
@@ -291,15 +288,15 @@ const Index = () => {
                   .map((article, i) => (
                     <ScrollReveal key={article.id} delay={i * 0.1}>
                       <Link to={`/news/${article.id}`} className="group block h-full">
-                        <Card className="flex h-full flex-col overflow-hidden border-white/10 bg-white/[0.03] transition-all duration-300 hover:-translate-y-1 hover:border-[hsl(195_85%_65%)]/40 hover:bg-white/[0.06]">
-                          <div className="relative h-36 overflow-hidden bg-[hsl(212_50%_8%)]">
+                        <Card className="flex h-full flex-col overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:bg-background">
+                          <div className="relative h-36 overflow-hidden bg-muted">
                             <img
                               src={articleImages[article.id] || "/placeholder.svg"}
                               alt={article.title}
                               loading="lazy"
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[hsl(212_50%_6%)]/80 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
                           </div>
                           <CardContent className="flex flex-1 flex-col p-5">
                             <div className="mb-3 flex flex-wrap gap-1.5">
@@ -307,19 +304,19 @@ const Index = () => {
                                 <Badge
                                   key={tag}
                                   variant="secondary"
-                                  className="bg-white/5 text-[10px] text-slate-200 ring-1 ring-white/10"
+                                  className="bg-muted text-[10px] text-muted-foreground ring-1 ring-border"
                                 >
                                   {tag}
                                 </Badge>
                               ))}
                             </div>
-                            <h3 className="mb-2 line-clamp-2 font-display text-lg font-bold text-white">
+                            <h3 className="mb-2 line-clamp-2 font-display text-lg font-bold text-card-foreground">
                               {article.title}
                             </h3>
-                            <p className="mb-4 line-clamp-3 flex-1 text-sm text-slate-300/75">
+                            <p className="mb-4 line-clamp-3 flex-1 text-sm text-muted-foreground">
                               {article.summary}
                             </p>
-                            <div className="flex items-center justify-between border-t border-white/10 pt-3 text-xs text-slate-400">
+                            <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" /> {article.author}
                               </span>
@@ -345,25 +342,25 @@ const Index = () => {
           <section id="cta" className="relative py-28">
             <div className="container mx-auto px-4">
               <ScrollReveal>
-                <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/10">
+                <div className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
                   <img
                     src={wafer}
                     alt="Silicon wafer with SoC die array"
                     width={1408}
                     height={1008}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover opacity-40"
+                    className="absolute inset-0 h-full w-full object-cover opacity-20"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_8%)]/95 via-[hsl(212_50%_10%)]/85 to-[hsl(195_70%_25%)]/60" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-card/90 to-primary/5" />
                   <div className="relative px-8 py-16 text-center md:px-16 md:py-20">
-                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                    <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                       04 — Start Building
                     </div>
-                    <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-white">
+                    <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                       Ready to build your{" "}
-                      <span className="text-[hsl(195_85%_65%)]">System-on-Chip?</span>
+                      <span className="text-primary">System-on-Chip?</span>
                     </h2>
-                    <p className="mx-auto mt-5 max-w-xl text-slate-200/80">
+                    <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
                       Define your project, pick a reference design, and start building custom
                       silicon today.
                     </p>
@@ -371,7 +368,7 @@ const Index = () => {
                       <Button
                         asChild
                         size="lg"
-                        className="rounded-full bg-[hsl(195_85%_60%)] px-8 text-base text-[hsl(212_50%_10%)] hover:bg-[hsl(195_85%_65%)]"
+                        className="rounded-full bg-primary px-8 text-base text-primary-foreground hover:bg-primary/90"
                       >
                         <Link to="/projects/start">
                           Start a Project <ArrowRight className="ml-2 h-4 w-4" />
@@ -381,7 +378,7 @@ const Index = () => {
                         asChild
                         size="lg"
                         variant="outline"
-                        className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                        className="rounded-full border-border bg-background px-8 text-foreground hover:bg-muted hover:text-foreground"
                       >
                         <Link to="/learn">Explore the Learning Hub</Link>
                       </Button>
