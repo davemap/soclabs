@@ -33,7 +33,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-electric/10 bg-[hsl(var(--nav-bg)/0.95)] backdrop-blur-xl">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link to="/" className="flex items-center font-nav font-bold tracking-tight mr-6">
-          <span className="text-primary-foreground text-4xl md:text-5xl lowercase leading-none">soc labs</span>
+          <span className="text-primary-foreground text-2xl md:text-3xl lowercase leading-none">soc labs</span>
         </Link>
 
 

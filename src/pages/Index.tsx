@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
 import CircuitBackground from "@/components/CircuitBackground";
-import ScrollProgressRail from "@/components/ScrollProgressRail";
+
 import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,13 +34,6 @@ const articleImages: Record<string, string> = {
   "dvfs-controller-results": imgDvfs,
 };
 
-const railSections = [
-  { id: "hero", label: "Intro" },
-  { id: "designs", label: "Designs" },
-  { id: "why", label: "Why Join" },
-  { id: "news", label: "Latest" },
-  { id: "cta", label: "Start" },
-];
 
 const Index = () => {
   const { user } = useAuth();
@@ -55,8 +48,6 @@ const Index = () => {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,hsl(212_50%_6%)_100%)]" />
         </div>
 
-        <ScrollProgressRail sections={railSections} />
-
         <div className="relative z-10">
           {/* ── HERO ───────────────────────────────────────────── */}
           <section id="hero" className="relative pt-32 pb-28 md:pt-40 md:pb-36">
@@ -67,12 +58,10 @@ const Index = () => {
                 transition={{ duration: 0.7 }}
                 className="max-w-4xl"
               >
-                <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.05]">
-                  Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span>
-                  <br />
-                  Integrate your <span className="text-[hsl(28_95%_60%)]">Accelerator.</span>
-                  <br />
-                  Test your <span className="text-[hsl(88_65%_65%)]">Chip.</span>
+                <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
+                  <span className="block">Develop your <span className="text-[hsl(195_90%_65%)]">System-on-Chip.</span></span>
+                  <span className="block">Integrate your <span className="text-[hsl(28_95%_60%)]">Accelerator.</span></span>
+                  <span className="block">Test your <span className="text-[hsl(88_65%_65%)]">Chip.</span></span>
                 </h1>
 
                 <p className="mt-8 mx-auto max-w-xl text-base md:text-lg text-slate-300/85 leading-relaxed">
