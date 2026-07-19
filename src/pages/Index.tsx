@@ -80,11 +80,11 @@ const Index = () => {
 
 
           {/* Reference Designs */}
-          <section id="designs" className="py-24 bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white border-y border-white/5">
+          <section id="designs" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
-                <p className="text-white/70 max-w-xl mx-auto">
+                <p className="text-slate-600 max-w-xl mx-auto">
                   Start with our proven architectures. Fork, extend, and build your custom accelerators on top.
                 </p>
               </ScrollReveal>
@@ -93,26 +93,26 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="block h-full">
-                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-white/10 bg-[#0b1c2b]/40 text-white hover:border-[#54bdde]/40 cursor-pointer">
+                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-slate-900/10 bg-white/70 text-slate-900 hover:border-[#54bdde]/40 cursor-pointer">
                         <CardContent className="p-7">
                           <div className="flex items-start justify-between mb-4">
                             <div>
-                              <h3 className="text-xl font-display font-bold text-white">{design.name}</h3>
-                              <p className="text-sm text-[#54bdde] font-medium">{design.tagline}</p>
+                              <h3 className="text-xl font-display font-bold text-slate-900">{design.name}</h3>
+                              <p className="text-sm text-[#2a8aa8] font-medium">{design.tagline}</p>
                             </div>
-                            <div className="w-11 h-11 rounded-xl bg-[#54bdde]/10 flex items-center justify-center">
-                              <Cpu className="h-5 w-5 text-[#54bdde]" />
+                            <div className="w-11 h-11 rounded-xl bg-[#54bdde]/20 flex items-center justify-center">
+                              <Cpu className="h-5 w-5 text-[#2a8aa8]" />
                             </div>
                           </div>
-                          <p className="text-sm text-white/70 mb-5 line-clamp-3">{design.description}</p>
+                          <p className="text-sm text-slate-600 mb-5 line-clamp-3">{design.description}</p>
                           <div className="flex flex-wrap gap-2 mb-5">
                             {design.features.slice(0, 3).map((f) => (
-                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#54bdde] font-medium border border-[#54bdde]/20">
+                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#2a8aa8] font-medium border border-[#54bdde]/20">
                                 {f}
                               </span>
                             ))}
                           </div>
-                          <span className="text-xs text-[#54bdde] font-medium inline-flex items-center gap-1">
+                          <span className="text-xs text-[#2a8aa8] font-medium inline-flex items-center gap-1">
                             View details <ArrowRight className="h-3 w-3" />
                           </span>
                         </CardContent>
@@ -122,7 +122,7 @@ const Index = () => {
                 ))}
               </div>
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-slate-900/20 text-slate-900 hover:bg-slate-900/10 hover:text-slate-900">
                   <Link to="/designs">View All Reference SoC's <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
