@@ -19,7 +19,8 @@ const HEIGHT = 2400;
 const MIN_LEN = 70;
 const MAX_LEN = 110;
 const EXIT_MARGIN = 20; // how far past the edge a terminal wire runs
-const MIN_VIA_SPACING = 240;
+// Large minimum spacing between wires of the same colour (vias are shared by both colours).
+const MIN_VIA_SPACING = 360;
 
 type Color = "blue" | "green";
 type Segment = { x1: number; y1: number; x2: number; y2: number; color: Color };
