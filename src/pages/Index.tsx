@@ -166,7 +166,7 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <div className="grid items-center gap-12 lg:grid-cols-2">
                 <ScrollReveal direction="left">
-                  <div className="relative overflow-hidden rounded-3xl border border-white/10">
+                  <div className="relative overflow-hidden rounded-3xl border border-border shadow-sm">
                     <img
                       src={labCommunity}
                       alt="Engineers collaborating in a hardware research lab"
@@ -175,17 +175,17 @@ const Index = () => {
                       loading="lazy"
                       className="h-full w-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-[hsl(212_50%_6%)]/60 via-transparent to-[hsl(195_75%_50%)]/10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
                   </div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
-                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-[hsl(195_85%_72%)]">
+                  <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-primary">
                     02 — Why Join
                   </div>
-                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight">
+                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                     A community that takes you all the way{" "}
-                    <span className="text-[hsl(195_85%_65%)]">to silicon.</span>
+                    <span className="text-primary">to silicon.</span>
                   </h2>
 
                   <div className="mt-8 space-y-6">
@@ -207,12 +207,12 @@ const Index = () => {
                       },
                     ].map((item) => (
                       <div key={item.title} className="flex items-start gap-4">
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(195_80%_60%)]/10 ring-1 ring-[hsl(195_80%_60%)]/30">
-                          <item.icon className="h-5 w-5 text-[hsl(195_85%_70%)]" />
+                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                          <item.icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <div className="font-display text-lg font-semibold text-white">{item.title}</div>
-                          <div className="mt-1 text-sm leading-relaxed text-slate-300/80">{item.desc}</div>
+                          <div className="font-display text-lg font-semibold text-foreground">{item.title}</div>
+                          <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
                         </div>
                       </div>
                     ))}
@@ -222,7 +222,7 @@ const Index = () => {
 
               {/* Stats bar */}
               <ScrollReveal className="mt-16">
-                <div className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-sm">
+                <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-sm">
                   <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
                     {[
                       { label: "Community Members", value: communityMembers.length },
@@ -231,10 +231,10 @@ const Index = () => {
                       { label: "Projects Built", value: communityProjects.length },
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
-                        <div className="font-display text-3xl md:text-4xl font-bold text-[hsl(195_85%_68%)]">
+                        <div className="font-display text-3xl md:text-4xl font-bold text-primary">
                           {stat.value}
                         </div>
-                        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                           {stat.label}
                         </div>
                       </div>
@@ -249,7 +249,7 @@ const Index = () => {
                     asChild
                     size="lg"
                     variant="outline"
-                    className="rounded-full border-white/20 bg-white/5 px-8 text-slate-100 hover:bg-white/10 hover:text-white"
+                    className="rounded-full border-border bg-card px-8 text-foreground hover:bg-muted hover:text-foreground"
                   >
                     <Link to="/about#join">Join the Community</Link>
                   </Button>
