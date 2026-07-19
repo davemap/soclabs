@@ -12,7 +12,6 @@ import { referenceDesigns, communityMembers, communityProjects, partners } from 
 import { newsArticles } from "@/data/newsData";
 import { useAuth } from "@/hooks/useAuth";
 
-import socDie from "@/assets/home/soc-die.jpg";
 import labCommunity from "@/assets/home/lab-community.jpg";
 import wafer from "@/assets/home/wafer.jpg";
 
