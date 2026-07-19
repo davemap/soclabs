@@ -198,7 +198,11 @@ const Index = () => {
             <div className="container mx-auto px-4">
               <div className="grid items-center gap-12 lg:grid-cols-2">
                 <ScrollReveal direction="left">
-                  <div className="relative overflow-hidden rounded-3xl border border-border shadow-sm">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                    className="relative overflow-hidden rounded-3xl border border-border shadow-sm"
+                  >
                     <img
                       src={labCommunity}
                       alt="Engineers collaborating in a hardware research lab"
@@ -208,7 +212,7 @@ const Index = () => {
                       className="h-full w-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
-                  </div>
+                  </motion.div>
                 </ScrollReveal>
 
                 <ScrollReveal direction="right">
