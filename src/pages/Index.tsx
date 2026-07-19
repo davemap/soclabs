@@ -196,7 +196,7 @@ const Index = () => {
           </section>
 
           {/* Project Focus */}
-          <section id="project-focus" className="relative py-24 bg-gradient-to-b from-[#e8f7fa] to-[#d4eef5] text-slate-900 overflow-hidden border-y border-white/5">
+          <section id="project-focus" className="relative py-24 bg-gradient-to-b from-[#b8e3ee] to-[#d4eef5] text-slate-900 overflow-hidden border-y border-slate-900/5">
             <div className="container mx-auto px-4 relative">
               <ScrollReveal className="text-center mb-12">
                 <div className="text-xs font-semibold tracking-[0.2em] text-[#2a8aa8] mb-3 uppercase">
@@ -216,7 +216,7 @@ const Index = () => {
                       to={`/projects/${project.id}`}
                       className="block max-w-5xl mx-auto group"
                     >
-                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-slate-900/10 bg-white/60 hover:border-[#54bdde]/40 hover:bg-white/80 transition-all p-8 md:p-10 backdrop-blur-sm">
+                      <div className="grid md:grid-cols-5 gap-8 rounded-2xl border border-slate-900/10 bg-white/70 hover:border-[#54bdde]/40 hover:bg-white/90 transition-all p-8 md:p-10 backdrop-blur-sm">
                         <div className="md:col-span-3">
                           <div className="flex flex-wrap gap-2 mb-4">
                             {project.tags.slice(0, 4).map((t) => (
@@ -246,7 +246,7 @@ const Index = () => {
                             { label: "Status", value: project.status },
                             { label: "Published", value: new Date(project.date).toLocaleDateString("en-GB", { month: "short", year: "numeric" }) },
                           ].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-slate-900/10 bg-[#c4e8f1]/60 p-4">
+                            <div key={s.label} className="rounded-xl border border-slate-900/10 bg-white/70 p-4">
                               <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">{s.label}</div>
                               <div className="text-sm font-semibold text-slate-900">{s.value}</div>
                             </div>
