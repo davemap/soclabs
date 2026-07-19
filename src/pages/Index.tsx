@@ -169,6 +169,7 @@ const Index = () => {
                           </span>
                         </CardContent>
                       </Card>
+                      </motion.div>
                     </Link>
                   </ScrollReveal>
                 ))}
