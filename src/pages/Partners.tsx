@@ -226,8 +226,8 @@ const Partners = () => {
                       >
                         <circle
                           r={r}
-                          fill={partner.type === "academic" ? "hsl(210, 100%, 60%)" : "hsl(15, 85%, 62%)"}
-                          stroke={highlightedOrg === partner.id ? "hsl(0, 0%, 100%)" : partner.type === "academic" ? "hsl(210, 100%, 80%)" : "hsl(15, 85%, 80%)"}
+                          fill={partner.type === "academic" ? "hsl(195, 85%, 55%)" : "hsl(15, 85%, 62%)"}
+                          stroke={highlightedOrg === partner.id ? "hsl(0, 0%, 100%)" : partner.type === "academic" ? "hsl(195, 85%, 80%)" : "hsl(15, 85%, 80%)"}
                           strokeWidth={sw}
                           opacity={0.9}
                         />
@@ -241,7 +241,7 @@ const Partners = () => {
               {/* Legend */}
               <div className="absolute top-3 left-3 flex gap-3">
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[hsl(210,100%,60%)]" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-[hsl(195,85%,55%)]" />
                   Academic
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
