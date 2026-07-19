@@ -332,12 +332,12 @@ const Index = () => {
           </section>
 
           {/* CTA */}
-          <section id="cta" className="py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white">
+          <section id="cta" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900">
             <div className="container mx-auto px-4 text-center">
               <ScrollReveal>
-                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-white/10 bg-[#0b1c2b]/40">
-                  <h2 className="text-3xl font-display font-bold mb-4 text-white">Ready to Build Your SoC?</h2>
-                  <p className="text-white/70 mb-8 leading-relaxed">
+                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-slate-900/10 bg-white/70">
+                  <h2 className="text-3xl font-display font-bold mb-4 text-slate-900">Ready to Build Your SoC?</h2>
+                  <p className="text-slate-600 mb-8 leading-relaxed">
                     Define your project, pick a reference design, and start building custom silicon today.
                   </p>
                   <Button asChild size="lg" className="rounded-full px-8 bg-[#54bdde] text-[#0b1c2b] hover:bg-[#7dd3ea]">
