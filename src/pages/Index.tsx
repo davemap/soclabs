@@ -49,7 +49,7 @@ const Index = () => {
 
         <div className="relative z-10">
           {/* Hero */}
-          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#e8f7fa] to-[#d4eef5] text-slate-900">
+          <section id="hero" className="relative overflow-hidden bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900">
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -80,11 +80,11 @@ const Index = () => {
 
 
           {/* Reference Designs */}
-          <section id="designs" className="py-24 bg-secondary/5 border-y border-border/50">
+          <section id="designs" className="py-24 bg-gradient-to-b from-[#0b1c2b] to-[#153447] text-white border-y border-white/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Reference SoC Designs</h2>
-                <p className="text-muted-foreground max-w-xl mx-auto">
+                <p className="text-white/70 max-w-xl mx-auto">
                   Start with our proven architectures. Fork, extend, and build your custom accelerators on top.
                 </p>
               </ScrollReveal>
@@ -93,26 +93,26 @@ const Index = () => {
                 {referenceDesigns.slice(0, 3).map((design, i) => (
                   <ScrollReveal key={design.id} delay={i * 0.12} direction={i % 2 === 0 ? "left" : "right"}>
                     <Link to={`/designs/${design.id}`} className="block h-full">
-                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-border/60 hover:border-electric/30 cursor-pointer">
+                      <Card className="h-full hover:shadow-xl hover:shadow-electric/5 hover:-translate-y-1 transition-all duration-300 border-white/10 bg-[#0b1c2b]/40 text-white hover:border-[#54bdde]/40 cursor-pointer">
                         <CardContent className="p-7">
                           <div className="flex items-start justify-between mb-4">
                             <div>
-                              <h3 className="text-xl font-display font-bold">{design.name}</h3>
-                              <p className="text-sm text-primary font-medium">{design.tagline}</p>
+                              <h3 className="text-xl font-display font-bold text-white">{design.name}</h3>
+                              <p className="text-sm text-[#54bdde] font-medium">{design.tagline}</p>
                             </div>
-                            <div className="w-11 h-11 rounded-xl bg-electric/10 flex items-center justify-center">
-                              <Cpu className="h-5 w-5 text-electric" />
+                            <div className="w-11 h-11 rounded-xl bg-[#54bdde]/10 flex items-center justify-center">
+                              <Cpu className="h-5 w-5 text-[#54bdde]" />
                             </div>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-5 line-clamp-3">{design.description}</p>
+                          <p className="text-sm text-white/70 mb-5 line-clamp-3">{design.description}</p>
                           <div className="flex flex-wrap gap-2 mb-5">
                             {design.features.slice(0, 3).map((f) => (
-                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                              <span key={f} className="text-xs px-2.5 py-1 rounded-full bg-[#54bdde]/10 text-[#54bdde] font-medium border border-[#54bdde]/20">
                                 {f}
                               </span>
                             ))}
                           </div>
-                          <span className="text-xs text-primary font-medium inline-flex items-center gap-1">
+                          <span className="text-xs text-[#54bdde] font-medium inline-flex items-center gap-1">
                             View details <ArrowRight className="h-3 w-3" />
                           </span>
                         </CardContent>
@@ -122,7 +122,7 @@ const Index = () => {
                 ))}
               </div>
               <ScrollReveal className="text-center mt-10">
-                <Button asChild variant="outline" size="lg" className="rounded-full px-8">
+                <Button asChild variant="outline" size="lg" className="rounded-full px-8 border-white/20 text-white hover:bg-white/10 hover:text-white">
                   <Link to="/designs">View All Reference SoC's <ArrowRight className="ml-2 h-4 w-4" /></Link>
                 </Button>
               </ScrollReveal>
@@ -130,7 +130,7 @@ const Index = () => {
           </section>
 
           {/* Why Join */}
-          <section id="why" className="relative py-24 bg-muted/40 accent-stripe border-y border-border">
+          <section id="why" className="relative py-24 bg-gradient-to-b from-[#b8e3ee] to-[#d4eef5] text-slate-900 border-y border-slate-900/5">
             <div className="container mx-auto px-4">
               <ScrollReveal>
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-14">Why Join SoC Labs?</h2>
@@ -141,19 +141,19 @@ const Index = () => {
                     icon: GraduationCap,
                     title: "Learn by Building",
                     desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert community support.",
-                    color: "bg-primary/10 text-primary",
+                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
                   },
                   {
                     icon: Users,
                     title: "Global Community",
                     desc: "Connect with researchers, students, and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                    color: "bg-coral/10 text-coral",
+                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
                   },
                   {
                     icon: Globe,
                     title: "Silicon Access",
                     desc: "Access ASIC shuttle programmes and FPGA platforms to take your designs from simulation to real hardware.",
-                    color: "bg-violet/10 text-violet",
+                    color: "bg-[#54bdde]/10 text-[#2a8aa8]",
                   },
                 ].map((item, i) => (
                   <ScrollReveal key={item.title} delay={i * 0.12}>
@@ -162,14 +162,14 @@ const Index = () => {
                         <item.icon className="h-6 w-6" />
                       </div>
                       <h3 className="font-display font-bold text-lg mb-2">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                      <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                     </div>
                   </ScrollReveal>
                 ))}
               </div>
 
               <ScrollReveal className="mt-16">
-                <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-background/80 backdrop-blur-sm shadow-lg p-6">
+                <div className="max-w-3xl mx-auto rounded-2xl border border-slate-900/10 bg-white/70 backdrop-blur-sm shadow-lg p-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[
                       { label: "Community Members", value: communityMembers.length },
@@ -179,7 +179,7 @@ const Index = () => {
                     ].map((stat) => (
                       <div key={stat.label} className="text-center">
                         <div className="text-3xl md:text-4xl font-display font-bold text-gradient">{stat.value}</div>
-                        <div className="text-xs text-muted-foreground mt-1 font-medium">{stat.label}</div>
+                        <div className="text-xs text-slate-600 mt-1 font-medium">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -268,11 +268,11 @@ const Index = () => {
 
           {/* Latest News */}
 
-          <section id="news" className="py-24 bg-secondary/5 border-y border-border/50">
+          <section id="news" className="py-24 bg-gradient-to-b from-[#d4eef5] to-[#b8e3ee] text-slate-900 border-y border-slate-900/5">
             <div className="container mx-auto px-4">
               <ScrollReveal className="text-center mb-14">
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">Latest News</h2>
-                <p className="text-muted-foreground max-w-xl mx-auto">
+                <p className="text-slate-600 max-w-xl mx-auto">
                   Stay up to date with community milestones, events, and research breakthroughs.
                 </p>
               </ScrollReveal>
@@ -332,15 +332,15 @@ const Index = () => {
           </section>
 
           {/* CTA */}
-          <section id="cta" className="py-24">
+          <section id="cta" className="py-24 bg-gradient-to-b from-[#153447] to-[#0b1c2b] text-white">
             <div className="container mx-auto px-4 text-center">
               <ScrollReveal>
-                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 via-transparent to-violet/5">
-                  <h2 className="text-3xl font-display font-bold mb-4">Ready to Build Your SoC?</h2>
-                  <p className="text-muted-foreground mb-8 leading-relaxed">
+                <div className="max-w-xl mx-auto p-10 rounded-2xl border border-white/10 bg-[#0b1c2b]/40">
+                  <h2 className="text-3xl font-display font-bold mb-4 text-white">Ready to Build Your SoC?</h2>
+                  <p className="text-white/70 mb-8 leading-relaxed">
                     Define your project, pick a reference design, and start building custom silicon today.
                   </p>
-                  <Button asChild size="lg" className="rounded-full px-8">
+                  <Button asChild size="lg" className="rounded-full px-8 bg-[#54bdde] text-[#0b1c2b] hover:bg-[#7dd3ea]">
                     <Link to="/projects/start">
                       Start a Project <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
