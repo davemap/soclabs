@@ -85,8 +85,8 @@ const CircuitBackground = ({
       if (placed >= count) break;
       if (tooClose(anchor.x, anchor.y)) continue;
 
-      // 60% single via chains (short), 40% two-via chains (still short).
-      const interiorVias = rand() > 0.6 ? 2 : 1;
+      // Mostly single-via chains for lots of short wires.
+      const interiorVias = rand() > 0.82 ? 2 : 1;
       const viaPositions: Via[] = [{ x: anchor.x, y: anchor.y }];
 
       // Pick the colour of the FIRST internal segment (between via0 and via1
