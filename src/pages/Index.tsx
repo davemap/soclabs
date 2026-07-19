@@ -83,6 +83,14 @@ const Index = () => {
                 transition={{ duration: 0.7 }}
                 className="max-w-4xl"
               >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5 }}
+                  className="mb-6 inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-medium tracking-wide text-primary"
+                >
+                  enabling innovation in system-on-chip development
+                </motion.div>
                 <h1 className="font-display font-bold tracking-tight text-4xl md:text-6xl lg:text-7xl leading-[1.15] space-y-4">
                   <span className="block">Develop your <span className="text-primary">System.</span>&nbsp;&nbsp;</span>
                   <span className="block">&nbsp; &nbsp; &nbsp;Integrate your <span className="text-[hsl(28_95%_50%)]">Accelerator.</span></span>
