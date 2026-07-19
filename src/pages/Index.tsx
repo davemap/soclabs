@@ -202,71 +202,54 @@ const Index = () => {
           {/* ── WHY JOIN ──────────────────────────────────────── */}
           <section id="why" className="relative py-24">
             <div className="container mx-auto px-4">
-              <div className="grid items-center gap-12 lg:grid-cols-2">
-                <ScrollReveal direction="left">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                    className="relative overflow-hidden rounded-3xl border border-border shadow-sm"
-                  >
-                    <img
-                      src={labCommunity}
-                      alt="Engineers collaborating in a hardware research lab"
-                      width={1600}
-                      height={1008}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
-                  </motion.div>
-                </ScrollReveal>
+              <ScrollReveal className="mb-10 text-center">
+                <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
+                  Why join <span className="text-primary">SoC Labs?</span>
+                </h2>
+              </ScrollReveal>
 
-                <ScrollReveal direction="right">
-                  <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
-                    A community that takes you all the way{" "}
-                    <span className="text-primary">to silicon.</span>
-                  </h2>
-                </ScrollReveal>
+              <ScrollReveal>
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                  className="relative mx-auto mb-10 max-w-5xl overflow-hidden rounded-3xl border border-border shadow-sm"
+                >
+                  <img
+                    src={labCommunity}
+                    alt="Engineers collaborating in a hardware research lab"
+                    width={1600}
+                    height={1008}
+                    loading="lazy"
+                    className="h-64 w-full object-cover md:h-80"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-electric/10" />
+                </motion.div>
+              </ScrollReveal>
 
-                <div className="mt-8 space-y-6">
-                  {[
-                    {
-                      icon: GraduationCap,
-                      title: "Learn by Building",
-                      desc: "Go from RTL to FPGA to ASIC with real reference designs, guided tutorials, and expert support.",
-                    },
-                    {
-                      icon: Users,
-                      title: "Global Community",
-                      desc: "Connect with researchers and engineers across 28+ countries. Share knowledge, collaborate on projects.",
-                    },
-                    {
-                      icon: Globe,
-                      title: "Silicon Access",
-                      desc: "Access ASIC shuttle programmes and FPGA platforms to take designs from simulation to real hardware.",
-                    },
-                  ].map((item, i) => (
-                    <ScrollReveal key={item.title} delay={i * 0.12} direction="right" distance={30}>
-                      <motion.div
-                        className="flex items-start gap-4 rounded-xl p-3 transition-colors hover:bg-muted/50"
-                        whileHover={{ x: 8 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      >
-                        <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30 transition-colors group-hover:bg-primary/20">
-                          <item.icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <div className="font-display text-lg font-semibold text-foreground">{item.title}</div>
-                          <div className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.desc}</div>
-                        </div>
-                      </motion.div>
-                    </ScrollReveal>
-                  ))}
-                </div>
+              <div className="mx-auto grid max-w-5xl gap-4 md:grid-cols-3">
+                {[
+                  { icon: GraduationCap, title: "Learn by building", desc: "RTL to FPGA to ASIC with real designs and guided support." },
+                  { icon: Users, title: "Global community", desc: "Connect with researchers and engineers across 28+ countries." },
+                  { icon: Globe, title: "Silicon access", desc: "ASIC shuttles and FPGA platforms to take ideas to hardware." },
+                ].map((item, i) => (
+                  <ScrollReveal key={item.title} delay={i * 0.1}>
+                    <motion.div
+                      className="h-full rounded-2xl border border-border bg-card p-5 text-center shadow-sm transition-colors hover:bg-muted/50"
+                      whileHover={{ y: -4 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/30">
+                        <item.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="font-display text-base font-semibold text-foreground">{item.title}</div>
+                      <div className="mt-1 text-sm text-muted-foreground">{item.desc}</div>
+                    </motion.div>
+                  </ScrollReveal>
+                ))}
               </div>
 
               {/* Stats bar */}
-              <ScrollReveal className="mt-16">
+              <ScrollReveal className="mt-12">
                 <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-6 shadow-sm">
                   <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
                     {[
@@ -294,7 +277,7 @@ const Index = () => {
               </ScrollReveal>
 
               {!user && (
-                <ScrollReveal className="mt-12 text-center">
+                <ScrollReveal className="mt-10 text-center">
                   <Button
                     asChild
                     size="lg"
