@@ -70,10 +70,10 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
       const colorRoll = rand();
       const color =
         colorRoll > 0.72
-          ? "hsl(195 80% 62%)" // lime accent
+          ? "hsl(195 85% 55%)" // bright accent
           : colorRoll > 0.42
-          ? "hsl(195 78% 62%)" // cyan
-          : "hsl(210 60% 55%)"; // muted electric
+          ? "hsl(195 85% 60%)" // cyan
+          : "hsl(195 75% 50%)"; // muted primary
 
       items.push({
         d,
@@ -98,14 +98,14 @@ const CircuitBackground = ({ className = "", seed = 7, density = 26 }: CircuitBa
       >
         <defs>
           <radialGradient id="via-lime" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="hsl(195 85% 65%)" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="hsl(195 85% 65%)" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="hsl(195 85% 65%)" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="via-cyan" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="hsl(195 85% 70%)" stopOpacity="0.9" />
             <stop offset="60%" stopColor="hsl(195 85% 70%)" stopOpacity="0.15" />
             <stop offset="100%" stopColor="hsl(195 85% 70%)" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="via-cyan" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="hsl(195 90% 75%)" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="hsl(195 90% 75%)" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="hsl(195 90% 75%)" stopOpacity="0" />
           </radialGradient>
           <filter id="glow-soft" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="1.6" />

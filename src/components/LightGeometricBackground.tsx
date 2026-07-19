@@ -15,8 +15,8 @@ const LightGeometricBackground = ({ className = "" }: LightGeometricBackgroundPr
     >
       {/* Soft ambient blobs */}
       <div className="absolute inset-0 opacity-40">
-        <div className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-[hsl(195_70%_85%)] blur-[120px]" />
-        <div className="absolute -bottom-[10%] -right-[10%] h-[50%] w-[50%] rounded-full bg-[hsl(210_60%_90%)] blur-[120px]" />
+        <div className="absolute -top-[10%] -left-[10%] h-[50%] w-[50%] rounded-full bg-[hsl(195_85%_85%)] blur-[120px]" />
+        <div className="absolute -bottom-[10%] -right-[10%] h-[50%] w-[50%] rounded-full bg-[hsl(195_75%_90%)] blur-[120px]" />
       </div>
 
       {/* Faint dot grid */}

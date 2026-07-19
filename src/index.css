@@ -21,7 +21,7 @@
     --popover: 214 31% 91%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 200 98% 39%;
+    --primary: 195 85% 45%;
     --primary-foreground: 204 100% 97%;
 
     --secondary: 215 24% 26%;
@@ -38,7 +38,7 @@
 
     --border: 212 26% 83%;
     --input: 212 26% 83%;
-    --ring: 200 98% 39%;
+    --ring: 195 85% 45%;
 
     --nav-bg: 208 57% 14%;
 
@@ -50,19 +50,19 @@
     --violet-foreground: 0 0% 100%;
     --amber: 38 92% 58%;
     --amber-foreground: 38 92% 10%;
-    --electric: 210 100% 60%;
+    --electric: 195 85% 55%;
     --electric-foreground: 0 0% 100%;
 
     --sidebar-background: 208 57% 11%;
     --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 200 98% 39%;
+    --sidebar-primary: 195 85% 45%;
     --sidebar-primary-foreground: 204 100% 97%;
     --sidebar-accent: 215 24% 26%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 212 26% 83%;
     --sidebar-ring: 200 98% 39%;
-    --chart-1: 198 93% 59%;
-    --chart-2: 213 93% 67%;
+    --chart-1: 195 85% 55%;
+    --chart-2: 195 85% 65%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
@@ -88,7 +88,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 215 24% 26%;
     --popover-foreground: 210 40% 98%;
-    --primary: 198 93% 59%;
+    --primary: 195 85% 60%;
     --primary-foreground: 204 80% 15%;
     --secondary: 212 26% 83%;
     --secondary-foreground: 228 84% 4%;
@@ -100,15 +100,15 @@
     --destructive-foreground: 0 85% 97%;
     --border: 215 19% 34%;
     --input: 215 19% 34%;
-    --ring: 198 93% 59%;
-    --chart-1: 199 95% 73%;
-    --chart-2: 211 96% 78%;
+    --ring: 195 85% 60%;
+    --chart-1: 195 85% 65%;
+    --chart-2: 195 85% 75%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
     --sidebar: 217 32% 17%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 198 93% 59%;
+    --sidebar-primary: 195 85% 60%;
     --sidebar-primary-foreground: 204 80% 15%;
     --sidebar-accent: 215 20% 65%;
     --sidebar-accent-foreground: 228 84% 4%;
@@ -142,7 +142,7 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(210 100% 60%), hsl(168 75% 50%));
+    background-image: linear-gradient(135deg, hsl(195 85% 55%), hsl(168 75% 50%));
   }
 
   .text-gradient-warm {
@@ -152,18 +152,18 @@
 
   .text-gradient-electric {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(210 100% 60%), hsl(260 55% 68%));
+    background-image: linear-gradient(135deg, hsl(195 85% 55%), hsl(260 55% 68%));
   }
 
   .bg-gradient-hero {
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210 100% 60% / 0.12), transparent),
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(195 85% 55% / 0.12), transparent),
       radial-gradient(ellipse 60% 40% at 80% 50%, hsl(168 75% 44% / 0.1), transparent),
       radial-gradient(ellipse 50% 30% at 20% 80%, hsl(260 55% 68% / 0.06), transparent);
   }
 
   .mesh-dots {
-    background-image: radial-gradient(circle, hsl(210 100% 60% / 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(circle, hsl(195 85% 55% / 0.08) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
