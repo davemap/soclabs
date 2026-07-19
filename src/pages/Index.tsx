@@ -1,12 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Cpu, Users, GraduationCap, Globe, Calendar, User } from "lucide-react";
+import { ArrowRight, Cpu, Users, GraduationCap, Globe, Calendar, User, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Layout from "@/components/Layout";
 import ScrollReveal from "@/components/ScrollReveal";
-import CircuitBackground from "@/components/CircuitBackground";
 import ScrollProgressRail from "@/components/ScrollProgressRail";
 import { referenceDesigns, communityMembers, communityProjects, partners } from "@/data/mockData";
 import { newsArticles } from "@/data/newsData";
@@ -34,9 +33,11 @@ const railSections = [
   { id: "hero", label: "Intro" },
   { id: "designs", label: "Designs" },
   { id: "why", label: "Why Join" },
+  { id: "project-focus", label: "Project Focus" },
   { id: "news", label: "Latest" },
   { id: "cta", label: "Start" },
 ];
+
 
 const Index = () => {
   const { user } = useAuth();
