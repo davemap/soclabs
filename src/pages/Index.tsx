@@ -95,7 +95,6 @@ const Index = () => {
           <section id="designs" className="relative py-24 border-y border-border/60">
             <div className="container mx-auto px-4">
               <ScrollReveal className="mb-14 max-w-2xl">
-                <div>
                 <h2 className="font-display text-3xl md:text-5xl font-bold leading-tight text-foreground">
                   Start with our{" "}
                   <span className="text-primary">proven architectures.</span>
