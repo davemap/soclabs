@@ -45,17 +45,19 @@ const Index = () => {
   return (
     <Layout>
       <div className="relative">
-        {/* Circuit backdrop that follows through the page */}
-        <div className="pointer-events-none fixed inset-0 z-0">
-          <CircuitBackground className="opacity-30" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_65%,hsl(var(--background))_100%)]" />
-        </div>
-
         <ScrollProgressRail sections={railSections} />
 
         <div className="relative z-10">
           {/* Hero */}
-          <section id="hero" className="relative overflow-hidden bg-gradient-hero mesh-dots">
+          <section id="hero" className="relative overflow-hidden bg-[#0b1c2b] text-white">
+            <div
+              className="absolute inset-0 opacity-[0.18] pointer-events-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(115deg, transparent 46%, rgba(147,197,253,0.5) 46%, rgba(147,197,253,0.5) 46.4%, transparent 46.4%), linear-gradient(0deg, transparent 62%, rgba(163,230,53,0.55) 62%, rgba(163,230,53,0.55) 62.3%, transparent 62.3%)",
+                backgroundSize: "220px 220px, 260px 260px",
+              }}
+            />
             <div className="container mx-auto px-4 py-28 md:py-40 relative">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -63,15 +65,18 @@ const Index = () => {
                 transition={{ duration: 0.6 }}
                 className="max-w-3xl mx-auto text-center"
               >
-                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1]">
+                <div className="text-xs md:text-sm font-semibold tracking-[0.2em] text-[#a3e635] mb-4 uppercase">
+                  Reference SoCs · Verification · Silicon
+                </div>
+                <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1] text-white">
                   Build Your Own{" "}
-                  <span className="text-gradient">System-on-Chip</span>
+                  <span className="text-[#a3e635]">System-on-Chip</span>
                 </h1>
-                <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto leading-relaxed">
                   SoC Labs gives academics and students reference ARM Cortex-M designs, tools, and a global community to create, verify, and fabricate custom silicon.
                 </p>
                 <div className="flex justify-center">
-                  <Button asChild size="lg" className="rounded-full px-8 text-base">
+                  <Button asChild size="lg" className="rounded-full px-8 text-base bg-[#a3e635] text-[#0b1c2b] hover:bg-[#bef264]">
                     <Link to="/projects">
                       Explore SoC Labs Projects <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
@@ -80,6 +85,7 @@ const Index = () => {
               </motion.div>
             </div>
           </section>
+
 
           {/* Reference Designs */}
           <section id="designs" className="py-24 bg-secondary/5 border-y border-border/50">
